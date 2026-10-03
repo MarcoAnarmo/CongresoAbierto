@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#16181d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <title>Congreso Abierto</title>
+  <path d="M15 18 7.5 37M15 18l7.5 19M49 18l-7.5 19M49 18l7.5 19"/>
+  <path d="M6 37h18a9 7.5 0 0 1-18 0zM40 37h18a9 7.5 0 0 1-18 0z" fill="#f7a04b"/>
+  <path d="M4.5 15.5c3.5 2 7.5 2.8 10.5 2.5 4.5-.5 8.5-3.5 13-3.6M59.5 15.5c-3.5 2-7.5 2.8-10.5 2.5-4.5-.5-8.5-3.5-13-3.6"/>
+  <rect x="17" y="55.5" width="30" height="5.5" rx="2.4" fill="#f7a04b"/>
+  <rect x="21.5" y="51" width="21" height="5" rx="2.2" fill="#e2852f"/>
+  <rect x="29" y="4" width="6" height="48" rx="3" fill="#f7a04b"/>
+  <circle cx="32" cy="15" r="5.2" fill="#ffd36e"/>
+  <circle cx="15" cy="18" r="2.4" fill="#f7a04b"/>
+  <circle cx="49" cy="18" r="2.4" fill="#f7a04b"/>
+</svg>
