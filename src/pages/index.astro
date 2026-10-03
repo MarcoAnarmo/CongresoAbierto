@@ -15,7 +15,7 @@ const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.
   <h1>¿Quién te representa y qué tiene?</h1>
   <p class="lead">
     Los 350 diputados del Congreso: lo que cobran, las propiedades y vehículos que ellos mismos declaran y cómo votan.
-    Solo datos oficiales, sin interpretaciones, cada uno con un enlace a su documento original.
+    Solo datos oficiales, sin interpretaciones, cada uno con un enlace a su documento original. Para que juzgues con criterio.
   </p>
 
   <Hemiciclo />
@@ -59,7 +59,8 @@ const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.
     .tabla-grupos .corto { display: inline; } .tabla-grupos .largo { display: none; }
     .tabla-grupos th, .tabla-grupos td { padding-left: 6px; padding-right: 6px; }
     .tabla-grupos thead th { font-size: .7rem; letter-spacing: .01em; }
-    .tabla-grupos th:first-child, .tabla-grupos td:first-child { padding-left: 12px; }
+    .tabla-grupos th:first-child, .tabla-grupos td:first-child { padding-left: 14px; }
+    .tabla-grupos th:last-child, .tabla-grupos td:last-child { padding-right: 14px; }
   }
   .tabla-grupos th[scope='row'] { text-transform: none; letter-spacing: 0; font-size: .95rem; color: var(--text); font-weight: 650; }
 </style>

@@ -19,7 +19,7 @@ const columnas = [
   <h1>Ranking</h1>
   <p class="lead">
     Propiedades, viviendas y vehículos que cada diputado declara en su declaración de bienes oficial más reciente, y lo que cobra al mes del Congreso.
-    Toca un encabezado para ordenar.
+    Puedes ordenar por cualquier columna y filtrar por nombre, partido, provincia o grupo.
   </p>
 
   <h2>Por grupo parlamentario</h2>
@@ -47,6 +47,14 @@ const columnas = [
       <option value="">Todos los grupos</option>
       {grupos.map((g) => <option value={g.corto}>{g.corto}</option>)}
     </select>
+    <label class="sr-only" for="f-orden">Ordenar por</label>
+    <select id="f-orden" class="orden-movil">
+      <option value="pr">Más propiedades</option>
+      <option value="v">Más viviendas</option>
+      <option value="co">Más vehículos</option>
+      <option value="r">Mayor retribución</option>
+      <option value="n">Nombre (A–Z)</option>
+    </select>
     <span class="small muted" id="f-cuenta" aria-live="polite"></span>
   </div>
 
@@ -73,10 +81,10 @@ const columnas = [
               <a href={url(`/diputado/${slug(d)}`)}>{d.nombreCompleto}</a>{d.patrimonio.revisar && <span title="Ficha con alguna lectura dudosa en el PDF oficial" class="aviso">*</span>}
               <span class="sub"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span> {etiquetaPartido(d)} · {d.circunscripcion}</span>
             </td>
-            <td class="num"><strong>{d.patrimonio.propiedades ?? '—'}</strong></td>
-            <td class="num">{d.patrimonio.viviendas ?? '—'}</td>
-            <td class="num">{d.patrimonio.vehiculos ?? '—'}</td>
-            <td class="num">{fmtNum(Math.round(d.retribucion.totalMensual))}<span class="eur">&nbsp;€</span></td>
+            <td class="num dato" data-k="pr" data-label="Propiedades" data-corto="Prop."><strong>{d.patrimonio.propiedades ?? '—'}</strong></td>
+            <td class="num dato" data-k="v" data-label="Viviendas" data-corto="Viv.">{d.patrimonio.viviendas ?? '—'}</td>
+            <td class="num dato" data-k="co" data-label="Vehículos" data-corto="Veh.">{d.patrimonio.vehiculos ?? '—'}</td>
+            <td class="num dato" data-k="r" data-label="€/mes" data-corto="€/mes">{fmtNum(Math.round(d.retribucion.totalMensual))}<span class="eur">&nbsp;€</span></td>
           </tr>
         ))}
       </tbody>
@@ -95,6 +103,7 @@ const columnas = [
   const texto = document.getElementById('f-texto') as HTMLInputElement;
   const grupo = document.getElementById('f-grupo') as HTMLSelectElement;
   const cuenta = document.getElementById('f-cuenta')!;
+  const ordenMovil = document.getElementById('f-orden') as HTMLSelectElement;
   const quitarTildes = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
   let clave = 'pr', desc = true;
 
@@ -111,7 +120,7 @@ const columnas = [
     for (const f of filas) {
       const ok = (!g || f.dataset.g === g) && (!q || quitarTildes(f.dataset.busca ?? '').includes(q));
       f.hidden = !ok;
-      if (ok) (f.querySelector('.pos') as HTMLElement).textContent = String(++n);
+      if (ok) { (f.querySelector('.pos') as HTMLElement).textContent = String(++n); (f.querySelector('.quien') as HTMLElement).dataset.pos = String(n); }
       cuerpo.appendChild(f);
     }
     cuenta.textContent = `${n} diputados`;
@@ -121,7 +130,10 @@ const columnas = [
     tabla.querySelectorAll('thead th').forEach((th) => th.removeAttribute('aria-sort'));
     const b = tabla.querySelector(`button.orden[data-k="${clave}"]`);
     b?.closest('th')?.setAttribute('aria-sort', desc ? 'descending' : 'ascending');
+    tabla.dataset.clave = clave;
+    ordenMovil.value = clave;
   }
+  ordenMovil.addEventListener('change', () => { clave = ordenMovil.value; desc = clave !== 'n'; marcar(); aplicar(); });
   tabla.querySelectorAll<HTMLButtonElement>('button.orden').forEach((b) => b.addEventListener('click', () => {
     const k = b.dataset.k!;
     desc = k === clave ? !desc : k !== 'n';
@@ -135,7 +147,6 @@ const columnas = [
 
 <style>
   .barras { display: grid; gap: 10px; }
-  @media (max-width: 600px) { .barras { gap: 6px; } .barra { row-gap: 2px; } }
   .barra { display: grid; grid-template-columns: 84px 1fr 150px; gap: 10px; align-items: center; }
   .barra .cifras { text-align: right; }
   .et { font-weight: 650; white-space: nowrap; }
@@ -148,8 +159,11 @@ const columnas = [
   .m-prop { background: color-mix(in srgb, var(--muted) 35%, transparent); }
   .m-viv { background: var(--muted); margin-left: 10px; }
   @media (max-width: 600px) {
-    .barra { grid-template-columns: 70px 1fr; }
-    .barra .cifras { grid-column: 2; margin-top: -6px; text-align: left; }
+    .barras { gap: 14px; }
+    .barra { grid-template-columns: 1fr auto; grid-template-areas: 'et cifras' 'pista pista'; row-gap: 6px; }
+    .barra .et { grid-area: et; }
+    .barra .cifras { grid-area: cifras; text-align: right; font-size: .9rem; }
+    .barra .pista { grid-area: pista; height: 14px; }
   }
   .filtros { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
   .filtros input { flex: 1 1 240px; }
@@ -159,24 +173,39 @@ const columnas = [
   th[aria-sort='ascending'] button.orden::after { content: ' ↑'; }
   button.orden:focus-visible { outline: 3px solid var(--accent); }
   .corto { display: none; }
+  @media (max-width: 820px) { .largo { display: none; } .corto { display: inline; } }
   .quien a { font-weight: 600; text-decoration: none; }
   .quien a:hover { color: var(--accent-text); }
   .quien .sub { display: block; font-size: .8rem; color: var(--muted); }
   .aviso { color: var(--accent-text); font-weight: 700; margin-left: 2px; }
+  .orden-movil { display: none; }
   @media (max-width: 640px) {
-    .largo { display: none; } .corto { display: inline; }
-    th.pos-h, td.pos { display: none; }
-    #tabla-ranking { font-size: .92rem; }
-    #tabla-ranking td.num { white-space: nowrap; }
+    .orden-movil { display: block; flex: 1 1 160px; }
+    #f-grupo { flex: 1 1 140px; }
+    #f-cuenta { flex-basis: 100%; }
+    #tabla-ranking thead { display: none; }
+    #tabla-ranking, #tabla-ranking tbody { display: block; }
+    #tabla-ranking tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 6px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    #tabla-ranking tr[hidden] { display: none; }
+    #tabla-ranking tr:last-child { border-bottom: 0; }
+    #tabla-ranking td { display: block; border: 0; padding: 0; }
+    #tabla-ranking td.pos { display: none; }
+    #tabla-ranking td.quien { grid-column: 1 / -1; margin-bottom: 8px; }
+    #tabla-ranking td.quien::before { content: attr(data-pos); display: inline-block; min-width: 1.6em; margin-right: 6px; padding: 0 6px; border-radius: 6px; background: var(--chip); color: var(--muted); font-size: .78rem; font-weight: 650; text-align: center; vertical-align: 2px; }
+    .quien a { font-size: 1rem; overflow-wrap: anywhere; }
+    .quien .sub { margin-top: 2px; }
+    #tabla-ranking td.dato { text-align: left; font-size: 1.05rem; font-variant-numeric: tabular-nums; background: var(--bg); border-radius: 8px; padding: 6px 7px; white-space: nowrap; }
+    #tabla-ranking td.dato::before { content: attr(data-label); display: block; font-size: .68rem; color: var(--muted); font-weight: 500; margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; }
+    #tabla-ranking[data-clave='pr'] td[data-k='pr'], #tabla-ranking[data-clave='v'] td[data-k='v'],
+    #tabla-ranking[data-clave='co'] td[data-k='co'], #tabla-ranking[data-clave='r'] td[data-k='r'] { background: var(--accent-soft); color: var(--accent-text); }
+    #tabla-ranking td.dato strong { font-weight: 700; }
   }
-  @media (max-width: 480px) {
-    #tabla-ranking th:nth-child(5), #tabla-ranking td:nth-child(5) { display: none; }
-    #tabla-ranking { font-size: .88rem; }
-    .quien a { font-size: .95rem; }
-    #tabla-ranking th, #tabla-ranking td { padding-left: 5px; padding-right: 5px; }
-    #tabla-ranking th { font-size: .68rem; letter-spacing: .01em; }
+  @media (max-width: 440px) {
+    #tabla-ranking td.dato::before { content: attr(data-corto); font-size: .74rem; }
+  }
+  @media (max-width: 360px) {
+    #tabla-ranking tr { gap: 4px 6px; padding: 12px; }
+    #tabla-ranking td.dato { font-size: .95rem; padding: 5px 6px; }
     #tabla-ranking .eur { display: none; }
-    .quien a { overflow-wrap: anywhere; hyphens: auto; }
-    #tabla-ranking th:first-child, #tabla-ranking td:first-child { padding-left: 12px; }
   }
 </style>

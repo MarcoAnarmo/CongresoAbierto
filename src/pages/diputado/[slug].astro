@@ -131,11 +131,11 @@ const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)
   tr.viv td:first-child { font-weight: 600; }
   @media (max-width: 640px) {
     .tabla-bienes thead { display: none; }
-    .tabla-bienes tr { display: block; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .tabla-bienes tr { display: block; padding: 12px 16px; border-bottom: 1px solid var(--border); }
     .tabla-bienes tr:last-child { border-bottom: 0; }
-    .tabla-bienes td { display: flex; justify-content: space-between; gap: 12px; border: 0; padding: 2px 0; text-align: right; }
+    .tabla-bienes td { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border: 0; padding: 3px 0; text-align: right; font-size: .9rem; }
     .tabla-bienes td.bien { display: block; text-align: left; font-size: 1rem; padding-bottom: 4px; }
-    .tabla-bienes td[data-label]::before { content: attr(data-label); color: var(--muted); text-align: left; font-size: .8rem; }
+    .tabla-bienes td[data-label]::before { content: attr(data-label); color: var(--muted); text-align: left; font-size: .8rem; flex: none; }
   }
   .tag { margin-left: 6px; font-size: .7rem; padding: 0 6px; }
   .votos { list-style: none; padding: 0; display: grid; gap: 8px; }
