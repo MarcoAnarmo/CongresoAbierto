@@ -93,5 +93,9 @@ th { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color:
 td.num, th.num { text-align: right; }
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@media (max-width: 600px) { th, td { padding: 9px 8px; } }
+@media (max-width: 600px) {
+  th, td { padding: 9px 8px; }
+  .table-scroll th:first-child, .table-scroll td:first-child { padding-left: 14px; }
+  .table-scroll th:last-child, .table-scroll td:last-child { padding-right: 14px; }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
