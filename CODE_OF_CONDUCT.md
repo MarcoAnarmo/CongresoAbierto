@@ -9,6 +9,6 @@ Congreso Abierto es un proyecto ciudadano sobre datos públicos. Para que cualqu
 
 Las personas que mantienen el proyecto pueden editar, ocultar o cerrar comentarios, *issues* o *pull requests* que no respeten estas normas y, si es necesario, bloquear a quien las incumpla de forma reiterada.
 
-Para avisar de un comportamiento inadecuado, escribe a marcoanarmo@gmail.com.
+Para avisar de un comportamiento inadecuado, escribe a congresoabierto.help@gmail.com.
 
 Inspirado en el [Contributor Covenant](https://www.contributor-covenant.org/es/).
