@@ -1,0 +1,171 @@
+---
+import Base from '../layouts/Base.astro';
+import { CARGOS_CAMARA, CARGOS_COMISION, ASIGNACION, INDEMNIZACION_MADRID, INDEMNIZACION_OTRAS, FUENTE_RETRIBUCIONES } from '../../scripts/retribuciones';
+import { diputados, fmtEur2, meta, fmtFecha, url } from '../lib/data';
+const conDecl = diputados.filter((d) => d.patrimonio.estado !== 'sin-declaracion').length;
+const ultimaDecl = diputados.map((d) => d.patrimonio.declaracionFecha ?? '').sort().at(-1) ?? null;
+const pdfs = diputados.reduce((a, d) => a + d.patrimonio.fuentes.length, 0);
+const secciones = [
+  { id: 'principio', t: 'Principio' },
+  { id: 'fuentes', t: 'Fuentes oficiales' },
+  { id: 'propiedades', t: 'Propiedades y viviendas' },
+  { id: 'vehiculos', t: 'Vehículos' },
+  { id: 'revision', t: 'Cómo se han copiado los datos' },
+  { id: 'retribuciones', t: 'Retribuciones' },
+  { id: 'votaciones', t: 'Votaciones' },
+  { id: 'errores', t: '¿Has visto un error?' },
+];
+---
+<Base title="Metodología" description="De dónde salen los datos de Congreso Abierto y cómo se presentan, sin interpretaciones.">
+  <div class="disposicion">
+    <aside class="lateral">
+      <h1>Fuentes y método</h1>
+      <nav class="indice" aria-label="Índice de la página">
+        <p class="indice-t">En esta página</p>
+        <ol>
+          {secciones.map((s) => <li><a class="subraya" href={`#${s.id}`}>{s.t}</a></li>)}
+        </ol>
+      </nav>
+    </aside>
+
+    <article class="prosa">
+      <section id="principio">
+        <h2>Principio</h2>
+        <p>
+          Aquí solo hay información oficial del Estado, presentada tal y como la publica la institución que la produce.
+          No hacemos interpretaciones ni valoraciones: ordenamos y simplificamos para que cualquiera pueda consultarla y sacar sus propias conclusiones.
+          Si algo no coincide con el documento oficial, manda el documento oficial.
+        </p>
+      </section>
+
+      <section id="fuentes">
+        <h2>Fuentes oficiales</h2>
+        <ul>
+          <li><strong>Diputados, grupos y cargos:</strong> buscador y fichas oficiales de <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> (XV Legislatura). Consultados el {new Date(meta.generado).toLocaleDateString('es-ES')}.</li>
+          <li><strong>Propiedades y vehículos:</strong> las <em>Declaraciones de Bienes y Rentas</em> que cada diputado presenta ante el Congreso y que este publica en su ficha: {pdfs} documentos de {conDecl} diputados; el más reciente es del {fmtFecha(ultimaDecl)}.</li>
+          <li><strong>Votaciones:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos de votaciones</a> del Congreso, con el texto oficial de cada expediente.</li>
+          <li><strong>Normas:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decretos-leyes y acuerdos de convalidación o derogación).</li>
+          <li><strong>Retribuciones:</strong> <a href={FUENTE_RETRIBUCIONES}>Régimen económico y ayudas de los miembros de la Cámara</a>, importes de 2026.</li>
+        </ul>
+        <p><strong>Grupo y candidatura.</strong> El Congreso registra dos datos distintos: la candidatura con la que cada diputado fue elegido en las elecciones y el grupo parlamentario al que pertenece hoy. Pueden no coincidir: quien deja su grupo pasa al Grupo Mixto aunque fuera elegido en otra lista. El hemiciclo ordena por grupo actual; cuando la candidatura es distinta, se indica entre paréntesis.</p>
+      </section>
+
+      <section id="propiedades">
+        <h2>Propiedades y viviendas</h2>
+        <p>Se usan las tablas de «Bienes inmuebles» de cada declaración, copiadas literalmente. Cada ficha enlaza a sus PDF originales.</p>
+        <ul>
+          <li><strong>Propiedades:</strong> todos los inmuebles urbanos y rústicos que el diputado declara a su nombre, en propiedad total o parcial: viviendas, garajes, trasteros, locales, naves, solares, fincas… Cada línea de la tabla oficial cuenta como una propiedad; si la línea indica un número de unidades («16 viviendas», «8 fincas rústicas», «piso y dos plazas de garaje»), se cuentan esas unidades.</li>
+          <li><strong>Viviendas:</strong> de esas propiedades, las que el propio diputado describe como vivienda, piso, casa, chalet, apartamento, ático, dúplex, estudio o similar, también en suelo rústico.</li>
+          <li>Se muestran el porcentaje y el tipo de derecho (pleno dominio, nuda propiedad, ganancial…) tal y como los escribe el diputado.</li>
+          <li>Los inmuebles de sociedades en las que participa el diputado se listan aparte en su ficha y no se suman.</li>
+          <li>Si la última declaración solo comunica un cambio (por ejemplo, una compra), se muestra junto a la declaración completa anterior. Un bien solo deja de contarse cuando una declaración oficial posterior comunica su venta o baja; la ficha indica cuál.</li>
+          <li>Las declaraciones reflejan el patrimonio en la fecha en que se presentaron.</li>
+        </ul>
+      </section>
+
+      <section id="vehiculos">
+        <h2>Vehículos</h2>
+        <p>Se copian de la tabla «Vehículos, embarcaciones y aeronaves». No se publican matrículas, porque el propio formulario oficial pide no indicarlas.</p>
+      </section>
+
+      <section id="revision">
+        <h2>Cómo se han copiado los datos</h2>
+        <p>
+          Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila,
+          incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura dudosa llevan un aviso (*) y un enlace al PDF para comprobarlo.
+        </p>
+      </section>
+
+      <section id="retribuciones">
+        <h2>Retribuciones</h2>
+        <p>Se muestran los importes mensuales oficiales de 2026 que corresponden a cada diputado según su circunscripción y sus cargos:</p>
+        <ul>
+          <li>Asignación constitucional, igual para todos: {fmtEur2(ASIGNACION)}.</li>
+          <li>Indemnización por gastos, exenta de IRPF: {fmtEur2(INDEMNIZACION_OTRAS)} (fuera de Madrid) o {fmtEur2(INDEMNIZACION_MADRID)} (electos por Madrid).</li>
+          <li>Complementos por cargo, no acumulables dentro de cada grupo (Mesa y Junta de Portavoces; Comisiones):
+            <ul>
+              {Object.values(CARGOS_CAMARA).map((c) => <li>{c.etiqueta}: {fmtEur2(c.complementoMesa + c.gastosRepresentacion + c.gastosLibreDisposicion)}</li>)}
+              {Object.values(CARGOS_COMISION).map((c) => <li>{c.etiqueta}: {fmtEur2(c.gastosRepresentacion)}</li>)}
+            </ul>
+          </li>
+        </ul>
+        <p>Los cargos salen de la ficha oficial de cada diputado. No se incluyen el transporte (lo paga el Congreso directamente) ni los sueldos de quienes además son miembros del Gobierno, que se rigen por los Presupuestos Generales del Estado.</p>
+      </section>
+
+      <section id="votaciones">
+        <h2>Votaciones</h2>
+        <p>
+          Cada votación muestra el texto oficial del expediente, el tipo de votación, el resultado y el voto de cada diputado según los datos abiertos del Congreso.
+          El hemiciclo es un gráfico ordenado por grupos parlamentarios; no reproduce el plano real de asientos.
+          Las votaciones por llamamiento (en voz alta) tardan más en publicarse en datos abiertos; se añaden cuando aparecen. <a href={url('/votaciones')}>Ver votaciones</a>.
+        </p>
+      </section>
+
+      <section id="errores">
+        <h2>¿Has visto un error?</h2>
+        <p>
+          Abre una incidencia en el repositorio del proyecto con el diputado, el dato y el enlace al documento oficial (con la página).
+          Solo se aceptan correcciones respaldadas por un documento oficial.
+        </p>
+      </section>
+    </article>
+  </div>
+</Base>
+
+<script>
+  const enlaces = [...document.querySelectorAll<HTMLAnchorElement>('.indice a')];
+  const secciones = enlaces.map((a) => document.getElementById(a.hash.slice(1))!);
+  const indice = document.querySelector('.lateral') as HTMLElement;
+  let actualPrev = -1;
+  function marcar() {
+    const cabecera = (document.querySelector('header.site') as HTMLElement).offsetHeight;
+    const movil = matchMedia('(max-width: 900px)').matches;
+    const corte = cabecera + (movil ? indice.offsetHeight : 0) + Math.min(140, innerHeight * 0.2);
+    let actual = 0;
+    secciones.forEach((s, i) => { if (s.getBoundingClientRect().top <= corte) actual = i; });
+    const sc = document.getElementById('desplazable')!;
+    const alFinal = sc.scrollHeight > sc.clientHeight + 1 ? sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 4 : innerHeight + scrollY >= document.documentElement.scrollHeight - 4;
+    if (alFinal) actual = secciones.length - 1;
+    indice.classList.toggle('pegado', movil && scrollY > 8);
+    document.documentElement.style.setProperty('--alto-indice', indice.offsetHeight + 'px');
+    if (actual === actualPrev) return;
+    actualPrev = actual;
+    enlaces.forEach((a, i) => (i === actual ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
+    if (movil) { const a = enlaces[actual]; indice.querySelector('ol')!.scrollTo({ left: a.offsetLeft - 16, behavior: 'smooth' }); }
+  }
+  addEventListener('scroll', marcar, { passive: true });
+  document.getElementById('desplazable')!.addEventListener('scroll', marcar, { passive: true });
+  addEventListener('resize', marcar);
+  marcar();
+</script>
+
+<style>
+  .disposicion { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: start; }
+  .lateral { position: sticky; top: calc(var(--tope) + 20px); }
+  .lateral h1 { font-size: 1.6rem; margin: .2rem 0 1.2rem; }
+  .indice { font-size: .92rem; border-left: 2px solid var(--border); }
+  .indice-t { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; margin: 0 0 6px 14px; }
+  .indice ol { list-style: none; margin: 0; padding: 0; }
+  .indice a { display: block; padding: 7px 12px; color: var(--muted); margin-left: -2px; border-left: 2px solid transparent; transition: color .15s, border-color .15s; }
+  .indice a::after { display: none; }
+  .indice a:hover { color: var(--text); border-left-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+  .indice a[aria-current] { color: var(--text); font-weight: 650; border-left-color: var(--accent); }
+  .prosa { max-width: 70ch; }
+  .prosa section { scroll-margin-top: calc(var(--tope) + 20px); }
+  .prosa section:first-child h2 { margin-top: .4rem; }
+  .prosa li { margin: .35rem 0; }
+  @media (max-width: 900px) {
+    .disposicion { display: block; }
+    .lateral { top: var(--tope); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--border); margin: 0 -16px 8px; padding: 0 16px; }
+    .lateral h1 { font-size: clamp(1.65rem, 5vw, 2.2rem); margin: .3rem 0 .2rem; transition: font-size .15s, margin .15s; }
+    .lateral.pegado h1 { font-size: 1.1rem; margin: .5rem 0 0; }
+    .indice { border-left: 0; margin: 0 -12px; }
+    .indice-t { display: none; }
+    .indice ol { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+    .indice ol::-webkit-scrollbar { display: none; }
+    .indice a { white-space: nowrap; margin: 0; border-left: 0; padding: 10px 12px; --sub-y: 0px; }
+    .indice a::after { display: block; }
+    .indice a:hover { border-left-color: transparent; }
+    .prosa section { scroll-margin-top: calc(var(--tope) + var(--alto-indice, 90px) + 12px); }
+  }
+</style>
