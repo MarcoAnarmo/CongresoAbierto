@@ -1,0 +1,23 @@
+name: Error en un dato
+description: Avisa de un dato que no coincide con el documento oficial.
+title: "Error: "
+labels: ["error-de-datos"]
+body:
+  - type: input
+    id: diputado
+    attributes:
+      label: Diputado o votación
+    validations:
+      required: true
+  - type: textarea
+    id: dato
+    attributes:
+      label: ¿Qué dato es incorrecto y cuál es el correcto?
+    validations:
+      required: true
+  - type: input
+    id: fuente
+    attributes:
+      label: Enlace al documento oficial (y número de página)
+    validations:
+      required: true

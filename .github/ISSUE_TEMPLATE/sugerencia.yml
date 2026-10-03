@@ -1,0 +1,17 @@
+name: Sugerencia
+description: Propón una mejora, una nueva fuente oficial o una idea para la web.
+title: "Sugerencia: "
+labels: ["sugerencia"]
+body:
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: ¿Qué propones?
+      description: Cuéntalo con tus palabras.
+    validations:
+      required: true
+  - type: textarea
+    id: fuente
+    attributes:
+      label: Fuente oficial (si la hay)
+      description: Enlace al documento del Congreso, BOE u otra institución pública.
