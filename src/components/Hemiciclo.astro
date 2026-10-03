@@ -95,8 +95,8 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     datos: Record<string, Info>; votos: Record<string, Record<string, Voto>>; colores: Record<string, string>; base: string;
     votaciones: { id: string; titulo: string; tipo: string; fecha: string; resultado: string; totales: { si: number; no: number; abstencion: number; noVota: number } }[];
   };
-  const css = getComputedStyle(document.documentElement);
-  const cVoto: Record<Voto, string> = { S: css.getPropertyValue('--si').trim(), N: css.getPropertyValue('--no').trim(), A: css.getPropertyValue('--abs').trim(), X: css.getPropertyValue('--novota').trim() };
+  // Variables CSS: así los colores cambian solos al pasar de modo claro a oscuro
+  const cVoto: Record<Voto, string> = { S: 'var(--si)', N: 'var(--no)', A: 'var(--abs)', X: 'var(--novota)' };
   const etVoto: Record<Voto, string> = { S: 'Sí', N: 'No', A: 'Abstención', X: 'No vota' };
   const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
   const tramos = {
