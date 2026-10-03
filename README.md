@@ -68,7 +68,7 @@ congreso.es bloquea muchas descargas automáticas, así que la descarga se hace 
 La web se publica en **Cloudflare Pages**, conectada a este repositorio:
 
 - Cada *merge* en `main` publica la web en producción.
-- Cada *pull request* genera una vista previa con su propia URL para revisar el cambio antes de aceptarlo.
+- Cada *pull request* desde una rama de este repositorio genera una vista previa con su propia URL. Los que llegan desde un *fork* no la tienen, pero GitHub Actions comprueba que la web compila en todos.
 - Configuración: comando `npm run build`, carpeta `dist`, Node 22 (`.node-version`).
 
 Es una web 100 % estática, así que también funciona en cualquier otro hosting estático con el mismo comando y carpeta.
