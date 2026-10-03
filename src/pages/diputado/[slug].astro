@@ -1,0 +1,146 @@
+---
+import Base from '../../layouts/Base.astro';
+import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug } from '../../lib/data';
+import type { Diputado } from '../../lib/types';
+
+export function getStaticPaths() {
+  return diputados.map((d) => ({ params: { slug: slug(d) }, props: { d } }));
+}
+const { d } = Astro.props as { d: Diputado };
+const p = d.patrimonio;
+const m = d.retribucion.mensual;
+const totalMensual = m.asignacion + m.complementoMesa + m.gastosRepresentacion + m.gastosLibreDisposicion + m.indemnizacion;
+const pctTxt = (n: number | null) => (n === null ? '—' : `${fmtNum(n)} %`);
+const votosDip = votaciones.map((v) => ({ v, voto: v.votos[String(d.codParlamentario)] ?? null }));
+const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)', 'Abstención': 'var(--abs)', 'No vota': 'var(--novota)' };
+---
+<Base title={d.nombreCompleto} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): retribución, viviendas y vehículos declarados y votaciones clave.`}>
+  <p><a class="volver" href={url('/ranking')}>← Ranking</a></p>
+  <div class="cabecera">
+    <img src={d.fotoUrl} alt={`Foto oficial de ${d.nombreCompleto}`} width="110" height="140" loading="lazy" referrerpolicy="no-referrer" />
+    <div>
+      <h1>{d.nombreCompleto}</h1>
+      <p>
+        <span class="pill"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span>{d.grupo.replace('GP ', 'Grupo ')}</span>
+        <span class="muted"> · Candidatura: {d.partido} · {d.genero === 'F' ? 'Diputada' : 'Diputado'} por {d.circunscripcion} desde {fmtFecha(d.fechaAlta)}</span>
+      </p>
+      {d.cargos.length > 0 && <p class="small">{d.cargos.join(' · ')}</p>}
+      <p class="small"><a href={d.fichaUrl} rel="noopener">Ficha oficial en congreso.es ↗</a></p>
+    </div>
+  </div>
+
+  <div class="grid-stats">
+    <div class="card stat destacada"><div class="v">{p.propiedades ?? '—'}</div><div class="l">propiedades a su nombre (viviendas, garajes, locales, fincas…)</div></div>
+    <div class="card stat"><div class="v">{p.viviendas ?? '—'}</div><div class="l">de ellas son viviendas</div></div>
+    <div class="card stat"><div class="v">{p.vehiculos ?? '—'}</div><div class="l">vehículos declarados</div></div>
+    <div class="card stat"><div class="v">{fmtEur(d.retribucion.totalMensual)}</div><div class="l">al mes del Congreso (importes oficiales 2026)</div></div>
+  </div>
+
+  {p.estado === 'verificado' && <p class="small muted">✓ Datos copiados literalmente del PDF oficial y revisados dos veces contra el original.</p>}
+  {p.estado === 'transcrito' && !p.revisar && <p class="small muted">Transcripción del PDF oficial pendiente de una segunda revisión.</p>}
+  {p.revisar && <p class="warn">Algún dato de esta ficha tiene una lectura dudosa en el PDF o un cambio comunicado que no identifica el bien. Compruébalo en el PDF oficial (enlazado abajo) y, si ves un error, <a href={url('/metodologia#errores')}>avísanos</a>.</p>}
+
+  <h2>Propiedades declaradas</h2>
+  {p.estado === 'sin-declaracion' ? <p class="muted">No hay declaración de bienes publicada todavía.</p> : (
+    <>
+      <p class="small muted">
+        {p.combinada
+          ? <>Su última declaración ({fmtFecha(p.declaracionFecha)}) solo comunica cambios, así que se muestra junto a su declaración completa anterior. Se listan todos los bienes que figuran en ellas, salvo los que una declaración posterior da expresamente por vendidos o dados de baja.</>
+          : <>Según su declaración de bienes del {fmtFecha(p.declaracionFecha)}.</>}
+      </p>
+      {p.inmuebles.length === 0 ? <p>No declara inmuebles a su nombre.</p> : (
+        <div class="card tabla-bienes" style="padding:0">
+          <table>
+            <thead><tr><th scope="col">Bien</th><th scope="col">Tipo</th><th scope="col">Situación</th><th scope="col" class="num">Año</th><th scope="col">Derecho y título</th><th scope="col" class="num">% declarado</th></tr></thead>
+            <tbody>
+              {p.inmuebles.map((i) => (
+                <tr class={i.esVivienda ? 'viv' : ''}>
+                  <td class="bien">{i.descripcion}{i.esVivienda && <span class="pill tag">vivienda</span>}</td>
+                  <td class="small" data-label="Tipo">{i.naturaleza === 'urbana' ? 'Urbano' : 'Rústico'}</td>
+                  <td data-label="Situación">{i.provincia ?? '—'}</td>
+                  <td class="num" data-label="Año">{i.anioAdquisicion ?? '—'}</td>
+                  <td class="small" data-label="Derecho">{[i.derecho, i.titulo].filter(Boolean).join(' · ') || '—'}</td>
+                  <td class="num" data-label="% declarado">{pctTxt(i.porcentaje)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {p.inmueblesSociedad.length > 0 && (
+        <>
+          <h3>Inmuebles de sociedades en las que participa</h3>
+          <ul>{p.inmueblesSociedad.map((i) => <li>{i.descripcion}{i.provincia && ` · ${i.provincia}`}{i.derecho && ` · ${i.derecho}`}</li>)}</ul>
+          <p class="small muted">No se suman a su número de viviendas porque pertenecen a la sociedad, no a la persona.</p>
+        </>
+      )}
+
+      <h2>Vehículos</h2>
+      {p.listaVehiculos.length === 0 ? <p>No declara vehículos.</p> : (
+        <ul>{p.listaVehiculos.map((v) => <li>{v.descripcion}{v.anioAdquisicion && <span class="muted"> · adquirido en {v.anioAdquisicion}</span>}</li>)}</ul>
+      )}
+
+      {p.notas.length > 0 && (
+        <details>
+          <summary class="small">Cambios comunicados y notas ({p.notas.length})</summary>
+          <ul class="small muted">{p.notas.map((n) => <li>{n}</li>)}</ul>
+        </details>
+      )}
+      <p class="small">Documentos oficiales: {p.fuentes.map((f, i) => <>{i > 0 && ' · '}<a href={f.url} rel="noopener">{f.parcial ? 'modificación' : 'declaración'} de bienes del {fmtFecha(f.fecha)} (PDF) ↗</a></>)}</p>
+    </>
+  )}
+
+  <h2>Retribución del Congreso</h2>
+  <div class="table-scroll card" style="padding:0">
+    <table>
+      <tbody>
+        <tr><td>Asignación constitucional</td><td class="num">{fmtEur2(m.asignacion)}/mes</td></tr>
+        {m.complementoMesa > 0 && <tr><td>Complemento por cargo en la Mesa</td><td class="num">{fmtEur2(m.complementoMesa)}/mes</td></tr>}
+        {m.gastosRepresentacion > 0 && <tr><td>Gastos de representación</td><td class="num">{fmtEur2(m.gastosRepresentacion)}/mes</td></tr>}
+        {m.gastosLibreDisposicion > 0 && <tr><td>Gastos de libre disposición</td><td class="num">{fmtEur2(m.gastosLibreDisposicion)}/mes</td></tr>}
+        <tr><td>Indemnización por gastos (exenta de IRPF){d.circunscripcion === 'Madrid' && ' · electos por Madrid'}</td><td class="num">{fmtEur2(m.indemnizacion)}/mes</td></tr>
+        <tr><th>Total mensual</th><th class="num">{fmtEur2(totalMensual)}</th></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">
+    {d.retribucion.cargosRetribuidos.length ? `Incluye complementos por: ${d.retribucion.cargosRetribuidos.join(', ')}. ` : 'Sin complementos por cargo. '}
+    No incluye otros ingresos (por ejemplo, el sueldo de miembro del Gobierno) ni gastos de transporte, que el Congreso paga directamente.{' '}
+    <a href={url('/metodologia#retribuciones')}>Cómo se calcula</a>.
+  </p>
+
+  {votosDip.length > 0 && (
+    <>
+      <h2>Votaciones sobre vivienda</h2>
+      <ul class="votos">
+        {votosDip.map(({ v, voto }) => (
+          <li>
+            <span class="pill voto" style={`border-color:${colorVoto[voto ?? 'No vota']}`}><span class="dot" style={`background:${colorVoto[voto ?? 'No vota']}`}></span>{voto ?? 'Sin dato'}</span>
+            <span><strong>{v.titulo}</strong> <span class="muted small">· {v.tipo} {fmtFecha(v.fecha)} · {v.resultado} · <a href={v.fuenteUrl} rel="noopener">fuente</a></span></span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+</Base>
+
+<style>
+  .cabecera { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .cabecera img { border-radius: 8px; object-fit: cover; background: var(--border); }
+  .cabecera > div { flex: 1 1 260px; }
+  tr.viv td:first-child { font-weight: 600; }
+  @media (max-width: 640px) {
+    .tabla-bienes thead { display: none; }
+    .tabla-bienes tr { display: block; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .tabla-bienes tr:last-child { border-bottom: 0; }
+    .tabla-bienes td { display: flex; justify-content: space-between; gap: 12px; border: 0; padding: 2px 0; text-align: right; }
+    .tabla-bienes td.bien { display: block; text-align: left; font-size: 1rem; padding-bottom: 4px; }
+    .tabla-bienes td[data-label]::before { content: attr(data-label); color: var(--muted); text-align: left; font-size: .8rem; }
+  }
+  .tag { margin-left: 6px; font-size: .7rem; padding: 0 6px; }
+  .votos { list-style: none; padding: 0; display: grid; gap: 8px; }
+  .votos li { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: baseline; }
+  .votos .voto { justify-self: start; }
+  .ok-box { background: color-mix(in srgb, var(--si) 10%, transparent); border-left: 3px solid var(--si); padding: 10px 12px; border-radius: 6px; font-size: .9rem; }
+  details { margin-top: 1rem; }
+</style>
