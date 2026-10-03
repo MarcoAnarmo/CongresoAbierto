@@ -12,7 +12,8 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "data:build": "tsx scripts/build-data.ts"
+    "data:build": "tsx scripts/build-data.ts",
+    "data:votaciones": "tsx scripts/importar-votaciones.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

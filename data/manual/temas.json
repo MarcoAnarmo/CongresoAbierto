@@ -1,0 +1,228 @@
+{
+  "_nota": "Temas para filtrar votaciones. Se asignan buscando estas palabras (sin tildes ni mayúsculas, al principio de una palabra) en el título oficial de lo votado. Una votación puede tener varios temas; si no casa ninguno, va a «Otros». Los dictámenes de convenios internacionales van siempre a «Política exterior». Para corregir una votación concreta, usa data/manual/temas-correcciones.json.",
+  "temas": [
+    {
+      "id": "vivienda",
+      "nombre": "Vivienda",
+      "palabras": [
+        "vivienda",
+        "alquiler",
+        "arrendamiento",
+        "inmobiliari",
+        "ocupacion ilegal",
+        "desahucio",
+        "pisos turisticos",
+        "urbanistic",
+        "suelo"
+      ]
+    },
+    {
+      "id": "economia",
+      "nombre": "Economía e impuestos",
+      "palabras": [
+        "fiscal",
+        "tribut",
+        "impuesto",
+        "presupuest",
+        "deuda publica",
+        "financiacion",
+        "credito",
+        "cuenta general del estado",
+        "empobrecimiento",
+        "encarecimiento",
+        "beneficios extraordinarios",
+        "banco",
+        "economic"
+      ]
+    },
+    {
+      "id": "trabajo",
+      "nombre": "Trabajo y pensiones",
+      "palabras": [
+        "seguridad social",
+        "jubilacion",
+        "pension",
+        "laboral",
+        "trabajador",
+        "empleo",
+        "jornada",
+        "estatuto marco",
+        "autonomos",
+        "mercado de trabajo",
+        "reforma laboral"
+      ]
+    },
+    {
+      "id": "sanidad",
+      "nombre": "Sanidad y cuidados",
+      "palabras": [
+        "sanitari",
+        "salud",
+        "dependencia",
+        "discapacidad",
+        "cribado",
+        "morir dignamente",
+        "profesion sanitaria"
+      ]
+    },
+    {
+      "id": "educacion",
+      "nombre": "Educación y cultura",
+      "palabras": [
+        "educaci",
+        "educativ",
+        "alumno",
+        "universidad",
+        "cultura",
+        "cine",
+        "unesco",
+        "audiovisual"
+      ]
+    },
+    {
+      "id": "igualdad",
+      "nombre": "Igualdad y derechos sociales",
+      "palabras": [
+        "mujer",
+        "igualdad",
+        "violencia vicaria",
+        "violencia de genero",
+        "terapias de conversion",
+        "discursos de odio",
+        "lgtbi",
+        "familias",
+        "infancia",
+        "juventud",
+        "jovenes",
+        "libertad de expresion"
+      ]
+    },
+    {
+      "id": "justicia",
+      "nombre": "Justicia y seguridad",
+      "palabras": [
+        "codigo penal",
+        "poder judicial",
+        "penitenciari",
+        "justicia",
+        "judicial",
+        "extradicion",
+        "delincuencia",
+        "inseguridad",
+        "seguridad ciudadana",
+        "suplicatorio",
+        "personas desaparecidas",
+        "agentes de la autoridad"
+      ]
+    },
+    {
+      "id": "migracion",
+      "nombre": "Migración y nacionalidad",
+      "palabras": [
+        "migracion",
+        "migratori",
+        "asilo",
+        "nacionalidad",
+        "prioridad nacional",
+        "inmigra",
+        "visados"
+      ]
+    },
+    {
+      "id": "exterior",
+      "nombre": "Política exterior",
+      "palabras": [
+        "acuerdo entre el reino de espana",
+        "acuerdo internacional",
+        "tratado de",
+        "convenio entre",
+        "convenio por el que",
+        "protocolo",
+        "ucrania",
+        "cuba",
+        "estados unidos",
+        "marruecos",
+        "oriente medio"
+      ]
+    },
+    {
+      "id": "defensa",
+      "nombre": "Defensa",
+      "palabras": [
+        "defensa nacional",
+        "ministerio de defensa",
+        "militar",
+        "poligono de tiro",
+        "seguridad nacional",
+        "informacion clasificada",
+        "fuerzas armadas"
+      ]
+    },
+    {
+      "id": "transporte",
+      "nombre": "Transporte e infraestructuras",
+      "palabras": [
+        "transporte",
+        "ferroviari",
+        "autopista",
+        "ap-9",
+        "movilidad",
+        "aereo",
+        "carretera",
+        "y vasca"
+      ]
+    },
+    {
+      "id": "territorio",
+      "nombre": "Comunidades autónomas",
+      "palabras": [
+        "comunidad autonoma",
+        "comunidades autonomas",
+        "financiacion territorial",
+        "ceuta",
+        "melilla",
+        "galicia",
+        "cataluna",
+        "canarias",
+        "pais vasco",
+        "parlamento de"
+      ]
+    },
+    {
+      "id": "campo-medioambiente",
+      "nombre": "Campo, energía y medio ambiente",
+      "palabras": [
+        "agroaliment",
+        "agrari",
+        "sector primario",
+        "pesca",
+        "incendios",
+        "aguas",
+        "cuencas hidrograficas",
+        "medio ambiente",
+        "clima",
+        "energ",
+        "suministro electrico"
+      ]
+    },
+    {
+      "id": "instituciones",
+      "nombre": "Instituciones y transparencia",
+      "palabras": [
+        "reglamento del congreso",
+        "regimen electoral",
+        "transparencia",
+        "grupos de interes",
+        "participacion en los asuntos publicos",
+        "radio television espanola",
+        "comision de investigacion",
+        "subcomision",
+        "declaracion de actividades",
+        "estatuto de los diputados",
+        "control al gobierno",
+        "disciplina parlamentaria",
+        "avocacion"
+      ]
+    }
+  ]
+}

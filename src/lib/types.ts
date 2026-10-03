@@ -120,8 +120,12 @@ export interface VotacionClave {
   documentos: { titulo: string; url: string; tipo?: 'boe' | 'bocg' | 'ds' | 'votacion' }[];
   /** Qué contiene el texto votado: títulos de artículos o extractos literales del documento oficial. */
   contenido?: Contenido;
-  /** Temas de la votación (ids de TEMAS). Si falta, se entiende vivienda. */
+  /** Temas de la votación (ids de data/manual/temas.json), asignados por palabras clave del título oficial. */
   temas?: string[];
+  /** Subgrupo oficial (p. ej. «Votación de la enmienda») y modalidad («Se vota en sus términos»). */
+  detalle?: string;
+  /** true si viene de la importación automática de datos abiertos (sin documentos revisados a mano). */
+  automatica?: boolean;
   resultado: 'Aprobada' | 'Rechazada' | 'Convalidado' | 'Derogado';
   totales: { si: number; no: number; abstencion: number; noVota: number };
   /** codParlamentario -> voto */

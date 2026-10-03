@@ -66,9 +66,10 @@ congreso.es bloquea muchas descargas automáticas, así que la descarga se hace 
 
 1. Abre https://www.congreso.es/es/opendata/votaciones y la consola (F12).
 2. Pega `scripts/browser/descargar-datos.js`: descarga `diputados_base.tsv`, `fichas.tsv` y `previas.tsv`. Cópialos a `data/raw/`.
-3. Para añadir una votación: en la misma consola, `await window._votacion('mi-id', 'SesionNNN/AAAAMMDD/VotacionNNN/VOT_xxxxxxxx')` y pega la línea en `data/raw/votaciones/votaciones-compactas.txt`. Añade en `data/manual/votaciones-clave.json` el texto oficial del expediente, su tipo, sus documentos oficiales (BOE, BOCG, Diario de Sesiones, PDF de la votación) y su contenido: títulos de artículos o extractos literales del texto oficial, sin resúmenes propios.
-4. Para transcribir una declaración de bienes nueva, pega `scripts/browser/visor-declaraciones.js` y usa `await window._compose(cod, urlPdf)`, que muestra la tabla de inmuebles y la de vehículos en una sola imagen. Sigue `data/raw/patrimonio/INSTRUCCIONES.md`.
-5. `npm run data:build && npm run build`.
+3. Para añadir **todas las votaciones del Pleno** de un día: pega `scripts/browser/votaciones-pleno.js`, elige el día en el calendario de la página y ejecuta `await window._bajarVotaciones()`. Copia los `votaciones-AAAAMMDD.jsonl` a `data/raw/votaciones/descargas/` y ejecuta `npm run data:votaciones && npm run data:build`. Los temas se asignan con `data/manual/temas.json` (correcciones puntuales en `data/manual/temas-correcciones.json`).
+4. Para añadir una votación **clave** (con documentos y contenido revisados): en la misma consola, `await window._votacion('mi-id', 'SesionNNN/AAAAMMDD/VotacionNNN/VOT_xxxxxxxx')` y pega la línea en `data/raw/votaciones/votaciones-compactas.txt`. Añade en `data/manual/votaciones-clave.json` el texto oficial del expediente, su tipo, sus documentos oficiales (BOE, BOCG, Diario de Sesiones, PDF de la votación) y su contenido: títulos de artículos o extractos literales del texto oficial, sin resúmenes propios.
+5. Para transcribir una declaración de bienes nueva, pega `scripts/browser/visor-declaraciones.js` y usa `await window._compose(cod, urlPdf)`, que muestra la tabla de inmuebles y la de vehículos en una sola imagen. Sigue `data/raw/patrimonio/INSTRUCCIONES.md`.
+6. `npm run data:build && npm run build`.
 
 ## Despliegue
 
