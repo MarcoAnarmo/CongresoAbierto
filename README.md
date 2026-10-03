@@ -63,13 +63,15 @@ congreso.es bloquea muchas descargas automáticas, así que la descarga se hace 
 4. Para transcribir una declaración de bienes nueva, pega `scripts/browser/visor-declaraciones.js` y usa `await window._compose(cod, urlPdf)`, que muestra la tabla de inmuebles y la de vehículos en una sola imagen. Sigue `data/raw/patrimonio/INSTRUCCIONES.md`.
 5. `npm run data:build && npm run build`.
 
-## Desplegar gratis
+## Despliegue
 
-Es una web 100 % estática (`dist/`), así que funciona en cualquier hosting estático:
+La web se publica en **Cloudflare Pages**, conectada a este repositorio:
 
-- **Vercel**: importa el repositorio de GitHub; detecta Astro solo (build `npm run build`, salida `dist`).
-- **Cloudflare Pages** o **Netlify**: mismo comando y carpeta.
-- **GitHub Pages**: con la acción oficial `withastro/action`.
+- Cada *merge* en `main` publica la web en producción.
+- Cada *pull request* desde una rama de este repositorio genera una vista previa con su propia URL. Los que llegan desde un *fork* no la tienen, pero GitHub Actions comprueba que la web compila en todos.
+- Configuración: comando `npm run build`, carpeta `dist`, Node 22 (`.node-version`).
+
+Es una web 100 % estática, así que también funciona en cualquier otro hosting estático con el mismo comando y carpeta.
 
 ## Licencia
 

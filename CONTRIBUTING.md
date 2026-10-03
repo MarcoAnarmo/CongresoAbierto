@@ -44,7 +44,7 @@ Nadie publica directamente en `main`: todo cambio llega como *pull request* y se
    `fix(datos): corrige la superficie de una vivienda del diputado 123`, `feat: añade filtro por provincia`, `docs: …`, `chore: …`.
 6. Sube la rama a tu fork y abre el *pull request* contra `main`. Rellena la plantilla e incluye el enlace al documento oficial si cambias un dato.
 
-Cada *pull request* genera una vista previa de la web para revisar el cambio.
+Al abrir el *pull request*, GitHub Actions comprueba automáticamente que la web compila (`npm run build`).
 
 ¿Nunca has hecho un *pull request*? La guía de GitHub [Contribuir a un proyecto](https://docs.github.com/es/get-started/exploring-projects-on-github/contributing-to-a-project) lo explica con capturas.
 
