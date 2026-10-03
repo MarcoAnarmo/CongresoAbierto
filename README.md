@@ -11,13 +11,16 @@ Web estática, ligera y de código abierto que acerca a la ciudadanía los datos
 
 > Las 429 declaraciones de bienes (PDF escaneados) se han copiado literalmente y revisado dos veces contra el original. Ver [docs/metodologia.md](docs/metodologia.md).
 
-## Participar
+## Colabora
 
-El proyecto es público: cualquiera puede leer el código y los datos. Los cambios se proponen siempre mediante *pull request* y se revisan antes de publicarse.
+El proyecto es público y cualquiera puede ayudar, sepa o no programar. Todos los cambios llegan mediante *pull request* y se revisan antes de publicarse.
 
-- [Hacer una sugerencia](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=sugerencia.yml)
 - [Avisar de un error en un dato](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=error-en-un-dato.yml)
-- [Cómo contribuir](CONTRIBUTING.md)
+- [Hacer una sugerencia](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=sugerencia.yml)
+- [Tareas para empezar](https://github.com/MarcoAnarmo/CongresoAbierto/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- [Guía para colaborar](CONTRIBUTING.md) · [Código de conducta](CODE_OF_CONDUCT.md)
+
+Lo más útil ahora mismo: **revisar fichas** contra su PDF oficial y añadir parlamentos autonómicos.
 
 ## Puesta en marcha
 
@@ -67,10 +70,6 @@ Es una web 100 % estática (`dist/`), así que funciona en cualquier hosting est
 - **Vercel**: importa el repositorio de GitHub; detecta Astro solo (build `npm run build`, salida `dist`).
 - **Cloudflare Pages** o **Netlify**: mismo comando y carpeta.
 - **GitHub Pages**: con la acción oficial `withastro/action`.
-
-## Contribuir
-
-Ver [CONTRIBUTING.md](CONTRIBUTING.md). Lo más útil ahora mismo: **revisar fichas** contra su PDF oficial y añadir parlamentos autonómicos.
 
 ## Licencia
 

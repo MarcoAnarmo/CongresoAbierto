@@ -1,1 +1,8 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Guía para colaborar
+    url: https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/CONTRIBUTING.md
+    about: Cómo enviar tu primer cambio y qué criterios se siguen.
+  - name: Fuentes y método
+    url: https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/docs/metodologia.md
+    about: De dónde sale cada dato y cómo se cuenta.

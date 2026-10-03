@@ -30,6 +30,9 @@ export const url = (p: string) => `${base}${p}`;
 /** Repositorio público del proyecto y enlaces para proponer cambios. */
 export const REPO = 'https://github.com/MarcoAnarmo/CongresoAbierto';
 export const enlaceSugerencia = `${REPO}/issues/new?template=sugerencia.yml`;
+export const enlaceGuia = `${REPO}/blob/main/CONTRIBUTING.md`;
+export const enlacePrimerasTareas = `${REPO}/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22`;
+export const enlaceIncidencias = `${REPO}/issues`;
 export const enlaceError = (que?: string) =>
   `${REPO}/issues/new?template=error-en-un-dato.yml${que ? `&title=${encodeURIComponent(`Error: ${que}`)}&diputado=${encodeURIComponent(que)}` : ''}`;
 

@@ -8,8 +8,9 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const nav: { href: string; label: string; corto?: string }[] = [
   { href: '/', label: 'Hemiciclo' },
   { href: '/ranking', label: 'Ranking' },
-  { href: '/votaciones', label: 'Votaciones' },
+  { href: '/votaciones', label: 'Votaciones', corto: 'Votos' },
   { href: '/metodologia', label: 'Metodología', corto: 'Método' },
+  { href: '/colabora', label: 'Colabora' },
 ];
 const activo = (href: string) => (href === '/' ? path === '/' || path === '' : path.startsWith(href));
 ---
@@ -65,7 +66,13 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
     <footer class="site-footer">
       <div class="wrap pie small muted">
         <p>Solo datos oficiales del <a href="https://www.congreso.es/es/datos-abiertos">Congreso de los Diputados</a> y del <a href="https://www.boe.es">BOE</a>, sin interpretaciones. Cada dato enlaza a su documento original.</p>
-        <p>Proyecto independiente y de código abierto (MIT) · <a href={REPO} rel="noopener">Código en GitHub</a> · <a href={enlaceSugerencia} rel="noopener">Hacer una sugerencia</a> · <a href={enlaceError()} rel="noopener">¿Ves un error?</a></p>
+        <p>Proyecto independiente y de código abierto (MIT).</p>
+        <ul class="enlaces-pie">
+          <li><a href={url('/colabora')}>¿Querrías colaborar?</a></li>
+          <li><a class="con-icono" href={REPO} rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5" /></svg>Código en GitHub</a></li>
+          <li><a href={enlaceSugerencia} rel="noopener">Hacer una sugerencia</a></li>
+          <li><a href={enlaceError()} rel="noopener">Avisar de un error</a></li>
+        </ul>
       </div>
     </footer>
     </div>
@@ -88,6 +95,8 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
   .site-footer { border-top: 1px solid var(--border); background: var(--surface); padding: 14px 0 calc(14px + env(safe-area-inset-bottom)); }
   .pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 24px; }
   .pie p { margin: 0; }
+  .con-icono { display: inline-flex; align-items: center; gap: 5px; }
+  .enlaces-pie { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
 
   /* Móvil: marca arriba y menú en una fila desplazable de pestañas */
   @media (max-width: 720px) {
@@ -99,6 +108,6 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
     main { padding-top: 16px; }
   }
   .l-corto { display: none; }
-  @media (max-width: 420px) { .l-largo { display: none; } .l-corto { display: inline; } nav a { padding: 10px 9px; --sub-x: 9px; } }
-  @media (max-width: 360px) { nav a { padding: 10px 7px; font-size: .88rem; --sub-x: 7px; } }
+  @media (max-width: 420px) { .l-largo { display: none; } .l-corto { display: inline; } nav { justify-content: space-between; } nav a { padding: 10px 7px; --sub-x: 7px; } }
+  @media (max-width: 360px) { nav { padding: 0 5px 4px; } nav a { padding: 10px 4px; font-size: .84rem; --sub-x: 4px; } }
 </style>
