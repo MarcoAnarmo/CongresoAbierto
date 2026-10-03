@@ -2,8 +2,8 @@
 import '../styles/global.css';
 import { url, REPO, enlaceSugerencia, enlaceError } from '../lib/data';
 
-interface Props { title: string; description?: string; /** Ruta de la tarjeta para redes (Open Graph), p. ej. /og/ranking.png */ imagen?: string; }
-const { title, description = 'Datos oficiales de los 350 diputados del Congreso: cuánto cobran, qué propiedades declaran y cómo votan.', imagen = '/og/portada.png' } = Astro.props;
+interface Props { title: string; description?: string; /** Ruta de la tarjeta horizontal para la vista previa en redes (Open Graph). */ imagen?: string; }
+const { title, description = 'Datos oficiales de los 350 diputados del Congreso: cuánto cobran, qué propiedades declaran y cómo votan.', imagen = '/tarjetas/horizontal/resumen.png' } = Astro.props;
 const tituloCompleto = title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`;
 const absoluta = (p: string) => new URL(url(p), Astro.site).href;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -114,6 +114,7 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
         <p>Solo datos oficiales del <a href="https://www.congreso.es/es/datos-abiertos">Congreso de los Diputados</a> y del <a href="https://www.boe.es">BOE</a>, sin interpretaciones. Cada dato enlaza a su documento original.</p>
         <p>Proyecto independiente y de código abierto (MIT).</p>
         <ul class="enlaces-pie">
+          <li><a href={url('/tarjetas')}>Tarjetas para compartir</a></li>
           <li><a href={url('/colabora')}>¿Querrías colaborar?</a></li>
           <li><a class="con-icono" href={REPO} rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5" /></svg>Código en GitHub</a></li>
           <li><a href={enlaceSugerencia} rel="noopener">Hacer una sugerencia</a></li>

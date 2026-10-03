@@ -2,6 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError } from '../../lib/data';
 import type { Diputado } from '../../lib/types';
+import BotonesTarjeta from '../../components/BotonesTarjeta.astro';
+import { rutaTarjeta } from '../../lib/tarjetas';
 
 export function getStaticPaths() {
   return diputados.map((d) => ({ params: { slug: slug(d) }, props: { d } }));
@@ -14,7 +16,7 @@ const pctTxt = (n: number | null) => (n === null ? '—' : `${fmtNum(n)} %`);
 const votosDip = votaciones.map((v) => ({ v, voto: v.votos[String(d.codParlamentario)] ?? null }));
 const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)', 'Abstención': 'var(--abs)', 'No vota': 'var(--novota)' };
 ---
-<Base title={d.nombreCompleto} imagen={`/og/diputado/${slug(d)}.png`} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): retribución, viviendas y vehículos declarados y votaciones clave.`}>
+<Base title={d.nombreCompleto} imagen={rutaTarjeta.diputado(d, 'horizontal')} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): retribución, viviendas y vehículos declarados y votaciones clave.`}>
   <p><a class="volver" href={url('/ranking')}>← Ranking</a></p>
   <div class="cabecera">
     <img src={d.fotoUrl} alt={`Foto oficial de ${d.nombreCompleto}`} width="110" height="140" loading="lazy" referrerpolicy="no-referrer" />
@@ -35,6 +37,7 @@ const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)
     <div class="card stat"><div class="v">{p.vehiculos ?? '—'}</div><div class="l">vehículos declarados</div></div>
     <div class="card stat"><div class="v">{fmtEur(d.retribucion.totalMensual)}</div><div class="l">al mes del Congreso (importes oficiales 2026)</div></div>
   </div>
+  <BotonesTarjeta historia={rutaTarjeta.diputado(d, 'historia')} horizontal={rutaTarjeta.diputado(d, 'horizontal')} nombre={`congreso-abierto-${slug(d)}`} />
 
   {p.estado === 'verificado' && <p class="small muted">✓ Datos copiados literalmente del PDF oficial y revisados dos veces contra el original.</p>}
   {p.estado === 'transcrito' && !p.revisar && <p class="small muted">Transcripción del PDF oficial pendiente de una segunda revisión.</p>}

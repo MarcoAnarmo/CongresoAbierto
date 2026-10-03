@@ -1,0 +1,42 @@
+---
+/**
+ * Botones para descargar o compartir una tarjeta. «Compartir» usa el menú del sistema
+ * (en el móvil permite mandarla directamente a una historia de Instagram, WhatsApp…).
+ */
+import { url } from '../lib/data';
+interface Props { historia: string; horizontal: string; nombre: string }
+const { historia, horizontal, nombre } = Astro.props;
+---
+<div class="botones-tarjeta" data-tarjeta={url(historia)} data-nombre={`${nombre}.png`}>
+  <a class="btn primario" href={url(historia)} download={`${nombre}.png`}>
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" /></svg>
+    Descargar tarjeta
+  </a>
+  <button class="btn compartir" type="button" hidden>
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M5 13v6h14v-6" /></svg>
+    Compartir
+  </button>
+  <a class="small horizontal" href={url(horizontal)} download={`${nombre}-horizontal.png`}>Versión horizontal</a>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.botones-tarjeta').forEach((caja) => {
+    const boton = caja.querySelector<HTMLButtonElement>('.compartir')!;
+    const prueba = new File([new Blob()], 'x.png', { type: 'image/png' });
+    if (!navigator.canShare?.({ files: [prueba] })) return;
+    boton.hidden = false;
+    boton.addEventListener('click', async () => {
+      try {
+        const r = await fetch(caja.dataset.tarjeta!);
+        const fichero = new File([await r.blob()], caja.dataset.nombre!, { type: 'image/png' });
+        await navigator.share({ files: [fichero] });
+      } catch { /* cancelado por la persona o sin conexión */ }
+    });
+  });
+</script>
+
+<style>
+  .botones-tarjeta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .botones-tarjeta .btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+  .horizontal { color: var(--muted); }
+</style>
