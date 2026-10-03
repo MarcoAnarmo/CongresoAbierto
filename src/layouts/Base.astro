@@ -122,6 +122,9 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
   nav { display: flex; gap: 2px; margin-left: auto; }
   .tema { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--muted); cursor: pointer; transition: color .15s, border-color .15s, background-color .15s; }
   .tema:hover { color: var(--accent-text); border-color: var(--accent); }
+  .balanza { flex: none; width: 40px; height: 40px; padding: 3px; border-radius: 10px; transition: background-color .15s; }
+  /* En modo oscuro el logo va sobre una placa clara, como un icono de app, para que se lea igual que en claro */
+  :global(:root[data-theme='dark']) .balanza { background: #fff3e6; }
   .tema .i-sol { display: none; }
   :global(:root[data-theme='dark']) .tema .i-sol { display: block; }
   :global(:root[data-theme='dark']) .tema .i-luna { display: none; }
