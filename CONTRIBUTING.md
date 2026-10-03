@@ -2,6 +2,13 @@
 
 Gracias por ayudar. Este proyecto vive de que cada dato sea **exacto y verificable**.
 
+## Cómo proponer cambios
+
+- **Sugerencias e ideas:** [abre una sugerencia](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=sugerencia.yml).
+- **Errores en los datos:** [avisa de un error](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=error-en-un-dato.yml) con el enlace al documento oficial.
+- **Cambios en el código o los datos:** haz un *fork*, crea una rama y abre un *pull request* contra `main`. Nadie publica directamente en `main`: todo pasa por revisión.
+- Usa [Conventional Commits](https://www.conventionalcommits.org/es/) en los mensajes (`feat:`, `fix:`, `docs:`, `chore:`…).
+
 ## Principios
 
 1. **Solo fuentes oficiales.** Cada dato debe poder comprobarse en un documento público (congreso.es, BOE, parlamentos autonómicos).

@@ -9,7 +9,15 @@ Web estática, ligera y de código abierto que acerca a la ciudadanía los datos
 
 **Principio:** solo información oficial del Estado (Congreso de los Diputados y BOE), sin interpretaciones ni opiniones. Cada dato enlaza a su documento original para que cada persona juzgue por sí misma.
 
-> Estado: **versión 0 (local)**. Las 429 declaraciones de bienes (PDF escaneados) se han copiado literalmente y revisado dos veces contra el original. Ver [docs/metodologia.md](docs/metodologia.md).
+> Las 429 declaraciones de bienes (PDF escaneados) se han copiado literalmente y revisado dos veces contra el original. Ver [docs/metodologia.md](docs/metodologia.md).
+
+## Participar
+
+El proyecto es público: cualquiera puede leer el código y los datos. Los cambios se proponen siempre mediante *pull request* y se revisan antes de publicarse.
+
+- [Hacer una sugerencia](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=sugerencia.yml)
+- [Avisar de un error en un dato](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=error-en-un-dato.yml)
+- [Cómo contribuir](CONTRIBUTING.md)
 
 ## Puesta en marcha
 
