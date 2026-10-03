@@ -1,0 +1,65 @@
+---
+import Base from '../layouts/Base.astro';
+import Hemiciclo from '../components/Hemiciclo.astro';
+import { diputados, resumen, fmtNum, url, meta } from '../lib/data';
+
+const conDatos = diputados.filter((d) => d.patrimonio.viviendas !== null);
+const totalProp = conDatos.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
+const totalViv = conDatos.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
+const propietarios = conDatos.filter((d) => (d.patrimonio.viviendas ?? 0) > 0).length;
+const tresOMas = conDatos.filter((d) => (d.patrimonio.viviendas ?? 0) >= 3).length;
+const pct = (n: number) => `${Math.round((100 * n) / conDatos.length)} %`;
+const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.viviendas - a.viviendas);
+---
+<Base title="Congreso Abierto">
+  <h1>¿Quién te representa y qué tiene?</h1>
+  <p class="lead">
+    Los 350 diputados del Congreso: lo que cobran, las propiedades y vehículos que ellos mismos declaran y cómo votan.
+    Solo datos oficiales, sin interpretaciones, cada uno con un enlace a su documento original.
+  </p>
+
+  <Hemiciclo />
+
+  <div class="grid-stats cifras-portada">
+    <div class="card stat destacada"><span class="v">{fmtNum(totalProp)}</span><span class="l">propiedades declaradas por los 350 diputados</span></div>
+    <div class="card stat"><span class="v">{fmtNum(totalViv)}</span><span class="l">de ellas son viviendas</span></div>
+    <div class="card stat"><span class="v">{pct(propietarios)}</span><span class="l">tiene al menos una vivienda</span></div>
+    <div class="card stat"><span class="v">{pct(tresOMas)}</span><span class="l">declara 3 viviendas o más</span></div>
+  </div>
+
+
+  <h2>Por grupo parlamentario</h2>
+  <div class="table-scroll card tabla-grupos" style="padding:0">
+    <table>
+      <thead><tr><th scope="col">Grupo</th><th scope="col" class="num"><abbr title="Diputados" class="corto">Dip.</abbr><span class="largo">Diputados</span></th><th scope="col" class="num"><abbr title="Propiedades" class="corto">Prop.</abbr><span class="largo">Propiedades</span></th><th scope="col" class="num"><abbr title="Viviendas" class="corto">Viv.</abbr><span class="largo">Viviendas</span></th><th scope="col" class="num"><abbr title="Vehículos" class="corto">Veh.</abbr><span class="largo">Vehículos</span></th></tr></thead>
+      <tbody>
+        {porGrupo.map((g) => (
+          <tr>
+            <th scope="row"><span class="dot" style={`background:${g.color}`}></span> {g.corto}</th>
+            <td class="num">{g.diputados}</td>
+            <td class="num"><strong>{fmtNum(g.propiedades)}</strong></td>
+            <td class="num">{fmtNum(g.viviendas)}</td>
+            <td class="num">{fmtNum(g.vehiculos)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">
+    Propiedades: inmuebles urbanos y rústicos a nombre del diputado (viviendas, garajes, trasteros, locales, solares, fincas…), en propiedad total o parcial.
+    Los de sociedades en las que participa se muestran aparte en su ficha. Datos consultados el {new Date(meta.generado).toLocaleDateString('es-ES')}.{' '}
+    <a href={url('/metodologia#propiedades')}>Cómo se cuentan</a>.
+  </p>
+</Base>
+
+<style>
+  .cifras-portada { margin-top: 1.8rem; }
+  .tabla-grupos .corto { display: none; text-decoration: none; }
+  @media (max-width: 520px) {
+    .tabla-grupos .corto { display: inline; } .tabla-grupos .largo { display: none; }
+    .tabla-grupos th, .tabla-grupos td { padding-left: 6px; padding-right: 6px; }
+    .tabla-grupos thead th { font-size: .7rem; letter-spacing: .01em; }
+    .tabla-grupos th:first-child, .tabla-grupos td:first-child { padding-left: 12px; }
+  }
+  .tabla-grupos th[scope='row'] { text-transform: none; letter-spacing: 0; font-size: .95rem; color: var(--text); font-weight: 650; }
+</style>

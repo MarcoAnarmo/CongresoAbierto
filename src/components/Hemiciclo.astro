@@ -1,0 +1,259 @@
+---
+import { diputados, votaciones, grupos, colorGrupo, url, slug, etiquetaPartido } from '../lib/data';
+import { disponerPorGrupos } from '../lib/hemiciclo';
+
+const orden = new Map(grupos.map((g) => [g.corto, g.orden]));
+const ordenados = [...diputados].sort((a, b) =>
+  (orden.get(a.grupoCorto)! - orden.get(b.grupoCorto)!) || a.apellidos.localeCompare(b.apellidos, 'es'));
+const gruposOrden = [...grupos].sort((a, b) => a.orden - b.orden).filter((g) => ordenados.some((d) => d.grupoCorto === g.corto));
+const { escanos, sectores } = disponerPorGrupos(gruposOrden.map((g) => ordenados.filter((d) => d.grupoCorto === g.corto).length));
+const W = 1000, H = 590, S = 440, CX = W / 2, CY = 560;
+const px = (r: number, ang: number) => [(CX + r * S * Math.cos(ang)).toFixed(1), (CY - r * S * Math.sin(ang)).toFixed(1)];
+
+// Franja de color de cada grupo por fuera del hemiciclo y su nombre
+const RB = 1.065;
+const franjas = sectores.map((s, i) => {
+  const [x1, y1] = px(RB, s.desde); const [x2, y2] = px(RB, s.hasta);
+  return { d: `M${x1} ${y1} A${(RB * S).toFixed(1)} ${(RB * S).toFixed(1)} 0 0 1 ${x2} ${y2}`, color: gruposOrden[i].color };
+});
+const etiquetas = sectores.map((s, i) => {
+  const ang = (s.desde + s.hasta) / 2;
+  const estrecho = s.desde - s.hasta < 0.12;
+  const r = estrecho && i % 2 === 1 ? 1.2 : 1.12;
+  const [x, y] = px(r, ang);
+  return { texto: gruposOrden[i].corto, x, y, color: gruposOrden[i].color, ancla: Math.cos(ang) > 0.25 ? 'start' : Math.cos(ang) < -0.25 ? 'end' : 'middle' };
+});
+
+const votosCliente = Object.fromEntries(votaciones.map((v) => [v.id, Object.fromEntries(Object.entries(v.votos).map(([c, x]) => [c, x === 'Sí' ? 'S' : x === 'No' ? 'N' : x === 'Abstención' ? 'A' : 'X']))]));
+const datos = Object.fromEntries(ordenados.map((d) => [d.codParlamentario, {
+  n: d.nombreCompleto, g: d.grupoCorto, p: etiquetaPartido(d), ci: d.circunscripcion,
+  pr: d.patrimonio.propiedades, v: d.patrimonio.viviendas, co: d.patrimonio.vehiculos,
+  r: d.retribucion.totalMensual, s: slug(d), rv: d.patrimonio.revisar,
+}]));
+const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
+---
+<section class="hemi" aria-labelledby="hemi-h">
+  <h2 id="hemi-h" class="sr-only">Hemiciclo</h2>
+  <div class="controles">
+    <div class="modos segmentado" role="group" aria-label="Qué mostrar en el hemiciclo">
+      <button class="btn" data-modo="grupo" aria-pressed="false">Grupo</button>
+      <button class="btn" data-modo="propiedades" aria-pressed="false">Propiedades</button>
+      <button class="btn" data-modo="viviendas" aria-pressed="false">Viviendas</button>
+    </div>
+    {votaciones.length > 0 && (
+      <div class="selector">
+        <label for="hemi-voto" class="sr-only">Ver una votación</label>
+        <select id="hemi-voto">
+          <option value="">Ver una votación…</option>
+          {votaciones.map((v) => <option value={`voto:${v.id}`}>{v.tema}</option>)}
+        </select>
+      </div>
+    )}
+  </div>
+  <p class="desc small muted" id="hemi-desc" aria-live="polite"></p>
+
+  <div class="lienzo">
+    <svg viewBox={`-130 0 ${W + 260} ${H}`} data-vb-movil={`12 ${(CY - RB * S - 10).toFixed(0)} ${W - 24} ${(RB * S + 26).toFixed(0)}`} role="img" aria-labelledby="hemi-titulo">
+      <title id="hemi-titulo">Hemiciclo del Congreso: 350 escaños agrupados por grupo parlamentario</title>
+      <g class="franjas" aria-hidden="true">
+        {franjas.map((f) => <path d={f.d} stroke={f.color} />)}
+      </g>
+      <g class="etiquetas" aria-hidden="true">
+        {etiquetas.map((e) => <text x={e.x} y={e.y} text-anchor={e.ancla} fill={e.color}>{e.texto}</text>)}
+      </g>
+      {ordenados.map((d, i) => {
+        const e = escanos[i];
+        return (
+          <a href={url(`/diputado/${slug(d)}`)} aria-label={`${d.nombreCompleto}, ${etiquetaPartido(d)}`}>
+            <circle cx={(CX + e.x * S).toFixed(1)} cy={(CY - e.y * S).toFixed(1)} r={(e.r * S).toFixed(1)}
+              data-cod={d.codParlamentario} data-color={colorGrupo(d.grupoCorto)} style={`fill:${colorGrupo(d.grupoCorto)}`} />
+          </a>
+        );
+      })}
+      <text x={CX} y={CY - 52} text-anchor="middle" class="centro" id="hemi-centro">350</text>
+      <text x={CX} y={CY - 16} text-anchor="middle" class="centro-sub" id="hemi-centro-sub">diputados</text>
+    </svg>
+    <div class="tip" id="hemi-tip" hidden>
+      <button class="cerrar" type="button" aria-label="Cerrar">×</button>
+      <div class="tip-cuerpo"></div>
+      <a class="btn primario ver" href="#">Ver ficha completa →</a>
+    </div>
+  </div>
+  <div class="leyenda small" id="hemi-leyenda"></div>
+  <p class="grupos-movil small" aria-label="Grupos de izquierda a derecha en el gráfico">
+    {gruposOrden.map((g) => <span><i style={`background:${g.color}`}></i>{g.corto}</span>)}
+  </p>
+  <p class="small muted nota">Pulsa un escaño para ver quién es. Gráfico ordenado por grupos parlamentarios; no reproduce el plano real de asientos.</p>
+</section>
+
+<script type="application/json" id="hemi-datos" set:html={JSON.stringify({ datos, votos: votosCliente, colores, base: url(''), votaciones: votaciones.map((v) => ({ id: v.id, titulo: v.titulo, tipo: v.tipo, fecha: v.fecha, resultado: v.resultado, totales: v.totales })) })} />
+
+<script>
+  type Info = { n: string; g: string; p: string; ci: string; pr: number | null; v: number | null; co: number | null; r: number; s: string; rv: boolean };
+  type Voto = 'S' | 'N' | 'A' | 'X';
+  const raw = JSON.parse(document.getElementById('hemi-datos')!.textContent!) as {
+    datos: Record<string, Info>; votos: Record<string, Record<string, Voto>>; colores: Record<string, string>; base: string;
+    votaciones: { id: string; titulo: string; tipo: string; fecha: string; resultado: string; totales: { si: number; no: number; abstencion: number; noVota: number } }[];
+  };
+  const css = getComputedStyle(document.documentElement);
+  const cVoto: Record<Voto, string> = { S: css.getPropertyValue('--si').trim(), N: css.getPropertyValue('--no').trim(), A: css.getPropertyValue('--abs').trim(), X: css.getPropertyValue('--novota').trim() };
+  const etVoto: Record<Voto, string> = { S: 'Sí', N: 'No', A: 'Abstención', X: 'No vota' };
+  const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
+  const tramos = {
+    viviendas: { cortes: [0, 1, 2, 4, 7], etiquetas: ['0', '1', '2', '3–4', '5–7', '8 o más'] },
+    propiedades: { cortes: [0, 1, 3, 6, 10], etiquetas: ['0', '1', '2–3', '4–6', '7–10', 'más de 10'] },
+  };
+  const tramo = (v: number | null, cortes: number[]) => (v === null ? -1 : cortes.findIndex((c) => v <= c) === -1 ? cortes.length : cortes.findIndex((c) => v <= c));
+
+  const circulos = [...document.querySelectorAll<SVGCircleElement>('.hemi circle[data-cod]')];
+  const tip = document.getElementById('hemi-tip')!;
+  const tipCuerpo = tip.querySelector('.tip-cuerpo') as HTMLElement;
+  const tipVer = tip.querySelector('.ver') as HTMLAnchorElement;
+  const leyenda = document.getElementById('hemi-leyenda')!;
+  const desc = document.getElementById('hemi-desc')!;
+  const centro = document.getElementById('hemi-centro')!;
+  const centroSub = document.getElementById('hemi-centro-sub')!;
+  const seccion = document.querySelector('.hemi') as HTMLElement;
+  const botones = [...document.querySelectorAll<HTMLButtonElement>('.hemi [data-modo]')];
+  const selVoto = document.getElementById('hemi-voto') as HTMLSelectElement | null;
+  const eur = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+  const num = new Intl.NumberFormat('es-ES');
+  const tactil = () => matchMedia('(hover: none), (max-width: 640px)').matches;
+  let modo = 'grupo';
+
+  const item = (color: string, texto: string, borde = false) => `<span class="pill"><span class="dot${borde ? ' vacio' : ''}" style="background:${color}"></span>${texto}</span>`;
+  const rellenar = (c: SVGCircleElement, color: string | null) => { c.style.fill = color ?? 'transparent'; c.classList.toggle('vacio', color === null); };
+
+  function pintar(m: string) {
+    modo = m;
+    seccion.dataset.modo = m.startsWith('voto:') ? 'voto' : m;
+    botones.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modo === m)));
+    if (selVoto) selVoto.value = m.startsWith('voto:') ? m : '';
+    try { localStorage.setItem('hemi-modo', m); } catch {}
+    if (m === 'grupo') {
+      circulos.forEach((c) => rellenar(c, c.dataset.color!));
+      const cuenta: Record<string, number> = {};
+      Object.values(raw.datos).forEach((d) => (cuenta[d.g] = (cuenta[d.g] ?? 0) + 1));
+      leyenda.innerHTML = Object.entries(raw.colores).map(([g, c]) => item(c, `${g} · ${cuenta[g] ?? 0}`)).join(' ');
+      desc.textContent = 'Composición del Congreso por grupo parlamentario.';
+      centro.textContent = '350'; centroSub.textContent = 'diputados';
+    } else if (m === 'viviendas' || m === 'propiedades') {
+      const t = tramos[m]; const campo = m === 'viviendas' ? 'v' : 'pr';
+      circulos.forEach((c) => { const i = tramo(raw.datos[c.dataset.cod!][campo], t.cortes); rellenar(c, i < 0 ? null : escala[i]); });
+      leyenda.innerHTML = `<span class="small muted guia">Menos</span>` + escala.map((c, i) => item(c, t.etiquetas[i])).join(' ') + `<span class="small muted guia">Más</span>`;
+      const total = Object.values(raw.datos).reduce((a, d) => a + (d[campo] ?? 0), 0);
+      desc.textContent = m === 'viviendas'
+        ? 'Viviendas que cada diputado declara, en propiedad total o parcial, en su declaración de bienes oficial más reciente.'
+        : 'Propiedades (inmuebles urbanos y rústicos a su nombre: viviendas, garajes, locales, fincas…) según su declaración de bienes oficial más reciente.';
+      centro.textContent = num.format(total); centroSub.textContent = m === 'viviendas' ? 'viviendas declaradas' : 'propiedades declaradas';
+    } else {
+      const id = m.slice(5); const vot = raw.votos[id]; const info = raw.votaciones.find((v) => v.id === id)!;
+      circulos.forEach((c) => { const x = vot[c.dataset.cod!]; rellenar(c, x ? cVoto[x] : null); });
+      const t = info.totales;
+      leyenda.innerHTML = [item(cVoto.S, `Sí · ${t.si}`), item(cVoto.N, `No · ${t.no}`), item(cVoto.A, `Abstención · ${t.abstencion}`), item(cVoto.X, `No vota · ${t.noVota}`), item('transparent', 'Aún no era diputado', true)].join(' ');
+      desc.innerHTML = `<span>${info.tipo} ${new Date(info.fecha + 'T12:00:00').toLocaleDateString('es-ES')}</span><br><strong class="texto">${info.titulo}</strong> Resultado: <strong>${info.resultado}</strong>.`;
+      centro.textContent = `${t.si}–${t.no}`; centroSub.textContent = `sí – no · ${info.resultado.toLowerCase()}`;
+    }
+    if (!tip.hidden && activo) mostrar(activo);
+  }
+
+  let activo: SVGCircleElement | null = null;
+  function mostrar(c: SVGCircleElement, x?: number, y?: number) {
+    activo = c;
+    const d = raw.datos[c.dataset.cod!];
+    const lineas = [
+      `<strong class="nombre">${d.n}</strong>`,
+      `<span class="muted"><span class="dot" style="background:${raw.colores[d.g]}"></span> ${d.p} · ${d.ci}</span>`,
+    ];
+    if (modo.startsWith('voto:')) { const v = raw.votos[modo.slice(5)][c.dataset.cod!]; lineas.push(v ? `Votó: <strong style="color:${cVoto[v]}">${etVoto[v]}</strong>` : '<span class="muted">Aún no era diputado/a en esa votación</span>'); }
+    lineas.push(`Propiedades: <strong>${d.pr ?? 'sin datos'}</strong> · Viviendas: <strong>${d.v ?? 'sin datos'}</strong>`);
+    lineas.push(`Vehículos: ${d.co ?? '—'} · Congreso: ${eur.format(d.r)}/mes`);
+    tipCuerpo.innerHTML = lineas.join('<br>');
+    tipVer.href = `${raw.base}/diputado/${d.s}`;
+    tip.hidden = false;
+    circulos.forEach((o) => o.classList.toggle('activo', o === c));
+    if (tactil()) { tip.classList.add('hoja'); tip.style.left = ''; tip.style.top = ''; return; }
+    tip.classList.remove('hoja');
+    const caja = tip.parentElement!.getBoundingClientRect();
+    const b = c.getBoundingClientRect();
+    const px = x ?? b.left + b.width / 2, py = y ?? b.top;
+    const ancho = tip.offsetWidth, alto = tip.offsetHeight;
+    tip.style.left = `${Math.min(Math.max(0, px - caja.left + 14), caja.width - ancho)}px`;
+    tip.style.top = `${Math.max(0, py - caja.top - alto - 14)}px`;
+  }
+  function ocultar() { tip.hidden = true; activo = null; circulos.forEach((o) => o.classList.remove('activo')); }
+
+  circulos.forEach((c) => {
+    c.addEventListener('pointerenter', (e) => { if (!tactil()) mostrar(c, e.clientX, e.clientY); });
+    c.addEventListener('pointermove', (e) => { if (!tactil()) mostrar(c, e.clientX, e.clientY); });
+    c.addEventListener('focus', () => mostrar(c));
+  });
+  // En pantallas táctiles, el toque abre la ficha rápida; el botón lleva a la ficha completa
+  document.querySelectorAll<SVGAElement>('.hemi svg a').forEach((a) => {
+    a.addEventListener('click', (e) => { if (tactil()) { e.preventDefault(); mostrar(a.querySelector('circle')!); } });
+  });
+  document.querySelector('.hemi svg')!.addEventListener('pointerleave', () => { if (!tactil()) ocultar(); });
+  tip.querySelector('.cerrar')!.addEventListener('click', ocultar);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') ocultar(); });
+  // En pantallas estrechas no hay etiquetas: se recorta el margen para que el hemiciclo se vea más grande
+  const svg = document.querySelector('.hemi svg') as SVGSVGElement;
+  const vbCompleto = svg.getAttribute('viewBox')!;
+  const estrecho = matchMedia('(max-width: 640px)');
+  const ajustarVista = () => svg.setAttribute('viewBox', estrecho.matches ? svg.dataset.vbMovil! : vbCompleto);
+  ajustarVista(); estrecho.addEventListener('change', ajustarVista);
+  // Un toque cerca de un escaño (aunque no justo encima) también lo selecciona
+  svg.addEventListener('click', (e) => {
+    if (!tactil() || (e.target as Element).closest('a')) return;
+    let mejor: SVGCircleElement | null = null, dist = 28;
+    circulos.forEach((c) => { const b = c.getBoundingClientRect(); const d = Math.hypot(b.left + b.width / 2 - e.clientX, b.top + b.height / 2 - e.clientY); if (d < dist) { dist = d; mejor = c; } });
+    if (mejor) mostrar(mejor);
+  });
+  botones.forEach((b) => b.addEventListener('click', () => pintar(b.dataset.modo!)));
+  selVoto?.addEventListener('change', () => { if (selVoto.value) pintar(selVoto.value); });
+  const validos = [...botones.map((b) => b.dataset.modo!), ...(selVoto ? [...selVoto.options].map((o) => o.value).filter(Boolean) : [])];
+  let inicial = 'propiedades';
+  try { const g = localStorage.getItem('hemi-modo'); if (g && validos.includes(g)) inicial = g; } catch {}
+  pintar(inicial);
+</script>
+
+<style>
+  .controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+
+  .selector { margin-left: auto; }
+  .selector select { width: 100%; min-width: 260px; }
+  @media (max-width: 640px) {
+    .modos { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
+    .modos .btn { padding: 8px 6px; }
+    .selector { margin-left: 0; width: 100%; }
+    .selector select { min-width: 0; }
+  }
+  .desc { min-height: 3.2em; margin: .7rem 0 .2rem; }
+  .desc :global(.texto) { color: var(--text); }
+  .lienzo { position: relative; margin: 0 -8px; }
+  svg { width: 100%; height: auto; display: block; overflow: visible; }
+  circle { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; transition: fill .25s, stroke .25s; }
+  circle.vacio { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 3 2; }
+  circle.activo, circle:hover { stroke: var(--text) !important; stroke-width: 4 !important; }
+  :global(.hemi svg a), :global(.hemi svg a:focus), :global(.hemi svg a:focus-visible) { outline: none; }
+  a:focus-visible circle { stroke: var(--accent) !important; stroke-width: 5 !important; }
+  .franjas path { fill: none; stroke-width: 9; }
+  .etiquetas text { font-size: 24px; font-weight: 750; paint-order: stroke; stroke: var(--bg); stroke-width: 5px; }
+  @media (max-width: 640px) { .etiquetas { display: none; } .franjas path { stroke-width: 12; } .lienzo { margin: 0; } }
+  .grupos-movil { display: none; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; }
+  .grupos-movil span { display: inline-flex; align-items: center; gap: 4px; }
+  .grupos-movil i { width: 16px; height: 6px; border-radius: 3px; display: inline-block; }
+  @media (max-width: 640px) { .grupos-movil { display: flex; } }
+  .centro { font-size: 52px; font-weight: 800; fill: var(--text); }
+  .centro-sub { font-size: 20px; fill: var(--muted); }
+  .tip { position: absolute; z-index: 15; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: .9rem; line-height: 1.5; box-shadow: 0 8px 28px rgb(0 0 0 / .18); max-width: 300px; pointer-events: none; }
+  .tip .nombre { font-size: 1rem; }
+  .tip .ver, .tip .cerrar { display: none; }
+  .tip.hoja { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); top: auto; max-width: none; pointer-events: auto; padding: 14px 16px 12px; }
+  .tip.hoja .ver { display: flex; justify-content: center; align-items: center; margin-top: 10px; text-decoration: none; }
+  .tip.hoja .cerrar { display: block; position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; color: var(--muted); cursor: pointer; }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+  .leyenda :global(.dot) { box-shadow: inset 0 0 0 1px rgb(127 127 127 / .35); }
+  .leyenda :global(.dot.vacio) { box-shadow: none; border: 1px dashed var(--muted); }
+  .leyenda :global(.guia) { padding: 0 2px; }
+  .nota { margin-top: 8px; }
+</style>
