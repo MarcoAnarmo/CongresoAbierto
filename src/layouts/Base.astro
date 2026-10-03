@@ -65,7 +65,13 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
     <footer class="site-footer">
       <div class="wrap pie small muted">
         <p>Solo datos oficiales del <a href="https://www.congreso.es/es/datos-abiertos">Congreso de los Diputados</a> y del <a href="https://www.boe.es">BOE</a>, sin interpretaciones. Cada dato enlaza a su documento original.</p>
-        <p>Proyecto independiente y de código abierto (MIT) · <a href={REPO} rel="noopener">Código en GitHub</a> · <a href={enlaceSugerencia} rel="noopener">Hacer una sugerencia</a> · <a href={enlaceError()} rel="noopener">¿Ves un error?</a></p>
+        <p>Proyecto independiente y de código abierto (MIT).</p>
+        <ul class="enlaces-pie">
+          <li><a href={url('/colabora')}>Colabora</a></li>
+          <li><a href={REPO} rel="noopener">Código en GitHub</a></li>
+          <li><a href={enlaceSugerencia} rel="noopener">Hacer una sugerencia</a></li>
+          <li><a href={enlaceError()} rel="noopener">Avisar de un error</a></li>
+        </ul>
       </div>
     </footer>
     </div>
@@ -88,6 +94,7 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
   .site-footer { border-top: 1px solid var(--border); background: var(--surface); padding: 14px 0 calc(14px + env(safe-area-inset-bottom)); }
   .pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 24px; }
   .pie p { margin: 0; }
+  .enlaces-pie { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
 
   /* Móvil: marca arriba y menú en una fila desplazable de pestañas */
   @media (max-width: 720px) {
