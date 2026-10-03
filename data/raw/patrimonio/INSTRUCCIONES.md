@@ -2,7 +2,9 @@
 
 Precisión ante todo: estos datos se publican sobre personas reales. Nunca adivinar; si algo no se lee, poner "?" y explicarlo en `dudas`.
 
-Cada línea del lote: `cod|nombre|urlPdf|tipo` (tipo = `ultima` o `anterior`).
+La transcripción final y revisada está en `revisado.jsonl` (una línea por PDF). Para una declaración nueva, añade su línea con el formato de abajo y pide una segunda revisión en el *pull request*.
+
+Cada declaración a transcribir: `cod|nombre|urlPdf|tipo` (tipo = `ultima` o `anterior`).
 
 Por cada PDF:
 1. `await window._compose(COD, 'URL')` en la pestaña propia (requiere haber cargado scripts/browser/visor-declaraciones.js).
@@ -17,3 +19,4 @@ Salida JSONL (una línea por PDF):
 - `derecho` = derecho sobre el bien (PLENO DOMINIO, NUDA PROPIEDAD, USUFRUCTO, GANANCIAL, 50%...); `titulo` = título de adquisición (COMPRAVENTA, HERENCIA, DONACIÓN...). Si no se puede separar, todo en `derecho`.
 - `esModificacionParcial`: true si la declaración solo comunica un cambio (p. ej. "modificación por adquisición de vehículo") y NO repite todo el patrimonio.
 - `obs`: notas relevantes sobre inmuebles o vehículos fuera de las tablas (observaciones de pág. 4).
+- Matrículas: no se publican. Si la descripción de un vehículo la incluye, sustitúyela por `[matrícula omitida]`.
