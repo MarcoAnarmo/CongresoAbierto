@@ -1,0 +1,24 @@
+{
+  "name": "congreso-abierto",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Datos públicos de los diputados del Congreso: retribuciones, patrimonio declarado y votaciones clave.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "data:build": "tsx scripts/build-data.ts",
+    "data:validate": "tsx scripts/validate-data.ts"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "astro": "^7.3.5",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5"
+  }
+}

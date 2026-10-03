@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+.DS_Store
+data/raw/*.pdf
+.preview/
+_to_delete/
+data/raw/pdf/
+# Ficheros intermedios de transcripción (el resultado final es revisado.jsonl)
+data/raw/patrimonio/lote-*
+data/raw/patrimonio/verificar*.json
+data/raw/patrimonio/verificado-*.json
+data/raw/patrimonio/revision2.json
+data/raw/pdf_faltan.txt
