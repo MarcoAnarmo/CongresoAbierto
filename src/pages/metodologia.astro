@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { CARGOS_CAMARA, CARGOS_COMISION, ASIGNACION, INDEMNIZACION_MADRID, INDEMNIZACION_OTRAS, FUENTE_RETRIBUCIONES } from '../../scripts/retribuciones';
-import { diputados, fmtEur2, meta, fmtFecha, url } from '../lib/data';
+import { diputados, fmtEur2, meta, fmtFecha, url, REPO, enlaceSugerencia, enlaceError } from '../lib/data';
 const conDecl = diputados.filter((d) => d.patrimonio.estado !== 'sin-declaracion').length;
 const ultimaDecl = diputados.map((d) => d.patrimonio.declaracionFecha ?? '').sort().at(-1) ?? null;
 const pdfs = diputados.reduce((a, d) => a + d.patrimonio.fuentes.length, 0);
@@ -104,8 +104,12 @@ const secciones = [
       <section id="errores">
         <h2>¿Has visto un error?</h2>
         <p>
-          Abre una incidencia en el repositorio del proyecto con el diputado, el dato y el enlace al documento oficial (con la página).
+          <a href={enlaceError()} rel="noopener">Abre una incidencia en GitHub</a> con el diputado, el dato y el enlace al documento oficial (con la página).
           Solo se aceptan correcciones respaldadas por un documento oficial.
+        </p>
+        <p>
+          El proyecto es público y cualquiera puede proponer cambios: <a href={enlaceSugerencia} rel="noopener">haz una sugerencia</a>
+          o envía un <em>pull request</em> al <a href={REPO} rel="noopener">repositorio</a>. Todos los cambios se revisan antes de publicarse.
         </p>
       </section>
     </article>

@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug } from '../../lib/data';
+import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError } from '../../lib/data';
 import type { Diputado } from '../../lib/types';
 
 export function getStaticPaths() {
@@ -25,7 +25,7 @@ const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)
         <span class="muted"> · Candidatura: {d.partido} · {d.genero === 'F' ? 'Diputada' : 'Diputado'} por {d.circunscripcion} desde {fmtFecha(d.fechaAlta)}</span>
       </p>
       {d.cargos.length > 0 && <p class="small">{d.cargos.join(' · ')}</p>}
-      <p class="small"><a href={d.fichaUrl} rel="noopener">Ficha oficial en congreso.es ↗</a></p>
+      <p class="small"><a href={d.fichaUrl} rel="noopener">Ficha oficial en congreso.es ↗</a> · <a href={enlaceError(d.nombreCompleto)} rel="noopener">Avisar de un error en esta ficha</a></p>
     </div>
   </div>
 

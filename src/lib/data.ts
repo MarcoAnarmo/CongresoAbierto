@@ -27,6 +27,12 @@ export const slug = (d: Diputado) => `${d.codParlamentario}-${d.nombreCompleto.n
 export const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 export const url = (p: string) => `${base}${p}`;
 
+/** Repositorio público del proyecto y enlaces para proponer cambios. */
+export const REPO = 'https://github.com/MarcoAnarmo/CongresoAbierto';
+export const enlaceSugerencia = `${REPO}/issues/new?template=sugerencia.yml`;
+export const enlaceError = (que?: string) =>
+  `${REPO}/issues/new?template=error-en-un-dato.yml${que ? `&title=${encodeURIComponent(`Error: ${que}`)}&diputado=${encodeURIComponent(que)}` : ''}`;
+
 /** Datos compactos para los scripts de cliente (hemiciclo y ranking). */
 export function datosCliente() {
   return diputados.map((d) => ({
