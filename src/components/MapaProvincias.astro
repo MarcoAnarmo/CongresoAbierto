@@ -1,0 +1,155 @@
+---
+import { diputados, colorGrupo, url, slug, etiquetaPartido, grupos } from '../lib/data';
+import { PROVINCIAS, COLUMNAS, FILAS, nombreLegible } from '../lib/provincias';
+
+const orden = new Map(grupos.map((g) => [g.corto, g.orden]));
+const porProvincia = PROVINCIAS.map((p) => {
+  const ds = diputados
+    .filter((d) => d.circunscripcion === p.nombre)
+    .sort((a, b) => (orden.get(a.grupoCorto)! - orden.get(b.grupoCorto)!) || a.apellidos.localeCompare(b.apellidos, 'es'));
+  const conDatos = ds.filter((d) => d.patrimonio.viviendas !== null);
+  const viviendas = conDatos.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
+  return {
+    ...p,
+    legible: nombreLegible(p.nombre),
+    escanos: ds.length,
+    viviendas,
+    media: conDatos.length ? viviendas / conDatos.length : null,
+    dips: ds.map((d) => ({ n: d.nombreCompleto, g: d.grupoCorto, c: colorGrupo(d.grupoCorto), p: etiquetaPartido(d), v: d.patrimonio.viviendas, pr: d.patrimonio.propiedades, f: d.fotoUrl, s: slug(d) })),
+  };
+});
+const sinCasilla = diputados.filter((d) => !PROVINCIAS.some((p) => p.nombre === d.circunscripcion));
+if (sinCasilla.length) throw new Error(`Circunscripciones sin casilla en el mapa: ${[...new Set(sinCasilla.map((d) => d.circunscripcion))].join(', ')}`);
+
+const celdas: ((typeof porProvincia)[number] | null)[] = [];
+for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(porProvincia.find((p) => p.col === c && p.fila === f) ?? null);
+---
+<section class="mapa" aria-labelledby="mapa-h" id="mapa">
+  <h2 id="mapa-h">Tus diputados por provincia</h2>
+  <p class="muted small intro">Cada casilla es una circunscripción, colocada de forma aproximada (no es un mapa a escala). Pulsa la tuya o escribe tu código postal.</p>
+
+  <div class="controles">
+    <div class="segmentado" role="group" aria-label="Qué mostrar en el mapa">
+      <button class="btn" type="button" data-mmodo="escanos" aria-pressed="true">Diputados</button>
+      <button class="btn" type="button" data-mmodo="viviendas" aria-pressed="false">Viviendas</button>
+    </div>
+    <form class="buscar-cp" id="mapa-cp-form" novalidate>
+      <label for="mapa-cp" class="sr-only">Tu código postal</label>
+      <input type="search" id="mapa-cp" inputmode="numeric" maxlength="5" placeholder="Tu código postal: 41001" autocomplete="postal-code" aria-describedby="mapa-cp-error" />
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+  <p class="error small" id="mapa-cp-error" aria-live="polite"></p>
+
+  <div class="disposicion">
+    <div>
+      <div class="rejilla" style={`--cols:${COLUMNAS}`}>
+        {celdas.map((p) => p
+          ? <button type="button" class="casilla" data-ab={p.abrev} data-escanos={p.escanos} data-media={p.media ?? ''} aria-label={`${p.legible}: ${p.escanos} ${p.escanos === 1 ? 'diputado' : 'diputados'}`} title={p.legible}>{p.abrev}</button>
+          : <span class="hueco" aria-hidden="true"></span>)}
+      </div>
+      <div class="leyenda small" id="mapa-leyenda" aria-hidden="true"></div>
+    </div>
+
+    <div class="panel card" id="mapa-panel" aria-live="polite">
+      <p class="small muted">Elige una provincia en el mapa.</p>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id="mapa-datos" set:html={JSON.stringify({ base: url(''), provincias: porProvincia.map(({ col, fila, nombre, ...r }) => r) })} />
+
+<script>
+  type Dip = { n: string; g: string; c: string; p: string; v: number | null; pr: number | null; f: string; s: string };
+  type Prov = { abrev: string; legible: string; cp: number; escanos: number; viviendas: number; media: number | null; dips: Dip[] };
+  const raw = JSON.parse(document.getElementById('mapa-datos')!.textContent!) as { base: string; provincias: Prov[] };
+  const casillas = [...document.querySelectorAll<HTMLButtonElement>('.mapa .casilla')];
+  const botones = [...document.querySelectorAll<HTMLButtonElement>('.mapa [data-mmodo]')];
+  const panel = document.getElementById('mapa-panel')!;
+  const leyenda = document.getElementById('mapa-leyenda')!;
+  const form = document.getElementById('mapa-cp-form') as HTMLFormElement;
+  const cp = document.getElementById('mapa-cp') as HTMLInputElement;
+  const error = document.getElementById('mapa-cp-error')!;
+  const num = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
+  const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
+  const modos = {
+    escanos: { cortes: [1, 3, 5, 8, 16], etiquetas: ['1', '2–3', '4–5', '6–8', '9–16', '30 o más'], valor: (c: HTMLElement) => Number(c.dataset.escanos) },
+    viviendas: { cortes: [0.5, 1, 1.5, 2, 3], etiquetas: ['≤ 0,5', '≤ 1', '≤ 1,5', '≤ 2', '≤ 3', 'más de 3'], valor: (c: HTMLElement) => (c.dataset.media ? Number(c.dataset.media) : null) },
+  };
+  let actual: Prov | null = null;
+  const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]!);
+
+  function pintar(m: keyof typeof modos) {
+    botones.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mmodo === m)));
+    const t = modos[m];
+    casillas.forEach((c) => {
+      const v = t.valor(c);
+      const i = v === null ? -1 : (t.cortes.findIndex((x) => v <= x) + 1 || t.cortes.length + 1) - 1;
+      c.style.background = i < 0 ? 'transparent' : escala[i];
+      c.classList.toggle('oscura', i >= 3);
+    });
+    leyenda.innerHTML = (m === 'escanos' ? 'Diputados elegidos: ' : 'Viviendas declaradas por diputado (media): ')
+      + escala.map((c, i) => `<span class="pill"><span class="dot" style="background:${c}"></span>${t.etiquetas[i]}</span>`).join(' ');
+    if (actual) mostrar(actual, false);
+  }
+
+  function mostrar(p: Prov, enfocar = true) {
+    actual = p;
+    casillas.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.ab === p.abrev)));
+    const filas = p.dips.map((d) => `
+      <li><a href="${raw.base}/diputado/${d.s}">
+        <img src="${esc(d.f)}" alt="" width="40" height="50" loading="lazy" referrerpolicy="no-referrer" />
+        <span class="quien"><strong>${esc(d.n)}</strong><span class="muted small"><span class="dot" style="background:${d.c}"></span> ${esc(d.p)}</span></span>
+        <span class="cifra small"><strong>${d.v ?? '—'}</strong> ${d.v === 1 ? 'vivienda' : 'viviendas'}</span>
+      </a></li>`).join('');
+    panel.innerHTML = `
+      <h3>${esc(p.legible)}</h3>
+      <p class="small muted">${p.escanos} ${p.escanos === 1 ? 'diputado elegido' : 'diputados elegidos'} · ${num.format(p.viviendas)} viviendas declaradas${p.media !== null ? ` (${num.format(p.media)} por diputado)` : ''}</p>
+      <ul class="lista">${filas}</ul>`;
+    if (enfocar && matchMedia('(max-width: 860px)').matches) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  casillas.forEach((c) => c.addEventListener('click', () => mostrar(raw.provincias.find((p) => p.abrev === c.dataset.ab)!)));
+  botones.forEach((b) => b.addEventListener('click', () => pintar(b.dataset.mmodo as keyof typeof modos)));
+  cp.addEventListener('input', () => { error.textContent = ''; });
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = cp.value.trim();
+    if (!/^\d{5}$/.test(v)) { error.textContent = 'Escribe un código postal de 5 cifras.'; return; }
+    const p = raw.provincias.find((x) => x.cp === Number(v.slice(0, 2)));
+    if (!p) { error.textContent = 'Ese código postal no corresponde a ninguna provincia. Prueba otro.'; return; }
+    mostrar(p);
+  });
+  pintar('escanos');
+</script>
+
+<style>
+  .mapa { margin-top: 2.4rem; }
+  .intro { max-width: 62ch; margin-top: -.3rem; }
+  .controles { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 12px 0 4px; }
+  .buscar-cp { display: flex; gap: 6px; flex: 1 1 260px; max-width: 360px; }
+  .buscar-cp input { flex: 1; min-width: 0; }
+  .error { color: var(--no); min-height: 1.4em; margin: 2px 0 8px; }
+  .disposicion { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .disposicion { grid-template-columns: minmax(0, 1fr); } }
+  .rejilla { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 4px; max-width: 560px; }
+  .casilla, .hueco { aspect-ratio: 1; }
+  .casilla { border: 1px solid var(--border); border-radius: 6px; padding: 0; cursor: pointer; font-size: clamp(.6rem, 2.3vw, .8rem); font-weight: 650; color: var(--text); letter-spacing: -.02em; transition: transform .12s, box-shadow .12s; }
+  .casilla.oscura { color: var(--bg); }
+  .casilla:hover { transform: scale(1.08); box-shadow: 0 0 0 2px var(--accent); }
+  .casilla[aria-pressed='true'] { box-shadow: 0 0 0 3px var(--accent); }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; color: var(--muted); }
+  /* El panel se rellena desde el script: sus estilos van en :global() */
+  .panel :global(h3) { margin: 0; font-size: 1.15rem; }
+  .panel :global(> p) { margin: 2px 0 10px; }
+  .panel :global(.lista) { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  @media (min-width: 861px) { .panel :global(.lista) { max-height: 460px; overflow-y: auto; } }
+  .panel :global(.lista a) { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 8px; text-decoration: none; }
+  .panel :global(.lista a:hover) { background: color-mix(in srgb, var(--accent) 8%, transparent); color: inherit; }
+  .panel :global(.lista img) { width: 40px; height: 50px; object-fit: cover; border-radius: 6px; background: var(--chip); flex: none; }
+  .panel :global(.quien) { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.3; }
+  .panel :global(.quien strong) { font-size: .95rem; }
+  .panel :global(.cifra) { white-space: nowrap; color: var(--muted); }
+  .panel :global(.cifra strong) { color: var(--text); }
+  .leyenda :global(.pill) { font-size: .78rem; }
+</style>
