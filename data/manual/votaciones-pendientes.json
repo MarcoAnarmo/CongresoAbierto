@@ -1,0 +1,57 @@
+[
+  {
+    "id": "rdl-26-27-2026",
+    "fecha": "2026-10-02",
+    "titulo": "Convalidación o derogación de los Reales Decretos-leyes 26/2026 y 27/2026, de 29 de septiembre",
+    "estado": "El Pleno acordó la derogación de ambos decretos el 2 de octubre de 2026 (votación por llamamiento). El Congreso todavía no ha publicado el voto de cada diputado en sus datos abiertos; se añadirá al hemiciclo en cuanto esté disponible.",
+    "fuentes": [
+      {
+        "titulo": "BOE: Real Decreto-ley 26/2026",
+        "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20266"
+      },
+      {
+        "titulo": "BOE: Acuerdo de derogación del RDL 26/2026",
+        "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20526"
+      },
+      {
+        "titulo": "BOE: Real Decreto-ley 27/2026",
+        "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20385"
+      },
+      {
+        "titulo": "BOE: Acuerdo de derogación del RDL 27/2026",
+        "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20527"
+      }
+    ],
+    "contenidos": [
+      {
+        "etiqueta": "Real Decreto-ley 26/2026: títulos del texto",
+        "fuente": {
+          "titulo": "BOE-A-2026-20266",
+          "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20266"
+        },
+        "items": [
+          "Título I. Medidas en materia de protección de la función social de la vivienda y frente a la especulación.",
+          "Título II. Medidas fiscales y tributarias en materia de vivienda.",
+          "Título III. Medidas para el incremento y la protección del parque público de vivienda.",
+          "Título IV. Medidas para el fomento de la promoción de vivienda asequible.",
+          "Título V. Otras medidas en materia de vivienda.",
+          "Título VI. Medidas para la creación de la Cuenta de Ahorro e Inversión Financia Europa.",
+          "Disposición final quinta. Prórroga extraordinaria contratos de arrendamiento de vivienda habitual.",
+          "Disposición final sexta. Limitación extraordinaria de la actualización anual de la renta de los contratos de arrendamiento de vivienda."
+        ]
+      },
+      {
+        "etiqueta": "Real Decreto-ley 27/2026: contenido",
+        "fuente": {
+          "titulo": "BOE-A-2026-20385",
+          "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20385"
+        },
+        "items": [
+          "Artículo único. Modificación de la Ley 29/1994, de 24 de noviembre, de Arrendamientos Urbanos.",
+          "Disposición adicional primera. Coordinación con la prórroga extraordinaria de los contratos de arrendamiento de vivienda habitual prevista en el Real Decreto-ley 26/2026.",
+          "Disposición transitoria única. Contratos de arrendamiento vigentes."
+        ]
+      }
+    ]
+  }
+]

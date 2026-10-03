@@ -1,0 +1,11 @@
+[
+  { "corto": "SUMAR", "nombre": "GP Plurinacional SUMAR", "color": "#E5197F", "orden": 1 },
+  { "corto": "ERC", "nombre": "GP Republicano", "color": "#F2B731", "orden": 2 },
+  { "corto": "EH Bildu", "nombre": "GP Euskal Herria Bildu", "color": "#1FA693", "orden": 3 },
+  { "corto": "PSOE", "nombre": "GP Socialista", "color": "#E30613", "orden": 4 },
+  { "corto": "PNV", "nombre": "GP Vasco (EAJ-PNV)", "color": "#2E7D32", "orden": 5 },
+  { "corto": "Mixto", "nombre": "GP Mixto", "color": "#8C8C8C", "orden": 6 },
+  { "corto": "Junts", "nombre": "GP Junts per Catalunya", "color": "#20C0B2", "orden": 7 },
+  { "corto": "PP", "nombre": "GP Popular en el Congreso", "color": "#1D84CE", "orden": 8 },
+  { "corto": "VOX", "nombre": "GP VOX", "color": "#5BC035", "orden": 9 }
+]

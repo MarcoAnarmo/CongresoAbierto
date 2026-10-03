@@ -1,0 +1,329 @@
+[
+  {
+    "id": "rdl-8-2026",
+    "fecha": "2026-04-28",
+    "tema": "RDL 8/2026 · alquiler (28/04/2026)",
+    "tipo": "Convalidación o derogación de Reales Decretos-leyes.",
+    "titulo": "Real Decreto-ley 8/2026, de 20 de marzo, de medidas en el alquiler en respuesta a las consecuencias económicas y sociales de la Guerra de Irán.",
+    "expediente": "130/000039",
+    "expedienteUrl": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=130/000039",
+    "fuenteUrl": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion175/20260428/Votacion003/VOT_20260428200330.json",
+    "documentos": [
+      {
+        "titulo": "BOE: Real Decreto-ley 8/2026 (texto publicado)",
+        "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-6545",
+        "tipo": "boe"
+      },
+      {
+        "titulo": "BOE: Acuerdo de derogación",
+        "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-9359",
+        "tipo": "boe"
+      },
+      {
+        "titulo": "BOCG núm. D-527 (08/05/2026): Derogación",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/D/BOCG-15-D-527.PDF#page=3",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "Diario de Sesiones núm. 181 (28/04/2026), pág. 35: debate en el Pleno",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/DS/PL/DSCD-15-PL-181.PDF#page=35",
+        "tipo": "ds"
+      },
+      {
+        "titulo": "Resultado oficial de la votación (PDF)",
+        "url": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion175/20260428/Votacion003/VOT_20260428200327.pdf",
+        "tipo": "votacion"
+      }
+    ],
+    "contenido": {
+      "etiqueta": "Artículos del Real Decreto-ley",
+      "fuente": {
+        "titulo": "BOE-A-2026-6545",
+        "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-6545"
+      },
+      "items": [
+        "Artículo 1. Prórroga extraordinaria de los contratos de arrendamiento de vivienda habitual.",
+        "Artículo 2. Limitación extraordinaria de la actualización anual de la renta de los contratos de arrendamiento de vivienda."
+      ]
+    }
+  },
+  {
+    "id": "pl-ley-vivienda-sumar-2026",
+    "fecha": "2026-09-15",
+    "tema": "Modificación Ley 12/2023 (15/09/2026)",
+    "tipo": "Toma en consideración de Proposiciones de Ley.",
+    "titulo": "Proposición de Ley del Grupo Parlamentario Plurinacional SUMAR, para la modificación de la Ley 12/2023, de 24 de mayo, por el derecho a la vivienda.",
+    "expediente": "122/000251",
+    "expedienteUrl": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122/000251",
+    "fuenteUrl": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion197/20260915/Votacion002/VOT_20260915204523.json",
+    "documentos": [
+      {
+        "titulo": "BOCG núm. B-300-1 (30/01/2026): Iniciativa",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-300-1.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "BOCG núm. B-300-2 (21/09/2026): Rechazada",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-300-2.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "Diario de Sesiones núm. 204 (15/09/2026), pág. 20: debate en el Pleno",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/DS/PL/DSCD-15-PL-204.PDF#page=20",
+        "tipo": "ds"
+      },
+      {
+        "titulo": "Resultado oficial de la votación (PDF)",
+        "url": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion197/20260915/Votacion002/VOT_20260915204519.pdf",
+        "tipo": "votacion"
+      }
+    ],
+    "contenido": {
+      "etiqueta": "Texto de la proposición (extracto literal)",
+      "fuente": {
+        "titulo": "BOCG B-300-1",
+        "url": "https://www.congreso.es/busqueda-de-publicaciones?p_p_id=publicaciones&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_publicaciones_mode=mostrarTextoIntegro&_publicaciones_legislatura=XV&_publicaciones_id_texto=(BOCG-15-B-300-1.CODI.)"
+      },
+      "items": [
+        "Modificar el artículo 10 de la Ley 12/2023, de 24 de mayo, por el derecho a la vivienda («Contenido del derecho de propiedad de la vivienda: facultades y delimitaciones»).",
+        "«A partir de la entrada en vigor de esta ley, queda limitada a las personas físicas la posibilidad de transmisión en calidad de adquirentes, tanto a título oneroso como gratuito, de la propiedad de viviendas en estado de uso. […]»",
+        "«Las siguientes entidades quedarán exceptuadas de la limitación anterior: a) Las asociaciones […]. b) Los agentes económicos y sociales. c) Las entidades inscritas en el Registro de Entidades Religiosas. d) Las entidades sin ánimo de lucro […]. e) Las Organizaciones No Gubernamentales para el Desarrollo […].»"
+      ]
+    }
+  },
+  {
+    "id": "pnl-especulacion-2026",
+    "fecha": "2026-05-20",
+    "tema": "PNL especulación inmobiliaria (20/05/2026)",
+    "tipo": "Proposiciones no de Ley.",
+    "titulo": "Proposición no de Ley del Grupo Parlamentario Plurinacional SUMAR, para frenar la especulación inmobiliaria y garantizar el acceso a una vivienda digna. Se vota en los términos de la enmienda transaccional presentada por el Grupo Parlamentario Socialista y el Grupo Parlamentario Plurinacional SUMAR.",
+    "expediente": "162/000498",
+    "expedienteUrl": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162/000498",
+    "fuenteUrl": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion180/20260520/Votacion005/VOT_20260520142326.json",
+    "documentos": [
+      {
+        "titulo": "BOCG núm. D-326 (25/04/2025): Iniciativa",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/D/BOCG-15-D-326.PDF#page=20",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "BOCG núm. D-538 (28/05/2026): Enmiendas y Rechazada",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/D/BOCG-15-D-538.PDF#page=3",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "Diario de Sesiones núm. 186 (20/05/2026), pág. 83: debate en el Pleno",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/DS/PL/DSCD-15-PL-186.PDF#page=83",
+        "tipo": "ds"
+      },
+      {
+        "titulo": "Resultado oficial de la votación (PDF)",
+        "url": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion180/20260520/Votacion005/VOT_20260520142320.pdf",
+        "tipo": "votacion"
+      }
+    ],
+    "contenido": {
+      "etiqueta": "Texto votado: enmienda transaccional de SUMAR y PSOE (literal)",
+      "fuente": {
+        "titulo": "BOCG D-538",
+        "url": "https://www.congreso.es/busqueda-de-publicaciones?p_p_id=publicaciones&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_publicaciones_mode=mostrarTextoIntegro&_publicaciones_legislatura=XV&_publicaciones_id_texto=(BOCG-15-D-538.CODI.)"
+      },
+      "items": [
+        "«1. Aplicar las modificaciones legales necesarias para establecer limitaciones a la adquisición de bienes inmuebles por distintas vías en función del territorio y el adquiriente para terminar con la compra especulativa.",
+        "2. Impulsar una reforma fiscal progresista que mejore el trato a las rentas del trabajo y elimine los beneficios fiscales de las rentas del capital particularmente de vehículos singulares como las SOCIMI.»"
+      ]
+    }
+  },
+  {
+    "id": "pl-okupacion-pp-2026",
+    "fecha": "2026-05-19",
+    "tema": "PL ocupación ilegal (19/05/2026)",
+    "tipo": "Toma en consideración de Proposiciones de Ley.",
+    "titulo": "Proposición de Ley del Grupo Parlamentario Popular en el Congreso, Orgánica contra la ocupación ilegal de inmuebles y para la convivencia vecinal y la protección de la seguridad de las personas y cosas en las comunidades de propietarios.",
+    "expediente": "122/000254",
+    "expedienteUrl": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122/000254",
+    "fuenteUrl": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion179/20260519/Votacion001/VOT_20260519203502.json",
+    "documentos": [
+      {
+        "titulo": "BOCG núm. B-304-1 (13/02/2026): Iniciativa",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-304-1.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "BOCG núm. B-304-2 (25/05/2026): Toma en consideración",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-304-2.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "Diario de Sesiones núm. 185 (19/05/2026), pág. 6: debate en el Pleno",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/DS/PL/DSCD-15-PL-185.PDF#page=6",
+        "tipo": "ds"
+      },
+      {
+        "titulo": "Resultado oficial de la votación (PDF)",
+        "url": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion179/20260519/Votacion001/VOT_20260519203459.pdf",
+        "tipo": "votacion"
+      }
+    ],
+    "contenido": {
+      "etiqueta": "Artículos de la proposición",
+      "fuente": {
+        "titulo": "BOCG B-304-1",
+        "url": "https://www.congreso.es/busqueda-de-publicaciones?p_p_id=publicaciones&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_publicaciones_mode=mostrarTextoIntegro&_publicaciones_legislatura=XV&_publicaciones_id_texto=(BOCG-15-B-304-1.CODI.)"
+      },
+      "items": [
+        "Artículo 1. Objeto.",
+        "Artículo 2. Ámbito de aplicación.",
+        "Artículo 3. Naturaleza de la ocupación ilegal.",
+        "Artículo 4. Modificación del Código Penal.",
+        "Artículo 5. Medidas procesales penales de mejora de la protección.",
+        "Artículo 6. Medidas procesales civiles de mejora de la protección.",
+        "Artículo 7. Respeto al régimen interior de la comunidad de propietarios y normas de convivencia vecinal.",
+        "Artículo 8. Normas de empadronamiento."
+      ]
+    }
+  },
+  {
+    "id": "pl-suelo-vivienda-pp-2026",
+    "fecha": "2026-04-21",
+    "tema": "PL ordenación urbanística y vivienda (21/04/2026)",
+    "tipo": "Toma en consideración de Proposiciones de Ley.",
+    "titulo": "Proposición de Ley del Grupo Parlamentario Popular en el Congreso, de medidas administrativas y procesales para la seguridad jurídica de la ordenación territorial y urbanística, el impulso del desarrollo urbano y la vivienda.",
+    "expediente": "122/000253",
+    "expedienteUrl": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122/000253",
+    "fuenteUrl": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion173/20260421/Votacion001/VOT_20260421201008.json",
+    "documentos": [
+      {
+        "titulo": "BOCG núm. B-303-1 (13/02/2026): Iniciativa",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-303-1.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "BOCG núm. B-303-2 (27/04/2026): Toma en consideración",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-303-2.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "Diario de Sesiones núm. 179 (21/04/2026), pág. 4: debate en el Pleno",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/DS/PL/DSCD-15-PL-179.PDF#page=4",
+        "tipo": "ds"
+      },
+      {
+        "titulo": "Resultado oficial de la votación (PDF)",
+        "url": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion173/20260421/Votacion001/VOT_20260421201006.pdf",
+        "tipo": "votacion"
+      }
+    ],
+    "contenido": {
+      "etiqueta": "Artículos de la proposición",
+      "fuente": {
+        "titulo": "BOCG B-303-1",
+        "url": "https://www.congreso.es/busqueda-de-publicaciones?p_p_id=publicaciones&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_publicaciones_mode=mostrarTextoIntegro&_publicaciones_legislatura=XV&_publicaciones_id_texto=(BOCG-15-B-303-1.CODI.)"
+      },
+      "items": [
+        "Artículo 1. Modificación del texto refundido de la Ley de Suelo y Rehabilitación Urbana, aprobado por Real Decreto Legislativo 7/2015, de 30 de octubre.",
+        "Artículo 2. Modificación de la Ley 29/1998, de 13 de julio, reguladora de la Jurisdicción Contencioso-administrativa.",
+        "Artículo 3. Modificación de la Ley 13/2003, de 23 de mayo, reguladora del contrato de concesión de obras públicas.",
+        "Artículo 4. Modificación de la Ley 1/2000, de 7 de enero, de Enjuiciamiento Civil.",
+        "Artículo 5. Modificación de la Ley 12/2023, de 24 de mayo, por el derecho a la vivienda.",
+        "Artículo 6. Modificación de la Ley 29/1994, de 24 de noviembre, de Arrendamientos Urbanos.",
+        "Disposición transitoria única. Instrumentos de ordenación territorial y urbanística y actos de aplicación afectados por recursos administrativos o contencioso-administrativos."
+      ]
+    }
+  },
+  {
+    "id": "pl-pisos-turisticos-2025",
+    "fecha": "2025-10-07",
+    "tema": "PL pisos turísticos (07/10/2025)",
+    "tipo": "Toma en consideración de Proposiciones de Ley.",
+    "titulo": "Proposición de Ley del Grupo Parlamentario Euskal Herria Bildu, sobre control y regulación de la publicidad y contratación de los pisos turísticos.",
+    "expediente": "122/000214",
+    "expedienteUrl": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122/000214",
+    "fuenteUrl": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion135/20251007/Votacion002/VOT_20251007214330.json",
+    "documentos": [
+      {
+        "titulo": "BOCG núm. B-256-1 (24/07/2025): Iniciativa",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-256-1.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "BOCG núm. B-256-2 (14/10/2025): Toma en consideración",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-256-2.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "Diario de Sesiones núm. 140 (07/10/2025), pág. 21: debate en el Pleno",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/DS/PL/DSCD-15-PL-140.PDF#page=21",
+        "tipo": "ds"
+      },
+      {
+        "titulo": "Resultado oficial de la votación (PDF)",
+        "url": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion135/20251007/Votacion002/VOT_20251007214327.pdf",
+        "tipo": "votacion"
+      }
+    ],
+    "contenido": {
+      "etiqueta": "Estructura de la proposición",
+      "fuente": {
+        "titulo": "BOCG B-256-1",
+        "url": "https://www.congreso.es/busqueda-de-publicaciones?p_p_id=publicaciones&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_publicaciones_mode=mostrarTextoIntegro&_publicaciones_legislatura=XV&_publicaciones_id_texto=(BOCG-15-B-256-1.CODI.)"
+      },
+      "items": [
+        "Título I. Disposiciones generales.",
+        "Título II. De las obligaciones: Capítulo I. Obligaciones para la publicación; Capítulo II. Obligaciones para la contratación.",
+        "Título III. Procedimiento de verificación.",
+        "Título IV. Régimen jurídico y sancionador.",
+        "Artículo 25. Unidad especializada para la inspección y control de las viviendas de uso turístico."
+      ]
+    }
+  },
+  {
+    "id": "pl-alquiler-temporada-2024-12",
+    "fecha": "2024-12-17",
+    "tema": "PL alquiler temporal y de habitaciones (17/12/2024)",
+    "tipo": "Toma en consideración de Proposiciones de Ley.",
+    "titulo": "Proposición de Ley de los Grupos Parlamentarios Plurinacional SUMAR, Republicano, Euskal Herria Bildu y Mixto, para la regulación de los contratos de alquiler temporales y alquiler de habitaciones.",
+    "expediente": "122/000136",
+    "expedienteUrl": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122/000136",
+    "fuenteUrl": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion086/20241217/Votacion001/VOT_20241217205720.json",
+    "documentos": [
+      {
+        "titulo": "BOCG núm. B-154-1 (31/10/2024): Iniciativa",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-154-1.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "BOCG núm. B-154-2 (23/12/2024): Toma en consideración",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-154-2.PDF#page=1",
+        "tipo": "bocg"
+      },
+      {
+        "titulo": "Diario de Sesiones núm. 89 (17/12/2024), pág. 78: debate en el Pleno",
+        "url": "https://www.congreso.es/public_oficiales/L15/CONG/DS/PL/DSCD-15-PL-89.PDF#page=78",
+        "tipo": "ds"
+      },
+      {
+        "titulo": "Resultado oficial de la votación (PDF)",
+        "url": "https://www.congreso.es/webpublica/opendata/votaciones/Leg15/Sesion086/20241217/Votacion001/VOT_20241217205718.pdf",
+        "tipo": "votacion"
+      }
+    ],
+    "contenido": {
+      "etiqueta": "Artículo único: artículos de la Ley de Arrendamientos Urbanos que modifica o añade",
+      "fuente": {
+        "titulo": "BOCG B-154-1",
+        "url": "https://www.congreso.es/busqueda-de-publicaciones?p_p_id=publicaciones&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_publicaciones_mode=mostrarTextoIntegro&_publicaciones_legislatura=XV&_publicaciones_id_texto=(BOCG-15-B-154-1.CODI.)"
+      },
+      "items": [
+        "Artículo 2. Arrendamiento de vivienda.",
+        "Artículo 3. Arrendamiento para uso distinto del de vivienda.",
+        "Artículo 4. Régimen aplicable.",
+        "Artículo 9 bis (nuevo). Plazo en los arrendamientos temporales.",
+        "Artículo 11. Desistimiento del contrato.",
+        "Artículo 21 bis (nuevo). Conservación de la vivienda temporal.",
+        "Artículo 36. Fianza.",
+        "Disposición adicional duodécima (nueva). Respecto a la legislación autonómica."
+      ]
+    }
+  }
+]

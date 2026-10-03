@@ -1,0 +1,18 @@
+{
+ "_comentario": "Ajustes documentados sobre la transcripción literal (data/raw/patrimonio/revisado.jsonl). Solo se excluye un bien cuando una declaración oficial posterior comunica su venta o baja. Cada exclusión cita el motivo.",
+ "diputados": {
+  "26": { "excluirVehiculos": [{ "contiene": "Peugeot 207", "motivo": "La declaración de 09/09/2025 comunica la baja del vehículo Peugeot 207." }] },
+  "28": { "excluirInmuebles": [{ "contiene": "LEÓN", "motivo": "La declaración de 03/12/2025 comunica la venta de una vivienda; la de León era la única declarada antes." }] },
+  "38": { "excluirVehiculos": [{ "contiene": "SERIE1-118iA", "motivo": "La declaración de 29/10/2025 comunica la venta del BMW Serie 1." }] },
+  "118": { "excluirVehiculos": [{ "contiene": "Ranchera", "motivo": "La declaración de 11/12/2024 comunica la venta del Mercedes Ranchera." }] },
+  "145": { "excluirInmuebles": [{ "contiene": "ISLAS BALEARES", "motivo": "La declaración de 19/03/2026 comunica la venta del piso en Islas Baleares (12/03/2026)." }],
+           "excluirVehiculos": [{ "contiene": "TIGUAN", "motivo": "La declaración de 24/07/2024 comunica el cambio del Tiguan por un MINI." }] },
+  "149": { "excluirVehiculos": [{ "contiene": "Golf TDI", "motivo": "La declaración de 23/05/2024 comunica la baja del Volkswagen Golf TDI." }],
+           "nota": "La declaración de 09/09/2025 comunica la venta de su participación en una vivienda heredada sin identificarla; la fila «Dos solares y dos viviendas» (herencia 2019) se mantiene tal como figura en 2023." },
+  "150": { "excluirInmuebles": [{ "contiene": "PISO EN CARBAJOSA", "motivo": "La declaración de 11/06/2025 indica que el piso se vendió el 28/10/2024." }] },
+  "180": { "excluirVehiculos": [{ "contiene": "Mazda CX 5", "motivo": "La declaración de 11/09/2024 comunica la venta del Mazda CX5 de 2015." }] },
+  "181": { "excluirVehiculos": [{ "contiene": "SUBARU XV", "motivo": "La declaración de 12/03/2025 indica que el Subaru XV ya no es de su propiedad." }] },
+  "293": { "excluirInmuebles": [{ "contiene": "NOVIEMBRE 2004", "motivo": "Las modificaciones de 2024 relacionan de nuevo los inmuebles urbanos y este piso ya no figura." }] },
+  "376": { "excluirInmuebles": [{ "contiene": "CASA PAREADA", "motivo": "La declaración de 30/12/2024 comunica la venta de la casa pareada." }] }
+ }
+}
