@@ -14,7 +14,7 @@ const pctTxt = (n: number | null) => (n === null ? '—' : `${fmtNum(n)} %`);
 const votosDip = votaciones.map((v) => ({ v, voto: v.votos[String(d.codParlamentario)] ?? null }));
 const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)', 'Abstención': 'var(--abs)', 'No vota': 'var(--novota)' };
 ---
-<Base title={d.nombreCompleto} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): retribución, viviendas y vehículos declarados y votaciones clave.`}>
+<Base title={d.nombreCompleto} imagen={`/og/diputado/${slug(d)}.png`} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): retribución, viviendas y vehículos declarados y votaciones clave.`}>
   <p><a class="volver" href={url('/ranking')}>← Ranking</a></p>
   <div class="cabecera">
     <img src={d.fotoUrl} alt={`Foto oficial de ${d.nombreCompleto}`} width="110" height="140" loading="lazy" referrerpolicy="no-referrer" />
