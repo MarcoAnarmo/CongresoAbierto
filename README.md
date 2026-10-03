@@ -17,7 +17,7 @@ El proyecto es público y cualquiera puede ayudar, sepa o no programar. Todos lo
 
 - [Avisar de un error en un dato](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=error-en-un-dato.yml)
 - [Hacer una sugerencia](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=sugerencia.yml)
-- [Tareas para empezar](https://github.com/MarcoAnarmo/CongresoAbierto/contribute)
+- [Tareas para empezar](https://github.com/MarcoAnarmo/CongresoAbierto/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [Guía para colaborar](CONTRIBUTING.md) · [Código de conducta](CODE_OF_CONDUCT.md)
 
 Lo más útil ahora mismo: **revisar fichas** contra su PDF oficial y añadir parlamentos autonómicos.

@@ -11,7 +11,7 @@ Gracias por querer ayudar. Este proyecto vive de que cada dato sea **exacto y ve
 | Comentar o votar propuestas | [Issues abiertas](https://github.com/MarcoAnarmo/CongresoAbierto/issues) | No |
 | Corregir datos, código o diseño | *Pull request* (ver abajo) | Un poco |
 
-Si es tu primera vez, mira las [tareas para empezar](https://github.com/MarcoAnarmo/CongresoAbierto/contribute) (etiqueta `good first issue`).
+Si es tu primera vez, mira las [tareas para empezar](https://github.com/MarcoAnarmo/CongresoAbierto/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) (etiqueta `good first issue`).
 
 Solo necesitas una [cuenta gratuita de GitHub](https://github.com/signup).
 
