@@ -65,7 +65,7 @@ congreso.es bloquea muchas descargas automáticas, así que la descarga se hace 
 
 ## Despliegue
 
-La web se publica en **Cloudflare Pages**, conectada a este repositorio:
+La web se publica en **Cloudflare Pages**, conectada a este repositorio: https://congresoabierto.pages.dev
 
 - Cada *merge* en `main` publica la web en producción.
 - Cada *pull request* desde una rama de este repositorio genera una vista previa con su propia URL. Los que llegan desde un *fork* no la tienen, pero GitHub Actions comprueba que la web compila en todos.
