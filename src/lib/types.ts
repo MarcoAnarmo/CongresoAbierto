@@ -120,6 +120,8 @@ export interface VotacionClave {
   documentos: { titulo: string; url: string; tipo?: 'boe' | 'bocg' | 'ds' | 'votacion' }[];
   /** Qué contiene el texto votado: títulos de artículos o extractos literales del documento oficial. */
   contenido?: Contenido;
+  /** Temas de la votación (ids de TEMAS). Si falta, se entiende vivienda. */
+  temas?: string[];
   resultado: 'Aprobada' | 'Rechazada' | 'Convalidado' | 'Derogado';
   totales: { si: number; no: number; abstencion: number; noVota: number };
   /** codParlamentario -> voto */

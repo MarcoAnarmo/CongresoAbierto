@@ -1,122 +1,228 @@
 ---
 import Base from '../layouts/Base.astro';
-import { votaciones, pendientes, diputados, grupos, fmtFecha, url } from '../lib/data';
+import { votaciones, pendientes, diputados, grupos, fmtFecha, url, TEMAS, temasDe } from '../lib/data';
 
 const claseTipo = (t: string) => (/Decretos-leyes/.test(t) ? 'rdl' : /no de Ley/i.test(t) ? 'pnl' : 'pl');
+const nombreTipo: Record<string, string> = { rdl: 'Decreto-ley', pl: 'Proposición de ley', pnl: 'Proposición no de ley' };
 const favorable = (r: string) => (/Aprobada|Convalidado/.test(r) ? 'si' : 'no');
 const busca = (...xs: (string | undefined)[]) => xs.filter(Boolean).join(' ').toLowerCase();
-const tabla = votaciones.map((v) => ({
+/** Etiqueta corta oficial sin la fecha final: «RDL 8/2026 · alquiler (28/04/2026)» → «RDL 8/2026 · alquiler». */
+const corto = (tema: string) => tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '');
+const etDoc: Record<string, string> = { boe: 'BOE', bocg: 'BOCG', ds: 'Diario', votacion: 'Votación' };
+
+const lista = [...votaciones].sort((a, b) => b.fecha.localeCompare(a.fecha)).map((v) => ({
   v,
   porGrupo: grupos.map((g) => {
     const ds = diputados.filter((d) => d.grupoCorto === g.corto);
     const c = { 'Sí': 0, 'No': 0, 'Abstención': 0, 'No vota': 0 } as Record<string, number>;
     ds.forEach((d) => { const x = v.votos[String(d.codParlamentario)]; if (x) c[x]++; });
-    return { g, c };
-  }),
+    return { g, c, total: c['Sí'] + c['No'] + c['Abstención'] + c['No vota'] };
+  }).filter((x) => x.total > 0),
 }));
+const pct = (n: number, t: number) => `${((100 * n) / t).toFixed(2)}%`;
+const fechas = [...new Set([...votaciones.map((v) => v.fecha), ...pendientes.map((p) => p.fecha)])];
 ---
 <Base title="Votaciones" description="Votaciones del Pleno del Congreso sobre vivienda, con el voto de cada diputado según los datos abiertos oficiales.">
-  <h1>Votaciones sobre vivienda</h1>
-  <p class="muted" style="max-width:65ch">
-    Votaciones del Pleno del Congreso (XV Legislatura) sobre vivienda. Los decretos-leyes se publican en el BOE; las proposiciones, en el Boletín Oficial de las Cortes Generales (BOCG). Los textos son los oficiales del Congreso y los votos, los publicados en sus{' '}
-    <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos</a>. Puedes verlas escaño a escaño en el <a href={url('/')}>hemiciclo</a>.
-    El desglose por grupo usa la composición actual de cada grupo.
+  <h1>Votaciones</h1>
+  <p class="muted lead">
+    Qué se votó en el Pleno del Congreso y cuál fue el resultado. Elige un día en el calendario o busca por tema; cada votación se despliega para ver el texto oficial, el voto por grupo y los documentos.
   </p>
 
-  <div class="filtros" role="search" aria-label="Filtrar votaciones">
-    <label class="sr-only" for="v-texto">Buscar en las votaciones</label>
-    <input type="search" id="v-texto" placeholder="Buscar: alquiler, SOCIMI, ocupación…" autocomplete="off" />
-    <div class="chips" role="group" aria-label="Tipo de iniciativa">
-      <button class="chip" data-f="tipo" data-v="" aria-pressed="true">Todas</button>
-      <button class="chip" data-f="tipo" data-v="rdl" aria-pressed="false">Decretos-leyes</button>
-      <button class="chip" data-f="tipo" data-v="pl" aria-pressed="false">Proposiciones de ley</button>
-      <button class="chip" data-f="tipo" data-v="pnl" aria-pressed="false">No de ley</button>
+  <div class="arriba">
+    <section class="card calendario" aria-labelledby="cal-mes">
+      <div class="cal-cab">
+        <button class="btn icono" type="button" id="cal-ant" aria-label="Mes anterior con votaciones">‹</button>
+        <h2 id="cal-mes" aria-live="polite"></h2>
+        <button class="btn icono" type="button" id="cal-sig" aria-label="Mes siguiente con votaciones">›</button>
+      </div>
+      <div class="cal-sem" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div class="cal-dias" id="cal-dias" role="grid" aria-labelledby="cal-mes"></div>
+      <p class="small muted cal-ley"><span><i class="punto si"></i> aprobada o convalidado</span><span><i class="punto no"></i> rechazada o derogado</span><span><i class="punto pend"></i> voto pendiente</span></p>
+    </section>
+
+    <div class="filtros" role="search" aria-label="Filtrar votaciones">
+      <label class="sr-only" for="v-texto">Buscar en las votaciones</label>
+      <input type="search" id="v-texto" placeholder="Buscar: alquiler, SOCIMI, ocupación…" autocomplete="off" />
+      <div class="chips" role="group" aria-label="Tema">
+        <button class="chip" type="button" data-f="tema" data-v="" aria-pressed="true">Todos los temas</button>
+        {TEMAS.map((t) => <button class="chip" type="button" data-f="tema" data-v={t.id} aria-pressed="false">{t.nombre}</button>)}
+      </div>
+      <details class="mas-filtros">
+        <summary>Más filtros</summary>
+        <div class="chips" role="group" aria-label="Tipo de iniciativa">
+          <button class="chip" type="button" data-f="tipo" data-v="" aria-pressed="true">Todos los tipos</button>
+          <button class="chip" type="button" data-f="tipo" data-v="rdl" aria-pressed="false">Decretos-leyes</button>
+          <button class="chip" type="button" data-f="tipo" data-v="pl" aria-pressed="false">Proposiciones de ley</button>
+          <button class="chip" type="button" data-f="tipo" data-v="pnl" aria-pressed="false">No de ley</button>
+        </div>
+        <div class="chips" role="group" aria-label="Resultado">
+          <button class="chip" type="button" data-f="res" data-v="" aria-pressed="true">Cualquier resultado</button>
+          <button class="chip" type="button" data-f="res" data-v="si" aria-pressed="false">Aprobadas o convalidados</button>
+          <button class="chip" type="button" data-f="res" data-v="no" aria-pressed="false">Rechazadas o derogados</button>
+        </div>
+      </details>
+      <p class="small muted cuenta"><span id="v-cuenta" aria-live="polite"></span> <button type="button" class="enlace" id="v-todas" hidden>Ver todas</button></p>
     </div>
-    <div class="chips" role="group" aria-label="Resultado">
-      <button class="chip" data-f="res" data-v="" aria-pressed="true">Cualquier resultado</button>
-      <button class="chip" data-f="res" data-v="si" aria-pressed="false">Aprobadas o convalidados</button>
-      <button class="chip" data-f="res" data-v="no" aria-pressed="false">Rechazadas o derogados</button>
-    </div>
-    <p class="small muted cuenta" id="v-cuenta" aria-live="polite"></p>
   </div>
 
-  {pendientes.map((p) => (
-    <section class="card pendiente votacion" data-tipo="rdl" data-res="no" data-busca={busca(p.titulo, p.estado, ...(p.contenidos ?? []).flatMap((c) => c.items))}>
-      <p class="small muted">{fmtFecha(p.fecha)} · voto nominal pendiente de publicación</p>
-      <h2>{p.titulo}</h2>
-      <p>{p.estado}</p>
-      {(p.contenidos ?? []).map((c) => (
-        <div class="contenido">
-          <p class="docs-t">{c.etiqueta}</p>
-          <ul>{c.items.map((i) => <li>{i}</li>)}</ul>
-          <p class="small muted fuente">Fuente: <a href={c.fuente.url} rel="noopener">{c.fuente.titulo} ↗</a></p>
-        </div>
-      ))}
-      <p class="small">Documentos oficiales: {p.fuentes.map((f, i) => <>{i > 0 && ' · '}<a href={f.url} rel="noopener">{f.titulo} ↗</a></>)}</p>
-    </section>
-  ))}
+  <div class="lista">
+    {pendientes.map((p) => (
+      <article class="card votacion pendiente" data-fecha={p.fecha} data-tema="vivienda" data-tipo="rdl" data-res="pend" data-busca={busca(p.titulo, p.estado, ...(p.contenidos ?? []).flatMap((c) => c.items))}>
+        <p class="meta small"><time datetime={p.fecha}>{fmtFecha(p.fecha)}</time><span class="etq">Decreto-ley</span></p>
+        <h2>{p.titulo}</h2>
+        <p class="resultado"><span class="insignia pend">Voto nominal pendiente</span></p>
+        <p class="small">{p.estado}</p>
+        {(p.contenidos ?? []).map((c) => (
+          <details class="pliegue">
+            <summary>{c.etiqueta}</summary>
+            <ul>{c.items.map((i) => <li>{i}</li>)}</ul>
+            <p class="small muted">Fuente: <a href={c.fuente.url} rel="noopener">{c.fuente.titulo} ↗</a></p>
+          </details>
+        ))}
+        <details class="pliegue">
+          <summary>Documentos oficiales</summary>
+          <ul class="docs">{p.fuentes.map((f) => <li><a href={f.url} rel="noopener">{f.titulo} ↗</a></li>)}</ul>
+        </details>
+      </article>
+    ))}
 
-  {tabla.map(({ v, porGrupo }) => (
-    <section class="card votacion" data-tipo={claseTipo(v.tipo)} data-res={favorable(v.resultado)} data-busca={busca(v.titulo, v.tema, v.tipo, v.resultado, ...(v.contenido?.items ?? []))}>
-      <p class="small muted">{v.tipo} · {fmtFecha(v.fecha)} · Sesión {v.sesion}, votación {v.numeroVotacion} · Expediente <a href={v.expedienteUrl} rel="noopener">{v.expediente}</a></p>
-      <h2>{v.titulo}</h2>
-      <p><strong class={/Aprobada|Convalidado/.test(v.resultado) ? 'ok' : 'ko'}>{v.resultado}</strong> · Sí {v.totales.si} · No {v.totales.no} · Abstención {v.totales.abstencion} · No vota {v.totales.noVota}</p>
-      {v.contenido && (
-        <div class="contenido">
-          <p class="docs-t">{v.contenido.etiqueta}</p>
-          <ul>{v.contenido.items.map((i) => <li>{i}</li>)}</ul>
-          <p class="small muted fuente">Fuente: <a href={v.contenido.fuente.url} rel="noopener">{v.contenido.fuente.titulo} ↗</a></p>
-        </div>
-      )}
-      <p class="docs-t">Voto por grupo</p>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Grupo</th><th class="num">Sí</th><th class="num">No</th><th class="num">Abst.</th><th class="num">No vota</th></tr></thead>
-          <tbody>
-            {porGrupo.map(({ g, c }) => (
-              <tr><td><span class="dot" style={`background:${g.color}`}></span> {g.corto}</td>
-                <td class="num">{c['Sí'] || ''}</td><td class="num">{c['No'] || ''}</td><td class="num">{c['Abstención'] || ''}</td><td class="num">{c['No vota'] || ''}</td></tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div class="docs small">
-        <p class="docs-t">Documentos oficiales</p>
-        <ul>
-          {v.documentos.map((d) => <li><span class={`tipo t-${d.tipo ?? 'otro'}`}>{({ boe: 'BOE', bocg: 'BOCG', ds: 'Diario', votacion: 'Votación' } as Record<string, string>)[d.tipo ?? ''] ?? 'Doc.'}</span><a href={d.url} rel="noopener">{d.titulo} ↗</a></li>)}
-          <li><span class="tipo t-json">Datos</span><a href={v.fuenteUrl} rel="noopener">Voto de cada diputado (JSON, datos abiertos) ↗</a></li>
-        </ul>
-      </div>
-    </section>
-  ))}
+    {lista.map(({ v, porGrupo }) => {
+      const t = v.totales; const total = t.si + t.no + t.abstencion + t.noVota; const tipo = claseTipo(v.tipo);
+      return (
+        <article class="card votacion" data-fecha={v.fecha} data-tema={temasDe(v).join(' ')} data-tipo={tipo} data-res={favorable(v.resultado)} data-busca={busca(v.titulo, v.tema, v.tipo, v.resultado, ...(v.contenido?.items ?? []))}>
+          <p class="meta small"><time datetime={v.fecha}>{fmtFecha(v.fecha)}</time><span class="etq">{nombreTipo[tipo]}</span></p>
+          <h2>{corto(v.tema)}</h2>
+          <p class="resultado">
+            <span class={`insignia ${favorable(v.resultado)}`}>{v.resultado}</span>
+            <span class="small"><strong>{t.si}</strong> sí · <strong>{t.no}</strong> no · <strong>{t.abstencion}</strong> abst. · {t.noVota} no vota</span>
+          </p>
+          <div class="barra" role="img" aria-label={`Sí ${t.si}, No ${t.no}, Abstención ${t.abstencion}, No vota ${t.noVota}`}>
+            <span class="b-si" style={`width:${pct(t.si, total)}`}></span><span class="b-no" style={`width:${pct(t.no, total)}`}></span><span class="b-abs" style={`width:${pct(t.abstencion, total)}`}></span><span class="b-nv" style={`width:${pct(t.noVota, total)}`}></span>
+          </div>
+
+          <details class="pliegue">
+            <summary>Qué se votó</summary>
+            <p class="titulo-oficial">{v.titulo}</p>
+            <p class="small muted">{v.tipo} Sesión {v.sesion}, votación {v.numeroVotacion} · Expediente <a href={v.expedienteUrl} rel="noopener">{v.expediente} ↗</a></p>
+            {v.contenido && (
+              <div class="contenido">
+                <p class="docs-t">{v.contenido.etiqueta}</p>
+                <ul>{v.contenido.items.map((i) => <li>{i}</li>)}</ul>
+                <p class="small muted">Fuente: <a href={v.contenido.fuente.url} rel="noopener">{v.contenido.fuente.titulo} ↗</a></p>
+              </div>
+            )}
+          </details>
+
+          <details class="pliegue">
+            <summary>Voto por grupo</summary>
+            <ul class="grupos">
+              {porGrupo.map(({ g, c, total: n }) => (
+                <li>
+                  <span class="g"><span class="dot" style={`background:${g.color}`}></span>{g.corto}</span>
+                  <span class="barra fina" role="img" aria-label={`${g.corto}: Sí ${c['Sí']}, No ${c['No']}, Abstención ${c['Abstención']}, No vota ${c['No vota']}`}>
+                    <span class="b-si" style={`width:${pct(c['Sí'], n)}`}></span><span class="b-no" style={`width:${pct(c['No'], n)}`}></span><span class="b-abs" style={`width:${pct(c['Abstención'], n)}`}></span><span class="b-nv" style={`width:${pct(c['No vota'], n)}`}></span>
+                  </span>
+                  <span class="n small">{[c['Sí'] && `${c['Sí']} sí`, c['No'] && `${c['No']} no`, c['Abstención'] && `${c['Abstención']} abst.`, c['No vota'] && `${c['No vota']} no vota`].filter(Boolean).join(' · ')}</span>
+                </li>
+              ))}
+            </ul>
+            <p class="small muted">Composición actual de cada grupo. Escaño a escaño en el <a href={url('/')}>hemiciclo</a>.</p>
+          </details>
+
+          <details class="pliegue">
+            <summary>Documentos oficiales</summary>
+            <ul class="docs">
+              {v.documentos.map((d) => <li><span class={`tipo t-${d.tipo ?? 'otro'}`}>{etDoc[d.tipo ?? ''] ?? 'Doc.'}</span><a href={d.url} rel="noopener">{d.titulo} ↗</a></li>)}
+              <li><span class="tipo t-json">Datos</span><a href={v.fuenteUrl} rel="noopener">Voto de cada diputado (JSON, datos abiertos) ↗</a></li>
+            </ul>
+          </details>
+        </article>
+      );
+    })}
+  </div>
 
   <p class="vacio muted" id="v-vacio" hidden>Ninguna votación coincide con el filtro.</p>
 
-  <h2>Glosario de procedimiento</h2>
-  <ul class="small">
-    <li><strong>Convalidación o derogación de Reales Decretos-leyes:</strong> el Congreso decide si un decreto-ley del Gobierno sigue en vigor (convalidación) o queda derogado (art. 86 de la Constitución).</li>
-    <li><strong>Toma en consideración de Proposiciones de Ley:</strong> el Pleno decide si una propuesta de ley presentada por grupos parlamentarios empieza a tramitarse (art. 126 del Reglamento del Congreso).</li>
-    <li><strong>Proposiciones no de Ley:</strong> propuestas sin rango de ley en las que la Cámara fija posición o insta al Gobierno (arts. 193 a 195 del Reglamento del Congreso).</li>
-  </ul>
+  <details class="card glosario">
+    <summary>Glosario de procedimiento</summary>
+    <ul class="small">
+      <li><strong>Convalidación o derogación de Reales Decretos-leyes:</strong> el Congreso decide si un decreto-ley del Gobierno sigue en vigor (convalidación) o queda derogado (art. 86 de la Constitución).</li>
+      <li><strong>Toma en consideración de Proposiciones de Ley:</strong> el Pleno decide si una propuesta de ley presentada por grupos parlamentarios empieza a tramitarse (art. 126 del Reglamento del Congreso).</li>
+      <li><strong>Proposiciones no de Ley:</strong> propuestas sin rango de ley en las que la Cámara fija posición o insta al Gobierno (arts. 193 a 195 del Reglamento del Congreso).</li>
+    </ul>
+  </details>
+  <p class="small muted">Los votos son los publicados en los <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos del Congreso</a>; los textos, los oficiales del BOE y del BOCG.</p>
 </Base>
 
+<script type="application/json" id="v-fechas" set:html={JSON.stringify(fechas)} />
+
 <script>
-  const cards = [...document.querySelectorAll<HTMLElement>('section.votacion')];
+  const cards = [...document.querySelectorAll<HTMLElement>('article.votacion')];
   const texto = document.getElementById('v-texto') as HTMLInputElement;
   const cuenta = document.getElementById('v-cuenta')!;
+  const todas = document.getElementById('v-todas') as HTMLButtonElement;
   const vacio = document.getElementById('v-vacio')!;
-  const estado: Record<string, string> = { tipo: '', res: '' };
+  const estado: Record<string, string> = { tema: '', tipo: '', res: '', dia: '' };
   const norm = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  function aplicar() {
+  const fechaLarga = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  function visibles(sinDia = false) {
     const q = norm(texto.value.trim());
-    let n = 0;
-    cards.forEach((c) => {
-      const ok = (!estado.tipo || c.dataset.tipo === estado.tipo) && (!estado.res || c.dataset.res === estado.res) && (!q || norm(c.dataset.busca ?? '').includes(q));
-      c.hidden = !ok; if (ok) n++;
-    });
-    cuenta.textContent = n === cards.length ? `${n} votaciones` : `${n} de ${cards.length} votaciones`;
-    vacio.hidden = n > 0;
+    return cards.filter((c) =>
+      (!estado.tema || (c.dataset.tema ?? '').split(' ').includes(estado.tema)) &&
+      (!estado.tipo || c.dataset.tipo === estado.tipo) &&
+      (!estado.res || c.dataset.res === estado.res) &&
+      (sinDia || !estado.dia || c.dataset.fecha === estado.dia) &&
+      (!q || norm(c.dataset.busca ?? '').includes(q)));
   }
+  function aplicar() {
+    const ok = new Set(visibles());
+    cards.forEach((c) => { c.hidden = !ok.has(c); });
+    const n = ok.size;
+    cuenta.textContent = estado.dia ? `${n} ${n === 1 ? 'votación' : 'votaciones'} el ${fechaLarga(estado.dia)}` : n === cards.length ? `${n} votaciones` : `${n} de ${cards.length} votaciones`;
+    todas.hidden = !estado.dia;
+    vacio.hidden = n > 0;
+    pintarCalendario();
+  }
+
+  // Calendario: solo se navega entre meses que tienen votaciones
+  const fechas = JSON.parse(document.getElementById('v-fechas')!.textContent!) as string[];
+  const meses = [...new Set(fechas.map((f) => f.slice(0, 7)))].sort();
+  let mes = meses[meses.length - 1];
+  const tituloMes = document.getElementById('cal-mes')!;
+  const dias = document.getElementById('cal-dias')!;
+  const ant = document.getElementById('cal-ant') as HTMLButtonElement;
+  const sig = document.getElementById('cal-sig') as HTMLButtonElement;
+
+  function pintarCalendario() {
+    const [a, m] = mes.split('-').map(Number);
+    const nombre = new Date(a, m - 1, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    tituloMes.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+    const enFiltro = visibles(true);
+    const primero = (new Date(a, m - 1, 1).getDay() + 6) % 7;
+    const n = new Date(a, m, 0).getDate();
+    let html = '<span></span>'.repeat(primero);
+    for (let d = 1; d <= n; d++) {
+      const iso = `${mes}-${String(d).padStart(2, '0')}`;
+      const delDia = enFiltro.filter((c) => c.dataset.fecha === iso);
+      if (!delDia.length) { html += `<span class="dia">${d}</span>`; continue; }
+      const puntos = delDia.map((c) => `<i class="punto ${c.dataset.res}"></i>`).join('');
+      html += `<button type="button" class="dia con" data-dia="${iso}" aria-pressed="${estado.dia === iso}" aria-label="${fechaLarga(iso)}: ${delDia.length} ${delDia.length === 1 ? 'votación' : 'votaciones'}">${d}<span class="puntos">${puntos}</span></button>`;
+    }
+    dias.innerHTML = html;
+    const i = meses.indexOf(mes);
+    ant.disabled = i <= 0; sig.disabled = i >= meses.length - 1;
+  }
+  dias.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-dia]');
+    if (!b) return;
+    estado.dia = estado.dia === b.dataset.dia ? '' : b.dataset.dia!;
+    aplicar();
+  });
+  ant.addEventListener('click', () => { const i = meses.indexOf(mes); if (i > 0) { mes = meses[i - 1]; pintarCalendario(); } });
+  sig.addEventListener('click', () => { const i = meses.indexOf(mes); if (i < meses.length - 1) { mes = meses[i + 1]; pintarCalendario(); } });
+  todas.addEventListener('click', () => { estado.dia = ''; aplicar(); });
+
   document.querySelectorAll<HTMLButtonElement>('.chip').forEach((b) => b.addEventListener('click', () => {
     estado[b.dataset.f!] = b.dataset.v!;
     document.querySelectorAll<HTMLButtonElement>(`.chip[data-f="${b.dataset.f}"]`).forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
@@ -127,28 +233,74 @@ const tabla = votaciones.map((v) => ({
 </script>
 
 <style>
-  section.card { margin: 16px 0; }
-  section h2 { margin-top: .2rem; font-size: 1.1rem; line-height: 1.35; }
-  .ok { color: var(--si); }
-  .ko { color: var(--no); }
-  .pendiente { border-style: dashed; }
-  section.votacion[hidden] { display: none; }
-  .filtros { display: grid; gap: 10px; margin: 18px 0 8px; }
+  .lead { max-width: 62ch; }
+  .arriba { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 20px; align-items: start; margin: 18px 0 8px; }
+  @media (max-width: 760px) { .arriba { grid-template-columns: minmax(0, 1fr); } }
+
+  .calendario { padding: 12px 14px; }
+  .cal-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .cal-cab h2 { margin: 0; font-size: 1.05rem; }
+  .btn.icono { min-height: 40px; width: 40px; padding: 0; font-size: 1.3rem; line-height: 1; }
+  .btn.icono:disabled { opacity: .35; cursor: default; }
+  .cal-sem, .cal-dias { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; text-align: center; }
+  .cal-sem { margin: 10px 0 4px; font-size: .72rem; color: var(--muted); font-weight: 650; }
+  .cal-dias :global(.dia) { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: .85rem; color: var(--muted); border-radius: 8px; }
+  .cal-dias :global(button.dia) { border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 650; cursor: pointer; padding: 0; gap: 2px; }
+  .cal-dias :global(button.dia:hover) { border-color: var(--accent); }
+  .cal-dias :global(button.dia[aria-pressed='true']) { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); box-shadow: 0 0 0 2px var(--accent); }
+  .cal-dias :global(.puntos) { display: flex; gap: 2px; }
+  .cal-ley { margin: 10px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; }
+  .cal-ley span { white-space: nowrap; }
+  @media (max-width: 760px) { .cal-dias :global(.dia) { aspect-ratio: auto; height: 38px; } }
+  :global(.punto) { display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
+  :global(.punto.si) { background: var(--si); } :global(.punto.no) { background: var(--no); } :global(.punto.pend) { background: var(--novota); }
+
+  .filtros { display: grid; gap: 10px; align-content: start; }
   .filtros input { width: 100%; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 6px 14px; min-height: 38px; cursor: pointer; font-size: .9rem; color: var(--muted); transition: border-color .15s, color .15s, background-color .15s; }
   .chip:hover { border-color: var(--accent); color: var(--accent-text); }
   .chip[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+  .mas-filtros summary { cursor: pointer; color: var(--muted); font-size: .9rem; padding: 4px 0; }
+  .mas-filtros[open] { display: grid; gap: 8px; }
   .cuenta { margin: 0; }
-  .vacio { padding: 24px 0; }
-  .contenido { background: var(--bg); border-radius: 10px; padding: 10px 14px; margin: 12px 0; }
-  .contenido ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 4px; font-size: .92rem; }
-  .contenido .fuente { margin: 8px 0 0; }
-  section.votacion > .docs-t { margin-top: 14px; }
-  .docs { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+  .enlace { border: 0; background: none; padding: 0 0 0 6px; color: var(--accent-text); text-decoration: underline; cursor: pointer; font: inherit; }
+
+  .lista { display: grid; gap: 12px; margin-top: 16px; }
+  article.votacion[hidden] { display: none; }
+  .votacion h2 { margin: .15rem 0 .4rem; font-size: 1.15rem; line-height: 1.3; }
+  .meta { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; color: var(--muted); }
+  .etq { font-size: .72rem; font-weight: 650; padding: 1px 8px; border-radius: 999px; background: var(--chip); }
+  .resultado { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 8px; }
+  .insignia { font-size: .82rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+  .insignia.si { background: color-mix(in srgb, var(--si) 14%, transparent); color: var(--si); }
+  .insignia.no { background: color-mix(in srgb, var(--no) 12%, transparent); color: var(--no); }
+  .insignia.pend { background: var(--chip); color: var(--muted); }
+  .pendiente { border-style: dashed; }
+  .barra { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--chip); }
+  .barra.fina { height: 8px; }
+  .b-si { background: var(--si); } .b-no { background: var(--no); } .b-abs { background: var(--abs); } .b-nv { background: var(--novota); }
+
+  .pliegue { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 4px; }
+  .pliegue + .pliegue { margin-top: 0; }
+  .pliegue summary { cursor: pointer; font-weight: 600; font-size: .93rem; padding: 8px 0; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .pliegue summary::-webkit-details-marker { display: none; }
+  .pliegue summary::after { content: '+'; color: var(--muted); font-size: 1.2rem; font-weight: 400; }
+  .pliegue[open] summary::after { content: '−'; }
+  .pliegue summary:hover { color: var(--accent-text); }
+  .pliegue ul { margin: 0 0 8px; padding-left: 1.1rem; display: grid; gap: 4px; font-size: .92rem; }
+  .titulo-oficial { margin: 0 0 6px; }
+  .contenido { background: var(--bg); border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
   .docs-t { margin: 0 0 6px; font-weight: 650; color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
-  .docs ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .grupos { list-style: none; padding: 0 !important; gap: 8px !important; }
+  .grupos li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 2px 10px; align-items: center; }
+  .grupos .g { display: flex; white-space: nowrap; align-items: center; gap: 6px; font-weight: 650; font-size: .88rem; grid-row: span 2; }
+  .grupos .n { color: var(--muted); }
+  ul.docs { list-style: none; padding: 0 !important; gap: 6px !important; }
   .docs li { display: flex; gap: 8px; align-items: baseline; }
   .tipo { flex: none; min-width: 64px; text-align: center; font-size: .7rem; font-weight: 700; letter-spacing: .03em; padding: 1px 6px; border-radius: 6px; background: var(--chip); color: var(--muted); }
   .t-boe, .t-bocg { background: var(--accent-soft); color: var(--accent-text); }
+  .vacio { padding: 24px 0; }
+  .glosario { margin-top: 2rem; }
+  .glosario summary { cursor: pointer; font-weight: 650; }
 </style>

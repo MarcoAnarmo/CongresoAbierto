@@ -57,3 +57,7 @@ export function datosCliente() {
 const sinTildes = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
 export const candidaturaDistinta = (d: Diputado) => !sinTildes(d.partido).includes(sinTildes(d.grupoCorto));
 export const etiquetaPartido = (d: Diputado) => (candidaturaDistinta(d) ? `${d.grupoCorto} (candidatura ${d.partido})` : d.partido);
+
+/** Temas con los que se clasifican las votaciones. Hoy solo vivienda; se irán añadiendo. */
+export const TEMAS = [{ id: 'vivienda', nombre: 'Vivienda' }] as const;
+export const temasDe = (v: { temas?: string[] }) => v.temas ?? ['vivienda'];
