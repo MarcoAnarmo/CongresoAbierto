@@ -273,13 +273,18 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
   @media (max-width: 760px) { .perfil { grid-template-columns: minmax(0, 1fr); } }
   .bloque h3 { margin: 0 0 8px; font-size: 1.05rem; }
   .lineas { margin: 0; padding-left: 1.1rem; display: grid; gap: 6px; font-size: .95rem; line-height: 1.45; }
-  .tipo { display: inline-block; margin: 3px 6px 0 0; font-size: .72rem; padding: 0 8px; text-decoration: none; vertical-align: 1px; }
+  /* Puede ser largo («Universidad Nacional de Educación a Distancia · pública»): que parta línea en vez de salirse */
+  .tipo { display: inline-block; max-width: 100%; white-space: normal; line-height: 1.4; border-radius: 12px; margin: 3px 6px 0 0; font-size: .72rem; padding: 1px 8px; text-decoration: none; vertical-align: 1px; }
   .lineas li > .tipo:first-of-type { margin-left: 4px; }
   .tipo.publica { border-color: color-mix(in srgb, var(--si) 55%, var(--border)); }
   .tipo.privada { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
   .tipo.otro { border-style: dashed; color: var(--muted); }
-  .filtros-tiempo { margin: 4px 0 14px; flex-wrap: wrap; }
-  @media (max-width: 520px) { .filtros-tiempo .btn { padding: 6px 9px; font-size: .86rem; } }
+  /* Siempre en una sola línea; si no cabe, se desliza en horizontal y el fondo gris solo ocupa los botones */
+  .filtros-tiempo { margin: 4px 0 14px; flex-wrap: nowrap; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .filtros-tiempo::-webkit-scrollbar { display: none; }
+  .filtros-tiempo .btn { flex: none; white-space: nowrap; }
+  @media (max-width: 520px) { .filtros-tiempo .btn { padding: 6px 8px; font-size: .84rem; } }
+  @media (max-width: 370px) { .filtros-tiempo .btn { padding: 6px 6px; font-size: .8rem; } }
   .linea { list-style: none; margin: 0; padding: 0 0 0 4px; border-left: 2px solid var(--border); display: grid; gap: 2px; }
   .linea li[hidden] { display: none; }
   .ev { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 14px; padding: 8px 0 8px 18px; position: relative; }
