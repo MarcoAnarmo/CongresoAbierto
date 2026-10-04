@@ -1,7 +1,7 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
 import { diputados, votaciones, grupos, colorGrupo, fmtEur, fmtNum, slug, resumen, candidaturaDistinta } from './data';
 import type { Diputado, VotacionClave, Voto } from './types';
-import { C, h, lienzo, cabecera, pie, cifra, retrato, barraVotos, fotoDataUri, aPng, type Formato } from './og';
+import { C, h, img, lienzo, cabecera, pie, cifra, retrato, barraVotos, fotoDataUri, aPng, type Formato } from './og';
 
 const fechaCorta = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 const fechaLarga = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -41,16 +41,29 @@ function chipVoto(voto: Voto | undefined, d: Diputado, ancho: number, alto: numb
   }, textoVoto(voto, d));
 }
 
-/** Cifra grande con su rótulo; «tono» decide el fondo (blanco, naranja suave u oscuro). */
-function dato(valor: string, etiqueta: string, tono: 'claro' | 'acento' | 'oscuro', e: number, flex = 1, tamValor = 96) {
-  const fondo = { claro: C.blanco, acento: C.acentoSuave, oscuro: C.texto }[tono];
-  const borde = { claro: C.borde, acento: '#f7c9a6', oscuro: C.texto }[tono];
-  return h('div', {
-    flexDirection: 'column', justifyContent: 'space-between', flex, gap: 6 * e, padding: `${22 * e}px ${26 * e}px`,
-    borderRadius: 24 * e, background: fondo, border: `${2 * e}px solid ${borde}`,
-  },
-    h('div', { fontSize: tamValor * e, fontWeight: 800, letterSpacing: -3 * e, lineHeight: 1, color: tono === 'acento' ? C.acento : tono === 'oscuro' ? '#fff' : C.texto }, valor),
-    h('div', { fontSize: 25 * e, lineHeight: 1.25, color: tono === 'oscuro' ? '#d5d8de' : C.apagado }, etiqueta));
+/* Iconos sencillos (trazo) para las cifras: edificio, casa y euro. */
+const icono = (trazos: string, color: string) =>
+  `data:image/svg+xml;base64,${Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${trazos}</svg>`).toString('base64')}`;
+const ICONOS = {
+  propiedades: icono('<path d="M4 21V5l8-3v19M12 21h8V9l-8-3"/><path d="M7.5 8h1M7.5 12h1M7.5 16h1M15.5 12h1M15.5 16h1M2.5 21h19"/>', C.acento),
+  viviendas: icono('<path d="M3 11 12 3.5 21 11"/><path d="M5.5 9.5V20.5h13V9.5"/><path d="M10 20.5v-6h4v6"/>', C.acento),
+  sueldo: icono('<path d="M17.5 6.5A7 7 0 1 0 17.5 17.5"/><path d="M4.5 10.5h9M4.5 13.5h9"/>', C.acento),
+};
+type Cifra = { valor: string; etiqueta: string; icono: keyof typeof ICONOS; destacada?: boolean; flex?: number; tam: number };
+
+/** Panel blanco con las cifras en columnas, separadas por una línea fina, cada una con su icono. */
+function panelCifras(cifras: Cifra[], e: number) {
+  return h('div', { background: C.blanco, border: `${2 * e}px solid ${C.borde}`, borderRadius: 28 * e, padding: `${24 * e}px ${8 * e}px` },
+    ...cifras.map((c, i) => h('div', {
+      flexDirection: 'column', flex: c.flex ?? 1, gap: 10 * e, padding: `0 ${24 * e}px`,
+      borderLeft: i ? `${2 * e}px solid ${C.chip}` : 'none',
+    },
+      // Misma altura para todas las cifras: así los rótulos quedan alineados aunque el importe vaya más pequeño
+      h('div', { height: 92 * e, alignItems: 'flex-end', fontSize: c.tam * e, fontWeight: 800, letterSpacing: -2.5 * e, lineHeight: 1, color: c.destacada ? C.acento : C.texto }, c.valor),
+      h('div', { alignItems: 'flex-start', gap: 10 * e },
+        h('div', { width: 40 * e, height: 40 * e, borderRadius: 20 * e, background: C.acentoSuave, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+          img(ICONOS[c.icono], 24 * e, 24 * e)),
+        h('div', { fontSize: 24 * e, lineHeight: 1.22, color: C.apagado, marginTop: 6 * e, flex: 1 }, c.etiqueta)))));
 }
 
 export async function tarjetaDiputado(d: Diputado, formato: Formato) {
@@ -70,9 +83,14 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
   const veh = p.vehiculos ? `${n(p.vehiculos)} ${p.vehiculos === 1 ? 'vehículo' : 'vehículos'}` : null;
   const notaBienes = sinDecl ? null : [p.declaracionFecha && `Declaración de bienes del ${fechaCorta(p.declaracionFecha)}`, veh && `también declara ${veh}`].filter(Boolean).join(' · ');
   const nombre = d.nombreCompleto;
+  const cifras = (ancha: boolean): Cifra[] => [
+    { valor: prop, etiqueta: etProp, icono: 'propiedades', tam: 96 },
+    { valor: viv, etiqueta: etViv, icono: 'viviendas', destacada: true, tam: 96 },
+    { valor: sueldo, etiqueta: etSueldo, icono: 'sueldo', flex: ancha ? 1.35 : 1.3, tam: sueldo.length > 6 ? 68 : 76 },
+  ];
 
   if (formato === 'horizontal') {
-    const tam = nombre.length > 34 ? 44 : nombre.length > 24 ? 50 : 58;
+    const tam = nombre.length > 34 ? 46 : nombre.length > 24 ? 52 : 60;
     return aPng(h('div', {
       width: 1200, height: 630, flexDirection: 'column', justifyContent: 'space-between', background: C.fondo, color: C.texto,
       fontFamily: 'Inter', borderTop: `12px solid ${C.naranja}`, padding: '30px 52px 32px',
@@ -81,15 +99,12 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
         cabecera(0.78),
         h('div', { fontSize: 22, fontWeight: 700, color: C.acento }, 'congresoabierto.pages.dev')),
       h('div', { gap: 30, alignItems: 'stretch' },
-        retrato(foto, nombre, 206, 262, color),
+        retrato(foto, nombre, 224, 292, color),
         h('div', { flexDirection: 'column', justifyContent: 'space-between', flex: 1, gap: 14 },
           h('div', { flexDirection: 'column', gap: 8 },
             h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 }, nombre),
             h('div', { alignItems: 'center', gap: 10, fontSize: 24, color: C.apagado }, puntoGrupo(color, 18), h('div', { fontWeight: 700, color: C.texto }, d.grupoCorto), candidaturaDistinta(d) ? `(${d.partido}) · ${cargo}` : `· ${cargo}`)),
-          h('div', { gap: 14 },
-            dato(prop, etProp, 'claro', 0.68, 1, 100),
-            dato(viv, etViv, 'acento', 0.68, 1, 100),
-            dato(sueldo, etSueldo, 'oscuro', 0.68, 1.45, 96)))),
+          panelCifras(cifras(true), 0.7))),
       h('div', { flexDirection: 'column', gap: 10 },
         h('div', { fontSize: 19, fontWeight: 700, color: C.apagado, letterSpacing: 0.3 }, 'CÓMO VOTÓ SOBRE VIVIENDA'),
         h('div', { gap: 10 },
@@ -110,17 +125,14 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
       h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.pages.dev')),
     // Quién es
     h('div', { alignItems: 'center', gap: 40, marginTop: 48 },
-      retrato(foto, nombre, 280, 356, color),
+      retrato(foto, nombre, 264, 352, color),
       h('div', { flexDirection: 'column', gap: 20, flex: 1 },
         h('div', { alignSelf: 'flex-start', alignItems: 'center', gap: 12, padding: '8px 20px', borderRadius: 999, background: C.blanco, border: `2px solid ${C.borde}`, fontSize: 30, fontWeight: 800 }, puntoGrupo(color, 22), d.grupoCorto, candidaturaDistinta(d) && h('div', { fontWeight: 400, color: C.apagado }, `· ${d.partido}`)),
         h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2.5, lineHeight: 1.04 }, nombre),
         h('div', { fontSize: 32, color: C.apagado, lineHeight: 1.25 }, cargo))),
     // Qué declara y cuánto cobra
     h('div', { flexDirection: 'column', gap: 12, marginTop: 40 },
-      h('div', { gap: 16 },
-        dato(prop, etProp, 'claro', 1, 1, 104),
-        dato(viv, etViv, 'acento', 1, 1, 104),
-        dato(sueldo, etSueldo, 'oscuro', 1, 1.3, sueldo.length > 6 ? 70 : 78)),
+      panelCifras(cifras(false), 1),
       notaBienes && h('div', { fontSize: 24, color: C.apagado, paddingLeft: 6 }, notaBienes),
       p.revisar && h('div', { alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 700, color: C.acento, paddingLeft: 6 }, h('div', { width: 30, height: 30, borderRadius: 15, background: C.acento, color: '#fff', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800 }, '!'), 'Lectura no confirmada: compruébala en el PDF oficial')),
     // Cómo votó
