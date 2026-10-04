@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
 import { url, REPO, enlaceSugerencia, enlaceError, enlaceHojaDeRuta } from '../lib/data';
+import type { NombreIcono } from '../lib/iconos';
+import Icono from '../components/Icono.astro';
 
 interface Props { title: string; description?: string; /** Ruta de la tarjeta horizontal para la vista previa en redes (Open Graph). */ imagen?: string; }
 const { title, description = 'Conoce a quien te representa · Transparencia y acceso fácil a datos oficiales del Congreso: quiénes son los 350 diputados, qué declaran y cómo votan.', imagen: imagenProp } = Astro.props;
@@ -10,12 +12,12 @@ const imagen = imagenProp ?? (['diputados', 'votaciones', 'metodologia', 'colabo
 const tituloCompleto = title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`;
 const absoluta = (p: string) => new URL(url(p), Astro.site).href;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const nav: { href: string; label: string; corto?: string }[] = [
-  { href: '/', label: 'Hemiciclo' },
-  { href: '/diputados', label: 'Diputados' },
-  { href: '/votaciones', label: 'Votaciones', corto: 'Votos' },
-  { href: '/metodologia', label: 'Metodología', corto: 'Método' },
-  { href: '/colabora', label: 'Colabora' },
+const nav: { href: string; label: string; corto?: string; icono: NombreIcono }[] = [
+  { href: '/', label: 'Hemiciclo', icono: 'hemiciclo' },
+  { href: '/diputados', label: 'Diputados', icono: 'fichas' },
+  { href: '/votaciones', label: 'Votaciones', corto: 'Votos', icono: 'votaciones' },
+  { href: '/metodologia', label: 'Metodología', corto: 'Método', icono: 'metodo' },
+  { href: '/colabora', label: 'Colabora', icono: 'colabora' },
 ];
 const activo = (href: string) => (href === '/' ? path === '/' || path === '' : path.startsWith(href) || (href === '/diputados' && path.startsWith('/diputado/')));
 ---
@@ -28,7 +30,10 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
     <script is:inline>
       // Aplica el tema guardado antes de pintar la página (claro por defecto)
       (function () {
-        var t = null;
+        var t = null, raiz = document.documentElement;
+        // Con JavaScript, la ficha de cada diputado se ve como resumen en cajitas (salvo que se haya elegido verla entera)
+        raiz.classList.add('js');
+        try { if (localStorage.getItem('fichaCompleta') === '1') raiz.classList.add('ficha-completa'); } catch (e) {}
         try { t = localStorage.getItem('tema'); } catch (e) {}
         if (t === 'oscuro') {
           document.documentElement.setAttribute('data-theme', 'dark');
@@ -115,6 +120,10 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
         </button>
       </div>
     </header>
+    <!-- Móvil: el menú va abajo, fijo y al alcance del pulgar -->
+    <nav class="nav-movil" aria-label="Principal">
+      {nav.map((n) => <a href={url(n.href)} aria-current={activo(n.href) ? 'page' : undefined}><span class="nm-ico"><Icono n={n.icono} tam={22} /></span><span>{n.corto ?? n.label}</span></a>)}
+    </nav>
     <script is:inline>
       (function () {
         var b = document.getElementById('boton-tema'), raiz = document.documentElement, meta = document.querySelector('meta[name="theme-color"]');
@@ -228,19 +237,25 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
   }
   @media (max-width: 420px) { .pie-rejilla { grid-template-columns: minmax(0, 1fr); gap: 26px; } }
 
-  /* Móvil: marca arriba y menú en una fila desplazable de pestañas */
-  @media (max-width: 720px) {
-    .bar { display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'marca tema' 'menu menu'; align-items: center; gap: 0; min-height: 0; padding-top: 6px; }
-    .brand { grid-area: marca; justify-content: flex-start; }
-    .tema { grid-area: tema; }
-    nav { grid-area: menu; }
-    nav { overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 12px 4px; }
-    nav::-webkit-scrollbar { display: none; }
-    nav a { padding: 10px 12px; font-size: .93rem; --sub-y: 2px; }
-    main { padding-top: 16px; }
-  }
+  /* Móvil: arriba solo la marca y el tema; el menú pasa a una barra fija abajo */
+  .nav-movil { display: none; }
   .l-corto { display: none; }
-  @media (max-width: 530px) { .l-largo { display: none; } .l-corto { display: inline; } nav { justify-content: space-between; } nav a { padding: 10px 4px; --sub-x: 4px; } }
-  @media (max-width: 374px) { nav { padding: 0 5px 4px; } nav a { padding: 10px 4px; font-size: .84rem; --sub-x: 4px; } }
-  @media (max-width: 340px) { nav a { padding: 10px 2px; font-size: .8rem; --sub-x: 2px; } }
+  @media (max-width: 720px) {
+    .bar { min-height: 52px; gap: 8px; }
+    .bar nav { display: none; }
+    .logo { width: 70px; height: 38px; }
+    main { padding-top: 16px; }
+    body { padding-bottom: calc(62px + env(safe-area-inset-bottom)); }
+    .nav-movil {
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+      padding: 4px 4px env(safe-area-inset-bottom); background: var(--surface); border-top: 1px solid var(--border);
+      box-shadow: 0 -4px 16px rgb(0 0 0 / .06);
+    }
+    .nav-movil a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; padding: 2px 0; font-size: .75rem; line-height: 1.2; color: var(--muted); text-decoration: none; border-radius: 12px; -webkit-tap-highlight-color: transparent; }
+    .nm-ico { display: grid; place-items: center; width: 52px; height: 30px; border-radius: 999px; transition: background-color .15s, color .15s; }
+    .nav-movil a[aria-current='page'] { color: var(--accent-text); font-weight: 650; }
+    .nav-movil a[aria-current='page'] .nm-ico { background: var(--accent-soft); }
+    .nav-movil a:active .nm-ico { background: var(--chip); }
+  }
+  @media (max-width: 340px) { .nav-movil a { font-size: .7rem; } .nm-ico { width: 44px; } }
 </style>
