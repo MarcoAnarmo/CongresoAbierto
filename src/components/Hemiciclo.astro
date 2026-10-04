@@ -273,12 +273,13 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
 <style>
   .controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 
-  .selector { margin-left: auto; }
-  .selector select { width: 100%; min-width: 260px; }
+  /* Ancho fijo: las opciones son largas y, sin límite, el selector saltaría a otra línea a todo el ancho */
+  .selector { margin-left: auto; flex: 0 1 360px; min-width: 0; }
+  .selector select { width: 100%; min-width: 0; text-overflow: ellipsis; }
   @media (max-width: 640px) {
     .modos { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
     .modos .btn { padding: 8px 6px; }
-    .selector { margin-left: 0; width: 100%; }
+    .selector { margin-left: 0; width: 100%; flex-basis: 100%; }
     .selector select { min-width: 0; }
   }
   .desc { min-height: 3.2em; margin: .7rem 0 .2rem; }
