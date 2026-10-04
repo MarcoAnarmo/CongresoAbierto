@@ -5,6 +5,7 @@ import MapaProvincias from '../components/MapaProvincias.astro';
 import type { Diputado } from '../lib/types';
 import BotonCompartir from '../components/BotonCompartir.astro';
 import DialogoCompartir from '../components/DialogoCompartir.astro';
+import Icono from '../components/Icono.astro';
 
 const filas = [...diputados].sort((a, b) =>
   (b.patrimonio.propiedades ?? -1) - (a.patrimonio.propiedades ?? -1) ||
@@ -40,21 +41,23 @@ const columnas = [
 <Base title="Diputados" description="Conoce a los 350 diputados del Congreso: formación, trayectoria, cargos, propiedades declaradas y retribución, con enlace a cada documento oficial.">
   <h1>Diputados</h1>
   <p class="lead">
-    Conoce a quien te representa: qué ha estudiado y dónde, a qué se ha dedicado, desde cuándo es diputado y qué declara tener.
-    Todo sale de su ficha oficial en el Congreso y de sus declaraciones; cada ficha enlaza al documento original.
+    Conoce a quien te representa: qué ha estudiado y dónde, a qué se ha dedicado, desde cuándo es diputado y qué declara tener.{' '}
+    <span class="lead-mas">Todo sale de su ficha oficial en el Congreso y de sus declaraciones; cada ficha enlaza al documento original.</span>
   </p>
 
   <div class="vista-barra">
     <div class="segmentado" role="group" aria-label="Cómo ver a los diputados">
-      <button class="btn" type="button" data-vista="tarjetas" aria-pressed="true">Fichas</button>
-      <button class="btn" type="button" data-vista="tabla" aria-pressed="false"><span class="largo">Tabla de patrimonio</span><span class="corto">Patrimonio</span></button>
-      <button class="btn" type="button" data-vista="grupos" aria-pressed="false"><span class="largo">Por grupo parlamentario</span><span class="corto">Por grupo</span></button>
-      <button class="btn" type="button" data-vista="mapa" aria-pressed="false"><span class="largo">Mapa por provincia</span><span class="corto">Mapa</span></button>
+      <button class="btn" type="button" data-vista="tarjetas" aria-pressed="true"><Icono n="fichas" tam={19} /><span>Fichas</span></button>
+      <button class="btn" type="button" data-vista="tabla" aria-pressed="false"><Icono n="tabla" tam={19} /><span class="largo">Tabla de patrimonio</span><span class="corto">Tabla</span></button>
+      <button class="btn" type="button" data-vista="grupos" aria-pressed="false"><Icono n="grupos" tam={19} /><span class="largo">Por grupo parlamentario</span><span class="corto">Grupos</span></button>
+      <button class="btn" type="button" data-vista="mapa" aria-pressed="false"><Icono n="mapa" tam={19} /><span class="largo">Mapa por provincia</span><span class="corto">Mapa</span></button>
     </div>
   </div>
   <div class="filtros" id="filtros" role="search" aria-label="Buscar diputados">
     <label class="sr-only" for="f-texto">Buscar por nombre, partido, provincia, estudios o trayectoria</label>
     <input type="search" id="f-texto" placeholder="Nombre, provincia, estudios, profesión…" autocomplete="off" />
+    <button class="btn boton-filtrar" type="button" id="abrir-filtros" aria-haspopup="dialog" aria-controls="dlg-filtros"><Icono n="filtros" tam={19} /><span>Filtrar</span><span class="n-filtros" id="n-filtros" hidden></span></button>
+    <div class="filtros-mas" id="filtros-mas">
     <label class="sr-only" for="f-grupo">Grupo parlamentario</label>
     <select id="f-grupo">
       <option value="">Todos los grupos</option>
@@ -83,14 +86,26 @@ const columnas = [
       <option value="co">Más vehículos</option>
       <option value="r">Mayor retribución</option>
     </select>
+    </div>
     <span class="small muted cuenta" id="f-cuenta" aria-live="polite"></span>
   </div>
+  <dialog class="dlg-filtros" id="dlg-filtros" aria-labelledby="dlg-filtros-t">
+    <div class="df-cab">
+      <h2 id="dlg-filtros-t">Filtrar y ordenar</h2>
+      <button class="df-cerrar" type="button" aria-label="Cerrar"><Icono n="cerrar" /></button>
+    </div>
+    <div class="df-cuerpo" id="df-cuerpo" tabindex="-1" autofocus></div>
+    <div class="df-pie">
+      <button class="btn" type="button" id="quitar-filtros">Quitar filtros</button>
+      <button class="btn primario" type="button" id="ver-resultados">Ver resultados</button>
+    </div>
+  </dialog>
 
   <ul class="tarjetas" id="tarjetas">
     {alfabetico.map((d) => (
-      <li class="tarjeta" {...datos(d)}>
+      <li class="tarjeta" {...datos(d)} style={`--g:${colorGrupo(d.grupoCorto)}`}>
         <a href={url(`/diputado/${slug(d)}`)}>
-          <img src={d.fotoUrl} alt="" width="60" height="76" loading="lazy" referrerpolicy="no-referrer" />
+          <img src={d.fotoUrl} alt="" width="64" height="80" loading="lazy" referrerpolicy="no-referrer" />
           <span class="t-cuerpo">
             <strong class="t-nombre">{d.nombreCompleto}</strong>
             <span class="t-sub"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span> {etiquetaPartido(d)} · {d.circunscripcion}</span>
@@ -101,6 +116,14 @@ const columnas = [
               {d.patrimonio.propiedades !== null && <span class="pill">{d.patrimonio.propiedades} {d.patrimonio.propiedades === 1 ? 'propiedad' : 'propiedades'} ({d.patrimonio.viviendas} {d.patrimonio.viviendas === 1 ? 'vivienda' : 'viviendas'})</span>}
             </span>
           </span>
+          <span class="t-cifra">
+            <span data-k="pr"><strong>{d.patrimonio.propiedades ?? '—'}</strong><small><span class="sr-only">propiedades, de ellas </span>{d.patrimonio.viviendas ?? '—'} viv.</small></span>
+            <span data-k="v"><strong>{d.patrimonio.viviendas ?? '—'}</strong><small>viviendas</small></span>
+            <span data-k="co"><strong>{d.patrimonio.vehiculos ?? '—'}</strong><small>vehículos</small></span>
+            <span data-k="r"><strong>{fmtNum(Math.round(d.retribucion.totalMensual))}</strong><small>€ al mes</small></span>
+            <span data-k="l"><strong>{nLeg(d) || '—'}</strong><small>{nLeg(d) === 1 ? 'legislatura' : 'legislat.'}</small></span>
+          </span>
+          <Icono n="derecha" tam={18} class="t-flecha" />
         </a>
         <BotonCompartir class="compartir-tarjeta" d={d} />
       </li>
@@ -129,6 +152,7 @@ const columnas = [
             <td class="num muted pos">{i + 1}</td>
             <td class="quien">
               <a href={url(`/diputado/${slug(d)}`)}>{d.nombreCompleto}</a>{(d.patrimonio.revisar || conAviso(d)) && <span title="Ficha con alguna lectura no confirmada en el PDF oficial" class="aviso">*</span>}
+              <button class="desplegar" type="button" aria-expanded="false" aria-label={`Ver todas las cifras de ${d.nombreCompleto}`}><Icono n="abajo" tam={18} /></button>
               <span class="sub"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span> {etiquetaPartido(d)} · {d.circunscripcion}</span>
             </td>
             <td class="num dato" data-k="pr" data-label="Propiedades" data-corto="Prop."><strong>{d.patrimonio.propiedades ?? '—'}</strong></td>
@@ -154,10 +178,10 @@ const columnas = [
   <section id="vista-grupos" hidden aria-labelledby="h-grupos">
     <h2 id="h-grupos" class="sr-only">Propiedades por grupo parlamentario</h2>
     <div class="grid-stats cifras-congreso">
-      <div class="card stat destacada"><span class="v">{fmtNum(totalProp)}</span><span class="l">propiedades declaradas por los 350 diputados</span></div>
-      <div class="card stat"><span class="v">{fmtNum(totalViv)}</span><span class="l">de ellas son viviendas</span></div>
-      <div class="card stat"><span class="v">{pct(conVivienda)}</span><span class="l">tiene al menos una vivienda</span></div>
-      <div class="card stat"><span class="v">{pct(tresOMas)}</span><span class="l">declara 3 viviendas o más</span></div>
+      <div class="card stat destacada"><span class="c-ico"><Icono n="propiedades" /></span><span class="v">{fmtNum(totalProp)}</span><span class="l">propiedades declaradas por los 350 diputados</span></div>
+      <div class="card stat"><span class="c-ico"><Icono n="vivienda" /></span><span class="v">{fmtNum(totalViv)}</span><span class="l">de ellas son viviendas</span></div>
+      <div class="card stat"><span class="c-ico"><Icono n="vivienda" /></span><span class="v">{pct(conVivienda)}</span><span class="l">tiene al menos una vivienda</span></div>
+      <div class="card stat"><span class="c-ico"><Icono n="viviendas" /></span><span class="v">{pct(tresOMas)}</span><span class="l">declara 3 viviendas o más</span></div>
     </div>
     <div class="table-scroll card" style="padding:0">
       <table class="tabla-grupos">
@@ -232,6 +256,11 @@ const columnas = [
   const form = document.getElementById('f-form') as HTMLSelectElement;
   const orden = document.getElementById('f-orden') as HTMLSelectElement;
   const cuenta = document.getElementById('f-cuenta')!;
+  const filtrosMas = document.getElementById('filtros-mas')!;
+  const dlgFiltros = document.getElementById('dlg-filtros') as HTMLDialogElement;
+  const abrirFiltros = document.getElementById('abrir-filtros') as HTMLButtonElement;
+  const nFiltros = document.getElementById('n-filtros')!;
+  const verResultados = document.getElementById('ver-resultados') as HTMLButtonElement;
   const quitarTildes = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const VISTAS = ['tarjetas', 'tabla', 'grupos', 'mapa'];
   // Cada lista recuerda su orden: las fichas, por nombre; la tabla de patrimonio, por más propiedades
@@ -256,6 +285,10 @@ const columnas = [
     }
     for (const t of tarjetas.sort(comparar)) { t.hidden = !pasa(t); lista.appendChild(t); }
     cuenta.textContent = n === 1 ? '1 diputado' : `${n} diputados`;
+    verResultados.textContent = n === 1 ? 'Ver 1 diputado' : `Ver ${n} diputados`;
+    const activos = [grupo, prov, form].filter((x) => x.value).length;
+    nFiltros.hidden = !activos; nFiltros.textContent = String(activos);
+    abrirFiltros.setAttribute('aria-label', activos ? `Filtrar (${activos} ${activos === 1 ? 'filtro activo' : 'filtros activos'})` : 'Filtrar y ordenar');
     if (ordenes[vista]) ordenes[vista] = { clave, desc };
     try { localStorage.setItem('diputados', JSON.stringify({ g: grupo.value, f: form.value, ordenes, vista })); } catch {}
   }
@@ -263,6 +296,7 @@ const columnas = [
     tabla.querySelectorAll('thead th').forEach((th) => th.removeAttribute('aria-sort'));
     tabla.querySelector(`button.orden[data-k="${clave}"]`)?.closest('th')?.setAttribute('aria-sort', desc ? 'descending' : 'ascending');
     tabla.dataset.clave = clave;
+    lista.dataset.clave = clave;
     orden.value = clave;
   }
   function verVista(v: string) {
@@ -285,6 +319,32 @@ const columnas = [
   }));
   botonesVista.forEach((b) => b.addEventListener('click', () => { verVista(b.dataset.vista!); marcar(); aplicar(); }));
   [texto].forEach((e) => e.addEventListener('input', aplicar));
+
+  // Móvil: los selectores pasan a una hoja que sube desde abajo («Filtrar»); en el ordenador siguen en línea
+  const movil = matchMedia('(max-width: 720px)');
+  const colocarFiltros = () => {
+    if (movil.matches) document.getElementById('df-cuerpo')!.appendChild(filtrosMas);
+    else { if (dlgFiltros.open) dlgFiltros.close(); abrirFiltros.after(filtrosMas); }
+  };
+  movil.addEventListener('change', colocarFiltros);
+  colocarFiltros();
+  abrirFiltros.addEventListener('click', () => { document.documentElement.classList.add('dlg-abierto'); dlgFiltros.showModal(); });
+  dlgFiltros.addEventListener('close', () => { document.documentElement.classList.remove('dlg-abierto'); abrirFiltros.focus(); });
+  dlgFiltros.querySelector('.df-cerrar')!.addEventListener('click', () => dlgFiltros.close());
+  dlgFiltros.addEventListener('click', (e) => { if (e.target === dlgFiltros) dlgFiltros.close(); });
+  verResultados.addEventListener('click', () => dlgFiltros.close());
+  document.getElementById('quitar-filtros')!.addEventListener('click', () => { grupo.value = ''; prov.value = ''; form.value = ''; aplicar(); });
+
+  // Móvil: cada fila de la tabla enseña la cifra por la que se ordena; el botón despliega las cuatro
+  cuerpo.addEventListener('click', (e) => {
+    const t = e.target as Element;
+    if (t.closest('a')) return;
+    const fila = t.closest('tr');
+    const boton = fila?.querySelector<HTMLButtonElement>('.desplegar');
+    if (!fila || !boton || getComputedStyle(boton).display === 'none') return;
+    const abierta = fila.classList.toggle('abierta');
+    boton.setAttribute('aria-expanded', String(abierta));
+  });
   [grupo, prov, form].forEach((e) => e.addEventListener('change', aplicar));
   try {
     const s = JSON.parse(localStorage.getItem('diputados') ?? 'null');
@@ -323,14 +383,44 @@ const columnas = [
   .filtros { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
   .filtros input { flex: 1 1 260px; }
   .filtros select { flex: 1 1 150px; width: auto; min-width: 0; }
-  @media (max-width: 640px) { .filtros select { flex-basis: calc(50% - 4px); } }
+  /* En el ordenador los selectores van en la misma fila que el buscador */
+  .filtros-mas { display: contents; }
+  .boton-filtrar { display: none; align-items: center; gap: 6px; flex: none; }
+  .n-filtros { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent-strong); color: #fff; font-size: .75rem; font-weight: 700; }
+  .n-filtros[hidden] { display: none; }
+  @media (max-width: 720px) {
+    .filtros { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+    .filtros[hidden] { display: none; }
+    .boton-filtrar { display: inline-flex; }
+    .filtros .cuenta { grid-column: 1 / -1; margin: 2px 0 0; }
+    .filtros .filtros-mas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; grid-column: 1 / -1; }
+  }
+  /* Hoja de filtros (móvil) */
+  .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; padding: 0; max-height: 90dvh; border: 1px solid var(--border); border-bottom: 0; border-radius: 20px 20px 0 0; background: var(--surface); color: var(--text); box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
+  .dlg-filtros[open] { display: flex; flex-direction: column; animation: subir .22s ease-out; }
+  .dlg-filtros::backdrop { background: rgb(20 22 28 / .55); }
+  @keyframes subir { from { transform: translateY(48px); opacity: .5; } }
+  .df-cab { position: relative; display: flex; align-items: center; gap: 12px; padding: 20px 8px 8px 16px; }
+  .df-cab::before { content: ''; position: absolute; top: 7px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: var(--border); }
+  .df-cab h2 { flex: 1; margin: 0; font-size: 1.15rem; }
+  .df-cerrar { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+  .df-cuerpo:focus { outline: none; }
+  .df-cuerpo { overflow-y: auto; padding: 4px 16px 12px; }
+  .df-cuerpo .filtros-mas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .df-cuerpo .sr-only { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; margin-top: 10px; font-size: .875rem; font-weight: 600; color: var(--muted); }
+  .df-cuerpo select { width: 100%; }
+  .df-pie { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }
+  :global(html.dlg-abierto), :global(html.dlg-abierto body) { overflow: hidden; }
   .vista-barra { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 4px 0 12px; }
   .cuenta { margin-left: auto; white-space: nowrap; }
   .cifras-congreso { margin: 0 0 14px; }
-  /* En el móvil, las cuatro pestañas en una sola fila */
-  @media (max-width: 560px) {
+  .vista-barra .segmentado .btn { display: inline-flex; align-items: center; gap: 8px; }
+  .vista-barra .segmentado .btn :global(.icono) { flex: none; }
+  /* En el móvil, las cuatro pestañas en una sola fila, con el icono encima del nombre */
+  @media (max-width: 720px) {
+    .lead-mas { display: none; }
     .vista-barra .segmentado { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; }
-    .vista-barra .segmentado .btn { padding: 6px 4px; font-size: .88rem; white-space: nowrap; }
+    .vista-barra .segmentado .btn { flex-direction: column; justify-content: center; gap: 3px; min-height: 56px; padding: 6px 2px; font-size: .8rem; line-height: 1.15; white-space: nowrap; }
   }
   .tarjetas { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
   .tarjeta[hidden], .tarjetas[hidden], .filtros[hidden] { display: none; }
@@ -341,13 +431,12 @@ const columnas = [
   .tabla-grupos .col-barra { width: 38%; }
   .tabla-grupos .pista { display: block; }
   .tabla-grupos tfoot th, .tabla-grupos tfoot td { border-top: 2px solid var(--border); }
-  @media (max-width: 640px) { .tabla-grupos .col-barra { display: none; } .tabla-grupos th, .tabla-grupos td { padding-left: 8px; padding-right: 8px; } }
   .leyenda-barras { flex-wrap: wrap; }
   .ley-barras { display: inline-flex; align-items: center; gap: 6px; }
-  @media (max-width: 640px) { .ley-barras { display: none; } }
   .tarjeta a { display: flex; gap: 12px; height: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); text-decoration: none; color: inherit; transition: border-color .12s, box-shadow .12s; }
   .tarjeta a:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); color: inherit; }
-  .tarjeta img { width: 60px; height: 76px; object-fit: cover; border-radius: 8px; background: var(--chip); flex: none; }
+  .tarjeta img { width: 64px; height: 80px; object-fit: cover; object-position: center top; padding: 2px; border: 2px solid var(--g); border-radius: 10px; background: var(--chip); background-clip: content-box; flex: none; }
+  .t-cifra, .tarjeta :global(.t-flecha) { display: none; }
   .t-cuerpo { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .t-nombre { font-size: 1rem; line-height: 1.25; }
   .t-sub { font-size: .8rem; color: var(--muted); }
@@ -368,31 +457,78 @@ const columnas = [
   .quien a:hover { color: var(--accent-text); }
   .quien .sub { display: block; font-size: .8rem; color: var(--muted); }
   .aviso { color: var(--accent-text); font-weight: 700; margin-left: 2px; }
+  /* Móvil: lista compacta, una fila por diputado con la cifra por la que se ordena a la derecha */
+  @media (max-width: 720px) {
+    .tarjetas { grid-template-columns: minmax(0, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .tarjeta a { align-items: center; gap: 12px; padding: 10px 10px 10px 12px; border: 0; border-radius: 0; }
+    .tarjeta a:hover { box-shadow: none; background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+    .tarjeta img { width: 46px; height: 58px; border-radius: 9px; padding: 1.5px; }
+    .t-form, .t-pie, .tarjeta :global(.compartir-tarjeta) { display: none; }
+    .t-cuerpo { flex: 1; gap: 1px; }
+    .t-nombre { padding-right: 0; font-size: .98rem; }
+    .t-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .82rem; }
+    .t-cifra { display: block; flex: none; text-align: right; line-height: 1.2; min-width: 52px; }
+    .t-cifra > span { display: none; flex-direction: column; align-items: flex-end; }
+    .t-cifra strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+    .t-cifra small { font-size: .75rem; color: var(--muted); white-space: nowrap; }
+    .tarjetas:not([data-clave='v']):not([data-clave='co']):not([data-clave='r']):not([data-clave='l']) .t-cifra > [data-k='pr'],
+    .tarjetas[data-clave='v'] .t-cifra > [data-k='v'], .tarjetas[data-clave='co'] .t-cifra > [data-k='co'],
+    .tarjetas[data-clave='r'] .t-cifra > [data-k='r'], .tarjetas[data-clave='l'] .t-cifra > [data-k='l'] { display: flex; }
+    .tarjeta :global(.t-flecha) { display: block; flex: none; color: var(--muted); margin-left: -4px; }
+  }
+  .desplegar { display: none; }
   @media (max-width: 640px) {
-    .tarjetas { grid-template-columns: minmax(0, 1fr); }
     #tabla-ranking thead { display: none; }
     #tabla-ranking, #tabla-ranking tbody { display: block; }
-    #tabla-ranking tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 6px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    /* Fila plegada: posición, nombre y la cifra por la que se ordena; desplegada: las cuatro cifras */
+    #tabla-ranking tr { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 12px 52px 12px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    #tabla-ranking tr.abierta { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     #tabla-ranking tr[hidden] { display: none; }
     #tabla-ranking tr:last-child { border-bottom: 0; }
     #tabla-ranking td { display: block; border: 0; padding: 0; }
     #tabla-ranking td.pos { display: none; }
-    #tabla-ranking td.quien { grid-column: 1 / -1; margin-bottom: 8px; }
+    #tabla-ranking td.quien { min-width: 0; }
+    #tabla-ranking tr.abierta td.quien { grid-column: 1 / -1; margin-bottom: 4px; }
     #tabla-ranking td.quien::before { content: attr(data-pos); display: inline-block; min-width: 1.6em; margin-right: 6px; padding: 0 6px; border-radius: 6px; background: var(--chip); color: var(--muted); font-size: .78rem; font-weight: 650; text-align: center; vertical-align: 2px; }
     .quien a { font-size: 1rem; overflow-wrap: anywhere; }
-    .quien .sub { margin-top: 2px; }
-    #tabla-ranking td.dato { text-align: left; font-size: 1.05rem; font-variant-numeric: tabular-nums; background: var(--bg); border-radius: 8px; padding: 6px 7px; white-space: nowrap; }
-    #tabla-ranking td.dato::before { content: attr(data-label); display: block; font-size: .68rem; color: var(--muted); font-weight: 500; margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; }
+    .quien .sub { margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #tabla-ranking td.dato { display: none; text-align: left; font-size: 1.05rem; font-variant-numeric: tabular-nums; background: var(--bg); border-radius: 8px; padding: 6px 8px; white-space: nowrap; }
+    #tabla-ranking tr.abierta td.dato,
+    #tabla-ranking[data-clave='n'] td[data-k='pr'], #tabla-ranking[data-clave='l'] td[data-k='pr'],
+    #tabla-ranking[data-clave='pr'] td[data-k='pr'], #tabla-ranking[data-clave='v'] td[data-k='v'],
+    #tabla-ranking[data-clave='co'] td[data-k='co'], #tabla-ranking[data-clave='r'] td[data-k='r'] { display: block; }
+    #tabla-ranking td.dato::before { content: attr(data-label); display: block; font-size: .75rem; color: var(--muted); font-weight: 500; margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; }
     #tabla-ranking[data-clave='pr'] td[data-k='pr'], #tabla-ranking[data-clave='v'] td[data-k='v'],
     #tabla-ranking[data-clave='co'] td[data-k='co'], #tabla-ranking[data-clave='r'] td[data-k='r'] { background: var(--accent-soft); color: var(--accent-text); }
     #tabla-ranking td.dato strong { font-weight: 700; }
+    .desplegar { display: grid; place-items: center; position: absolute; top: 50%; right: 6px; width: 44px; height: 44px; margin-top: -22px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+    #tabla-ranking tr.abierta .desplegar { top: 12px; margin-top: 0; }
+    .desplegar :global(.icono) { transition: transform .15s; }
+    .desplegar[aria-expanded='true'] :global(.icono) { transform: rotate(180deg); }
+
+    /* Por grupo: nombre y diputados, barra a todo el ancho y debajo las tres cifras */
+    .tabla-grupos thead { display: none; }
+    .tabla-grupos, .tabla-grupos tbody, .tabla-grupos tfoot { display: block; }
+    .tabla-grupos tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: end; padding: 14px 14px 12px; border-bottom: 1px solid var(--border); }
+    .tabla-grupos tbody tr:last-child { border-bottom: 1px solid var(--border); }
+    .tabla-grupos th, .tabla-grupos td { display: block; border: 0 !important; padding: 0; }
+    .tabla-grupos th[scope='row'] { grid-column: 1 / 3; align-self: center; font-size: 1.05rem; text-transform: none; letter-spacing: 0; color: var(--text); }
+    .tabla-grupos .col-barra { display: block; grid-column: 1 / -1; grid-row: 2; width: auto; }
+    .tabla-grupos tfoot .col-barra { display: none; }
+    .tabla-grupos td.num { text-align: left; font-size: 1rem; }
+    .tabla-grupos td.num::before { content: attr(data-label); display: block; font-size: .75rem; color: var(--muted); }
+    .tabla-grupos td[data-label='Diputados'] { grid-column: 3; grid-row: 1; text-align: right; }
+    .tabla-grupos .pista { height: 14px; }
+    .ley-barras { display: inline-flex; }
   }
   @media (max-width: 440px) {
-    #tabla-ranking td.dato::before { content: attr(data-corto); font-size: .74rem; }
+    #tabla-ranking td.dato::before { content: attr(data-corto); }
   }
   @media (max-width: 360px) {
-    #tabla-ranking tr { gap: 4px 6px; padding: 12px; }
+    #tabla-ranking tr { gap: 4px 6px; padding: 12px 48px 12px 12px; }
     #tabla-ranking td.dato { font-size: .95rem; padding: 5px 6px; }
     #tabla-ranking .eur { display: none; }
   }
+  /* Cifras de todo el Congreso: cada una con su icono */
+  .c-ico { display: inline-grid; place-items: center; width: 34px; height: 34px; margin-bottom: 4px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-text); }
 </style>
