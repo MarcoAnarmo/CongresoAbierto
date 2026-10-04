@@ -1,6 +1,7 @@
 import diputadosJson from '../../data/congreso/diputados.json';
 import votacionesJson from '../../data/congreso/votaciones.json';
 import resumenJson from '../../data/congreso/resumen.json';
+import plenoJson from '../../data/congreso/votaciones-pleno.json';
 import gruposJson from '../../data/manual/grupos.json';
 import type { Contenido, Diputado, GrupoInfo, VotacionClave } from './types';
 
@@ -57,3 +58,10 @@ export function datosCliente() {
 const sinTildes = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
 export const candidaturaDistinta = (d: Diputado) => !sinTildes(d.partido).includes(sinTildes(d.grupoCorto));
 export const etiquetaPartido = (d: Diputado) => (candidaturaDistinta(d) ? `${d.grupoCorto} (candidatura ${d.partido})` : d.partido);
+
+/** Temas con los que se filtran las votaciones (data/manual/temas.json). */
+export const TEMAS = (votacionesJson as any).temas as { id: string; nombre: string }[];
+export const temasDe = (v: { temas?: string[] }) => v.temas ?? ['otros'];
+/** Todas las votaciones del Pleno importadas de datos abiertos, más las votaciones clave. Más recientes primero. */
+export const votacionesPleno = [...votaciones, ...((plenoJson as any).votaciones as VotacionClave[])]
+  .sort((a, b) => b.fecha.localeCompare(a.fecha) || b.sesion - a.sesion || b.numeroVotacion - a.numeroVotacion);

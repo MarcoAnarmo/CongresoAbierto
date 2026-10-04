@@ -13,3 +13,5 @@ data/raw/patrimonio/verificar*.json
 data/raw/patrimonio/verificado-*.json
 data/raw/patrimonio/revision2.json
 data/raw/pdf_faltan.txt
+# JSON oficiales de votaciones descargados (el resultado compacto es data/raw/votaciones/pleno.jsonl)
+data/raw/votaciones/descargas/
