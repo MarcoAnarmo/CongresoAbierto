@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
-import { diputados, resumen, grupos, colorGrupo, fmtEur, fmtNum, url, slug, etiquetaPartido } from '../lib/data';
+import { diputados, resumen, grupos, colorGrupo, fmtNum, url, slug, etiquetaPartido, meta } from '../lib/data';
+import MapaProvincias from '../components/MapaProvincias.astro';
 import type { Diputado } from '../lib/types';
 import BotonCompartir from '../components/BotonCompartir.astro';
 import DialogoCompartir from '../components/DialogoCompartir.astro';
@@ -12,6 +13,13 @@ const filas = [...diputados].sort((a, b) =>
 const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.viviendas - a.viviendas);
 const max = Math.max(...porGrupo.map((g) => g.propiedades));
 const provincias = [...new Set(diputados.map((d) => d.circunscripcion))].sort((a, b) => a.localeCompare(b, 'es'));
+// Cifras de todo el Congreso (vista «Por grupo»)
+const conDatos = diputados.filter((d) => d.patrimonio.viviendas !== null);
+const totalProp = conDatos.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
+const totalViv = conDatos.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
+const pct = (n: number) => `${Math.round((100 * n) / conDatos.length)} %`;
+const conVivienda = conDatos.filter((d) => (d.patrimonio.viviendas ?? 0) > 0).length;
+const tresOMas = conDatos.filter((d) => (d.patrimonio.viviendas ?? 0) >= 3).length;
 const alfabetico = [...diputados].sort((a, b) => a.apellidos.localeCompare(b.apellidos, 'es'));
 const etTipo = { publica: 'Universidad pública', privada: 'Universidad privada', ambas: 'Universidad pública y privada' } as Record<string, string>;
 const formacionCorta = (d: Diputado) => d.perfil?.formacion[0]?.texto ?? null;
@@ -36,6 +44,14 @@ const columnas = [
     Todo sale de su ficha oficial en el Congreso y de sus declaraciones; cada ficha enlaza al documento original.
   </p>
 
+  <div class="vista-barra">
+    <div class="segmentado" role="group" aria-label="Cómo ver a los diputados">
+      <button class="btn" type="button" data-vista="tarjetas" aria-pressed="true">Fichas</button>
+      <button class="btn" type="button" data-vista="tabla" aria-pressed="false"><span class="largo">Tabla de patrimonio</span><span class="corto">Patrimonio</span></button>
+      <button class="btn" type="button" data-vista="grupos" aria-pressed="false"><span class="largo">Por grupo parlamentario</span><span class="corto">Por grupo</span></button>
+      <button class="btn" type="button" data-vista="mapa" aria-pressed="false"><span class="largo">Mapa por provincia</span><span class="corto">Mapa</span></button>
+    </div>
+  </div>
   <div class="filtros" id="filtros" role="search" aria-label="Buscar diputados">
     <label class="sr-only" for="f-texto">Buscar por nombre, partido, provincia, estudios o trayectoria</label>
     <input type="search" id="f-texto" placeholder="Nombre, provincia, estudios, profesión…" autocomplete="off" />
@@ -67,14 +83,7 @@ const columnas = [
       <option value="co">Más vehículos</option>
       <option value="r">Mayor retribución</option>
     </select>
-  </div>
-  <div class="vista-barra">
-    <div class="segmentado" role="group" aria-label="Cómo ver la lista">
-      <button class="btn" type="button" data-vista="tarjetas" aria-pressed="true">Fichas</button>
-      <button class="btn" type="button" data-vista="tabla" aria-pressed="false"><span class="largo">Tabla de patrimonio</span><span class="corto">Patrimonio</span></button>
-      <button class="btn" type="button" data-vista="grupos" aria-pressed="false"><span class="largo">Propiedades por grupo parlamentario</span><span class="corto">Por grupo</span></button>
-    </div>
-    <span class="small muted" id="f-cuenta" aria-live="polite"></span>
+    <span class="small muted cuenta" id="f-cuenta" aria-live="polite"></span>
   </div>
 
   <ul class="tarjetas" id="tarjetas">
@@ -144,6 +153,12 @@ const columnas = [
 
   <section id="vista-grupos" hidden aria-labelledby="h-grupos">
     <h2 id="h-grupos" class="sr-only">Propiedades por grupo parlamentario</h2>
+    <div class="grid-stats cifras-congreso">
+      <div class="card stat destacada"><span class="v">{fmtNum(totalProp)}</span><span class="l">propiedades declaradas por los 350 diputados</span></div>
+      <div class="card stat"><span class="v">{fmtNum(totalViv)}</span><span class="l">de ellas son viviendas</span></div>
+      <div class="card stat"><span class="v">{pct(conVivienda)}</span><span class="l">tiene al menos una vivienda</span></div>
+      <div class="card stat"><span class="v">{pct(tresOMas)}</span><span class="l">declara 3 viviendas o más</span></div>
+    </div>
     <div class="table-scroll card" style="padding:0">
       <table class="tabla-grupos">
         <thead>
@@ -187,7 +202,15 @@ const columnas = [
       </table>
     </div>
     <p class="small muted leyenda-barras"><span class="ley-barras"><span class="muestra m-prop"></span> propiedades <span class="muestra m-viv"></span> de ellas, viviendas ·</span> Suma de lo que declara cada diputado del grupo · <a href={url('/metodologia#propiedades')}>Cómo se cuentan</a></p>
+    <p class="small muted">
+      Propiedades: inmuebles urbanos y rústicos a nombre del diputado (viviendas, garajes, trasteros, locales, solares, fincas…), en propiedad total o parcial.
+      Los de sociedades en las que participa se muestran aparte en su ficha. Datos consultados el {new Date(meta.generado).toLocaleDateString('es-ES')}.
+    </p>
   </section>
+
+  <div id="vista-mapa" hidden>
+    <MapaProvincias enVista />
+  </div>
 
 </Base>
 
@@ -199,6 +222,7 @@ const columnas = [
   const tarjetas = [...lista.children] as HTMLLIElement[];
   const vistaTabla = document.getElementById('vista-tabla')!;
   const vistaGrupos = document.getElementById('vista-grupos')!;
+  const vistaMapa = document.getElementById('vista-mapa')!;
   const filtros = document.getElementById('filtros')!;
   const notaFormacion = document.getElementById('nota-formacion')!;
   const botonesVista = [...document.querySelectorAll<HTMLButtonElement>('[data-vista]')];
@@ -209,6 +233,9 @@ const columnas = [
   const orden = document.getElementById('f-orden') as HTMLSelectElement;
   const cuenta = document.getElementById('f-cuenta')!;
   const quitarTildes = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const VISTAS = ['tarjetas', 'tabla', 'grupos', 'mapa'];
+  // Cada lista recuerda su orden: las fichas, por nombre; la tabla de patrimonio, por más propiedades
+  const ordenes: Record<string, { clave: string; desc: boolean }> = { tarjetas: { clave: 'n', desc: false }, tabla: { clave: 'pr', desc: true } };
   let clave = 'n', desc = false, vista = 'tarjetas';
 
   const valor = (f: HTMLElement, k: string) => parseFloat(f.dataset[k] ?? '0');
@@ -229,7 +256,8 @@ const columnas = [
     }
     for (const t of tarjetas.sort(comparar)) { t.hidden = !pasa(t); lista.appendChild(t); }
     cuenta.textContent = n === 1 ? '1 diputado' : `${n} diputados`;
-    try { localStorage.setItem('diputados', JSON.stringify({ g: grupo.value, f: form.value, clave, desc, vista })); } catch {}
+    if (ordenes[vista]) ordenes[vista] = { clave, desc };
+    try { localStorage.setItem('diputados', JSON.stringify({ g: grupo.value, f: form.value, ordenes, vista })); } catch {}
   }
   function marcar() {
     tabla.querySelectorAll('thead th').forEach((th) => th.removeAttribute('aria-sort'));
@@ -238,9 +266,16 @@ const columnas = [
     orden.value = clave;
   }
   function verVista(v: string) {
-    vista = v; vistaTabla.hidden = v !== 'tabla'; lista.hidden = v !== 'tarjetas'; vistaGrupos.hidden = v !== 'grupos';
-    filtros.hidden = v === 'grupos'; cuenta.hidden = v === 'grupos'; notaFormacion.hidden = v !== 'tarjetas';
+    if (!VISTAS.includes(v)) v = 'tarjetas';
+    vista = v; vistaTabla.hidden = v !== 'tabla'; lista.hidden = v !== 'tarjetas'; vistaGrupos.hidden = v !== 'grupos'; vistaMapa.hidden = v !== 'mapa';
+    // Los filtros y el orden solo tienen sentido en las dos listas (fichas y tabla)
+    filtros.hidden = !ordenes[v]; notaFormacion.hidden = v !== 'tarjetas';
+    if (ordenes[v]) ({ clave, desc } = ordenes[v]);
     botonesVista.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === v)));
+    // La vista queda en la dirección para poder enlazarla (/diputados?vista=mapa)
+    const u = new URL(location.href);
+    if (v === 'tarjetas') u.searchParams.delete('vista'); else u.searchParams.set('vista', v);
+    history.replaceState(null, '', u);
   }
   orden.addEventListener('change', () => { clave = orden.value; desc = clave !== 'n'; marcar(); aplicar(); });
   tabla.querySelectorAll<HTMLButtonElement>('button.orden').forEach((b) => b.addEventListener('click', () => {
@@ -248,15 +283,20 @@ const columnas = [
     desc = k === clave ? !desc : k !== 'n';
     clave = k; marcar(); aplicar();
   }));
-  botonesVista.forEach((b) => b.addEventListener('click', () => { verVista(b.dataset.vista!); aplicar(); }));
+  botonesVista.forEach((b) => b.addEventListener('click', () => { verVista(b.dataset.vista!); marcar(); aplicar(); }));
   [texto].forEach((e) => e.addEventListener('input', aplicar));
   [grupo, prov, form].forEach((e) => e.addEventListener('change', aplicar));
-  try { const s = JSON.parse(localStorage.getItem('diputados') ?? 'null'); if (s) { grupo.value = s.g ?? ''; form.value = s.f ?? ''; clave = s.clave ?? 'n'; desc = s.desc ?? false; vista = s.vista ?? 'tarjetas'; } } catch {}
+  try {
+    const s = JSON.parse(localStorage.getItem('diputados') ?? 'null');
+    if (s) { grupo.value = s.g ?? ''; form.value = s.f ?? ''; vista = s.vista ?? 'tarjetas'; if (s.ordenes) Object.assign(ordenes, s.ordenes); }
+  } catch {}
   // Filtros desde la dirección: /diputados?provincia=Sevilla&grupo=PSOE&q=derecho
   const ps = new URLSearchParams(location.search);
   if (ps.has('provincia')) prov.value = ps.get('provincia')!;
   if (ps.has('grupo')) grupo.value = ps.get('grupo')!;
   if (ps.has('q')) texto.value = ps.get('q')!;
+  if (ps.has('vista')) vista = ps.get('vista')!;
+  else if (location.hash === '#mapa') vista = 'mapa';
   verVista(vista); marcar(); aplicar();
 </script>
 
@@ -284,7 +324,14 @@ const columnas = [
   .filtros input { flex: 1 1 260px; }
   .filtros select { flex: 1 1 150px; width: auto; min-width: 0; }
   @media (max-width: 640px) { .filtros select { flex-basis: calc(50% - 4px); } }
-  .vista-barra { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 4px 0 14px; }
+  .vista-barra { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 4px 0 12px; }
+  .cuenta { margin-left: auto; white-space: nowrap; }
+  .cifras-congreso { margin: 0 0 14px; }
+  /* En el móvil, las cuatro pestañas en una sola fila */
+  @media (max-width: 560px) {
+    .vista-barra .segmentado { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; }
+    .vista-barra .segmentado .btn { padding: 6px 4px; font-size: .88rem; white-space: nowrap; }
+  }
   .tarjetas { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
   .tarjeta[hidden], .tarjetas[hidden], .filtros[hidden] { display: none; }
   .tarjeta { position: relative; }

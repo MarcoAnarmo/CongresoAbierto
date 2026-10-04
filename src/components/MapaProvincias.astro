@@ -23,11 +23,15 @@ const porProvincia = PROVINCIAS.map((p) => {
 const sinCasilla = diputados.filter((d) => !PROVINCIAS.some((p) => p.nombre === d.circunscripcion));
 if (sinCasilla.length) throw new Error(`Circunscripciones sin casilla en el mapa: ${[...new Set(sinCasilla.map((d) => d.circunscripcion))].join(', ')}`);
 
+/** enVista: dentro de las pestañas de Diputados (título solo para lectores de pantalla, sin margen arriba). */
+interface Props { enVista?: boolean }
+const { enVista = false } = Astro.props;
+
 const celdas: ((typeof porProvincia)[number] | null)[] = [];
 for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(porProvincia.find((p) => p.col === c && p.fila === f) ?? null);
 ---
-<section class="mapa" aria-labelledby="mapa-h" id="mapa">
-  <h2 id="mapa-h">Tus diputados por provincia</h2>
+<section class:list={['mapa', { 'en-vista': enVista }]} aria-labelledby="mapa-h" id="mapa">
+  <h2 id="mapa-h" class:list={{ 'sr-only': enVista }}>Tus diputados por provincia</h2>
   <p class="muted small intro">Cada casilla es una circunscripción, colocada de forma aproximada (no es un mapa a escala). Pulsa la tuya o escribe tu código postal.</p>
 
   <div class="controles">
@@ -129,6 +133,8 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
 
 <style>
   .mapa { margin-top: 2.4rem; }
+  .mapa.en-vista { margin-top: 0; }
+  .en-vista .intro { margin-top: 0; }
   .intro { max-width: 62ch; margin-top: -.3rem; }
   .controles { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 12px 0 4px; }
   .buscar-cp { display: flex; gap: 6px; flex: 1 1 260px; max-width: 360px; }

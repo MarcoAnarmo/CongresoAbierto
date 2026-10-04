@@ -30,14 +30,13 @@ Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien.
 ## Qué hay en la web
 
 - **Hemiciclo interactivo**: los 350 escaños por grupo, por propiedades o por viviendas declaradas, y el voto de cada diputado en cualquier votación del Pleno, elegida por tema.
-- **Tus diputados por provincia**: un mapa de circunscripciones; pulsa la tuya o escribe tu código postal.
 - **Diputados**: una ficha de cada diputado con
   - un resumen de un vistazo: propiedades, viviendas, vehículos y retribución mensual;
   - su formación (y si la universidad es pública o privada según el registro oficial de universidades, el RUCT), trayectoria y cargos;
   - las deudas y préstamos que declara;
   - una línea de tiempo con sus legislaturas, cargos y declaraciones.
 
-  Con buscador, filtros por grupo, provincia y formación, tabla de patrimonio y propiedades por grupo parlamentario.
+  Con buscador, filtros por grupo, provincia y formación, tabla de patrimonio, propiedades por grupo parlamentario y un mapa por provincia (pulsa la tuya o escribe tu código postal).
 - **Votaciones**: todas las votaciones del Pleno por temas (vivienda, economía, sanidad…) con calendario, y votaciones clave con el contenido literal del texto y sus documentos oficiales.
 - **Retribuciones** según los importes oficiales del régimen económico de la Cámara (2026).
 - Modo claro y oscuro, y diseño pensado para el móvil.
