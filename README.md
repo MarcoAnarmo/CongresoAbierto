@@ -2,7 +2,7 @@
 
 **https://congresoabierto.pages.dev**
 
-**Conoce a quien te representa.** Transparencia y acceso fácil a datos oficiales del Congreso.
+**Conoce a quien te representa** · Transparencia y acceso fácil a datos oficiales del Congreso
 
 Web estática, ligera y de código abierto que acerca a la ciudadanía los datos **públicos** de los 350 diputados del Congreso:
 
