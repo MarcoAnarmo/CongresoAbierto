@@ -3,16 +3,16 @@ import '../styles/global.css';
 import { url, REPO, enlaceSugerencia, enlaceError } from '../lib/data';
 
 interface Props { title: string; description?: string; }
-const { title, description = 'Datos oficiales de los 350 diputados del Congreso: cuánto cobran, qué propiedades declaran y cómo votan.' } = Astro.props;
+const { title, description = 'Conoce a quien te representa. Transparencia y acceso fácil a datos oficiales del Congreso: quiénes son los 350 diputados, qué declaran y cómo votan.' } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const nav: { href: string; label: string; corto?: string }[] = [
   { href: '/', label: 'Hemiciclo' },
-  { href: '/ranking', label: 'Ranking' },
+  { href: '/diputados', label: 'Diputados' },
   { href: '/votaciones', label: 'Votaciones', corto: 'Votos' },
   { href: '/metodologia', label: 'Metodología', corto: 'Método' },
   { href: '/colabora', label: 'Colabora' },
 ];
-const activo = (href: string) => (href === '/' ? path === '/' || path === '' : path.startsWith(href));
+const activo = (href: string) => (href === '/' ? path === '/' || path === '' : path.startsWith(href) || (href === '/diputados' && path.startsWith('/diputado/')));
 ---
 <!doctype html>
 <html lang="es">
@@ -129,6 +129,7 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
     </main>
     <footer class="site-footer">
       <div class="wrap pie small muted">
+        <p class="lema-pie"><strong>Conoce a quien te representa.</strong> Transparencia y acceso fácil a datos oficiales del Congreso.</p>
         <p>Solo datos oficiales del <a href="https://www.congreso.es/es/datos-abiertos">Congreso de los Diputados</a> y del <a href="https://www.boe.es">BOE</a>, sin interpretaciones. Cada dato enlaza a su documento original.</p>
         <p>Proyecto independiente y de código abierto (MIT).</p>
         <ul class="enlaces-pie">
@@ -182,6 +183,7 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
     main { padding-top: 16px; }
   }
   .l-corto { display: none; }
-  @media (max-width: 420px) { .l-largo { display: none; } .l-corto { display: inline; } nav { justify-content: space-between; } nav a { padding: 10px 7px; --sub-x: 7px; } }
-  @media (max-width: 360px) { nav { padding: 0 5px 4px; } nav a { padding: 10px 4px; font-size: .84rem; --sub-x: 4px; } }
+  @media (max-width: 530px) { .l-largo { display: none; } .l-corto { display: inline; } nav { justify-content: space-between; } nav a { padding: 10px 4px; --sub-x: 4px; } }
+  @media (max-width: 374px) { nav { padding: 0 5px 4px; } nav a { padding: 10px 4px; font-size: .84rem; --sub-x: 4px; } }
+  @media (max-width: 340px) { nav a { padding: 10px 2px; font-size: .8rem; --sub-x: 2px; } }
 </style>

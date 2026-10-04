@@ -1,0 +1,299 @@
+---
+import Base from '../layouts/Base.astro';
+import { diputados, resumen, grupos, colorGrupo, fmtEur, fmtNum, url, slug, etiquetaPartido } from '../lib/data';
+import type { Diputado } from '../lib/types';
+
+const filas = [...diputados].sort((a, b) =>
+  (b.patrimonio.propiedades ?? -1) - (a.patrimonio.propiedades ?? -1) ||
+  (b.patrimonio.viviendas ?? -1) - (a.patrimonio.viviendas ?? -1) ||
+  a.apellidos.localeCompare(b.apellidos, 'es'));
+const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.viviendas - a.viviendas);
+const max = Math.max(...porGrupo.map((g) => g.propiedades));
+const provincias = [...new Set(diputados.map((d) => d.circunscripcion))].sort((a, b) => a.localeCompare(b, 'es'));
+const alfabetico = [...diputados].sort((a, b) => a.apellidos.localeCompare(b.apellidos, 'es'));
+const etTipo = { publica: 'Universidad pública', privada: 'Universidad privada', ambas: 'Universidad pública y privada' } as Record<string, string>;
+const formacionCorta = (d: Diputado) => d.perfil?.formacion[0]?.texto ?? null;
+const nLeg = (d: Diputado) => d.perfil?.legislaturas.length ?? 0;
+const busca = (d: Diputado) => [d.nombreCompleto, d.circunscripcion, d.partido, d.grupoCorto, ...(d.perfil?.formacion.map((f) => f.texto) ?? []), ...(d.perfil?.trayectoria ?? [])].join(' ').toLowerCase();
+const datos = (d: Diputado) => ({
+  'data-n': d.apellidos, 'data-busca': busca(d), 'data-g': d.grupoCorto, 'data-c': d.circunscripcion, 'data-f': d.perfil?.tipoFormacion ?? 'sin-datos',
+  'data-pr': d.patrimonio.propiedades ?? -1, 'data-v': d.patrimonio.viviendas ?? -1, 'data-co': d.patrimonio.vehiculos ?? -1, 'data-r': d.retribucion.totalMensual, 'data-l': nLeg(d),
+});
+const columnas = [
+  { k: 'pr', t: 'Propiedades', corto: 'Prop.' },
+  { k: 'v', t: 'Viviendas', corto: 'Viv.' },
+  { k: 'co', t: 'Vehículos', corto: 'Veh.' },
+  { k: 'r', t: 'Congreso €/mes', corto: '€/mes' },
+];
+---
+<Base title="Diputados" description="Conoce a los 350 diputados del Congreso: formación, trayectoria, cargos, propiedades declaradas y retribución, con enlace a cada documento oficial.">
+  <h1>Diputados</h1>
+  <p class="lead">
+    Conoce a quien te representa: qué ha estudiado y dónde, a qué se ha dedicado, desde cuándo es diputado y qué declara tener.
+    Todo sale de su ficha oficial en el Congreso y de sus declaraciones; cada ficha enlaza al documento original.
+  </p>
+
+  <div class="filtros" role="search" aria-label="Buscar diputados">
+    <label class="sr-only" for="f-texto">Buscar por nombre, partido, provincia, estudios o trayectoria</label>
+    <input type="search" id="f-texto" placeholder="Nombre, provincia, estudios, profesión…" autocomplete="off" />
+    <label class="sr-only" for="f-grupo">Grupo parlamentario</label>
+    <select id="f-grupo">
+      <option value="">Todos los grupos</option>
+      {grupos.map((g) => <option value={g.corto}>{g.corto}</option>)}
+    </select>
+    <label class="sr-only" for="f-prov">Provincia</label>
+    <select id="f-prov">
+      <option value="">Todas las provincias</option>
+      {provincias.map((p) => <option value={p}>{p}</option>)}
+    </select>
+    <label class="sr-only" for="f-form">Formación</label>
+    <select id="f-form">
+      <option value="">Toda la formación</option>
+      <option value="publica">Universidad pública</option>
+      <option value="privada">Universidad privada</option>
+      <option value="ambas">Pública y privada</option>
+      <option value="sin-centro">No indica el centro</option>
+      <option value="sin-datos">Sin estudios en la ficha</option>
+    </select>
+    <label class="sr-only" for="f-orden">Ordenar por</label>
+    <select id="f-orden">
+      <option value="n">Nombre (A–Z)</option>
+      <option value="l">Más legislaturas</option>
+      <option value="pr">Más propiedades</option>
+      <option value="v">Más viviendas</option>
+      <option value="co">Más vehículos</option>
+      <option value="r">Mayor retribución</option>
+    </select>
+  </div>
+  <div class="vista-barra">
+    <div class="segmentado" role="group" aria-label="Cómo ver la lista">
+      <button class="btn" type="button" data-vista="tarjetas" aria-pressed="true">Fichas</button>
+      <button class="btn" type="button" data-vista="tabla" aria-pressed="false">Tabla de patrimonio</button>
+    </div>
+    <span class="small muted" id="f-cuenta" aria-live="polite"></span>
+  </div>
+
+  <ul class="tarjetas" id="tarjetas">
+    {alfabetico.map((d) => (
+      <li class="tarjeta" {...datos(d)}>
+        <a href={url(`/diputado/${slug(d)}`)}>
+          <img src={d.fotoUrl} alt="" width="60" height="76" loading="lazy" referrerpolicy="no-referrer" />
+          <span class="t-cuerpo">
+            <strong class="t-nombre">{d.nombreCompleto}</strong>
+            <span class="t-sub"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span> {etiquetaPartido(d)} · {d.circunscripcion}</span>
+            <span class="t-form">{formacionCorta(d) ?? <span class="muted">Su ficha oficial no detalla estudios</span>}</span>
+            <span class="t-pie">
+              {d.perfil && etTipo[d.perfil.tipoFormacion] && <span class={`pill tipo ${d.perfil.tipoFormacion}`}>{etTipo[d.perfil.tipoFormacion]}</span>}
+              {nLeg(d) > 0 && <span class="pill">{nLeg(d) === 1 ? '1.ª legislatura' : `${nLeg(d)} legislaturas`}</span>}
+              {d.patrimonio.propiedades !== null && <span class="pill">{d.patrimonio.propiedades} {d.patrimonio.propiedades === 1 ? 'propiedad' : 'propiedades'} ({d.patrimonio.viviendas} {d.patrimonio.viviendas === 1 ? 'vivienda' : 'viviendas'})</span>}
+            </span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <div id="vista-tabla" hidden>
+  <div class="table-scroll card" style="padding:0">
+    <table id="tabla-ranking">
+      <caption class="sr-only">Diputados ordenados por número de propiedades</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="num pos-h">#</th>
+          <th scope="col"><button class="orden" data-k="n">Diputado</button></th>
+          {columnas.map((c) => (
+            <th scope="col" class="num" aria-sort={c.k === 'pr' ? 'descending' : undefined}>
+              <button class="orden" data-k={c.k}><span class="largo">{c.t}</span><span class="corto">{c.corto}</span></button>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {filas.map((d, i) => (
+          <tr {...datos(d)}>
+            <td class="num muted pos">{i + 1}</td>
+            <td class="quien">
+              <a href={url(`/diputado/${slug(d)}`)}>{d.nombreCompleto}</a>{d.patrimonio.revisar && <span title="Ficha con alguna lectura dudosa en el PDF oficial" class="aviso">*</span>}
+              <span class="sub"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span> {etiquetaPartido(d)} · {d.circunscripcion}</span>
+            </td>
+            <td class="num dato" data-k="pr" data-label="Propiedades" data-corto="Prop."><strong>{d.patrimonio.propiedades ?? '—'}</strong></td>
+            <td class="num dato" data-k="v" data-label="Viviendas" data-corto="Viv.">{d.patrimonio.viviendas ?? '—'}</td>
+            <td class="num dato" data-k="co" data-label="Vehículos" data-corto="Veh.">{d.patrimonio.vehiculos ?? '—'}</td>
+            <td class="num dato" data-k="r" data-label="€/mes" data-corto="€/mes">{fmtNum(Math.round(d.retribucion.totalMensual))}<span class="eur">&nbsp;€</span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">
+    <span class="aviso">*</span> Ficha con alguna lectura dudosa en el PDF o un cambio comunicado que no identifica el bien. Consulta la ficha y el documento original.
+    Propiedades: inmuebles urbanos y rústicos a su nombre. <a href={url('/metodologia#propiedades')}>Cómo se cuentan</a>.
+  </p>
+  </div>
+  <p class="small muted">
+    Formación: texto literal de la ficha oficial. Si nombra una universidad española, se indica si es pública o privada según el
+    <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades" rel="noopener">registro oficial de universidades (RUCT) ↗</a>.{' '}
+    <a href={url('/metodologia#perfil')}>Cómo se obtiene</a>.
+  </p>
+
+  <h2>Propiedades por grupo parlamentario</h2>
+  <div class="barras card" role="list">
+    {porGrupo.map((g) => (
+      <div class="barra" role="listitem">
+        <span class="et"><span class="dot" style={`background:${g.color}`}></span> {g.corto}</span>
+        <span class="pista" aria-hidden="true">
+          <span class="relleno" style={`width:${(100 * g.propiedades) / max}%;--c:${g.color}`}>
+            <span class="viv" style={`width:${(100 * g.viviendas) / Math.max(1, g.propiedades)}%`}></span>
+          </span>
+        </span>
+        <span class="cifras"><strong>{fmtNum(g.propiedades)}</strong> prop. · {fmtNum(g.viviendas)} viv.</span>
+      </div>
+    ))}
+    <p class="small muted leyenda-barras"><span class="muestra m-prop"></span> propiedades <span class="muestra m-viv"></span> de ellas, viviendas</p>
+  </div>
+
+</Base>
+
+<script>
+  const tabla = document.getElementById('tabla-ranking') as HTMLTableElement;
+  const cuerpo = tabla.tBodies[0];
+  const filas = [...cuerpo.rows];
+  const lista = document.getElementById('tarjetas') as HTMLUListElement;
+  const tarjetas = [...lista.children] as HTMLLIElement[];
+  const vistaTabla = document.getElementById('vista-tabla')!;
+  const botonesVista = [...document.querySelectorAll<HTMLButtonElement>('[data-vista]')];
+  const texto = document.getElementById('f-texto') as HTMLInputElement;
+  const grupo = document.getElementById('f-grupo') as HTMLSelectElement;
+  const prov = document.getElementById('f-prov') as HTMLSelectElement;
+  const form = document.getElementById('f-form') as HTMLSelectElement;
+  const orden = document.getElementById('f-orden') as HTMLSelectElement;
+  const cuenta = document.getElementById('f-cuenta')!;
+  const quitarTildes = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  let clave = 'n', desc = false, vista = 'tarjetas';
+
+  const valor = (f: HTMLElement, k: string) => parseFloat(f.dataset[k] ?? '0');
+  const comparar = (a: HTMLElement, b: HTMLElement) => {
+    let r = clave === 'n' ? (a.dataset.n ?? '').localeCompare(b.dataset.n ?? '', 'es') : valor(a, clave) - valor(b, clave);
+    if (r === 0 && clave !== 'n') r = (b.dataset.n ?? '').localeCompare(a.dataset.n ?? '', 'es');
+    return desc ? -r : r;
+  };
+  function aplicar() {
+    const q = quitarTildes(texto.value.trim().toLowerCase());
+    const pasa = (f: HTMLElement) => (!grupo.value || f.dataset.g === grupo.value) && (!prov.value || f.dataset.c === prov.value)
+      && (!form.value || f.dataset.f === form.value) && (!q || quitarTildes(f.dataset.busca ?? '').includes(q));
+    let n = 0;
+    for (const f of filas.sort(comparar)) {
+      const ok = pasa(f); f.hidden = !ok;
+      if (ok) { (f.querySelector('.pos') as HTMLElement).textContent = String(++n); (f.querySelector('.quien') as HTMLElement).dataset.pos = String(n); }
+      cuerpo.appendChild(f);
+    }
+    for (const t of tarjetas.sort(comparar)) { t.hidden = !pasa(t); lista.appendChild(t); }
+    cuenta.textContent = n === 1 ? '1 diputado' : `${n} diputados`;
+    try { localStorage.setItem('diputados', JSON.stringify({ g: grupo.value, f: form.value, clave, desc, vista })); } catch {}
+  }
+  function marcar() {
+    tabla.querySelectorAll('thead th').forEach((th) => th.removeAttribute('aria-sort'));
+    tabla.querySelector(`button.orden[data-k="${clave}"]`)?.closest('th')?.setAttribute('aria-sort', desc ? 'descending' : 'ascending');
+    tabla.dataset.clave = clave;
+    orden.value = clave;
+  }
+  function verVista(v: string) {
+    vista = v; vistaTabla.hidden = v !== 'tabla'; lista.hidden = v === 'tabla';
+    botonesVista.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === v)));
+  }
+  orden.addEventListener('change', () => { clave = orden.value; desc = clave !== 'n'; marcar(); aplicar(); });
+  tabla.querySelectorAll<HTMLButtonElement>('button.orden').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.k!;
+    desc = k === clave ? !desc : k !== 'n';
+    clave = k; marcar(); aplicar();
+  }));
+  botonesVista.forEach((b) => b.addEventListener('click', () => { verVista(b.dataset.vista!); aplicar(); }));
+  [texto].forEach((e) => e.addEventListener('input', aplicar));
+  [grupo, prov, form].forEach((e) => e.addEventListener('change', aplicar));
+  try { const s = JSON.parse(localStorage.getItem('diputados') ?? 'null'); if (s) { grupo.value = s.g ?? ''; form.value = s.f ?? ''; clave = s.clave ?? 'n'; desc = s.desc ?? false; vista = s.vista ?? 'tarjetas'; } } catch {}
+  // Filtros desde la dirección: /diputados?provincia=Sevilla&grupo=PSOE&q=derecho
+  const ps = new URLSearchParams(location.search);
+  if (ps.has('provincia')) prov.value = ps.get('provincia')!;
+  if (ps.has('grupo')) grupo.value = ps.get('grupo')!;
+  if (ps.has('q')) texto.value = ps.get('q')!;
+  verVista(vista); marcar(); aplicar();
+</script>
+
+<style>
+  .barras { display: grid; gap: 10px; }
+  .barra { display: grid; grid-template-columns: 84px 1fr 150px; gap: 10px; align-items: center; }
+  .barra .cifras { text-align: right; }
+  .et { font-weight: 650; white-space: nowrap; }
+  .pista { height: 16px; background: var(--bg); border-radius: 8px; overflow: hidden; }
+  .relleno { display: block; height: 100%; border-radius: 8px; position: relative; min-width: 4px; background: color-mix(in srgb, var(--c) 32%, transparent); }
+  .viv { position: absolute; inset: 0 auto 0 0; background: var(--c); border-radius: 8px; }
+  .cifras { font-size: .85rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .leyenda-barras { margin: 4px 0 0; display: flex; align-items: center; gap: 6px; }
+  .muestra { display: inline-block; width: 22px; height: 10px; border-radius: 5px; }
+  .m-prop { background: color-mix(in srgb, var(--muted) 35%, transparent); }
+  .m-viv { background: var(--muted); margin-left: 10px; }
+  @media (max-width: 600px) {
+    .barras { gap: 14px; }
+    .barra { grid-template-columns: 1fr auto; grid-template-areas: 'et cifras' 'pista pista'; row-gap: 6px; }
+    .barra .et { grid-area: et; }
+    .barra .cifras { grid-area: cifras; text-align: right; font-size: .9rem; }
+    .barra .pista { grid-area: pista; height: 14px; }
+  }
+  .filtros { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .filtros input { flex: 1 1 260px; }
+  .filtros select { flex: 1 1 150px; width: auto; min-width: 0; }
+  @media (max-width: 640px) { .filtros select { flex-basis: calc(50% - 4px); } }
+  .vista-barra { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 4px 0 14px; }
+  .tarjetas { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+  .tarjeta[hidden] { display: none; }
+  .tarjeta a { display: flex; gap: 12px; height: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); text-decoration: none; color: inherit; transition: border-color .12s, box-shadow .12s; }
+  .tarjeta a:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); color: inherit; }
+  .tarjeta img { width: 60px; height: 76px; object-fit: cover; border-radius: 8px; background: var(--chip); flex: none; }
+  .t-cuerpo { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .t-nombre { font-size: 1rem; line-height: 1.25; }
+  .t-sub { font-size: .8rem; color: var(--muted); }
+  .t-form { font-size: .85rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .t-pie { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .t-pie .pill { font-size: .72rem; padding: 1px 8px; }
+  .tipo.publica { border-color: color-mix(in srgb, var(--si) 55%, var(--border)); }
+  .tipo.privada { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+  .tipo.ambas { border-style: dashed; }
+  button.orden { all: unset; cursor: pointer; text-transform: inherit; letter-spacing: inherit; padding: 6px 0; display: inline-block; }
+  th[aria-sort] button.orden { color: var(--text); }
+  th[aria-sort='descending'] button.orden::after { content: ' ↓'; }
+  th[aria-sort='ascending'] button.orden::after { content: ' ↑'; }
+  button.orden:focus-visible { outline: 3px solid var(--accent); }
+  .corto { display: none; }
+  @media (max-width: 820px) { .largo { display: none; } .corto { display: inline; } }
+  .quien a { font-weight: 600; text-decoration: none; }
+  .quien a:hover { color: var(--accent-text); }
+  .quien .sub { display: block; font-size: .8rem; color: var(--muted); }
+  .aviso { color: var(--accent-text); font-weight: 700; margin-left: 2px; }
+  @media (max-width: 640px) {
+    .tarjetas { grid-template-columns: minmax(0, 1fr); }
+    #tabla-ranking thead { display: none; }
+    #tabla-ranking, #tabla-ranking tbody { display: block; }
+    #tabla-ranking tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 6px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    #tabla-ranking tr[hidden] { display: none; }
+    #tabla-ranking tr:last-child { border-bottom: 0; }
+    #tabla-ranking td { display: block; border: 0; padding: 0; }
+    #tabla-ranking td.pos { display: none; }
+    #tabla-ranking td.quien { grid-column: 1 / -1; margin-bottom: 8px; }
+    #tabla-ranking td.quien::before { content: attr(data-pos); display: inline-block; min-width: 1.6em; margin-right: 6px; padding: 0 6px; border-radius: 6px; background: var(--chip); color: var(--muted); font-size: .78rem; font-weight: 650; text-align: center; vertical-align: 2px; }
+    .quien a { font-size: 1rem; overflow-wrap: anywhere; }
+    .quien .sub { margin-top: 2px; }
+    #tabla-ranking td.dato { text-align: left; font-size: 1.05rem; font-variant-numeric: tabular-nums; background: var(--bg); border-radius: 8px; padding: 6px 7px; white-space: nowrap; }
+    #tabla-ranking td.dato::before { content: attr(data-label); display: block; font-size: .68rem; color: var(--muted); font-weight: 500; margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; }
+    #tabla-ranking[data-clave='pr'] td[data-k='pr'], #tabla-ranking[data-clave='v'] td[data-k='v'],
+    #tabla-ranking[data-clave='co'] td[data-k='co'], #tabla-ranking[data-clave='r'] td[data-k='r'] { background: var(--accent-soft); color: var(--accent-text); }
+    #tabla-ranking td.dato strong { font-weight: 700; }
+  }
+  @media (max-width: 440px) {
+    #tabla-ranking td.dato::before { content: attr(data-corto); font-size: .74rem; }
+  }
+  @media (max-width: 360px) {
+    #tabla-ranking tr { gap: 4px 6px; padding: 12px; }
+    #tabla-ranking td.dato { font-size: .95rem; padding: 5px 6px; }
+    #tabla-ranking .eur { display: none; }
+  }
+</style>
