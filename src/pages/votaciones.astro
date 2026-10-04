@@ -130,7 +130,7 @@ const fechas = [...new Set([...votacionesPleno.map((v) => v.fecha), ...pendiente
           <details class="pliegue">
             <summary>Voto por grupo</summary>
             <ul class="grupos" data-g={porGrupo.map(({ g, c }) => [g.corto, c['Sí'], c['No'], c['Abstención'], c['No vota']].join(',')).join(';')}></ul>
-            <p class="small muted">Composición actual de cada grupo. Escaño a escaño en el <a href={url('/')}>hemiciclo</a>.</p>
+            <p class="small muted">Composición actual de cada grupo. <a href={url(`/?votacion=${encodeURIComponent(v.id)}#hemiciclo`)}>Ver esta votación escaño a escaño en el hemiciclo</a>.</p>
           </details>
 
           <details class="pliegue">
