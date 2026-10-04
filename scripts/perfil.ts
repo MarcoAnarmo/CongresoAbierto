@@ -6,6 +6,7 @@
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { construirPatrimonio, type DeclRaw } from './patrimonio.ts';
+import { resumenDeudas } from './deudas.ts';
 import type { Perfil, LineaFormacion, Evento, Universidad } from '../src/lib/types.ts';
 
 interface FichaRaw {
@@ -129,6 +130,8 @@ export function construirPerfil(cod: number, genero: 'F' | 'M', decls: DeclRaw[]
       const p = construirPatrimonio([d], urlBienes, {});
       resumen = `${p.propiedades} ${p.propiedades === 1 ? 'propiedad' : 'propiedades'} (${p.viviendas} ${p.viviendas === 1 ? 'vivienda' : 'viviendas'}) y ${p.vehiculos} ${p.vehiculos === 1 ? 'vehículo' : 'vehículos'}`;
     } else if (d) resumen = d.cambios?.trim() || d.obs?.trim() || 'Comunica cambios en su patrimonio';
+    const deudas = resumenDeudas(pdf);
+    if (deudas && !(d?.esModificacionParcial && deudas === 'sin préstamos declarados')) resumen = [resumen, `deudas: ${deudas}`].filter(Boolean).join(' · ');
     eventos.push({ fecha, tipo: 'bienes', texto: d?.esModificacionParcial ? 'Modificación de su declaración de bienes' : 'Declaración de bienes y rentas', detalle: resumen, url: b.url });
   }
   for (const i of f.interesesEconomicos) {

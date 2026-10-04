@@ -37,6 +37,13 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 3. Solo se excluye un bien cuando una declaración oficial posterior comunica su venta o baja; cada exclusión está en `data/manual/correcciones.json` con su motivo y se muestra en la ficha.
 4. No se publican matrículas (el propio formulario oficial pide no indicarlas).
 
+## Deudas y préstamos
+
+- Fuente: apartado «Deudas y obligaciones patrimoniales» (pág. 4) de las declaraciones de bienes. Transcripción literal en `data/raw/deudas/revisado.jsonl` (instrucciones en `data/raw/deudas/INSTRUCCIONES.md`), con dos transcripciones independientes y las diferencias resueltas contra el PDF.
+- `scripts/deudas.ts`: el importe se lee como número solo si el formato no deja dudas (grupos de miles de 3 cifras; 1 o 2 cifras tras el último separador = decimales). Si no, se muestra el texto y el total se marca «al menos».
+- Total: suma de saldos pendientes de la tabla de préstamos de la declaración más reciente que rellena el apartado (entre las que forman su patrimonio vigente). No se suman declaraciones distintas.
+- Nombres de particulares que no son el diputado → «[nombre omitido]».
+
 ## Retribución
 
 Se muestran solo importes mensuales oficiales: asignación + complementos por cargo (el mayor de Mesa/Junta de Portavoces y el mayor de Comisiones, porque no son acumulables dentro de cada grupo) + indemnización. No se estiman pagas anuales. No incluye sueldos de miembros del Gobierno, transporte ni dietas de viajes oficiales.

@@ -11,6 +11,7 @@ const secciones = [
   { id: 'perfil', t: 'Formación y trayectoria' },
   { id: 'propiedades', t: 'Propiedades y viviendas' },
   { id: 'vehiculos', t: 'Vehículos' },
+  { id: 'deudas', t: 'Deudas y préstamos' },
   { id: 'revision', t: 'Cómo se han copiado los datos' },
   { id: 'retribuciones', t: 'Retribuciones' },
   { id: 'votaciones', t: 'Votaciones' },
@@ -85,10 +86,24 @@ const secciones = [
         <p>Se copian de la tabla «Vehículos, embarcaciones y aeronaves». No se publican matrículas, porque el propio formulario oficial pide no indicarlas.</p>
       </section>
 
+      <section id="deudas">
+        <h2>Deudas y préstamos</h2>
+        <p>Se copian del apartado «Deudas y obligaciones patrimoniales» (página 4) de las mismas declaraciones de bienes que se usan para las propiedades.</p>
+        <ul>
+          <li>Cada préstamo se publica con su descripción y acreedor, fecha de concesión, importe concedido y saldo pendiente, <strong>tal y como los escribe el diputado</strong> (formato, erratas y todo).</li>
+          <li>El saldo pendiente total es la suma de la tabla de préstamos de su declaración más reciente que rellena el apartado. Si algún importe no se puede leer como número sin interpretarlo (un dígito ilegible en el escaneo, un formato imposible), no se suma y se indica «al menos».</li>
+          <li>No se suman préstamos de declaraciones distintas, porque el mismo préstamo puede repetirse. Las anteriores que siguen vigentes se muestran aparte.</li>
+          <li>«Otras deudas y obligaciones» (pensiones, avales, financiaciones…) y las observaciones del diputado sobre sus deudas se copian literalmente y no se suman.</li>
+          <li>El nombre de personas particulares que no son el diputado (por ejemplo, hijos) se sustituye por «[nombre omitido]».</li>
+          <li>El saldo es el de la fecha que indica el formulario oficial: a 31 de diciembre del año anterior a la declaración o en el mes anterior a presentarla.</li>
+        </ul>
+      </section>
+
       <section id="revision">
         <h2>Cómo se han copiado los datos</h2>
         <p>
-          Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila,
+          Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila
+          (las deudas, con dos transcripciones independientes cuyas diferencias se resuelven mirando el PDF),
           incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura dudosa llevan un aviso (*) y un enlace al PDF para comprobarlo.
         </p>
       </section>
