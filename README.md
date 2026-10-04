@@ -23,9 +23,20 @@ El proyecto es público y cualquiera puede ayudar, sepa o no programar. Todos lo
 - [Avisar de un error en un dato](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=error-en-un-dato.yml)
 - [Hacer una sugerencia](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=sugerencia.yml)
 - [Tareas para empezar](https://github.com/MarcoAnarmo/CongresoAbierto/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- [Hoja de ruta](https://github.com/MarcoAnarmo/CongresoAbierto/issues?q=is%3Aissue+label%3Ahoja-de-ruta)
 - [Guía para colaborar](CONTRIBUTING.md) · [Código de conducta](CODE_OF_CONDUCT.md)
 
 Lo más útil ahora mismo: **revisar fichas** contra su PDF oficial y añadir parlamentos autonómicos.
+
+## Hoja de ruta
+
+La intención es mantener la web **actualizada mes a mes** con los datos oficiales y seguir ampliándola. Cada paso es una [issue con la etiqueta `hoja-de-ruta`](https://github.com/MarcoAnarmo/CongresoAbierto/issues?q=is%3Aissue+label%3Ahoja-de-ruta), donde se puede comentar o colaborar:
+
+- **Actualización mensual** de diputados, declaraciones y votaciones.
+- **Gobiernos autonómicos** y, después, sus parlamentos.
+- **Lenguas cooficiales**: la web en català, galego, euskara, valencià y aranés.
+- **Más datos de cada diputado**: acciones y sociedades, trabajos anteriores con su empleador, y saldos y rentas declarados.
+- **Datos abiertos**: descargas en JSON y CSV para que cualquiera pueda reutilizarlos.
 
 ## Puesta en marcha
 
