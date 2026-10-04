@@ -114,6 +114,41 @@ export interface Perfil {
   declaracionesIntereses: { fecha: string | null; url: string }[];
 }
 
+export interface Prestamo {
+  /** Texto literal: descripción y acreedor. */
+  descripcion: string;
+  fechaConcesion: string | null;
+  /** Importes tal como los escribe el diputado. */
+  concedido: string | null;
+  pendiente: string | null;
+  /** Importes en euros, solo si el texto se puede leer como número sin interpretar. */
+  concedidoEuros: number | null;
+  pendienteEuros: number | null;
+}
+export interface DeclaracionDeudas {
+  fecha: string | null;
+  url: string;
+  parcial: boolean;
+  prestamos: Prestamo[];
+  /** «Otras deudas y obligaciones derivadas de contratos, sentencias o cualquier otro título» (literal). */
+  otras: string | null;
+  /** Observaciones del declarante sobre sus deudas (literal). */
+  nota: string | null;
+  /** Suma de los saldos pendientes de la tabla de préstamos de esta declaración. */
+  totalPendiente: number;
+  /** true si algún saldo no se puede leer como número (se muestra el texto literal). */
+  totalIncompleto: boolean;
+}
+/** Deudas declaradas en las mismas declaraciones de bienes que se usan para su patrimonio. */
+export interface Deudas {
+  /** La declaración más reciente que rellena el apartado de deudas. */
+  principal: DeclaracionDeudas | null;
+  /** Declaraciones anteriores del patrimonio vigente que también declaran deudas (pueden repetir préstamos). */
+  anteriores: DeclaracionDeudas[];
+  /** true si ninguna de sus declaraciones vigentes declara deudas. */
+  sinDeudas: boolean;
+}
+
 export interface Diputado {
   id: string;
   camara: Camara;
@@ -134,6 +169,7 @@ export interface Diputado {
   retribucion: Retribucion;
   patrimonio: Patrimonio;
   perfil: Perfil | null;
+  deudas: Deudas | null;
 }
 
 export interface VotacionClave {

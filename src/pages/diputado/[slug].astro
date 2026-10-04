@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError } from '../../lib/data';
 import type { Diputado } from '../../lib/types';
+import TablaPrestamos from '../../components/TablaPrestamos.astro';
 
 export function getStaticPaths() {
   return diputados.map((d) => ({ params: { slug: slug(d) }, props: { d } }));
@@ -14,6 +15,7 @@ const pctTxt = (n: number | null) => (n === null ? '—' : `${fmtNum(n)} %`);
 const votosDip = votaciones.map((v) => ({ v, voto: v.votos[String(d.codParlamentario)] ?? null }));
 const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)', 'Abstención': 'var(--abs)', 'No vota': 'var(--novota)' };
 const pf = d.perfil;
+const dd = d.deudas;
 const fechaEvento = (f: string) => (f.length === 4 ? f : new Date(f + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }));
 const etEvento: Record<string, string> = { legislatura: 'Congreso', cargo: 'Cargo', trayectoria: 'Trayectoria', bienes: 'Bienes', intereses: 'Intereses' };
 const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades';
@@ -164,6 +166,48 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
     </>
   )}
 
+  {dd && (
+    <section aria-labelledby="h-deudas">
+      <h2 id="h-deudas">Deudas y préstamos</h2>
+      {dd.sinDeudas || !dd.principal ? (
+        <p>No declara deudas ni préstamos en su declaración de bienes{p.declaracionFecha && ` del ${fmtFecha(p.declaracionFecha)}`}.</p>
+      ) : (
+        <>
+          <p class="small muted">
+            Según su {dd.principal.parcial ? 'modificación de la declaración de bienes' : 'declaración de bienes'} del {fmtFecha(dd.principal.fecha)}.
+            Los importes se copian tal y como los escribe el diputado.
+          </p>
+          {dd.principal.prestamos.length > 0 && (
+            <>
+              <div class="card stat deuda-total">
+                <div class="v">{dd.principal.totalIncompleto && <span class="small">al menos </span>}{fmtEur(dd.principal.totalPendiente)}</div>
+                <div class="l">de saldo pendiente en {dd.principal.prestamos.length} {dd.principal.prestamos.length === 1 ? 'préstamo' : 'préstamos'} (suma de la tabla oficial)</div>
+              </div>
+              <TablaPrestamos prestamos={dd.principal.prestamos} />
+            </>
+          )}
+          {dd.principal.otras && <p><strong>Otras deudas y obligaciones:</strong> {dd.principal.otras}</p>}
+          {dd.principal.nota && <p class="small muted">Observación del diputado: «{dd.principal.nota}»</p>}
+          {dd.anteriores.length > 0 && (
+            <details>
+              <summary class="small">Deudas en declaraciones anteriores que siguen vigentes ({dd.anteriores.length})</summary>
+              <p class="small muted">Pueden repetir préstamos de la declaración más reciente: no se suman.</p>
+              {dd.anteriores.map((a) => (
+                <div class="anterior">
+                  <p class="small"><a href={a.url} rel="noopener">{a.parcial ? 'Modificación' : 'Declaración'} del {fmtFecha(a.fecha)} (PDF) ↗</a></p>
+                  {a.prestamos.length > 0 && <TablaPrestamos prestamos={a.prestamos} />}
+                  {a.otras && <p class="small"><strong>Otras deudas y obligaciones:</strong> {a.otras}</p>}
+                  {a.nota && <p class="small muted">Observación: «{a.nota}»</p>}
+                </div>
+              ))}
+            </details>
+          )}
+        </>
+      )}
+      <p class="small muted">Apartado «Deudas y obligaciones patrimoniales» de su declaración oficial. <a href={url('/metodologia#deudas')}>Cómo se obtiene</a>.</p>
+    </section>
+  )}
+
   <h2>Retribución del Congreso</h2>
   <div class="table-scroll card" style="padding:0">
     <table>
@@ -218,6 +262,8 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
   .ok-box { background: color-mix(in srgb, var(--si) 10%, transparent); border-left: 3px solid var(--si); padding: 10px 12px; border-radius: 6px; font-size: .9rem; }
   details { margin-top: 1rem; }
   .resumen-ficha { margin-top: 1.2rem; }
+  .deuda-total { display: inline-block; margin: 4px 0 12px; min-width: 260px; }
+  .anterior { margin-top: 12px; }
   .perfil { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 1.4rem 0 .5rem; }
   .perfil .nota-perfil { grid-column: 1 / -1; margin: 0; }
   @media (max-width: 760px) { .perfil { grid-template-columns: minmax(0, 1fr); } }
