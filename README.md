@@ -2,13 +2,15 @@
 
 **https://congresoabierto.pages.dev**
 
+**Conoce a quien te representa.** Transparencia y acceso fácil a datos oficiales del Congreso.
+
 Web estática, ligera y de código abierto que acerca a la ciudadanía los datos **públicos** de los 350 diputados del Congreso:
 
 - **Hemiciclo interactivo**: grupo, propiedades y viviendas de cada escaño, y su voto en las votaciones clave.
 - **Propiedades, viviendas y vehículos** que cada diputado declara en su *Declaración de Bienes y Rentas*.
 - **Retribución mensual** de cada diputado según los importes oficiales del régimen económico de la Cámara (2026).
 - **Votaciones sobre vivienda**, con el contenido literal de cada texto, sus documentos oficiales y filtros.
-- **Ranking** de propiedades y viviendas por diputado y por grupo parlamentario.
+- **Diputados**: ficha de cada uno con su formación (y si la universidad es pública o privada, según el registro oficial), trayectoria, cargos y una línea de tiempo con sus declaraciones; buscador y tabla de patrimonio.
 
 **Principio:** solo información oficial del Estado (Congreso de los Diputados, BOE y Boletín Oficial de las Cortes Generales), sin interpretaciones ni opiniones. Cada dato enlaza a su documento original para que cada persona juzgue por sí misma.
 
