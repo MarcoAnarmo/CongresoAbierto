@@ -2,6 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError } from '../../lib/data';
 import type { Diputado } from '../../lib/types';
+import TablaPrestamos from '../../components/TablaPrestamos.astro';
+import AvisoDudoso from '../../components/AvisoDudoso.astro';
 
 export function getStaticPaths() {
   return diputados.map((d) => ({ params: { slug: slug(d) }, props: { d } }));
@@ -13,9 +15,14 @@ const totalMensual = m.asignacion + m.complementoMesa + m.gastosRepresentacion +
 const pctTxt = (n: number | null) => (n === null ? '—' : `${fmtNum(n)} %`);
 const votosDip = votaciones.map((v) => ({ v, voto: v.votos[String(d.codParlamentario)] ?? null }));
 const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)', 'Abstención': 'var(--abs)', 'No vota': 'var(--novota)' };
+const pf = d.perfil;
+const dd = d.deudas;
+const fechaEvento = (f: string) => (f.length === 4 ? f : new Date(f + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }));
+const etEvento: Record<string, string> = { legislatura: 'Congreso', cargo: 'Cargo', trayectoria: 'Trayectoria', bienes: 'Bienes', intereses: 'Intereses' };
+const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades';
 ---
 <Base title={d.nombreCompleto} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): retribución, viviendas y vehículos declarados y votaciones clave.`}>
-  <p><a class="volver" href={url('/ranking')}>← Ranking</a></p>
+  <p><a class="volver" href={url('/diputados')}>← Diputados</a></p>
   <div class="cabecera">
     <img src={d.fotoUrl} alt={`Foto oficial de ${d.nombreCompleto}`} width="110" height="140" loading="lazy" referrerpolicy="no-referrer" />
     <div>
@@ -24,17 +31,84 @@ const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)
         <span class="pill"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span>{d.grupo.replace('GP ', 'Grupo ')}</span>
         <span class="muted"> · Candidatura: {d.partido} · {d.genero === 'F' ? 'Diputada' : 'Diputado'} por {d.circunscripcion} desde {fmtFecha(d.fechaAlta)}</span>
       </p>
+      {pf && (
+        <p class="small muted">
+          {pf.anioNacimiento && <>{d.genero === 'F' ? 'Nacida' : 'Nacido'} en {pf.anioNacimiento} · </>}
+          {pf.legislaturasTexto || `${d.genero === 'F' ? 'Diputada' : 'Diputado'} de la XV Legislatura`}
+        </p>
+      )}
       {d.cargos.length > 0 && <p class="small">{d.cargos.join(' · ')}</p>}
       <p class="small"><a href={d.fichaUrl} rel="noopener">Ficha oficial en congreso.es ↗</a> · <a href={enlaceError(d.nombreCompleto)} rel="noopener">Avisar de un error en esta ficha</a></p>
     </div>
   </div>
 
-  <div class="grid-stats">
+  <div class="grid-stats resumen-ficha">
     <div class="card stat destacada"><div class="v">{p.propiedades ?? '—'}</div><div class="l">propiedades a su nombre (viviendas, garajes, locales, fincas…)</div></div>
     <div class="card stat"><div class="v">{p.viviendas ?? '—'}</div><div class="l">de ellas son viviendas</div></div>
     <div class="card stat"><div class="v">{p.vehiculos ?? '—'}</div><div class="l">vehículos declarados</div></div>
     <div class="card stat"><div class="v">{fmtEur(d.retribucion.totalMensual)}</div><div class="l">al mes del Congreso (importes oficiales 2026)</div></div>
   </div>
+
+  {pf && (
+    <section class="perfil" aria-labelledby="h-perfil">
+      <h2 id="h-perfil" class="sr-only">Formación y trayectoria</h2>
+      <div class="card bloque">
+        <h3>Formación</h3>
+        {pf.formacion.length === 0 ? <p class="muted small">Su ficha oficial no detalla estudios.</p> : (
+          <ul class="lineas">
+            {pf.formacion.map((f) => (
+              <li>
+                {f.texto}
+                {f.centros.map((c) => <a class={`pill tipo ${c.tipo === 'pública' ? 'publica' : 'privada'}`} href={RUCT} rel="noopener" title={`${c.nombre}: universidad ${c.tipo} según el registro oficial de universidades (RUCT)`}>{c.nombre} · {c.tipo}</a>)}
+                {f.otroCentro && <span class="pill tipo otro" title="El centro no figura en el registro oficial de universidades españolas (RUCT)">Centro no incluido en el RUCT</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+        {pf.formacion.length > 0 && pf.tipoFormacion === 'sin-centro' && <p class="small muted">La ficha no indica en qué centro estudió.</p>}
+      </div>
+      <div class="card bloque">
+        <h3>Trayectoria</h3>
+        {pf.trayectoria.length === 0 ? <p class="muted small">Su ficha oficial no detalla trayectoria.</p> : (
+          <ul class="lineas">{pf.trayectoria.map((t) => <li>{t}</li>)}</ul>
+        )}
+      </div>
+      <p class="small muted nota-perfil">
+        Texto literal de su <a href={d.fichaUrl} rel="noopener">ficha personal en congreso.es ↗</a>, que redacta cada diputado.
+        El tipo de universidad (pública o privada) es el del <a href={RUCT} rel="noopener">registro oficial de universidades (RUCT) ↗</a>.{' '}
+        <a href={url('/metodologia#perfil')}>Cómo se obtiene</a>.
+      </p>
+    </section>
+  )}
+
+  {pf && pf.eventos.length > 0 && (
+    <section aria-labelledby="h-tiempo">
+      <h2 id="h-tiempo">Línea de tiempo</h2>
+      <div class="segmentado filtros-tiempo" role="group" aria-label="Qué mostrar en la línea de tiempo">
+        <button class="btn" type="button" data-t="" aria-pressed="true">Todo</button>
+        <button class="btn" type="button" data-t="congreso" aria-pressed="false">Congreso</button>
+        <button class="btn" type="button" data-t="trayectoria" aria-pressed="false">Trayectoria</button>
+        <button class="btn" type="button" data-t="declaraciones" aria-pressed="false">Declaraciones</button>
+      </div>
+      <ol class="linea">
+        {pf.eventos.map((e) => (
+          <li class={`ev ev-${e.tipo}`} data-grupo={e.tipo === 'legislatura' || e.tipo === 'cargo' ? 'congreso' : e.tipo === 'trayectoria' ? 'trayectoria' : 'declaraciones'}>
+            <time datetime={e.fecha}>{fechaEvento(e.fecha)}</time>
+            <div>
+              <span class="etq">{etEvento[e.tipo]}</span>
+              {e.url ? <a href={e.url} rel="noopener">{e.texto} (PDF) ↗</a> : <span>{e.texto}</span>}
+              {e.detalle && <p class="small muted">{e.detalle}</p>}
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p class="small muted">
+        Fechas de su ficha oficial (legislaturas, cargos actuales y años que cita en su trayectoria) y de sus declaraciones en esta legislatura.
+        Las cifras de cada declaración de bienes son las de ese documento; las modificaciones solo comunican cambios.
+      </p>
+    </section>
+  )}
+
 
   {p.estado === 'verificado' && <p class="small muted">✓ Datos copiados literalmente del PDF oficial y revisados dos veces contra el original.</p>}
   {p.estado === 'transcrito' && !p.revisar && <p class="small muted">Transcripción del PDF oficial pendiente de una segunda revisión.</p>}
@@ -86,8 +160,56 @@ const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)
           <ul class="small muted">{p.notas.map((n) => <li>{n}</li>)}</ul>
         </details>
       )}
-      <p class="small">Documentos oficiales: {p.fuentes.map((f, i) => <>{i > 0 && ' · '}<a href={f.url} rel="noopener">{f.parcial ? 'modificación' : 'declaración'} de bienes del {fmtFecha(f.fecha)} (PDF) ↗</a></>)}</p>
+      <p class="small">Documentos oficiales: {p.fuentes.map((f, i) => <>{i > 0 && ' · '}<a href={f.url} rel="noopener">{f.parcial ? 'modificación' : 'declaración'} de bienes del {fmtFecha(f.fecha)} (PDF) ↗</a></>)}
+        {pf?.declaracionesIntereses.map((x) => <> · <a href={x.url} rel="noopener">intereses económicos{x.fecha && ` del ${fmtFecha(x.fecha)}`} (PDF) ↗</a></>)}
+        {pf?.declaracionActividades && <> · <a href={pf.declaracionActividades} rel="noopener">declaración de actividades (PDF) ↗</a></>}
+      </p>
     </>
+  )}
+
+  {dd && (
+    <section aria-labelledby="h-deudas">
+      <h2 id="h-deudas">Deudas y préstamos</h2>
+      {dd.sinDeudas || !dd.principal ? (
+        <p>No declara deudas ni préstamos en su declaración de bienes{p.declaracionFecha && ` del ${fmtFecha(p.declaracionFecha)}`}.</p>
+      ) : (
+        <>
+          <p class="small muted">
+            Según su {dd.principal.parcial ? 'modificación de la declaración de bienes' : 'declaración de bienes'} del {fmtFecha(dd.principal.fecha)}.
+            Los importes se copian tal y como los escribe el diputado.
+          </p>
+          {dd.principal.aviso && <AvisoDudoso texto={dd.principal.aviso} url={dd.principal.url} nombre={d.nombreCompleto} />}
+          {dd.principal.prestamos.length > 0 && (
+            <>
+              <div class="card stat deuda-total">
+                <div class="v">{dd.principal.totalIncompleto && <span class="small">al menos </span>}{fmtEur(dd.principal.totalPendiente)}</div>
+                <div class="l">de saldo pendiente en {dd.principal.prestamos.length} {dd.principal.prestamos.length === 1 ? 'préstamo' : 'préstamos'} (suma de la tabla oficial)</div>
+                {dd.principal.totalIncompleto && <div class="l">Algún saldo está en blanco o no se puede leer en el original y no se suma.</div>}
+              </div>
+              <TablaPrestamos prestamos={dd.principal.prestamos} />
+            </>
+          )}
+          {dd.principal.otras && <p><strong>Otras deudas y obligaciones:</strong> {dd.principal.otras}</p>}
+          {dd.principal.nota && <p class="small muted">Observación del diputado: «{dd.principal.nota}»</p>}
+          {dd.anteriores.length > 0 && (
+            <details>
+              <summary class="small">Deudas en declaraciones anteriores que siguen vigentes ({dd.anteriores.length})</summary>
+              <p class="small muted">Pueden repetir préstamos de la declaración más reciente: no se suman.</p>
+              {dd.anteriores.map((a) => (
+                <div class="anterior">
+                  <p class="small"><a href={a.url} rel="noopener">{a.parcial ? 'Modificación' : 'Declaración'} del {fmtFecha(a.fecha)} (PDF) ↗</a></p>
+                  {a.aviso && <AvisoDudoso texto={a.aviso} url={a.url} nombre={d.nombreCompleto} />}
+                  {a.prestamos.length > 0 && <TablaPrestamos prestamos={a.prestamos} />}
+                  {a.otras && <p class="small"><strong>Otras deudas y obligaciones:</strong> {a.otras}</p>}
+                  {a.nota && <p class="small muted">Observación: «{a.nota}»</p>}
+                </div>
+              ))}
+            </details>
+          )}
+        </>
+      )}
+      <p class="small muted">Apartado «Deudas y obligaciones patrimoniales» de su declaración oficial. <a href={url('/metodologia#deudas')}>Cómo se obtiene</a>.</p>
+    </section>
   )}
 
   <h2>Retribución del Congreso</h2>
@@ -143,4 +265,39 @@ const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)
   .votos .voto { justify-self: start; }
   .ok-box { background: color-mix(in srgb, var(--si) 10%, transparent); border-left: 3px solid var(--si); padding: 10px 12px; border-radius: 6px; font-size: .9rem; }
   details { margin-top: 1rem; }
+  .resumen-ficha { margin-top: 1.2rem; }
+  .deuda-total { display: inline-block; margin: 4px 0 12px; min-width: 260px; }
+  .anterior { margin-top: 12px; }
+  .perfil { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 1.4rem 0 .5rem; }
+  .perfil .nota-perfil { grid-column: 1 / -1; margin: 0; }
+  @media (max-width: 760px) { .perfil { grid-template-columns: minmax(0, 1fr); } }
+  .bloque h3 { margin: 0 0 8px; font-size: 1.05rem; }
+  .lineas { margin: 0; padding-left: 1.1rem; display: grid; gap: 6px; font-size: .95rem; line-height: 1.45; }
+  .tipo { display: inline-block; margin: 3px 6px 0 0; font-size: .72rem; padding: 0 8px; text-decoration: none; vertical-align: 1px; }
+  .lineas li > .tipo:first-of-type { margin-left: 4px; }
+  .tipo.publica { border-color: color-mix(in srgb, var(--si) 55%, var(--border)); }
+  .tipo.privada { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+  .tipo.otro { border-style: dashed; color: var(--muted); }
+  .filtros-tiempo { margin: 4px 0 14px; flex-wrap: wrap; }
+  @media (max-width: 520px) { .filtros-tiempo .btn { padding: 6px 9px; font-size: .86rem; } }
+  .linea { list-style: none; margin: 0; padding: 0 0 0 4px; border-left: 2px solid var(--border); display: grid; gap: 2px; }
+  .linea li[hidden] { display: none; }
+  .ev { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 14px; padding: 8px 0 8px 18px; position: relative; }
+  .ev::before { content: ''; position: absolute; left: -9px; top: 13px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 3px solid var(--muted); box-sizing: border-box; }
+  .ev-legislatura::before, .ev-cargo::before { border-color: var(--accent); }
+  .ev-trayectoria::before { border-color: var(--text); }
+  .ev-bienes::before, .ev-intereses::before { border-color: var(--si); }
+  .ev time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .88rem; padding-top: 1px; }
+  .ev .etq { display: inline-block; font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-right: 8px; }
+  .ev p { margin: 2px 0 0; }
+  @media (max-width: 520px) { .ev { grid-template-columns: minmax(0, 1fr); } }
 </style>
+
+<script>
+  const chipsT = [...document.querySelectorAll<HTMLButtonElement>('.filtros-tiempo [data-t]')];
+  const evs = [...document.querySelectorAll<HTMLLIElement>('.linea .ev')];
+  chipsT.forEach((c) => c.addEventListener('click', () => {
+    chipsT.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+    evs.forEach((e) => { e.hidden = !!c.dataset.t && e.dataset.grupo !== c.dataset.t; });
+  }));
+</script>

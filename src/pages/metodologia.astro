@@ -8,8 +8,10 @@ const pdfs = diputados.reduce((a, d) => a + d.patrimonio.fuentes.length, 0);
 const secciones = [
   { id: 'principio', t: 'Principio' },
   { id: 'fuentes', t: 'Fuentes oficiales' },
+  { id: 'perfil', t: 'Formación y trayectoria' },
   { id: 'propiedades', t: 'Propiedades y viviendas' },
   { id: 'vehiculos', t: 'Vehículos' },
+  { id: 'deudas', t: 'Deudas y préstamos' },
   { id: 'revision', t: 'Cómo se han copiado los datos' },
   { id: 'retribuciones', t: 'Retribuciones' },
   { id: 'votaciones', t: 'Votaciones' },
@@ -51,6 +53,21 @@ const secciones = [
         <p><strong>Grupo y candidatura.</strong> El Congreso registra dos datos distintos: la candidatura con la que cada diputado fue elegido en las elecciones y el grupo parlamentario al que pertenece hoy. Pueden no coincidir: quien deja su grupo pasa al Grupo Mixto aunque fuera elegido en otra lista. El hemiciclo ordena por grupo actual; cuando la candidatura es distinta, se indica entre paréntesis.</p>
       </section>
 
+      <section id="perfil">
+        <h2>Formación y trayectoria</h2>
+        <p>
+          Salen de la <em>Ficha personal</em> de cada diputado en <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, un texto que redacta el propio diputado.
+          Se copia literalmente, línea a línea, y solo se separa en dos bloques:
+        </p>
+        <ul>
+          <li><strong>Formación:</strong> las líneas que hablan de títulos o estudios (licenciado, grado, máster, doctor, diplomado, ingeniero, curso, programa…). El resto es <strong>trayectoria</strong>. Una frase de empleo (profesor, investigador, director…) no cuenta como estudio aunque nombre una universidad.</li>
+          <li><strong>Universidad pública o privada:</strong> solo cuando la línea nombra el centro. El tipo es el que figura en el <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades">Registro de Universidades, Centros y Títulos (RUCT)</a> del Ministerio. Se reconocen también otras formas de nombrarla (en otras lenguas oficiales, siglas como UCM o UNED, y centros que forman parte de una universidad, como ICADE, ESADE o IESE). La lista está en <code>data/manual/universidades.json</code>.</li>
+          <li>Si nombra un centro que no está en el RUCT (por ejemplo, una universidad extranjera), se indica así, sin clasificarlo. Si no nombra el centro, se dice que la ficha no lo indica: no se deduce nada.</li>
+          <li>No se recogen datos familiares (estado civil, hijos) aunque aparezcan en la ficha.</li>
+          <li><strong>Línea de tiempo:</strong> las legislaturas en las que ha sido diputado (con sus fechas oficiales), sus cargos actuales en la Cámara con la fecha de inicio, las líneas de su trayectoria que citan un año y sus declaraciones de bienes y de intereses económicos de esta legislatura, cada una con su PDF.</li>
+        </ul>
+      </section>
+
       <section id="propiedades">
         <h2>Propiedades y viviendas</h2>
         <p>Se usan las tablas de «Bienes inmuebles» de cada declaración, copiadas literalmente. Cada ficha enlaza a sus PDF originales.</p>
@@ -69,10 +86,25 @@ const secciones = [
         <p>Se copian de la tabla «Vehículos, embarcaciones y aeronaves». No se publican matrículas, porque el propio formulario oficial pide no indicarlas.</p>
       </section>
 
+      <section id="deudas">
+        <h2>Deudas y préstamos</h2>
+        <p>Se copian del apartado «Deudas y obligaciones patrimoniales» (página 4) de las mismas declaraciones de bienes que se usan para las propiedades.</p>
+        <ul>
+          <li>Cada préstamo se publica con su descripción y acreedor, fecha de concesión, importe concedido y saldo pendiente, <strong>tal y como los escribe el diputado</strong> (formato, erratas y todo).</li>
+          <li>El saldo pendiente total es la suma de la tabla de préstamos de su declaración más reciente que rellena el apartado. Si algún importe no se puede leer como número sin interpretarlo (un dígito ilegible en el escaneo, un formato imposible), no se suma y se indica «al menos».</li>
+          <li>No se suman préstamos de declaraciones distintas, porque el mismo préstamo puede repetirse. Las anteriores que siguen vigentes se muestran aparte.</li>
+          <li>«Otras deudas y obligaciones» (pensiones, avales, financiaciones…) y las observaciones del diputado sobre sus deudas se copian literalmente y no se suman.</li>
+          <li>El nombre de personas particulares que no son el diputado (por ejemplo, hijos) se sustituye por «[nombre omitido]».</li>
+          <li>Si una lectura no se ha podido confirmar al 100 % (una cifra tapada o cortada en el escaneo, un separador casi invisible) o el original trae un dato incoherente (una fecha imposible o posterior a la declaración), la ficha lo indica con un aviso de <strong>lectura no confirmada</strong>, un enlace al PDF y otro para avisarnos si alguien puede confirmarlo.</li>
+          <li>El saldo es el de la fecha que indica el formulario oficial: a 31 de diciembre del año anterior a la declaración o en el mes anterior a presentarla.</li>
+        </ul>
+      </section>
+
       <section id="revision">
         <h2>Cómo se han copiado los datos</h2>
         <p>
-          Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila,
+          Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila
+          (las deudas, con dos transcripciones independientes cuyas diferencias se resuelven mirando el PDF),
           incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura dudosa llevan un aviso (*) y un enlace al PDF para comprobarlo.
         </p>
       </section>

@@ -1,0 +1,16 @@
+---
+/** Aviso visible cuando un dato no se ha podido confirmar al 100 % en el documento oficial. */
+import { enlaceError } from '../lib/data';
+interface Props { texto: string; url?: string | null; nombre?: string }
+const { texto, url, nombre } = Astro.props;
+---
+<p class="aviso-dudoso" role="note">
+  <strong>Lectura no confirmada.</strong> {texto}
+  {url && <> Compruébalo en el <a href={url} rel="noopener">PDF oficial ↗</a>.</>}
+  {' '}Si puedes confirmarlo, <a href={enlaceError(nombre)} rel="noopener">avísanos</a>.
+</p>
+
+<style>
+  .aviso-dudoso { margin: 8px 0 12px; padding: 10px 12px; border-radius: 8px; font-size: .9rem; line-height: 1.45;
+    background: color-mix(in srgb, var(--abs) 14%, transparent); border-left: 3px solid var(--abs); }
+</style>
