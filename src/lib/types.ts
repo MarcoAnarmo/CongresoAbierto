@@ -81,6 +81,76 @@ export interface Patrimonio {
   notas: string[];
 }
 
+export interface Universidad { codigo: string; nombre: string; tipo: 'pública' | 'privada' }
+export interface LineaFormacion {
+  /** Texto literal de la ficha oficial. */
+  texto: string;
+  /** Universidades del RUCT nombradas en la línea, con su tipo oficial. */
+  centros: Universidad[];
+  /** true si nombra un centro que no está en el RUCT (extranjero, escuela no universitaria…). */
+  otroCentro: boolean;
+}
+export interface Evento {
+  /** AAAA o AAAA-MM-DD */
+  fecha: string;
+  tipo: 'legislatura' | 'cargo' | 'trayectoria' | 'bienes' | 'intereses';
+  texto: string;
+  detalle?: string;
+  url?: string;
+}
+/** Datos de la «Ficha personal» oficial del Congreso y línea de tiempo con sus declaraciones. */
+export interface Perfil {
+  anioNacimiento: number | null;
+  /** Legislaturas en las que ha sido diputado/a (números romanos), según la ficha oficial. */
+  legislaturas: string[];
+  legislaturasTexto: string;
+  formacion: LineaFormacion[];
+  trayectoria: string[];
+  /** Tipo de universidad que consta en su formación según el RUCT. */
+  tipoFormacion: 'publica' | 'privada' | 'ambas' | 'sin-centro' | 'sin-datos';
+  cargosActuales: { cargo: string; desde: string | null }[];
+  eventos: Evento[];
+  declaracionActividades: string | null;
+  declaracionesIntereses: { fecha: string | null; url: string }[];
+}
+
+export interface Prestamo {
+  /** Texto literal: descripción y acreedor. */
+  descripcion: string;
+  fechaConcesion: string | null;
+  /** Importes tal como los escribe el diputado. */
+  concedido: string | null;
+  pendiente: string | null;
+  /** Importes en euros, solo si el texto se puede leer como número sin interpretar. */
+  concedidoEuros: number | null;
+  pendienteEuros: number | null;
+}
+export interface DeclaracionDeudas {
+  fecha: string | null;
+  url: string;
+  parcial: boolean;
+  prestamos: Prestamo[];
+  /** «Otras deudas y obligaciones derivadas de contratos, sentencias o cualquier otro título» (literal). */
+  otras: string | null;
+  /** Observaciones del declarante sobre sus deudas (literal). */
+  nota: string | null;
+  /** Suma de los saldos pendientes de la tabla de préstamos de esta declaración. */
+  totalPendiente: number;
+  /** true si algún saldo no se puede leer como número o está en blanco (el total es «al menos»). */
+  totalIncompleto: boolean;
+  /** Lectura que no se ha podido confirmar al 100 % o dato incoherente en el original. */
+  aviso: string | null;
+}
+/** Deudas declaradas en las mismas declaraciones de bienes que se usan para su patrimonio. */
+export interface Deudas {
+  /** La declaración más reciente que rellena el apartado de deudas. */
+  principal: DeclaracionDeudas | null;
+  /** Declaraciones anteriores del patrimonio vigente que también declaran deudas (pueden repetir préstamos). */
+  anteriores: DeclaracionDeudas[];
+  /** true si ninguna de sus declaraciones vigentes declara deudas. */
+  sinDeudas: boolean;
+}
+
 export interface Diputado {
   id: string;
   camara: Camara;
@@ -100,6 +170,8 @@ export interface Diputado {
   cargos: string[];
   retribucion: Retribucion;
   patrimonio: Patrimonio;
+  perfil: Perfil | null;
+  deudas: Deudas | null;
 }
 
 export interface VotacionClave {
@@ -120,6 +192,12 @@ export interface VotacionClave {
   documentos: { titulo: string; url: string; tipo?: 'boe' | 'bocg' | 'ds' | 'votacion' }[];
   /** Qué contiene el texto votado: títulos de artículos o extractos literales del documento oficial. */
   contenido?: Contenido;
+  /** Temas de la votación (ids de data/manual/temas.json), asignados por palabras clave del título oficial. */
+  temas?: string[];
+  /** Subgrupo oficial (p. ej. «Votación de la enmienda») y modalidad («Se vota en sus términos»). */
+  detalle?: string;
+  /** true si viene de la importación automática de datos abiertos (sin documentos revisados a mano). */
+  automatica?: boolean;
   resultado: 'Aprobada' | 'Rechazada' | 'Convalidado' | 'Derogado';
   totales: { si: number; no: number; abstencion: number; noVota: number };
   /** codParlamentario -> voto */

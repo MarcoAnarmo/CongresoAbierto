@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hemiciclo from '../components/Hemiciclo.astro';
+import MapaProvincias from '../components/MapaProvincias.astro';
 import { diputados, resumen, fmtNum, url, meta } from '../lib/data';
 
 const conDatos = diputados.filter((d) => d.patrimonio.viviendas !== null);
@@ -12,10 +13,12 @@ const pct = (n: number) => `${Math.round((100 * n) / conDatos.length)} %`;
 const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.viviendas - a.viviendas);
 ---
 <Base title="Congreso Abierto">
-  <h1>¿Quién te representa y qué tiene?</h1>
+  <h1>Conoce a quien te representa</h1>
+  <p class="lema">Transparencia y acceso fácil a datos oficiales del Congreso</p>
   <p class="lead">
-    Los 350 diputados del Congreso: lo que cobran, las propiedades y vehículos que ellos mismos declaran y cómo votan.
-    Solo datos oficiales, sin interpretaciones, cada uno con un enlace a su documento original. Para que juzgues con criterio.
+    Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien. Aquí están los 350 diputados: quiénes son, qué han estudiado,
+    a qué se han dedicado, lo que cobran, lo que ellos mismos declaran tener y cómo votan. Solo datos oficiales, sin interpretaciones,
+    cada uno con un enlace a su documento original. Para que juzgues con criterio.
   </p>
 
   <Hemiciclo />
@@ -27,6 +30,7 @@ const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.
     <div class="card stat"><span class="v">{pct(tresOMas)}</span><span class="l">declara 3 viviendas o más</span></div>
   </div>
 
+  <MapaProvincias />
 
   <h2>Por grupo parlamentario</h2>
   <div class="table-scroll card tabla-grupos" style="padding:0">
@@ -53,6 +57,8 @@ const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.
 </Base>
 
 <style>
+  .lead { max-width: 92ch; }
+  .lema { margin: -.2rem 0 .5rem; font-size: clamp(1.05rem, 2.8vw, 1.25rem); font-weight: 650; color: var(--accent-text); }
   .cifras-portada { margin-top: 1.8rem; }
   .tabla-grupos .corto { display: none; text-decoration: none; }
   @media (max-width: 520px) {

@@ -1,5 +1,5 @@
 ---
-import { diputados, votaciones, grupos, colorGrupo, url, slug, etiquetaPartido } from '../lib/data';
+import { diputados, votaciones, votacionesPleno, TEMAS, temasDe, grupos, colorGrupo, url, slug, etiquetaPartido } from '../lib/data';
 import { disponerPorGrupos } from '../lib/hemiciclo';
 
 const orden = new Map(grupos.map((g) => [g.corto, g.orden]));
@@ -24,6 +24,22 @@ const etiquetas = sectores.map((s, i) => {
   return { texto: gruposOrden[i].corto, x, y, color: gruposOrden[i].color, ancla: Math.cos(ang) > 0.25 ? 'start' : Math.cos(ang) < -0.25 ? 'end' : 'middle' };
 });
 
+// Selector de votaciones: todas las del Pleno, agrupadas por tema y de la más reciente a la más antigua.
+// Una votación con varios temas aparece en cada uno. Las que no son clave se descargan al elegirlas.
+const fechaCorta = (iso: string) => iso.split('-').reverse().join('/');
+const recorta = (t: string, n = 95) => (t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t);
+/** El final del detalle es lo que distingue votaciones del mismo asunto («Enmienda 14», «Punto 2»). */
+const finDe = (t: string, n: number) => (t.length > n ? `…${t.slice(-(n - 1)).replace(/^\S*\s/, '')}` : t);
+const etiquetaVoto = (v: (typeof votacionesPleno)[number]) =>
+  v.automatica
+    ? `${fechaCorta(v.fecha)} · nº ${v.numeroVotacion} · ${recorta(v.titulo, 70)}${v.detalle ? ` · ${finDe(v.detalle.replace(/\.$/, ''), 50)}` : ''}`
+    : `${fechaCorta(v.fecha)} · ${v.tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '')} (votación clave)`;
+const gruposVoto = TEMAS.map((t) => ({
+  nombre: t.nombre,
+  votaciones: votacionesPleno.filter((v) => temasDe(v).includes(t.id))
+    .sort((a, b) => b.fecha.localeCompare(a.fecha) || b.sesion - a.sesion || b.numeroVotacion - a.numeroVotacion),
+})).filter((g) => g.votaciones.length > 0);
+
 const votosCliente = Object.fromEntries(votaciones.map((v) => [v.id, Object.fromEntries(Object.entries(v.votos).map(([c, x]) => [c, x === 'Sí' ? 'S' : x === 'No' ? 'N' : x === 'Abstención' ? 'A' : 'X']))]));
 const datos = Object.fromEntries(ordenados.map((d) => [d.codParlamentario, {
   n: d.nombreCompleto, g: d.grupoCorto, p: etiquetaPartido(d), ci: d.circunscripcion,
@@ -32,7 +48,7 @@ const datos = Object.fromEntries(ordenados.map((d) => [d.codParlamentario, {
 }]));
 const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
 ---
-<section class="hemi" aria-labelledby="hemi-h">
+<section class="hemi" id="hemiciclo" aria-labelledby="hemi-h">
   <h2 id="hemi-h" class="sr-only">Hemiciclo</h2>
   <div class="controles">
     <div class="modos segmentado" role="group" aria-label="Qué mostrar en el hemiciclo">
@@ -45,7 +61,11 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
         <label for="hemi-voto" class="sr-only">Ver una votación</label>
         <select id="hemi-voto">
           <option value="">Ver una votación…</option>
-          {votaciones.map((v) => <option value={`voto:${v.id}`}>{v.tema}</option>)}
+          {gruposVoto.map((g) => (
+            <optgroup label={`${g.nombre} (${g.votaciones.length})`}>
+              {g.votaciones.map((v) => <option value={`voto:${v.id}`}>{etiquetaVoto(v)}</option>)}
+            </optgroup>
+          ))}
         </select>
       </div>
     )}
@@ -130,6 +150,10 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     botones.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modo === m)));
     if (selVoto) selVoto.value = m.startsWith('voto:') ? m : '';
     try { localStorage.setItem('hemi-modo', m); } catch {}
+    // La votación elegida queda en la dirección (?votacion=…) para poder compartirla
+    const dir = new URL(location.href);
+    if (m.startsWith('voto:')) dir.searchParams.set('votacion', m.slice(5)); else dir.searchParams.delete('votacion');
+    if (dir.href !== location.href) history.replaceState(history.state, '', dir);
     if (m === 'grupo') {
       circulos.forEach((c) => rellenar(c, c.dataset.color!));
       const cuenta: Record<string, number> = {};
@@ -209,22 +233,53 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     if (mejor) mostrar(mejor);
   });
   botones.forEach((b) => b.addEventListener('click', () => pintar(b.dataset.modo!)));
-  selVoto?.addEventListener('change', () => { if (selVoto.value) pintar(selVoto.value); });
+  /** Pinta una votación; si no es clave, primero descarga su voto escaño a escaño. */
+  async function verVotacion(m: string) {
+    const id = m.slice(5);
+    if (!raw.votos[id]) {
+      seccion.setAttribute('aria-busy', 'true');
+      const ok = await cargarVotacion(id);
+      seccion.removeAttribute('aria-busy');
+      if (!ok) { desc.textContent = 'No se ha podido cargar esta votación. Inténtalo de nuevo.'; return; }
+    }
+    pintar(m);
+  }
+  selVoto?.addEventListener('change', () => { if (selVoto.value) verVotacion(selVoto.value); });
   const validos = [...botones.map((b) => b.dataset.modo!), ...(selVoto ? [...selVoto.options].map((o) => o.value).filter(Boolean) : [])];
   let inicial = 'propiedades';
   try { const g = localStorage.getItem('hemi-modo'); if (g && validos.includes(g)) inicial = g; } catch {}
-  pintar(inicial);
+
+  /** Votación pedida desde la página de votaciones (?votacion=id). Las que no son clave se descargan al pedirlas. */
+  async function cargarVotacion(id: string): Promise<boolean> {
+    try {
+      const r = await fetch(`${raw.base}/datos/votos/${encodeURIComponent(id)}.json`);
+      if (!r.ok) return false;
+      const v = await r.json() as (typeof raw.votaciones)[number] & { votos: Record<string, Voto> };
+      raw.votos[id] = v.votos;
+      raw.votaciones.push(v);
+      if (selVoto && ![...selVoto.options].some((o) => o.value === `voto:${id}`)) {
+        const corto = v.titulo.length > 70 ? `${v.titulo.slice(0, 68).trimEnd()}…` : v.titulo;
+        selVoto.add(new Option(`${new Date(v.fecha + 'T12:00:00').toLocaleDateString('es-ES')} · ${corto}`, `voto:${id}`), 1);
+      }
+      return true;
+    } catch { return false; }
+  }
+  const pedida = new URLSearchParams(location.search).get('votacion');
+  const objetivo = pedida ? `voto:${pedida}` : inicial;
+  if (!objetivo.startsWith('voto:') || raw.votos[objetivo.slice(5)]) pintar(objetivo);
+  else { pintar('propiedades'); verVotacion(objetivo); }
 </script>
 
 <style>
   .controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 
-  .selector { margin-left: auto; }
-  .selector select { width: 100%; min-width: 260px; }
+  /* Ancho fijo: las opciones son largas y, sin límite, el selector saltaría a otra línea a todo el ancho */
+  .selector { margin-left: auto; flex: 0 1 360px; min-width: 0; }
+  .selector select { width: 100%; min-width: 0; text-overflow: ellipsis; }
   @media (max-width: 640px) {
     .modos { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
     .modos .btn { padding: 8px 6px; }
-    .selector { margin-left: 0; width: 100%; }
+    .selector { margin-left: 0; width: 100%; flex-basis: 100%; }
     .selector select { min-width: 0; }
   }
   .desc { min-height: 3.2em; margin: .7rem 0 .2rem; }

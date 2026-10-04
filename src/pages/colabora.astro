@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { url, REPO, enlaceSugerencia, enlaceError, enlaceGuia, enlacePrimerasTareas, enlaceIncidencias } from '../lib/data';
+import { url, REPO, enlaceSugerencia, enlaceError, enlaceGuia, enlacePrimerasTareas, enlaceIncidencias, enlaceHojaDeRuta } from '../lib/data';
 ---
 <Base title="Colabora" description="Cómo ayudar a mantener Congreso Abierto: avisar de errores, proponer mejoras o contribuir al código.">
   <h1>Colabora</h1>
@@ -29,6 +29,17 @@ import { url, REPO, enlaceSugerencia, enlaceError, enlaceGuia, enlacePrimerasTar
       <a class="btn" href={enlaceGuia} rel="noopener">Guía para colaborar ↗</a>
     </section>
   </div>
+
+  <h2>Hoja de ruta</h2>
+  <p>La intención es mantener la web <strong>actualizada mes a mes</strong> con los datos oficiales y seguir ampliándola. Estos son los próximos pasos:</p>
+  <ul class="ruta">
+    <li><strong>Actualización mensual</strong> de diputados, declaraciones y votaciones.</li>
+    <li><strong>Gobiernos autonómicos</strong> y, después, sus parlamentos.</li>
+    <li><strong>Lenguas cooficiales</strong>: la web en català, galego, euskara, valencià y aranés.</li>
+    <li><strong>Más datos de cada diputado</strong>: acciones y sociedades, trabajos anteriores con su empleador, y saldos y rentas declarados.</li>
+    <li><strong>Datos abiertos</strong>: descargas en JSON y CSV para que cualquiera pueda reutilizarlos.</li>
+  </ul>
+  <p>Cada paso es una propuesta abierta en GitHub donde puedes comentar o colaborar. <a href={enlaceHojaDeRuta} rel="noopener">Ver la hoja de ruta ↗</a></p>
 
   <h2>Cómo funciona</h2>
   <ol class="pasos">

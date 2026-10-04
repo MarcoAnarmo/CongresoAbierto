@@ -180,7 +180,7 @@ export async function tarjetaResumen(formato: Formato) {
 
 /* ---------- Páginas genéricas (solo vista previa de enlaces) ---------- */
 export const PAGINAS: Record<string, { titulo: string; subtitulo: string }> = {
-  ranking: { titulo: 'Ranking de los 350 diputados', subtitulo: 'Propiedades, viviendas, vehículos y retribución según sus declaraciones oficiales.' },
+  diputados: { titulo: 'Los 350 diputados', subtitulo: 'Quiénes son, qué declaran y cuánto cobran, según sus declaraciones oficiales.' },
   votaciones: { titulo: 'Votaciones sobre vivienda', subtitulo: 'Qué se votó en el Pleno del Congreso y qué votó cada diputado.' },
   metodologia: { titulo: 'Metodología', subtitulo: 'De dónde sale cada dato y cómo se cuenta.' },
   colabora: { titulo: 'Colabora', subtitulo: 'Proyecto independiente y de código abierto.' },

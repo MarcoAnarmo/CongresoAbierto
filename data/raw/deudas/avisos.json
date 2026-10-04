@@ -1,0 +1,24 @@
+{
+ "nota": "Avisos públicos sobre lecturas que no se han podido confirmar al 100 % o datos incoherentes en el original. Clave: nombre del PDF.",
+ "avisos": {
+  "000005_000_e_0000019_20230801.pdf": "La fecha de concesión que figura (18/12/2023) es posterior a la de la declaración (01/08/2023); puede ser una errata del original.",
+  "000030_000_e_0000147_20230802.pdf": "La fecha de concesión del tercer préstamo (25/08/2024) es posterior a la de la declaración (agosto de 2023); puede ser una errata del original.",
+  "000362_000_e_0006659_20231220.pdf": "La fecha de concesión que figura (20 oct 2024) es posterior a la de la declaración (20/12/2023); puede ser una errata del original.",
+  "000046_000_e_0000200_20230802.pdf": "La fecha del primer préstamo figura como «09-19-2019», que no corresponde a una fecha válida en formato día-mes.",
+  "000250_000_e_0001053_20230811.pdf": "La fecha figura como «02-022021»; no se puede saber con certeza qué fecha quiso escribir el diputado.",
+  "000074_001_e_0075932_20250715.pdf": "El importe concedido de la segunda hipoteca figura como «232.00,00», un formato que no permite saber la cifra exacta.",
+  "000392_000_e_0051602_20241212.pdf": "El importe concedido figura como «75.6000,00€», un formato que no permite saber la cifra exacta.",
+  "000328_001_e_0125395_20260908.pdf": "Una franja del escaneo tapa una cifra del importe concedido de los dos préstamos («25.?23» y «130.?00»).",
+  "000352_000_e_0002620_20231017.pdf": "La impresión es muy tenue: el separador decimal del saldo pendiente apenas se ve.",
+  "000155_000_e_0000668_20230808.pdf": "El saldo pendiente («70.764,4 €») toca el borde de la celda; podría faltar una última cifra.",
+  "000173_000_e_0000742_20230809.pdf": "El saldo pendiente («4.362,2») toca el borde de la celda; podría faltar una última cifra.",
+  "000402_000_e_0078912_20250909.pdf": "El saldo pendiente («88.019,1») toca el borde de la celda; podría faltar una última cifra.",
+  "000393_001_e_0110831_20260415.pdf": "Los importes tocan el borde de sus celdas y la última cifra queda tapada en parte; la lectura es probable pero no segura.",
+  "000394_000_e_0056886_20250218.pdf": "La fecha del primer préstamo («OCTUBRE 2012») toca el borde de la celda; podría faltar algún carácter.",
+  "000277_001_e_0046638_20241030.pdf": "Escaneo de baja calidad: los separadores de los importes parecen puntos pero podrían ser comas.",
+  "000116_000_e_0000506_20230807.pdf": "Bajo los importes hay una segunda línea cortada por el borde de la celda que no se puede leer (parece «(50%)»).",
+  "000182_000_e_0000776_20230809.pdf": "Las observaciones mencionan un «MICROCRÉDITO PSOE» sin importe ni fecha; no queda claro si es una deuda del diputado.",
+  "000111_001_e_0079969_20250916.pdf": "Las observaciones mencionan el pago pendiente de una vivienda nueva que no figura en la tabla de deudas.",
+  "000014_000_e_0001375_20230816.pdf": "Los préstamos 6 y 7 están escritos en «Otras deudas» porque no cabían en la tabla, y no se suman al total."
+ }
+}

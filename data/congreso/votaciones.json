@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generado": "2026-10-03T15:20:00.839Z",
+  "generado": "2026-10-04T11:49:22.852Z",
   "fuente": "Congreso de los Diputados (datos abiertos y fichas oficiales)",
   "legislatura": "XV"
  },
@@ -409,7 +409,11 @@
     "407": "Sí",
     "408": "Sí"
    },
-   "asientos": {}
+   "asientos": {},
+   "temas": [
+    "vivienda",
+    "economia"
+   ]
   },
   {
    "id": "pl-ley-vivienda-sumar-2026",
@@ -815,7 +819,10 @@
     "411": "No",
     "412": "Abstención"
    },
-   "asientos": {}
+   "asientos": {},
+   "temas": [
+    "vivienda"
+   ]
   },
   {
    "id": "pnl-especulacion-2026",
@@ -1216,7 +1223,10 @@
     "407": "Sí",
     "408": "Sí"
    },
-   "asientos": {}
+   "asientos": {},
+   "temas": [
+    "vivienda"
+   ]
   },
   {
    "id": "pl-okupacion-pp-2026",
@@ -1623,7 +1633,10 @@
     "407": "No",
     "408": "No"
    },
-   "asientos": {}
+   "asientos": {},
+   "temas": [
+    "vivienda"
+   ]
   },
   {
    "id": "pl-suelo-vivienda-pp-2026",
@@ -2029,7 +2042,10 @@
     "407": "No",
     "408": "No"
    },
-   "asientos": {}
+   "asientos": {},
+   "temas": [
+    "vivienda"
+   ]
   },
   {
    "id": "pl-pisos-turisticos-2025",
@@ -2429,7 +2445,10 @@
     "404": "No",
     "405": "Sí"
    },
-   "asientos": {}
+   "asientos": {},
+   "temas": [
+    "vivienda"
+   ]
   },
   {
    "id": "pl-alquiler-temporada-2024-12",
@@ -2822,7 +2841,10 @@
     "394": "Sí",
     "395": "No"
    },
-   "asientos": {}
+   "asientos": {},
+   "temas": [
+    "vivienda"
+   ]
   }
  ],
  "pendientes": [
@@ -2880,6 +2902,68 @@
      ]
     }
    ]
+  }
+ ],
+ "temas": [
+  {
+   "id": "vivienda",
+   "nombre": "Vivienda"
+  },
+  {
+   "id": "economia",
+   "nombre": "Economía e impuestos"
+  },
+  {
+   "id": "trabajo",
+   "nombre": "Trabajo y pensiones"
+  },
+  {
+   "id": "sanidad",
+   "nombre": "Sanidad y cuidados"
+  },
+  {
+   "id": "educacion",
+   "nombre": "Educación y cultura"
+  },
+  {
+   "id": "igualdad",
+   "nombre": "Igualdad y derechos sociales"
+  },
+  {
+   "id": "justicia",
+   "nombre": "Justicia y seguridad"
+  },
+  {
+   "id": "migracion",
+   "nombre": "Migración y nacionalidad"
+  },
+  {
+   "id": "exterior",
+   "nombre": "Política exterior"
+  },
+  {
+   "id": "defensa",
+   "nombre": "Defensa"
+  },
+  {
+   "id": "transporte",
+   "nombre": "Transporte e infraestructuras"
+  },
+  {
+   "id": "territorio",
+   "nombre": "Comunidades autónomas"
+  },
+  {
+   "id": "campo-medioambiente",
+   "nombre": "Campo, energía y medio ambiente"
+  },
+  {
+   "id": "instituciones",
+   "nombre": "Instituciones y transparencia"
+  },
+  {
+   "id": "otros",
+   "nombre": "Otros"
   }
  ]
 }

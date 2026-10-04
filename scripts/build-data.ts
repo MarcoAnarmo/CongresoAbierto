@@ -3,14 +3,18 @@
  *   data/raw/diputados_base.tsv   (buscador oficial de diputados)
  *   data/raw/fichas.tsv           (ficha de cada diputado: cargos y declaración)
  *   data/raw/patrimonio/*.jsonl   (transcripción de las declaraciones de bienes)
+ *   data/raw/deudas/revisado.jsonl (deudas y préstamos de las declaraciones de bienes)
+ *   data/raw/fichas-personales.jsonl (ficha personal: formación, trayectoria, cargos y declaraciones)
  *   data/raw/votaciones/*.json    (votaciones clave descargadas de datos abiertos)
  *   data/manual/*.json            (grupos, votaciones clave y correcciones manuales)
  * Salida: data/congreso/{diputados,votaciones,resumen}.json
  */
-import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { calcularRetribucion } from './retribuciones.ts';
 import { construirPatrimonio, type DeclRaw } from './patrimonio.ts';
+import { construirPerfil } from './perfil.ts';
+import { construirDeudas } from './deudas.ts';
 import type { Diputado, GrupoInfo, VotacionClave, Voto } from '../src/lib/types.ts';
 
 const RAW = 'data/raw';
@@ -73,6 +77,8 @@ const diputados: Diputado[] = leerTsv('diputados_base.tsv').map(([cod, apellidos
     cargos: ficha.cargos,
     retribucion: calcularRetribucion(ficha.cargos, circ),
     patrimonio,
+    perfil: construirPerfil(+cod, genero === '2' ? 'F' : 'M', decls.get(+cod) ?? [], URL_BIENES),
+    deudas: construirDeudas(patrimonio.fuentes),
   } satisfies Diputado;
 });
 
@@ -100,6 +106,47 @@ for (const vc of clavesManual) {
 }
 const pendientes = JSON.parse(readFileSync('data/manual/votaciones-pendientes.json', 'utf8'));
 
+// --- Temas: palabras clave sobre el título oficial (data/manual/temas.json) y correcciones a mano
+const { temas: TEMAS } = JSON.parse(readFileSync('data/manual/temas.json', 'utf8')) as { temas: { id: string; nombre: string; palabras: string[] }[] };
+const temasFijos = JSON.parse(readFileSync('data/manual/temas-correcciones.json', 'utf8')).votaciones as Record<string, string[]>;
+const sinTildes = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const reTema = TEMAS.map((t) => ({ id: t.id, re: new RegExp(`(^|[^a-z0-9])(${t.palabras.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`) }));
+function temasPorTexto(id: string, texto: string, tipo: string) {
+  if (temasFijos[id]) return temasFijos[id];
+  const t = sinTildes(texto);
+  const ts = reTema.filter((x) => x.re.test(t)).map((x) => x.id);
+  if (/Convenios internacionales/.test(tipo) && !ts.includes('exterior')) ts.push('exterior');
+  return ts.length ? ts : ['otros'];
+}
+for (const v of votaciones) v.temas = (v as any).temas ?? temasPorTexto(v.id, v.titulo, v.tipo);
+
+// --- Todas las votaciones del Pleno (data/raw/votaciones/pleno.jsonl, ver scripts/importar-votaciones.ts)
+// Las votaciones clave (con texto, documentos y contenido revisados a mano) sustituyen a su versión automática.
+const RUTA_PLENO = join(RAW, 'votaciones', 'pleno.jsonl');
+const clavesPorFuente = new Set(votaciones.map((v) => v.fuenteUrl));
+const LETRA_PLENO: Record<string, Voto> = { S: 'Sí', N: 'No', A: 'Abstención', X: 'No vota' };
+const pleno: VotacionClave[] = existsSync(RUTA_PLENO) ? readFileSync(RUTA_PLENO, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l))
+  .filter((p: any) => !clavesPorFuente.has(p.fuente))
+  .map((p: any) => {
+    const [titulo, ...modalidad] = String(p.texto).split('\n').map((s: string) => s.trim()).filter(Boolean);
+    const t = p.totales;
+    // Resultado a partir de los totales oficiales: mayoría simple, salvo la votación de conjunto
+    // de leyes orgánicas, que exige mayoría absoluta (176 votos a favor; art. 81 de la Constitución).
+    const organica = /Org[aá]nica/.test(titulo) && /conjunto/i.test([titulo, ...p.subgrupo].join(' '));
+    const aprobada = organica ? t.si >= 176 : t.si > t.no;
+    const esRdl = /Decretos-leyes/.test(p.tipo) && /^Real Decreto-ley/.test(titulo);
+    const votos: Record<string, Voto> = {};
+    for (const [cod, x] of Object.entries(p.votos as Record<string, string>)) votos[cod] = LETRA_PLENO[x];
+    return {
+      id: p.id, fecha: p.fecha, sesion: p.sesion, numeroVotacion: p.numero, tema: '', tipo: p.tipo, titulo,
+      detalle: [...p.subgrupo, ...modalidad].join(' · ') || undefined,
+      expediente: '', expedienteUrl: '', fuenteUrl: p.fuente,
+      documentos: [{ titulo: `Resultado de la votación (PDF oficial)`, url: p.fuente.replace(/\.json$/, '.pdf'), tipo: 'votacion' }],
+      resultado: esRdl ? (aprobada ? 'Convalidado' : 'Derogado') : aprobada ? 'Aprobada' : 'Rechazada',
+      totales: t, votos, asientos: {}, temas: temasPorTexto(p.id, p.texto + ' ' + p.subgrupo.join(' '), p.tipo), automatica: true,
+    } satisfies VotacionClave;
+  }) : [];
+
 // --- Resumen por grupo
 const resumen = grupos.map((g) => {
   const ds = diputados.filter((d) => d.grupoCorto === g.corto);
@@ -122,7 +169,8 @@ const resumen = grupos.map((g) => {
 
 const meta = { generado: new Date().toISOString(), fuente: 'Congreso de los Diputados (datos abiertos y fichas oficiales)', legislatura: 'XV' };
 writeFileSync(join(OUT, 'diputados.json'), JSON.stringify({ meta, diputados }, null, 1));
-writeFileSync(join(OUT, 'votaciones.json'), JSON.stringify({ meta, votaciones, pendientes }, null, 1));
+writeFileSync(join(OUT, 'votaciones.json'), JSON.stringify({ meta, votaciones, pendientes, temas: [...TEMAS.map(({ id, nombre }) => ({ id, nombre })), { id: 'otros', nombre: 'Otros' }] }, null, 1));
+writeFileSync(join(OUT, 'votaciones-pleno.json'), JSON.stringify({ meta, votaciones: pleno }));
 writeFileSync(join(OUT, 'resumen.json'), JSON.stringify({ meta, grupos: resumen }, null, 1));
-console.log(`OK: ${diputados.length} diputados, ${votaciones.length} votaciones clave`);
+console.log(`OK: ${diputados.length} diputados, ${votaciones.length} votaciones clave y ${pleno.length} votaciones más del Pleno`);
 console.log(`Propiedades: ${diputados.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0)} · Viviendas declaradas: ${diputados.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0)} · a revisar: ${diputados.filter((d) => d.patrimonio.revisar).length}`);

@@ -1,0 +1,759 @@
+{
+ "fuente": {
+  "titulo": "Registro de Universidades, Centros y Títulos (RUCT), Ministerio de Ciencia, Innovación y Universidades",
+  "url": "https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades",
+  "consultado": "2026-10-04"
+ },
+ "nota": "Tipo (pública/privada) según el RUCT. Los alias son otras formas en que las fichas nombran la misma universidad: otras lenguas, siglas, abreviaturas, centros que forman parte de ella (ICADE, ESADE, IESE, Blanquerna…) y alguna errata literal de las fichas («Pumpeu Fabra»).",
+ "universidades": [
+  {
+   "codigo": "022",
+   "nombre": "Universidad Autónoma de Barcelona",
+   "tipo": "pública",
+   "alias": [
+    "Universitat Autònoma de Barcelona",
+    "UAB"
+   ]
+  },
+  {
+   "codigo": "023",
+   "nombre": "Universidad Autónoma de Madrid",
+   "tipo": "pública",
+   "alias": [
+    "Autónoma de Madrid",
+    "UAM"
+   ]
+  },
+  {
+   "codigo": "036",
+   "nombre": "Universidad Carlos III de Madrid",
+   "tipo": "pública",
+   "alias": [
+    "Universidad Carlos III",
+    "UC3M"
+   ]
+  },
+  {
+   "codigo": "010",
+   "nombre": "Universidad Complutense de Madrid",
+   "tipo": "pública",
+   "alias": [
+    "Complutense",
+    "UCM"
+   ]
+  },
+  {
+   "codigo": "037",
+   "nombre": "Universidad de A Coruña",
+   "tipo": "pública",
+   "alias": [
+    "Universidade da Coruña",
+    "Universidad de La Coruña",
+    "Universidade de A Coruña"
+   ]
+  },
+  {
+   "codigo": "029",
+   "nombre": "Universidad de Alcalá",
+   "tipo": "pública",
+   "alias": [
+    "Universidad de Alcalá de Henares",
+    "U. Alcalá"
+   ]
+  },
+  {
+   "codigo": "001",
+   "nombre": "Universidad de Alicante",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "048",
+   "nombre": "Universidad de Almería",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "004",
+   "nombre": "Universidad de Barcelona",
+   "tipo": "pública",
+   "alias": [
+    "Universitat de Barcelona"
+   ]
+  },
+  {
+   "codigo": "051",
+   "nombre": "Universidad de Burgos",
+   "tipo": "pública",
+   "alias": [
+    "U. Burgos"
+   ]
+  },
+  {
+   "codigo": "005",
+   "nombre": "Universidad de Cádiz",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "016",
+   "nombre": "Universidad de Cantabria",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "034",
+   "nombre": "Universidad de Castilla-La Mancha",
+   "tipo": "pública",
+   "alias": [
+    "UCLM"
+   ]
+  },
+  {
+   "codigo": "006",
+   "nombre": "Universidad de Córdoba",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "002",
+   "nombre": "Universidad de Extremadura",
+   "tipo": "pública",
+   "alias": [
+    "UEX"
+   ]
+  },
+  {
+   "codigo": "008",
+   "nombre": "Universidad de Granada",
+   "tipo": "pública",
+   "alias": [
+    "UGR"
+   ]
+  },
+  {
+   "codigo": "049",
+   "nombre": "Universidad de Huelva",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "050",
+   "nombre": "Universidad de Jaén",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "015",
+   "nombre": "Universidad de La Laguna",
+   "tipo": "pública",
+   "alias": [
+    "Universidad de la Laguna"
+   ]
+  },
+  {
+   "codigo": "045",
+   "nombre": "Universidad de La Rioja",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "026",
+   "nombre": "Universidad de Las Palmas de Gran Canaria",
+   "tipo": "pública",
+   "alias": [
+    "ULPGC"
+   ]
+  },
+  {
+   "codigo": "009",
+   "nombre": "Universidad de León",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "044",
+   "nombre": "Universidad de Lleida",
+   "tipo": "pública",
+   "alias": [
+    "Universitat de Lleida"
+   ]
+  },
+  {
+   "codigo": "011",
+   "nombre": "Universidad de Málaga",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "012",
+   "nombre": "Universidad de Murcia",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "013",
+   "nombre": "Universidad de Oviedo",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "014",
+   "nombre": "Universidad de Salamanca",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "007",
+   "nombre": "Universidad de Santiago de Compostela",
+   "tipo": "pública",
+   "alias": [
+    "Universidade de Santiago",
+    "Universidad de Santiago",
+    "USC"
+   ]
+  },
+  {
+   "codigo": "017",
+   "nombre": "Universidad de Sevilla",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "019",
+   "nombre": "Universidad de Valladolid",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "038",
+   "nombre": "Universidad de Vigo",
+   "tipo": "pública",
+   "alias": [
+    "Universidade de Vigo"
+   ]
+  },
+  {
+   "codigo": "021",
+   "nombre": "Universidad de Zaragoza",
+   "tipo": "pública",
+   "alias": [
+    "Unizar"
+   ]
+  },
+  {
+   "codigo": "020",
+   "nombre": "Universidad del País Vasco/Euskal Herriko Unibertsitatea",
+   "tipo": "pública",
+   "alias": [
+    "Universidad del País Vasco",
+    "Euskal Herriko Unibertsitatea",
+    "UPV/EHU",
+    "UPV-EHU",
+    "Universidad País Vasco",
+    "U. País Vasco"
+   ]
+  },
+  {
+   "codigo": "063",
+   "nombre": "Universidad Internacional de Andalucía",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "071",
+   "nombre": "Universidad Internacional Menéndez Pelayo",
+   "tipo": "pública",
+   "alias": [
+    "Menéndez Pelayo",
+    "UIMP"
+   ]
+  },
+  {
+   "codigo": "040",
+   "nombre": "Universidad Jaume I de Castellón",
+   "tipo": "pública",
+   "alias": [
+    "Universitat Jaume I",
+    "Jaume I"
+   ]
+  },
+  {
+   "codigo": "055",
+   "nombre": "Universidad Miguel Hernández de Elche",
+   "tipo": "pública",
+   "alias": [
+    "Miguel Hernández"
+   ]
+  },
+  {
+   "codigo": "028",
+   "nombre": "Universidad Nacional de Educación a Distancia",
+   "tipo": "pública",
+   "alias": [
+    "UNED",
+    "Educación a Distancia"
+   ]
+  },
+  {
+   "codigo": "058",
+   "nombre": "Universidad Pablo de Olavide",
+   "tipo": "pública",
+   "alias": [
+    "Pablo de Olavide"
+   ]
+  },
+  {
+   "codigo": "064",
+   "nombre": "Universidad Politécnica de Cartagena",
+   "tipo": "pública",
+   "alias": []
+  },
+  {
+   "codigo": "024",
+   "nombre": "Universidad Politécnica de Catalunya",
+   "tipo": "pública",
+   "alias": [
+    "Universitat Politècnica de Catalunya",
+    "UPC",
+    "Universidad Politécnica de Cataluña",
+    "Politécnica de Cataluña"
+   ]
+  },
+  {
+   "codigo": "025",
+   "nombre": "Universidad Politécnica de Madrid",
+   "tipo": "pública",
+   "alias": [
+    "Politécnica de Madrid",
+    "UPM"
+   ]
+  },
+  {
+   "codigo": "039",
+   "nombre": "Universidad Pompeu Fabra",
+   "tipo": "pública",
+   "alias": [
+    "Universitat Pompeu Fabra",
+    "Pompeu Fabra",
+    "Pumpeu Fabra"
+   ]
+  },
+  {
+   "codigo": "035",
+   "nombre": "Universidad Pública de Navarra",
+   "tipo": "pública",
+   "alias": [
+    "Universidad Pública de Navarra",
+    "UPNA"
+   ]
+  },
+  {
+   "codigo": "056",
+   "nombre": "Universidad Rey Juan Carlos",
+   "tipo": "pública",
+   "alias": [
+    "Rey Juan Carlos",
+    "URJC"
+   ]
+  },
+  {
+   "codigo": "042",
+   "nombre": "Universidad Rovira i Virgili",
+   "tipo": "pública",
+   "alias": [
+    "Universitat Rovira i Virgili",
+    "Rovira i Virgili",
+    "Rovira y Virgili"
+   ]
+  },
+  {
+   "codigo": "043",
+   "nombre": "Universitat de Girona",
+   "tipo": "pública",
+   "alias": [
+    "Universidad de Girona"
+   ]
+  },
+  {
+   "codigo": "003",
+   "nombre": "Universitat de les Illes Balears",
+   "tipo": "pública",
+   "alias": [
+    "Universidad de las Islas Baleares",
+    "Universidad de las Illes Balears",
+    "UIB"
+   ]
+  },
+  {
+   "codigo": "018",
+   "nombre": "Universitat de València (Estudi General)",
+   "tipo": "pública",
+   "alias": [
+    "Universitat de València",
+    "Universidad de Valencia"
+   ]
+  },
+  {
+   "codigo": "027",
+   "nombre": "Universitat Politècnica de València",
+   "tipo": "pública",
+   "alias": [
+    "Universidad Politécnica de Valencia",
+    "Politècnica de València"
+   ]
+  },
+  {
+   "codigo": "089",
+   "nombre": "CUNEF Universidad",
+   "tipo": "privada",
+   "alias": [
+    "CUNEF"
+   ]
+  },
+  {
+   "codigo": "087",
+   "nombre": "ESIC Universidad",
+   "tipo": "privada",
+   "alias": [
+    "ESIC"
+   ]
+  },
+  {
+   "codigo": "057",
+   "nombre": "IE Universidad",
+   "tipo": "privada",
+   "alias": [
+    "IE University",
+    "Instituto de Empresa",
+    "IE Business School"
+   ]
+  },
+  {
+   "codigo": "109",
+   "nombre": "IE Universidad Madrid",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "061",
+   "nombre": "Mondragón Unibertsitatea",
+   "tipo": "privada",
+   "alias": [
+    "Mondragon Unibertsitatea",
+    "Universidad de Mondragón"
+   ]
+  },
+  {
+   "codigo": "074",
+   "nombre": "Universidad a Distancia de Madrid",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "047",
+   "nombre": "Universidad Alfonso X El Sabio",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "106",
+   "nombre": "Universidad Alfonso X el Sabio Mare Nostrum",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "052",
+   "nombre": "Universidad Antonio de Nebrija",
+   "tipo": "privada",
+   "alias": [
+    "Nebrija"
+   ]
+  },
+  {
+   "codigo": "065",
+   "nombre": "Universidad Camilo José Cela",
+   "tipo": "privada",
+   "alias": [
+    "Camilo José Cela"
+   ]
+  },
+  {
+   "codigo": "067",
+   "nombre": "Universidad Cardenal Herrera-CEU",
+   "tipo": "privada",
+   "alias": [
+    "Cardenal Herrera"
+   ]
+  },
+  {
+   "codigo": "072",
+   "nombre": "Universidad Católica de Valencia San Vicente Mártir",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "066",
+   "nombre": "Universidad Católica San Antonio",
+   "tipo": "privada",
+   "alias": [
+    "UCAM",
+    "Católica San Antonio"
+   ]
+  },
+  {
+   "codigo": "059",
+   "nombre": "Universidad Católica Santa Teresa de Jesús de Ávila",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "102",
+   "nombre": "Universidad CEU Fernando III",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "030",
+   "nombre": "Universidad de Deusto",
+   "tipo": "privada",
+   "alias": [
+    "Deusto"
+   ]
+  },
+  {
+   "codigo": "100",
+   "nombre": "Universidad de Diseño, Innovación y Tecnología (UDIT)",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "090",
+   "nombre": "Universidad de las Hespérides",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "110",
+   "nombre": "Universidad de Mallorca",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "031",
+   "nombre": "Universidad de Navarra",
+   "tipo": "privada",
+   "alias": [
+    "Universidad de Navarra",
+    "IESE"
+   ]
+  },
+  {
+   "codigo": "060",
+   "nombre": "Universidad de Vic-Universidad Central de Catalunya",
+   "tipo": "privada",
+   "alias": [
+    "Universitat de Vic"
+   ]
+  },
+  {
+   "codigo": "085",
+   "nombre": "Universidad del Atlántico Medio",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "098",
+   "nombre": "Universidad Euneiz",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "107",
+   "nombre": "Universidad Europea de Andalucía",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "079",
+   "nombre": "Universidad Europea de Canarias",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "053",
+   "nombre": "Universidad Europea de Madrid",
+   "tipo": "privada",
+   "alias": [
+    "Universidad Europea"
+   ]
+  },
+  {
+   "codigo": "082",
+   "nombre": "Universidad Europea de Valencia",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "083",
+   "nombre": "Universidad Europea del Atlántico",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "069",
+   "nombre": "Universidad Europea Miguel de Cervantes",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "084",
+   "nombre": "Universidad Fernando Pessoa-Canarias (UFP-C)",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "068",
+   "nombre": "Universidad Francisco de Vitoria",
+   "tipo": "privada",
+   "alias": [
+    "Francisco de Vitoria"
+   ]
+  },
+  {
+   "codigo": "097",
+   "nombre": "Universidad Intercontinental de la Empresa",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "094",
+   "nombre": "Universidad Internacional de la Empresa",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "077",
+   "nombre": "Universidad Internacional de La Rioja",
+   "tipo": "privada",
+   "alias": [
+    "UNIR"
+   ]
+  },
+  {
+   "codigo": "080",
+   "nombre": "Universidad Internacional Isabel I de Castilla",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "108",
+   "nombre": "Universidad Internacional para el Desarrollo UNINDE",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "088",
+   "nombre": "Universidad Internacional Villanueva",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "081",
+   "nombre": "Universidad Loyola Andalucía",
+   "tipo": "privada",
+   "alias": [
+    "Loyola"
+   ]
+  },
+  {
+   "codigo": "033",
+   "nombre": "Universidad Pontificia Comillas",
+   "tipo": "privada",
+   "alias": [
+    "Comillas",
+    "ICADE",
+    "ICAI"
+   ]
+  },
+  {
+   "codigo": "032",
+   "nombre": "Universidad Pontificia de Salamanca",
+   "tipo": "privada",
+   "alias": [
+    "Pontificia de Salamanca"
+   ]
+  },
+  {
+   "codigo": "041",
+   "nombre": "Universidad Ramón Llull",
+   "tipo": "privada",
+   "alias": [
+    "Universitat Ramon Llull",
+    "Ramon Llull",
+    "ESADE",
+    "IQS",
+    "Blanquerna"
+   ]
+  },
+  {
+   "codigo": "073",
+   "nombre": "Universidad San Jorge",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "046",
+   "nombre": "Universidad San Pablo-CEU",
+   "tipo": "privada",
+   "alias": [
+    "San Pablo CEU",
+    "San Pablo-CEU",
+    "CEU San Pablo"
+   ]
+  },
+  {
+   "codigo": "103",
+   "nombre": "Universidad Tecnológica Atlántico-Mediterráneo",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "104",
+   "nombre": "Universidad Tecnológica de las Islas Canarias",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "070",
+   "nombre": "Universitat Abat Oliba CEU",
+   "tipo": "privada",
+   "alias": [
+    "Abat Oliba"
+   ]
+  },
+  {
+   "codigo": "062",
+   "nombre": "Universitat Internacional de Catalunya",
+   "tipo": "privada",
+   "alias": [
+    "Universitat Internacional de Catalunya"
+   ]
+  },
+  {
+   "codigo": "076",
+   "nombre": "Universitat Internacional Valenciana",
+   "tipo": "privada",
+   "alias": []
+  },
+  {
+   "codigo": "054",
+   "nombre": "Universitat Oberta de Catalunya",
+   "tipo": "privada",
+   "alias": [
+    "UOC",
+    "Universitat Oberta"
+   ]
+  }
+ ]
+}
