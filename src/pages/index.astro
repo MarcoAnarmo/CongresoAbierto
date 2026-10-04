@@ -5,11 +5,43 @@ import Hemiciclo from '../components/Hemiciclo.astro';
 <Base title="Congreso Abierto">
   <h1>Conoce a quien te representa</h1>
   <p class="lema">Transparencia y acceso fácil a datos oficiales del Congreso</p>
-  <p class="lead">
+  <script is:inline>
+    // Móvil: lema y subtítulo en una sola línea cada uno; el tamaño de letra se ajusta al ancho real de la pantalla
+    // (depende de la fuente del sistema). Si haría falta una letra demasiado pequeña, se parte en dos líneas equilibradas.
+    (function () {
+      var piezas = [[document.querySelector('main h1'), 30, 18], [document.querySelector('main .lema'), 17, 13]];
+      // No basta con una regla de tres: la fuente del sistema (San Francisco en Apple) cambia el espaciado
+      // entre letras según el tamaño. Se reduce y se vuelve a medir hasta que el texto cabe de verdad.
+      // Ancho real del texto (con decimales); scrollWidth redondea y nunca es menor que el ancho de la caja
+      function sobra(el) { var r = document.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect().width > el.clientWidth - 1; }
+      function ajustar() {
+        var movil = matchMedia('(max-width: 720px)').matches;
+        piezas.forEach(function (p) {
+          var el = p[0], max = p[1], min = p[2];
+          el.style.fontSize = ''; el.style.whiteSpace = '';
+          if (!movil) return;
+          el.style.whiteSpace = 'nowrap';
+          var f = max, n = 0;
+          el.style.fontSize = f + 'px';
+          while (sobra(el) && f > min && n++ < 40) {
+            f = Math.max(min, Math.min(f - 0.25, Math.floor((f * (el.clientWidth - 1) / el.scrollWidth) * 4) / 4));
+            el.style.fontSize = f + 'px';
+          }
+          if (sobra(el)) { el.style.fontSize = ''; el.style.whiteSpace = ''; }
+        });
+      }
+      ajustar();
+      addEventListener('resize', ajustar);
+      if (document.fonts) { document.fonts.ready.then(ajustar); document.fonts.addEventListener('loadingdone', ajustar); }
+    })();
+  </script>
+  <p class="lead largo">
     Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien. Aquí están los 350 diputados: quiénes son, qué han estudiado,
     a qué se han dedicado, lo que cobran, lo que ellos mismos declaran tener y cómo votan. Solo datos oficiales, sin interpretaciones,
     cada uno con un enlace a su documento original. Para que juzgues con criterio.
   </p>
+  <!-- Móvil: texto corto para que el hemiciclo se vea entero nada más entrar -->
+  <p class="lead corto">Quiénes son los 350 diputados, qué cobran, qué declaran tener y cómo votan. Solo datos oficiales.</p>
 
   <Hemiciclo />
 </Base>
@@ -22,4 +54,12 @@ import Hemiciclo from '../components/Hemiciclo.astro';
 <style>
   .lead { max-width: 92ch; }
   .lema { margin: -.2rem 0 .5rem; font-size: clamp(1.05rem, 2.8vw, 1.25rem); font-weight: 650; color: var(--accent-text); }
+  .lead.corto { display: none; }
+  @media (max-width: 720px) {
+    .lead.largo { display: none; }
+    .lead.corto { display: block; margin: .5rem 0 .9rem; font-size: .95rem; line-height: 1.5; text-wrap: pretty; }
+    /* El tamaño exacto lo ajusta el script de arriba para que cada uno quepa en una línea */
+    h1 { margin: 0 0 .2rem; letter-spacing: -.025em; text-wrap: balance; }
+    .lema { margin: 0; font-size: .95rem; line-height: 1.35; text-wrap: balance; }
+  }
 </style>

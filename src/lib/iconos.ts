@@ -1,0 +1,28 @@
+/** Trazos (24×24, línea de 2) de los iconos de la web; mismo estilo que los de las tarjetas para compartir. */
+export const TRAZOS = {
+  propiedades: '<path d="M4 21V5l8-3v19M12 21h8V9l-8-3"/><path d="M7.5 8h1M7.5 12h1M7.5 16h1M15.5 12h1M15.5 16h1M2.5 21h19"/>',
+  vivienda: '<path d="M3 11 12 3.5 21 11"/><path d="M5.5 9.5V20.5h13V9.5"/><path d="M10 20.5v-6h4v6"/>',
+  viviendas: '<path d="M2 12 8 7l6 5"/><path d="M3.5 11v8.5h9V11"/><path d="M12 7.5 16 4l6 5"/><path d="M20.5 8v11.5H15"/>',
+  vehiculo: '<path d="M5 16.5H3.5v-4l2-5h13l2 5v4H19"/><path d="M3.5 12.5h17"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/>',
+  deuda: '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>',
+  sueldo: '<path d="M17.5 6.5A7 7 0 1 0 17.5 17.5"/><path d="M4.5 10.5h9M4.5 13.5h9"/>',
+  voto: '<path d="M4 11.5h16v9H4z"/><path d="M8.5 11.5 12 4.5l5 2.5-2.3 4.5"/><path d="M8 16h8"/>',
+  formacion: '<path d="M2 9.5 12 5l10 4.5-10 4.5z"/><path d="M6 11.5v4.5c0 1.4 2.7 2.8 6 2.8s6-1.4 6-2.8v-4.5"/><path d="M22 9.5v5"/>',
+  trayectoria: '<circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h6.5a3.5 3.5 0 0 1 0 7h-5a3.5 3.5 0 0 0 0 7H16"/>',
+  documento: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  aviso: '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.7v.1"/>',
+  cerrar: '<path d="M6 6l12 12M18 6 6 18"/>',
+  abajo: '<path d="m6 9 6 6 6-6"/>',
+  derecha: '<path d="m9 6 6 6-6 6"/>',
+  filtros: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  fichas: '<rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.5" cy="10.5" r="2"/><path d="M5.5 16c.6-1.6 1.6-2.4 3-2.4s2.4.8 3 2.4M14 9.5h4M14 13h4"/>',
+  tabla: '<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9.5h18M3 14.5h18M9 9.5v10"/>',
+  grupos: '<path d="M4 20V11M10 20V5M16 20v-7M21.5 20h-19"/>',
+  mapa: '<path d="m3 6.5 6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',
+  hemiciclo: '<circle cx="3.6" cy="18" r="1.4"/><circle cx="5.2" cy="12.4" r="1.4"/><circle cx="9.2" cy="8.2" r="1.4"/><circle cx="14.8" cy="8.2" r="1.4"/><circle cx="18.8" cy="12.4" r="1.4"/><circle cx="20.4" cy="18" r="1.4"/><circle cx="9" cy="17" r="1.4"/><circle cx="12" cy="13.6" r="1.4"/><circle cx="15" cy="17" r="1.4"/>',
+  votaciones: '<path d="m4 7 1.6 1.6L9 5.2M4 15.5l1.6 1.6L9 13.7"/><path d="M12.5 7h7.5M12.5 15.5h7.5"/>',
+  metodo: '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7.5h6"/>',
+  colabora: '<circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c.7-3.2 2.6-5 5.5-5s4.8 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.6c2.4-.3 4 1.2 4.6 4.4"/>',
+} as const;
+export type NombreIcono = keyof typeof TRAZOS;

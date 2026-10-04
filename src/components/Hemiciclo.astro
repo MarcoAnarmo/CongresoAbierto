@@ -6,8 +6,10 @@ const orden = new Map(grupos.map((g) => [g.corto, g.orden]));
 const ordenados = [...diputados].sort((a, b) =>
   (orden.get(a.grupoCorto)! - orden.get(b.grupoCorto)!) || a.apellidos.localeCompare(b.apellidos, 'es'));
 const gruposOrden = [...grupos].sort((a, b) => a.orden - b.orden).filter((g) => ordenados.some((d) => d.grupoCorto === g.corto));
-const { escanos, sectores } = disponerPorGrupos(gruposOrden.map((g) => ordenados.filter((d) => d.grupoCorto === g.corto).length));
+const { escanos, sectores, rPunto } = disponerPorGrupos(gruposOrden.map((g) => ordenados.filter((d) => d.grupoCorto === g.corto).length));
 const W = 1000, H = 590, S = 440, CX = W / 2, CY = 560;
+// Radio libre en el centro (fila interior 0.38 menos el radio de un escaño): ahí van la cifra y su texto
+const HUECO = ((0.38 - rPunto) * S).toFixed(0);
 const px = (r: number, ang: number) => [(CX + r * S * Math.cos(ang)).toFixed(1), (CY - r * S * Math.sin(ang)).toFixed(1)];
 
 // Franja de color de cada grupo por fuera del hemiciclo y su nombre
@@ -73,7 +75,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   <p class="desc small muted" id="hemi-desc" aria-live="polite"></p>
 
   <div class="lienzo">
-    <svg viewBox={`-130 0 ${W + 260} ${H}`} data-vb-movil={`12 ${(CY - RB * S - 10).toFixed(0)} ${W - 24} ${(RB * S + 26).toFixed(0)}`} role="img" aria-labelledby="hemi-titulo">
+    <svg viewBox={`-130 0 ${W + 260} ${H}`} data-hueco={HUECO} data-vb-movil={`12 ${(CY - RB * S - 10).toFixed(0)} ${W - 24} ${(RB * S + 26).toFixed(0)}`} role="img" aria-labelledby="hemi-titulo">
       <title id="hemi-titulo">Hemiciclo del Congreso: 350 escaños agrupados por grupo parlamentario</title>
       <g class="franjas" aria-hidden="true">
         {franjas.map((f) => <path d={f.d} stroke={f.color} />)}
@@ -99,11 +101,11 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
       <a class="btn primario ver" href="#">Ver ficha completa →</a>
     </div>
   </div>
-  <div class="leyenda small" id="hemi-leyenda"></div>
+  <div class="leyenda small" id="hemi-leyenda" role="group" aria-label="Leyenda: pulsa un color para resaltar esos escaños"></div>
   <p class="grupos-movil small" aria-label="Grupos de izquierda a derecha en el gráfico">
     {gruposOrden.map((g) => <span><i style={`background:${g.color}`}></i>{g.corto}</span>)}
   </p>
-  <p class="small muted nota">Pulsa un escaño para ver quién es. Gráfico ordenado por grupos parlamentarios; no reproduce el plano real de asientos.</p>
+  <p class="small muted nota">Pulsa un escaño para ver quién es, o un color de la leyenda para resaltar solo esos escaños. Gráfico ordenado por grupos parlamentarios; no reproduce el plano real de asientos.</p>
 </section>
 
 <script type="application/json" id="hemi-datos" set:html={JSON.stringify({ datos, votos: votosCliente, colores, base: url(''), votaciones: votaciones.map((v) => ({ id: v.id, titulo: v.titulo, tipo: v.tipo, fecha: v.fecha, resultado: v.resultado, totales: v.totales })) })} />
@@ -120,8 +122,8 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   const etVoto: Record<Voto, string> = { S: 'Sí', N: 'No', A: 'Abstención', X: 'No vota' };
   const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
   const tramos = {
-    viviendas: { cortes: [0, 1, 2, 4, 7], etiquetas: ['0', '1', '2', '3–4', '5–7', '8 o más'] },
-    propiedades: { cortes: [0, 1, 3, 6, 10], etiquetas: ['0', '1', '2–3', '4–6', '7–10', 'más de 10'] },
+    viviendas: { cortes: [0, 1, 2, 4, 7], etiquetas: ['0', '1', '2', '3–4', '5–7', '8+'], unidad: ['vivienda', 'viviendas'] },
+    propiedades: { cortes: [0, 1, 3, 6, 10], etiquetas: ['0', '1', '2–3', '4–6', '7–10', '11+'], unidad: ['propiedad', 'propiedades'] },
   };
   const tramo = (v: number | null, cortes: number[]) => (v === null ? -1 : cortes.findIndex((c) => v <= c) === -1 ? cortes.length : cortes.findIndex((c) => v <= c));
 
@@ -141,7 +143,13 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   const tactil = () => matchMedia('(hover: none), (max-width: 640px)').matches;
   let modo = 'grupo';
 
-  const item = (color: string, texto: string, borde = false) => `<span class="pill"><span class="dot${borde ? ' vacio' : ''}" style="background:${color}"></span>${texto}</span>`;
+  // Cada elemento de la leyenda es un botón: al pulsarlo se resaltan solo los escaños de ese color
+  const item = (color: string, texto: string, clave: string, borde = false) =>
+    `<button type="button" class="pill filtro" data-f="${clave}" aria-pressed="false"><span class="dot${borde ? ' vacio' : ''}" style="background:${color}"></span>${texto}</button>`;
+  /** Escala ordenada de menos a más: una barra de tramos con su número debajo */
+  const escalaHtml = (etiquetas: string[], unidad: string, cuenta: number[], sinDatos: number) =>
+    `<div class="escala">${escala.map((c, i) => `<button type="button" class="tramo filtro" data-f="${i}" aria-pressed="false" aria-label="${etiquetas[i]} ${unidad}: ${cuenta[i]} diputados"><i style="background:${c}"></i><span>${etiquetas[i]}</span></button>`).join('')}` +
+    (sinDatos ? `<button type="button" class="tramo filtro sd" data-f="-1" aria-pressed="false" aria-label="Sin datos: ${sinDatos} diputados"><i></i><span>s/d</span></button>` : '') + '</div>';
   const rellenar = (c: SVGCircleElement, color: string | null) => { c.style.fill = color ?? 'transparent'; c.classList.toggle('vacio', color === null); };
 
   function pintar(m: string) {
@@ -155,30 +163,75 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     if (m.startsWith('voto:')) dir.searchParams.set('votacion', m.slice(5)); else dir.searchParams.delete('votacion');
     if (dir.href !== location.href) history.replaceState(history.state, '', dir);
     if (m === 'grupo') {
-      circulos.forEach((c) => rellenar(c, c.dataset.color!));
+      circulos.forEach((c) => { rellenar(c, c.dataset.color!); c.dataset.k = raw.datos[c.dataset.cod!].g; });
       const cuenta: Record<string, number> = {};
       Object.values(raw.datos).forEach((d) => (cuenta[d.g] = (cuenta[d.g] ?? 0) + 1));
-      leyenda.innerHTML = Object.entries(raw.colores).map(([g, c]) => item(c, `${g} · ${cuenta[g] ?? 0}`)).join(' ');
+      leyenda.innerHTML = Object.entries(raw.colores).map(([g, c]) => item(c, `${g} · ${cuenta[g] ?? 0}`, g)).join(' ');
       desc.textContent = 'Composición del Congreso por grupo parlamentario.';
       centro.textContent = '350'; centroSub.textContent = 'diputados';
     } else if (m === 'viviendas' || m === 'propiedades') {
       const t = tramos[m]; const campo = m === 'viviendas' ? 'v' : 'pr';
-      circulos.forEach((c) => { const i = tramo(raw.datos[c.dataset.cod!][campo], t.cortes); rellenar(c, i < 0 ? null : escala[i]); });
-      leyenda.innerHTML = `<span class="small muted guia">Menos</span>` + escala.map((c, i) => item(c, t.etiquetas[i])).join(' ') + `<span class="small muted guia">Más</span>`;
+      const cuenta = escala.map(() => 0); let sinDatos = 0;
+      circulos.forEach((c) => {
+        const i = tramo(raw.datos[c.dataset.cod!][campo], t.cortes);
+        rellenar(c, i < 0 ? null : escala[i]); c.dataset.k = String(i);
+        if (i < 0) sinDatos++; else cuenta[i]++;
+      });
+      leyenda.innerHTML = escalaHtml(t.etiquetas, t.unidad[1], cuenta, sinDatos);
       const total = Object.values(raw.datos).reduce((a, d) => a + (d[campo] ?? 0), 0);
       desc.textContent = m === 'viviendas'
         ? 'Viviendas que cada diputado declara, en propiedad total o parcial, en su declaración de bienes oficial más reciente.'
         : 'Propiedades (inmuebles urbanos y rústicos a su nombre: viviendas, garajes, locales, fincas…) según su declaración de bienes oficial más reciente.';
-      centro.textContent = num.format(total); centroSub.textContent = m === 'viviendas' ? 'viviendas declaradas' : 'propiedades declaradas';
+      centro.textContent = num.format(total); centroSub.textContent = m === 'viviendas' ? 'viviendas' : 'propiedades';
     } else {
       const id = m.slice(5); const vot = raw.votos[id]; const info = raw.votaciones.find((v) => v.id === id)!;
-      circulos.forEach((c) => { const x = vot[c.dataset.cod!]; rellenar(c, x ? cVoto[x] : null); });
+      circulos.forEach((c) => { const x = vot[c.dataset.cod!]; rellenar(c, x ? cVoto[x] : null); c.dataset.k = x ?? '-'; });
       const t = info.totales;
-      leyenda.innerHTML = [item(cVoto.S, `Sí · ${t.si}`), item(cVoto.N, `No · ${t.no}`), item(cVoto.A, `Abstención · ${t.abstencion}`), item(cVoto.X, `No vota · ${t.noVota}`), item('transparent', 'Aún no era diputado', true)].join(' ');
+      leyenda.innerHTML = [item(cVoto.S, `Sí · ${t.si}`, 'S'), item(cVoto.N, `No · ${t.no}`, 'N'), item(cVoto.A, `Abstención · ${t.abstencion}`, 'A'), item(cVoto.X, `No vota · ${t.noVota}`, 'X'), item('transparent', 'Aún no era diputado', '-', true)].join(' ');
       desc.innerHTML = `<span>${info.tipo} ${new Date(info.fecha + 'T12:00:00').toLocaleDateString('es-ES')}</span><br><strong class="texto">${info.titulo}</strong> Resultado: <strong>${info.resultado}</strong>.`;
       centro.textContent = `${t.si}–${t.no}`; centroSub.textContent = `sí – no · ${info.resultado.toLowerCase()}`;
     }
+    centroBase = [centro.textContent!, centroSub.textContent!];
+    filtrar(null);
     if (!tip.hidden && activo) mostrar(activo);
+  }
+
+  // Filtro de la leyenda: resalta los escaños de un color y la cifra central cuenta cuántos son
+  let filtro: string | null = null;
+  let centroBase: [string, string] = ['', ''];
+  function filtrar(f: string | null) {
+    filtro = f;
+    let n = 0;
+    circulos.forEach((c) => { const fuera = f !== null && c.dataset.k !== f; c.classList.toggle('atenuado', fuera); if (f !== null && !fuera) n++; });
+    leyenda.classList.toggle('filtrando', f !== null);
+    leyenda.querySelectorAll<HTMLButtonElement>('.filtro').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.f === f)));
+    if (f === null) { centro.textContent = centroBase[0]; centroSub.textContent = centroBase[1]; }
+    else {
+      centro.textContent = num.format(n);
+      centroSub.textContent = seccion.dataset.modo === 'grupo' ? f : seccion.dataset.modo === 'voto' ? (f === '-' ? 'sin escaño' : etVoto[f as Voto].toLowerCase()) : n === 1 ? 'diputado' : 'diputados';
+    }
+    ajustarCentro();
+  }
+  leyenda.addEventListener('click', (e) => {
+    const b = (e.target as Element).closest<HTMLButtonElement>('.filtro');
+    if (b) filtrar(filtro === b.dataset.f ? null : b.dataset.f!);
+  });
+
+  /** La cifra y su texto no deben tocar los escaños: si no caben en el hueco central, se reduce la letra. */
+  function ajustarCentro() {
+    const radio = Number((document.querySelector('.hemi svg') as SVGSVGElement).dataset.hueco);
+    ([[centro, 52], [centroSub, 16]] as const).forEach(([el, dy]) => {
+      el.style.fontSize = '';
+      let f = parseFloat(getComputedStyle(el).fontSize);
+      for (let k = 0; k < 4; k++) {
+        const alto = dy + 0.74 * f;
+        const cabe = 2 * Math.sqrt(Math.max(0, radio * radio - alto * alto)) - 24;
+        const largo = (el as unknown as SVGTextElement).getComputedTextLength();
+        if (largo <= cabe) break;
+        f = Math.floor(f * Math.max(0.5, cabe / largo) * 10) / 10;
+        el.style.fontSize = `${f}px`;
+      }
+    });
   }
 
   let activo: SVGCircleElement | null = null;
@@ -224,7 +277,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   const vbCompleto = svg.getAttribute('viewBox')!;
   const estrecho = matchMedia('(max-width: 640px)');
   const ajustarVista = () => svg.setAttribute('viewBox', estrecho.matches ? svg.dataset.vbMovil! : vbCompleto);
-  ajustarVista(); estrecho.addEventListener('change', ajustarVista);
+  ajustarVista(); estrecho.addEventListener('change', () => { ajustarVista(); ajustarCentro(); });
   // Un toque cerca de un escaño (aunque no justo encima) también lo selecciona
   svg.addEventListener('click', (e) => {
     if (!tactil() || (e.target as Element).closest('a')) return;
@@ -282,12 +335,14 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     .selector { margin-left: 0; width: 100%; flex-basis: 100%; }
     .selector select { min-width: 0; }
   }
+  @media (max-width: 360px) { .modos .btn { padding: 8px 2px; font-size: .92rem; } }
   .desc { min-height: 3.2em; margin: .7rem 0 .2rem; }
   .desc :global(.texto) { color: var(--text); }
   .lienzo { position: relative; margin: 0 -8px; }
   svg { width: 100%; height: auto; display: block; overflow: visible; }
-  circle { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; transition: fill .25s, stroke .25s; }
+  circle { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; transition: fill .25s, stroke .25s, opacity .2s; }
   circle.vacio { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 3 2; }
+  circle.atenuado { opacity: .13; }
   circle.activo, circle:hover { stroke: var(--text) !important; stroke-width: 4 !important; }
   :global(.hemi svg a), :global(.hemi svg a:focus), :global(.hemi svg a:focus-visible) { outline: none; }
   a:focus-visible circle { stroke: var(--accent) !important; stroke-width: 5 !important; }
@@ -303,12 +358,49 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   .tip { position: absolute; z-index: 15; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: .9rem; line-height: 1.5; box-shadow: 0 8px 28px rgb(0 0 0 / .18); max-width: 300px; pointer-events: none; }
   .tip .nombre { font-size: 1rem; }
   .tip .ver, .tip .cerrar { display: none; }
-  .tip.hoja { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); top: auto; max-width: none; pointer-events: auto; padding: 14px 16px 12px; }
+  .tip.hoja { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); top: auto; max-width: none; pointer-events: auto; padding: 14px 16px 12px; border-radius: 16px; }
+  /* Con el menú abajo (móvil), la ficha rápida queda justo encima de él */
+  @media (max-width: 720px) { .tip.hoja { bottom: calc(70px + env(safe-area-inset-bottom)); } }
   .tip.hoja .ver { display: flex; justify-content: center; align-items: center; margin-top: 10px; text-decoration: none; }
   .tip.hoja .cerrar { display: block; position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; color: var(--muted); cursor: pointer; }
   .leyenda { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
   .leyenda :global(.dot) { box-shadow: inset 0 0 0 1px rgb(127 127 127 / .35); }
   .leyenda :global(.dot.vacio) { box-shadow: none; border: 1px dashed var(--muted); }
-  .leyenda :global(.guia) { padding: 0 2px; }
+  /* Leyenda pulsable: cada color filtra los escaños */
+  .leyenda :global(.filtro) { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: border-color .15s, box-shadow .15s, opacity .15s; }
+  .leyenda :global(.pill.filtro) { line-height: 1.6; }
+  .leyenda :global(.pill.filtro:hover) { border-color: var(--accent); }
+  .leyenda :global(.pill.filtro[aria-pressed='true']) { border-color: var(--text); box-shadow: inset 0 0 0 1px var(--text); font-weight: 650; }
+  .leyenda.filtrando :global(.filtro[aria-pressed='false']) { opacity: .5; }
+  /* Escala de menos a más: tramos seguidos, como una regla */
+  .leyenda :global(.escala) { display: flex; gap: 3px; width: 100%; max-width: 440px; }
+  .leyenda :global(.tramo) { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-height: 44px; padding: 6px 0 2px; border: 0; background: none; border-radius: 8px; font-size: .8rem; line-height: 1.2; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .leyenda :global(.tramo i) { display: block; height: 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgb(127 127 127 / .3); transition: box-shadow .15s; }
+  .leyenda :global(.tramo:first-child i) { border-radius: 7px 3px 3px 7px; }
+  .leyenda :global(.tramo:nth-child(6) i) { border-radius: 3px 7px 7px 3px; }
+  .leyenda :global(.tramo.sd) { flex: .8 1 0; margin-left: 8px; }
+  .leyenda :global(.tramo.sd i) { box-shadow: none; border: 1.5px dashed var(--muted); border-radius: 7px; }
+  .leyenda :global(.tramo:hover span) { color: var(--accent-text); }
+  .leyenda :global(.tramo[aria-pressed='true'] i) { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--text); }
+  .leyenda :global(.tramo[aria-pressed='true'] span) { color: var(--text); font-weight: 700; }
   .nota { margin-top: 8px; }
+  /* Móvil: el hemiciclo justo debajo de los modos para que se vea entero al entrar;
+     el selector de votaciones y las explicaciones van debajo */
+  @media (max-width: 640px) {
+    .hemi { display: flex; flex-direction: column; }
+    .controles { display: contents; }
+    .modos { order: 1; }
+    .lienzo { order: 2; margin: 10px -6px 0; }
+    .leyenda { order: 3; justify-content: center; gap: 4px; margin-top: 8px; }
+    .leyenda :global(.pill) { font-size: .78rem; padding: 2px 9px; gap: 5px; min-height: 30px; }
+    .leyenda :global(.dot) { width: 9px; height: 9px; }
+    .leyenda :global(.escala) { margin: 0 auto; }
+    .selector { order: 4; margin-top: 14px; }
+    .desc { order: 5; min-height: 0; margin: 10px 0 0; }
+    .grupos-movil { order: 6; justify-content: center; margin-top: 10px; }
+    .hemi[data-modo='grupo'] .grupos-movil { display: none; }
+    .nota { order: 7; }
+    .centro { font-size: 66px; }
+    .centro-sub { font-size: 28px; }
+  }
 </style>
