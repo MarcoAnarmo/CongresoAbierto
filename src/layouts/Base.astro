@@ -33,25 +33,59 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
     </script>
     <title>{title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`}</title>
     <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg?v=3')} />
-    <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png?v=3')} />
-    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png?v=3')} />
+    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg?v=4')} />
+    <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png?v=4')} />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png?v=4')} />
   </head>
   <body>
     <a class="saltar" href="#contenido">Saltar al contenido</a>
     <header class="site">
       <div class="wrap bar">
         <a class="brand" href={url('/')} aria-label="Congreso Abierto, inicio">
-          <svg class="balanza" viewBox="0 0 64 64" width="34" height="34" aria-hidden="true" fill="none" stroke="#16181d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 18 7.5 37M15 18l7.5 19M49 18l-7.5 19M49 18l7.5 19" />
-            <path d="M6 37h18a9 7.5 0 0 1-18 0zM40 37h18a9 7.5 0 0 1-18 0z" fill="#f7a04b" />
-            <path d="M4.5 15.5c3.5 2 7.5 2.8 10.5 2.5 4.5-.5 8.5-3.5 13-3.6M59.5 15.5c-3.5 2-7.5 2.8-10.5 2.5-4.5-.5-8.5-3.5-13-3.6" />
-            <rect x="17" y="55.5" width="30" height="5.5" rx="2.4" fill="#f7a04b" />
-            <rect x="21.5" y="51" width="21" height="5" rx="2.2" fill="#e2852f" />
-            <rect x="29" y="4" width="6" height="48" rx="3" fill="#f7a04b" />
-            <circle cx="32" cy="15" r="5.2" fill="#ffd36e" />
-            <circle cx="15" cy="18" r="2.4" fill="#f7a04b" />
-            <circle cx="49" cy="18" r="2.4" fill="#f7a04b" />
+          <svg class="logo" viewBox="0 12 64 40" fill="none" stroke="#16181d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="51" height="32" aria-hidden="true">
+            <g transform="translate(32 46) scale(.94) translate(-32 -46)" stroke-width="1.1">
+              <circle cx="20.9" cy="41.4" r="2.2" fill="#ffd36e"/>
+              <circle cx="27.4" cy="34.9" r="2.2" fill="#ffd36e"/>
+              <circle cx="36.6" cy="34.9" r="2.2" fill="#ffd36e"/>
+              <circle cx="43.1" cy="41.4" r="2.2" fill="#ffd36e"/>
+              <circle cx="14.6" cy="41.5" r="2.2" fill="#f7a04b"/>
+              <circle cx="16.5" cy="36.8" r="2.2" fill="#f7a04b"/>
+              <circle cx="22.8" cy="30.5" r="2.2" fill="#f7a04b"/>
+              <circle cx="27.5" cy="28.6" r="2.2" fill="#f7a04b"/>
+              <circle cx="36.5" cy="28.6" r="2.2" fill="#f7a04b"/>
+              <circle cx="41.2" cy="30.5" r="2.2" fill="#f7a04b"/>
+              <circle cx="47.5" cy="36.8" r="2.2" fill="#f7a04b"/>
+              <circle cx="49.4" cy="41.5" r="2.2" fill="#f7a04b"/>
+              <circle cx="8.4" cy="41.5" r="2.2" fill="#f7a04b"/>
+              <circle cx="9.8" cy="36.8" r="2.2" fill="#f7a04b"/>
+              <circle cx="12.2" cy="32.5" r="2.2" fill="#f7a04b"/>
+              <circle cx="18.5" cy="26.2" r="2.2" fill="#f7a04b"/>
+              <circle cx="22.8" cy="23.8" r="2.2" fill="#f7a04b"/>
+              <circle cx="27.5" cy="22.4" r="2.2" fill="#f7a04b"/>
+              <circle cx="36.5" cy="22.4" r="2.2" fill="#f7a04b"/>
+              <circle cx="41.2" cy="23.8" r="2.2" fill="#f7a04b"/>
+              <circle cx="45.5" cy="26.2" r="2.2" fill="#f7a04b"/>
+              <circle cx="51.8" cy="32.5" r="2.2" fill="#f7a04b"/>
+              <circle cx="54.2" cy="36.8" r="2.2" fill="#f7a04b"/>
+              <circle cx="55.6" cy="41.5" r="2.2" fill="#f7a04b"/>
+              <circle cx="2.3" cy="41.5" r="2.2" fill="#e2852f"/>
+              <circle cx="3.4" cy="36.8" r="2.2" fill="#e2852f"/>
+              <circle cx="5.3" cy="32.3" r="2.2" fill="#e2852f"/>
+              <circle cx="7.9" cy="28.2" r="2.2" fill="#e2852f"/>
+              <circle cx="14.2" cy="21.9" r="2.2" fill="#e2852f"/>
+              <circle cx="18.3" cy="19.3" r="2.2" fill="#e2852f"/>
+              <circle cx="22.8" cy="17.4" r="2.2" fill="#e2852f"/>
+              <circle cx="27.5" cy="16.3" r="2.2" fill="#e2852f"/>
+              <circle cx="36.5" cy="16.3" r="2.2" fill="#e2852f"/>
+              <circle cx="41.2" cy="17.4" r="2.2" fill="#e2852f"/>
+              <circle cx="45.7" cy="19.3" r="2.2" fill="#e2852f"/>
+              <circle cx="49.8" cy="21.9" r="2.2" fill="#e2852f"/>
+              <circle cx="56.1" cy="28.2" r="2.2" fill="#e2852f"/>
+              <circle cx="58.7" cy="32.3" r="2.2" fill="#e2852f"/>
+              <circle cx="60.6" cy="36.8" r="2.2" fill="#e2852f"/>
+              <circle cx="61.7" cy="41.5" r="2.2" fill="#e2852f"/>
+            </g>
+            <path d="M28.5 41h7l-1 7h-5Z" fill="#ffd36e" stroke-width="1.4"/>
           </svg>
           <span>Congreso Abierto</span>
         </a>
@@ -122,9 +156,9 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
   nav { display: flex; gap: 2px; margin-left: auto; }
   .tema { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--muted); cursor: pointer; transition: color .15s, border-color .15s, background-color .15s; }
   .tema:hover { color: var(--accent-text); border-color: var(--accent); }
-  .balanza { flex: none; width: 40px; height: 40px; padding: 3px; border-radius: 10px; transition: background-color .15s; }
+  .logo { flex: none; width: 54px; height: 38px; padding: 3px 4px; border-radius: 10px; transition: background-color .15s; }
   /* En modo oscuro el logo va sobre una placa clara, como un icono de app, para que se lea igual que en claro */
-  :global(:root[data-theme='dark']) .balanza { background: #fff3e6; }
+  :global(:root[data-theme='dark']) .logo { background: #fff3e6; }
   .tema .i-sol { display: none; }
   :global(:root[data-theme='dark']) .tema .i-sol { display: block; }
   :global(:root[data-theme='dark']) .tema .i-luna { display: none; }
