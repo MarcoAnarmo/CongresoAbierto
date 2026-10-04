@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError } from '../../lib/data';
 import type { Diputado } from '../../lib/types';
 import BotonesTarjeta from '../../components/BotonesTarjeta.astro';
-import { rutaTarjeta } from '../../lib/tarjetas';
+import { rutaTarjeta, compartir } from '../../lib/tarjetas';
 import TablaPrestamos from '../../components/TablaPrestamos.astro';
 import AvisoDudoso from '../../components/AvisoDudoso.astro';
 
@@ -50,7 +50,7 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
     <div class="card stat"><div class="v">{p.vehiculos ?? '—'}</div><div class="l">vehículos declarados</div></div>
     <div class="card stat"><div class="v">{fmtEur(d.retribucion.totalMensual)}</div><div class="l">al mes del Congreso (importes oficiales 2026)</div></div>
   </div>
-  <BotonesTarjeta historia={rutaTarjeta.diputado(d, 'historia')} horizontal={rutaTarjeta.diputado(d, 'horizontal')} nombre={`congreso-abierto-${slug(d)}`} />
+  <BotonesTarjeta historia={rutaTarjeta.diputado(d, 'historia')} horizontal={rutaTarjeta.diputado(d, 'horizontal')} nombre={`congreso-abierto-${slug(d)}`} {...compartir.diputado(d)} vista titulo={`Comparte la ficha de ${d.nombreCompleto}`} />
 
   {pf && (
     <section class="perfil" aria-labelledby="h-perfil">

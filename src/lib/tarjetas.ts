@@ -275,3 +275,28 @@ export const rutaTarjeta = {
   resumen: (f: Formato) => `/tarjetas/${f}/resumen.png`,
   pagina: (id: string) => `/tarjetas/horizontal/pagina/${id}.png`,
 };
+
+/* ---------- Texto y enlace para compartir ---------- */
+const cuenta = (k: number, uno: string, varios: string) => `${fmtNum(k)} ${k === 1 ? uno : varios}`;
+/** Enlace (ruta de la web) y texto que acompaña a cada tarjeta al compartirla. Solo datos oficiales, sin valoraciones. */
+export const compartir = {
+  diputado: (d: Diputado) => {
+    const p = d.patrimonio;
+    const bienes = p.propiedades === null ? 'no tiene publicada su declaración de bienes'
+      : `declara ${cuenta(p.propiedades, 'propiedad', 'propiedades')}${p.propiedades && p.viviendas !== null ? ` (${cuenta(p.viviendas, 'vivienda', 'viviendas')})` : ''}`;
+    return {
+      enlace: `/diputado/${slug(d)}`,
+      texto: `${d.nombreCompleto} (${d.grupoCorto}, ${nombreLegible(d.circunscripcion)}) ${bienes} y cobra ${fmtEur(d.retribucion.totalMensual)} al mes del Congreso. Así votó sobre vivienda:`,
+    };
+  },
+  votacion: (v: VotacionClave) => ({
+    enlace: `/?votacion=${encodeURIComponent(v.id)}#hemiciclo`,
+    texto: `${rotulo(v).corto} (${fechaLarga(v.fecha)}): ${v.resultado.toLowerCase()} con ${v.totales.si} sí, ${v.totales.no} no y ${v.totales.abstencion} abstenciones. Qué votó cada diputado:`,
+  }),
+  provincia: (id: string) => {
+    const c = circunscripciones.find((x) => x.id === id)!;
+    const k = diputados.filter((d) => d.circunscripcion === c.nombre).length;
+    return { enlace: `/diputados?provincia=${encodeURIComponent(c.nombre)}`, texto: `${k === 1 ? 'El diputado elegido' : `Los ${k} diputados elegidos`} por ${c.legible}: qué declaran, cuánto cobran y cómo votan.` };
+  },
+  resumen: () => ({ enlace: '/', texto: 'Los 350 diputados del Congreso: qué declaran, cuánto cobran y cómo votan, con sus datos oficiales.' }),
+};

@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import BotonesTarjeta from '../../components/BotonesTarjeta.astro';
 import { diputados, votaciones, url, slug, fmtFecha } from '../../lib/data';
-import { rutaTarjeta, circunscripciones, temaCorto } from '../../lib/tarjetas';
+import { rutaTarjeta, circunscripciones, temaCorto, compartir } from '../../lib/tarjetas';
 
 const vots = [...votaciones].sort((a, b) => b.fecha.localeCompare(a.fecha));
 const dips = [...diputados].sort((a, b) => a.apellidos.localeCompare(b.apellidos, 'es'));
@@ -18,7 +18,7 @@ const dips = [...diputados].sort((a, b) => a.apellidos.localeCompare(b.apellidos
   <div class="rejilla">
     <figure class="tarjeta">
       <img src={url(rutaTarjeta.resumen('historia'))} alt="Tarjeta con las cifras de propiedades y viviendas declaradas por los 350 diputados" width="270" height="480" loading="lazy" />
-      <figcaption><BotonesTarjeta historia={rutaTarjeta.resumen('historia')} horizontal={rutaTarjeta.resumen('horizontal')} nombre="congreso-abierto-resumen" /></figcaption>
+      <figcaption><BotonesTarjeta historia={rutaTarjeta.resumen('historia')} horizontal={rutaTarjeta.resumen('horizontal')} nombre="congreso-abierto-resumen" {...compartir.resumen()} /></figcaption>
     </figure>
   </div>
 
@@ -29,7 +29,7 @@ const dips = [...diputados].sort((a, b) => a.apellidos.localeCompare(b.apellidos
         <img src={url(rutaTarjeta.votacion(v, 'historia'))} alt={`Tarjeta de la votación ${temaCorto(v.tema)} del ${fmtFecha(v.fecha)}: ${v.resultado}`} width="270" height="480" loading="lazy" />
         <figcaption>
           <p class="small"><strong>{temaCorto(v.tema)}</strong><br /><span class="muted">{fmtFecha(v.fecha)}</span></p>
-          <BotonesTarjeta historia={rutaTarjeta.votacion(v, 'historia')} horizontal={rutaTarjeta.votacion(v, 'horizontal')} nombre={`congreso-abierto-${v.id}`} />
+          <BotonesTarjeta historia={rutaTarjeta.votacion(v, 'historia')} horizontal={rutaTarjeta.votacion(v, 'horizontal')} nombre={`congreso-abierto-${v.id}`} {...compartir.votacion(v)} />
         </figcaption>
       </figure>
     ))}
@@ -44,7 +44,7 @@ const dips = [...diputados].sort((a, b) => a.apellidos.localeCompare(b.apellidos
     {circunscripciones.map((c) => (
       <figure class="tarjeta" data-prov={c.id} hidden={c.id !== 'madrid'}>
         <img src={url(rutaTarjeta.provincia(c.id, 'historia'))} alt={`Tarjeta de los diputados elegidos por ${c.legible}`} width="270" height="480" loading="lazy" />
-        <figcaption><BotonesTarjeta historia={rutaTarjeta.provincia(c.id, 'historia')} horizontal={rutaTarjeta.provincia(c.id, 'horizontal')} nombre={`congreso-abierto-${c.id}`} /></figcaption>
+        <figcaption><BotonesTarjeta historia={rutaTarjeta.provincia(c.id, 'historia')} horizontal={rutaTarjeta.provincia(c.id, 'horizontal')} nombre={`congreso-abierto-${c.id}`} {...compartir.provincia(c.id)} /></figcaption>
       </figure>
     ))}
   </div>
@@ -60,7 +60,7 @@ const dips = [...diputados].sort((a, b) => a.apellidos.localeCompare(b.apellidos
     {dips.map((d) => (
       <figure class="tarjeta" data-dip={slug(d)} hidden>
         <img src={url(rutaTarjeta.diputado(d, 'historia'))} alt={`Tarjeta de ${d.nombreCompleto}`} width="270" height="480" loading="lazy" />
-        <figcaption><BotonesTarjeta historia={rutaTarjeta.diputado(d, 'historia')} horizontal={rutaTarjeta.diputado(d, 'horizontal')} nombre={`congreso-abierto-${slug(d)}`} /></figcaption>
+        <figcaption><BotonesTarjeta historia={rutaTarjeta.diputado(d, 'historia')} horizontal={rutaTarjeta.diputado(d, 'horizontal')} nombre={`congreso-abierto-${slug(d)}`} {...compartir.diputado(d)} /></figcaption>
       </figure>
     ))}
   </div>
