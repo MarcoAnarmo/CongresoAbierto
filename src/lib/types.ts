@@ -81,6 +81,39 @@ export interface Patrimonio {
   notas: string[];
 }
 
+export interface Universidad { codigo: string; nombre: string; tipo: 'pública' | 'privada' }
+export interface LineaFormacion {
+  /** Texto literal de la ficha oficial. */
+  texto: string;
+  /** Universidades del RUCT nombradas en la línea, con su tipo oficial. */
+  centros: Universidad[];
+  /** true si nombra un centro que no está en el RUCT (extranjero, escuela no universitaria…). */
+  otroCentro: boolean;
+}
+export interface Evento {
+  /** AAAA o AAAA-MM-DD */
+  fecha: string;
+  tipo: 'legislatura' | 'cargo' | 'trayectoria' | 'bienes' | 'intereses';
+  texto: string;
+  detalle?: string;
+  url?: string;
+}
+/** Datos de la «Ficha personal» oficial del Congreso y línea de tiempo con sus declaraciones. */
+export interface Perfil {
+  anioNacimiento: number | null;
+  /** Legislaturas en las que ha sido diputado/a (números romanos), según la ficha oficial. */
+  legislaturas: string[];
+  legislaturasTexto: string;
+  formacion: LineaFormacion[];
+  trayectoria: string[];
+  /** Tipo de universidad que consta en su formación según el RUCT. */
+  tipoFormacion: 'publica' | 'privada' | 'ambas' | 'sin-centro' | 'sin-datos';
+  cargosActuales: { cargo: string; desde: string | null }[];
+  eventos: Evento[];
+  declaracionActividades: string | null;
+  declaracionesIntereses: { fecha: string | null; url: string }[];
+}
+
 export interface Diputado {
   id: string;
   camara: Camara;
@@ -100,6 +133,7 @@ export interface Diputado {
   cargos: string[];
   retribucion: Retribucion;
   patrimonio: Patrimonio;
+  perfil: Perfil | null;
 }
 
 export interface VotacionClave {

@@ -8,6 +8,7 @@ const pdfs = diputados.reduce((a, d) => a + d.patrimonio.fuentes.length, 0);
 const secciones = [
   { id: 'principio', t: 'Principio' },
   { id: 'fuentes', t: 'Fuentes oficiales' },
+  { id: 'perfil', t: 'Formación y trayectoria' },
   { id: 'propiedades', t: 'Propiedades y viviendas' },
   { id: 'vehiculos', t: 'Vehículos' },
   { id: 'revision', t: 'Cómo se han copiado los datos' },
@@ -49,6 +50,21 @@ const secciones = [
           <li><strong>Retribuciones:</strong> <a href={FUENTE_RETRIBUCIONES}>Régimen económico y ayudas de los miembros de la Cámara</a>, importes de 2026.</li>
         </ul>
         <p><strong>Grupo y candidatura.</strong> El Congreso registra dos datos distintos: la candidatura con la que cada diputado fue elegido en las elecciones y el grupo parlamentario al que pertenece hoy. Pueden no coincidir: quien deja su grupo pasa al Grupo Mixto aunque fuera elegido en otra lista. El hemiciclo ordena por grupo actual; cuando la candidatura es distinta, se indica entre paréntesis.</p>
+      </section>
+
+      <section id="perfil">
+        <h2>Formación y trayectoria</h2>
+        <p>
+          Salen de la <em>Ficha personal</em> de cada diputado en <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, un texto que redacta el propio diputado.
+          Se copia literalmente, línea a línea, y solo se separa en dos bloques:
+        </p>
+        <ul>
+          <li><strong>Formación:</strong> las líneas que hablan de títulos o estudios (licenciado, grado, máster, doctor, diplomado, ingeniero, curso, programa…). El resto es <strong>trayectoria</strong>. Una frase de empleo (profesor, investigador, director…) no cuenta como estudio aunque nombre una universidad.</li>
+          <li><strong>Universidad pública o privada:</strong> solo cuando la línea nombra el centro. El tipo es el que figura en el <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades">Registro de Universidades, Centros y Títulos (RUCT)</a> del Ministerio. Se reconocen también otras formas de nombrarla (en otras lenguas oficiales, siglas como UCM o UNED, y centros que forman parte de una universidad, como ICADE, ESADE o IESE). La lista está en <code>data/manual/universidades.json</code>.</li>
+          <li>Si nombra un centro que no está en el RUCT (por ejemplo, una universidad extranjera), se indica así, sin clasificarlo. Si no nombra el centro, se dice que la ficha no lo indica: no se deduce nada.</li>
+          <li>No se recogen datos familiares (estado civil, hijos) aunque aparezcan en la ficha.</li>
+          <li><strong>Línea de tiempo:</strong> las legislaturas en las que ha sido diputado (con sus fechas oficiales), sus cargos actuales en la Cámara con la fecha de inicio, las líneas de su trayectoria que citan un año y sus declaraciones de bienes y de intereses económicos de esta legislatura, cada una con su PDF.</li>
+        </ul>
       </section>
 
       <section id="propiedades">

@@ -13,6 +13,13 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 | Textos votados | BOE (decretos-leyes), BOCG (proposiciones) y Diario de Sesiones | Enlaces y extractos literales en `data/manual/votaciones-clave.json` |
 | Retribuciones | https://www.congreso.es/es/cem/regecodip (2026) | `scripts/retribuciones.ts` |
 
+## Formación y trayectoria
+
+- Fuente: «Ficha personal» de cada diputado en congreso.es, descargada con `scripts/browser/fichas-personales.js` → `data/raw/fichas-personales.jsonl`. No se guardan datos familiares (estado civil, hijos).
+- `scripts/perfil.ts` copia las líneas literalmente y las separa en formación (títulos y estudios) y trayectoria. Una frase de empleo no cuenta como estudio aunque cite una universidad.
+- Tipo de universidad (pública/privada): solo si la línea nombra el centro, según el RUCT del Ministerio (`data/manual/universidades.json`, con alias en otras lenguas, siglas y centros adscritos). Los centros fuera del RUCT se marcan sin clasificar.
+- Línea de tiempo: legislaturas (fechas oficiales), cargos actuales con su fecha, líneas de trayectoria que citan un año y declaraciones de bienes e intereses económicos de la XV Legislatura.
+
 ## Patrimonio
 
 - Se usa la última declaración publicada. Si es una **modificación parcial** (solo comunica un cambio), se combina con la última declaración completa anterior (`esModificacionParcial` en la transcripción).
