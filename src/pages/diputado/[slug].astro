@@ -2,8 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError } from '../../lib/data';
 import type { Diputado } from '../../lib/types';
-import BotonesTarjeta from '../../components/BotonesTarjeta.astro';
-import { rutaTarjeta, compartir } from '../../lib/tarjetas';
+import BotonCompartir from '../../components/BotonCompartir.astro';
+import DialogoCompartir from '../../components/DialogoCompartir.astro';
+import { rutaTarjeta } from '../../lib/tarjetas';
 import TablaPrestamos from '../../components/TablaPrestamos.astro';
 import AvisoDudoso from '../../components/AvisoDudoso.astro';
 
@@ -26,6 +27,7 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
 <Base title={d.nombreCompleto} imagen={rutaTarjeta.diputado(d, 'horizontal')} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): retribución, viviendas y vehículos declarados y votaciones clave.`}>
   <p><a class="volver" href={url('/diputados')}>← Diputados</a></p>
   <div class="cabecera">
+    <BotonCompartir class="compartir-ficha" d={d} />
     <div class="foto"><img src={d.fotoUrl} alt={`Foto oficial de ${d.nombreCompleto}`} width="132" height="168" loading="lazy" referrerpolicy="no-referrer" /></div>
     <div class="cab-texto">
       <h1>{d.nombreCompleto}</h1>
@@ -50,7 +52,7 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
     <div class="card stat"><div class="v">{p.vehiculos ?? '—'}</div><div class="l">vehículos declarados</div></div>
     <div class="card stat"><div class="v">{fmtEur(d.retribucion.totalMensual)}</div><div class="l">al mes del Congreso (importes oficiales 2026)</div></div>
   </div>
-  <BotonesTarjeta historia={rutaTarjeta.diputado(d, 'historia')} horizontal={rutaTarjeta.diputado(d, 'horizontal')} nombre={`congreso-abierto-${slug(d)}`} {...compartir.diputado(d)} vista titulo={`Comparte la ficha de ${d.nombreCompleto}`} />
+  <DialogoCompartir />
 
   {pf && (
     <section class="perfil" aria-labelledby="h-perfil">
@@ -252,7 +254,9 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
 
 <style>
   /* La foto ocupa exactamente el alto del bloque de texto */
-  .cabecera { display: flex; gap: 20px; align-items: stretch; }
+  .cabecera { display: flex; gap: 20px; align-items: stretch; position: relative; }
+  .cabecera :global(.compartir-ficha) { position: absolute; top: 0; right: 0; }
+  .cab-texto h1 { padding-right: 48px; }
   .foto { flex: none; width: 132px; position: relative; border-radius: 10px; overflow: hidden; background: var(--border); }
   .foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
   .cab-texto { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }

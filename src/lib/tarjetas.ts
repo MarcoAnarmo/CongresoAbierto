@@ -300,3 +300,4 @@ export const compartir = {
   },
   resumen: () => ({ enlace: '/', texto: 'Los 350 diputados del Congreso: qué declaran, cuánto cobran y cómo votan, con sus datos oficiales.' }),
 };
+

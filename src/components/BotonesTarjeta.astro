@@ -5,6 +5,7 @@
  * La historia usa el menú de compartir del móvil con la imagen; donde no se puede (ordenador), la descarga.
  */
 import { url } from '../lib/data';
+import { enlacesRedes } from '../scripts/compartir';
 interface Props {
   historia: string; horizontal: string; nombre: string;
   /** Ruta de la página que se comparte (su vista previa es la tarjeta horizontal). */
@@ -17,8 +18,7 @@ interface Props {
 }
 const { historia, horizontal, nombre, enlace, texto, vista = false, titulo = 'Compártelo' } = Astro.props;
 const absoluta = new URL(url(enlace), Astro.site).href;
-const whatsapp = `https://wa.me/?text=${encodeURIComponent(`${texto} ${absoluta}`)}`;
-const x = `https://x.com/intent/post?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(absoluta)}`;
+const { whatsapp, x } = enlacesRedes(texto, absoluta);
 ---
 <div class:list={['compartir', { 'con-vista': vista }]} data-historia={url(historia)} data-nombre={`${nombre}.png`} data-enlace={absoluta} data-texto={texto}>
   {vista && (
@@ -33,11 +33,11 @@ const x = `https://x.com/intent/post?text=${encodeURIComponent(texto)}&url=${enc
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="4 2.6" /><path d="M12 8v8M8 12h8" /></svg>
         <span class="largo">Historia de Instagram</span><span class="corto">Historia</span>
       </button>
-      <a class="btn c-red" href={whatsapp} target="_blank" rel="noopener">
+      <a class="btn c-red c-whatsapp" href={whatsapp} target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.6 19z" /></svg>
         WhatsApp
       </a>
-      <a class="btn c-red" href={x} target="_blank" rel="noopener">
+      <a class="btn c-red c-x" href={x} target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14v10H9l-4 4z" /></svg>
         <span class="largo">Publicar en X</span><span class="corto">X</span>
       </a>
@@ -60,44 +60,8 @@ const x = `https://x.com/intent/post?text=${encodeURIComponent(texto)}&url=${enc
 </div>
 
 <script>
-  const prueba = new File([new Blob()], 'x.png', { type: 'image/png' });
-  const puedeImagen = !!navigator.canShare?.({ files: [prueba] });
-  document.querySelectorAll<HTMLElement>('.compartir').forEach((caja) => {
-    const { historia, nombre, enlace, texto } = caja.dataset as Record<string, string>;
-    const aviso = caja.querySelector<HTMLElement>('.c-aviso')!;
-    const avisar = (t: string) => { aviso.textContent = t; };
-    const descargar = () => {
-      const a = Object.assign(document.createElement('a'), { href: historia, download: nombre });
-      document.body.append(a); a.click(); a.remove();
-    };
-
-    caja.querySelector('.c-historia')!.addEventListener('click', async () => {
-      if (!puedeImagen) {
-        descargar();
-        avisar('Imagen descargada. Súbela a tu historia desde Instagram; desde el móvil este botón la manda directamente.');
-        return;
-      }
-      try {
-        const r = await fetch(historia);
-        const fichero = new File([await r.blob()], nombre, { type: 'image/png' });
-        // Solo la imagen: así el móvil ofrece Instagram (Historias), WhatsApp (Estado)…
-        await navigator.share({ files: [fichero] });
-      } catch (e) {
-        if ((e as Error).name !== 'AbortError') { descargar(); avisar('No se pudo abrir el menú de compartir; la imagen se ha descargado.'); }
-      }
-    });
-
-    caja.querySelector('.c-copiar')!.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(enlace); avisar('Enlace copiado.'); }
-      catch { avisar(enlace); }
-    });
-
-    const mas = caja.querySelector<HTMLButtonElement>('.c-mas')!;
-    if (navigator.share) {
-      mas.hidden = false;
-      mas.addEventListener('click', () => navigator.share({ text: texto, url: enlace }).catch(() => {}));
-    }
-  });
+  import { prepararCaja } from '../scripts/compartir';
+  document.querySelectorAll<HTMLElement>('.compartir').forEach(prepararCaja);
 </script>
 
 <style>

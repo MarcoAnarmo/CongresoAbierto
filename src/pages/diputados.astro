@@ -2,6 +2,8 @@
 import Base from '../layouts/Base.astro';
 import { diputados, resumen, grupos, colorGrupo, fmtEur, fmtNum, url, slug, etiquetaPartido } from '../lib/data';
 import type { Diputado } from '../lib/types';
+import BotonCompartir from '../components/BotonCompartir.astro';
+import DialogoCompartir from '../components/DialogoCompartir.astro';
 
 const filas = [...diputados].sort((a, b) =>
   (b.patrimonio.propiedades ?? -1) - (a.patrimonio.propiedades ?? -1) ||
@@ -91,9 +93,11 @@ const columnas = [
             </span>
           </span>
         </a>
+        <BotonCompartir class="compartir-tarjeta" d={d} />
       </li>
     ))}
   </ul>
+  <DialogoCompartir />
 
   <div id="vista-tabla" hidden>
   <div class="table-scroll card" style="padding:0">
@@ -283,6 +287,9 @@ const columnas = [
   .vista-barra { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 4px 0 14px; }
   .tarjetas { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
   .tarjeta[hidden], .tarjetas[hidden], .filtros[hidden] { display: none; }
+  .tarjeta { position: relative; }
+  .tarjeta :global(.compartir-tarjeta) { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; }
+  .t-nombre { padding-right: 36px; }
   .segmentado { flex-wrap: wrap; }
   .tabla-grupos .col-barra { width: 38%; }
   .tabla-grupos .pista { display: block; }
