@@ -43,6 +43,7 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 - `scripts/deudas.ts`: el importe se lee como número solo si el formato no deja dudas (grupos de miles de 3 cifras; 1 o 2 cifras tras el último separador = decimales). Si no, se muestra el texto y el total se marca «al menos».
 - Total: suma de saldos pendientes de la tabla de préstamos de la declaración más reciente que rellena el apartado (entre las que forman su patrimonio vigente). No se suman declaraciones distintas.
 - Nombres de particulares que no son el diputado → «[nombre omitido]».
+- Lecturas no confirmadas al 100 % o datos incoherentes del original: aviso público por declaración en `data/raw/deudas/avisos.json` (clave: nombre del PDF), que la ficha muestra como «Lectura no confirmada» con enlace al PDF. Si un saldo está en blanco o no se puede leer, el total se marca «al menos».
 
 ## Retribución
 

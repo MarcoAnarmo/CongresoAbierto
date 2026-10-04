@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generado": "2026-10-04T10:55:32.906Z",
+  "generado": "2026-10-04T11:29:38.655Z",
   "fuente": "Congreso de los Diputados (datos abiertos y fichas oficiales)",
   "legislatura": "XV"
  },
@@ -409,6 +409,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-09-21",
      "url": "https://www.congreso.es/docbienes/leg15/000316/000316_001_e_0001872_20230921.pdf",
      "parcial": false,
@@ -699,6 +700,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000066/000066_000_e_0000297_20230803.pdf",
      "parcial": false,
@@ -1245,6 +1247,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-07",
      "url": "https://www.congreso.es/docbienes/leg15/000128/000128_000_e_0000550_20230807.pdf",
      "parcial": false,
@@ -1589,6 +1592,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000296/000296_000_e_0001239_20230816.pdf",
      "parcial": false,
@@ -1937,6 +1941,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-09-25",
      "url": "https://www.congreso.es/docbienes/leg15/000132/000132_001_e_0082176_20250925.pdf",
      "parcial": true,
@@ -1957,6 +1962,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2024-05-29",
       "url": "https://www.congreso.es/docbienes/leg15/000132/000132_001_e_0027319_20240529.pdf",
       "parcial": true,
@@ -1976,6 +1982,7 @@
       "totalIncompleto": false
      },
      {
+      "aviso": null,
       "fecha": "2023-08-07",
       "url": "https://www.congreso.es/docbienes/leg15/000132/000132_000_e_0000562_20230807.pdf",
       "parcial": false,
@@ -2229,6 +2236,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-01-23",
      "url": "https://www.congreso.es/docbienes/leg15/000371/000371_000_e_0008921_20240123.pdf",
      "parcial": false,
@@ -2544,6 +2552,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "La fecha del primer préstamo figura como «09-19-2019», que no corresponde a una fecha válida en formato día-mes.",
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000046/000046_000_e_0000200_20230802.pdf",
      "parcial": false,
@@ -2909,6 +2918,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000286/000286_000_e_0001200_20230814.pdf",
      "parcial": false,
@@ -3136,6 +3146,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-01",
      "url": "https://www.congreso.es/docbienes/leg15/000003/000003_000_e_0000012_20230801.pdf",
      "parcial": false,
@@ -3450,6 +3461,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000236/000236_000_e_0000999_20230810.pdf",
      "parcial": false,
@@ -3938,6 +3950,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000174/000174_000_e_0000747_20230809.pdf",
      "parcial": false,
@@ -4167,6 +4180,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-09-16",
      "url": "https://www.congreso.es/docbienes/leg15/000388/000388_000_e_0038092_20240916.pdf",
      "parcial": false,
@@ -4410,6 +4424,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-12-19",
      "url": "https://www.congreso.es/docbienes/leg15/000357/000357_000_e_0006617_20231219.pdf",
      "parcial": false,
@@ -4949,6 +4964,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000319/000319_000_e_0001347_20230816.pdf",
      "parcial": false,
@@ -5228,6 +5244,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000311/000311_000_e_0001306_20230816.pdf",
      "parcial": false,
@@ -5698,6 +5715,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-07-15",
      "url": "https://www.congreso.es/docbienes/leg15/000124/000124_001_e_0122621_20260715.pdf",
      "parcial": false,
@@ -5992,6 +6010,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000211/000211_000_e_0000900_20230810.pdf",
      "parcial": false,
@@ -6024,7 +6043,7 @@
      "otras": null,
      "nota": null,
      "totalPendiente": 82898,
-     "totalIncompleto": false
+     "totalIncompleto": true
     },
     "anteriores": [],
     "sinDeudas": false
@@ -6271,6 +6290,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000329/000329_000_e_0001380_20230816.pdf",
      "parcial": false,
@@ -6675,6 +6695,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-08-01",
      "url": "https://www.congreso.es/docbienes/leg15/000401/000401_000_e_0077117_20250801.pdf",
      "parcial": false,
@@ -6901,6 +6922,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "La fecha figura como «02-022021»; no se puede saber con certeza qué fecha quiso escribir el diputado.",
      "fecha": "2023-08-11",
      "url": "https://www.congreso.es/docbienes/leg15/000250/000250_000_e_0001053_20230811.pdf",
      "parcial": false,
@@ -7143,6 +7165,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000020/000020_000_e_0000087_20230802.pdf",
      "parcial": false,
@@ -7561,6 +7584,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-10-10",
      "url": "https://www.congreso.es/docbienes/leg15/000146/000146_001_e_0002403_20231010.pdf",
      "parcial": false,
@@ -7808,6 +7832,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-12-11",
      "url": "https://www.congreso.es/docbienes/leg15/000241/000241_001_e_0051258_20241211.pdf",
      "parcial": true,
@@ -7828,6 +7853,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-10",
       "url": "https://www.congreso.es/docbienes/leg15/000241/000241_000_e_0001014_20230810.pdf",
       "parcial": false,
@@ -8670,6 +8696,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-01-28",
      "url": "https://www.congreso.es/docbienes/leg15/000405/000405_000_e_0096089_20260128.pdf",
      "parcial": false,
@@ -8931,6 +8958,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-10-23",
      "url": "https://www.congreso.es/docbienes/leg15/000261/000261_001_e_0002978_20231023.pdf",
      "parcial": false,
@@ -9177,6 +9205,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000322/000322_000_e_0001352_20230816.pdf",
      "parcial": false,
@@ -9682,6 +9711,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-07-22",
      "url": "https://www.congreso.es/docbienes/leg15/000383/000383_001_e_0076475_20250722.pdf",
      "parcial": true,
@@ -9945,6 +9975,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000291/000291_000_e_0001212_20230814.pdf",
      "parcial": false,
@@ -10267,6 +10298,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-11",
      "url": "https://www.congreso.es/docbienes/leg15/000248/000248_000_e_0001042_20230811.pdf",
      "parcial": false,
@@ -10492,6 +10524,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000193/000193_000_e_0000833_20230809.pdf",
      "parcial": false,
@@ -10778,6 +10811,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000167/000167_000_e_0000709_20230808.pdf",
      "parcial": false,
@@ -11027,6 +11061,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000197/000197_000_e_0000842_20230809.pdf",
      "parcial": false,
@@ -11511,6 +11546,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-06-11",
      "url": "https://www.congreso.es/docbienes/leg15/000399/000399_000_e_0072247_20250611.pdf",
      "parcial": false,
@@ -11872,6 +11908,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000157/000157_000_e_0000675_20230808.pdf",
      "parcial": false,
@@ -12359,6 +12396,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000242/000242_000_e_0001017_20230810.pdf",
      "parcial": false,
@@ -12762,6 +12800,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000136/000136_000_e_0000587_20230808.pdf",
      "parcial": false,
@@ -12963,6 +13002,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000339/000339_000_e_0001412_20230816.pdf",
      "parcial": false,
@@ -13250,6 +13290,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-07-31",
      "url": "https://www.congreso.es/docbienes/leg15/000001/000001_000_e_0000005_20230731.pdf",
      "parcial": false,
@@ -13838,6 +13879,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000231/000231_000_e_0000989_20230810.pdf",
      "parcial": false,
@@ -14232,6 +14274,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000195/000195_000_e_0000836_20230809.pdf",
      "parcial": false,
@@ -14433,6 +14476,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-09-10",
      "url": "https://www.congreso.es/docbienes/leg15/000387/000387_000_e_0037563_20240910.pdf",
      "parcial": false,
@@ -14725,6 +14769,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000264/000264_000_e_0001107_20230814.pdf",
      "parcial": false,
@@ -15480,6 +15525,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000013/000013_000_e_0000059_20230802.pdf",
      "parcial": false,
@@ -16196,6 +16242,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000288/000288_000_e_0001205_20230814.pdf",
      "parcial": false,
@@ -16476,6 +16523,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000153/000153_000_e_0000664_20230808.pdf",
      "parcial": false,
@@ -16676,6 +16724,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-04",
      "url": "https://www.congreso.es/docbienes/leg15/000106/000106_000_e_0000451_20230804.pdf",
      "parcial": false,
@@ -16997,6 +17046,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000227/000227_000_e_0000968_20230810.pdf",
      "parcial": false,
@@ -17267,6 +17317,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000287/000287_000_e_0001201_20230814.pdf",
      "parcial": false,
@@ -17561,6 +17612,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-04",
      "url": "https://www.congreso.es/docbienes/leg15/000103/000103_000_e_0000436_20230804.pdf",
      "parcial": false,
@@ -17766,6 +17818,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000270/000270_000_e_0001130_20230814.pdf",
      "parcial": false,
@@ -18032,6 +18085,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000063/000063_000_e_0000278_20230803.pdf",
      "parcial": false,
@@ -18268,6 +18322,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000315/000315_000_e_0001321_20230816.pdf",
      "parcial": false,
@@ -19019,6 +19074,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000114/000114_000_e_0001215_20230816.pdf",
      "parcial": false,
@@ -19555,6 +19611,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000340/000340_000_e_0001415_20230816.pdf",
      "parcial": false,
@@ -19796,6 +19853,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-09-19",
      "url": "https://www.congreso.es/docbienes/leg15/000350/000350_000_e_0001781_20230919.pdf",
      "parcial": false,
@@ -20060,6 +20118,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000077/000077_000_e_0000339_20230803.pdf",
      "parcial": false,
@@ -20568,6 +20627,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-08-05",
      "url": "https://www.congreso.es/docbienes/leg15/000149/000149_001_e_0123791_20260805.pdf",
      "parcial": false,
@@ -21096,6 +21156,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-10-08",
      "url": "https://www.congreso.es/docbienes/leg15/000154/000154_001_e_0084376_20251008.pdf",
      "parcial": true,
@@ -21116,6 +21177,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-08",
       "url": "https://www.congreso.es/docbienes/leg15/000154/000154_000_e_0000667_20230808.pdf",
       "parcial": false,
@@ -21865,6 +21927,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "Los importes tocan el borde de sus celdas y la última cifra queda tapada en parte; la lectura es probable pero no segura.",
      "fecha": "2026-04-15",
      "url": "https://www.congreso.es/docbienes/leg15/000393/000393_001_e_0110831_20260415.pdf",
      "parcial": false,
@@ -22174,6 +22237,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-12-30",
      "url": "https://www.congreso.es/docbienes/leg15/000376/000376_001_e_0053187_20241230.pdf",
      "parcial": true,
@@ -22194,6 +22258,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2024-02-20",
       "url": "https://www.congreso.es/docbienes/leg15/000376/000376_000_e_0012168_20240220.pdf",
       "parcial": false,
@@ -23133,6 +23198,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000278/000278_000_e_0001171_20230814.pdf",
      "parcial": false,
@@ -23406,6 +23472,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000230/000230_000_e_0000979_20230810.pdf",
      "parcial": false,
@@ -23692,6 +23759,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-07",
      "url": "https://www.congreso.es/docbienes/leg15/000115/000115_000_e_0000495_20230807.pdf",
      "parcial": false,
@@ -24227,6 +24295,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000229/000229_000_e_0000973_20230810.pdf",
      "parcial": false,
@@ -24494,6 +24563,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-06-17",
      "url": "https://www.congreso.es/docbienes/leg15/000040/000040_001_e_0073129_20250617.pdf",
      "parcial": true,
@@ -24694,6 +24764,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000324/000324_000_e_0001361_20230816.pdf",
      "parcial": false,
@@ -25021,6 +25092,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-09-11",
      "url": "https://www.congreso.es/docbienes/leg15/000348/000348_000_e_0001661_20230911.pdf",
      "parcial": false,
@@ -25339,6 +25411,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-02-14",
      "url": "https://www.congreso.es/docbienes/leg15/000395/000395_000_e_0056607_20250214.pdf",
      "parcial": false,
@@ -25591,6 +25664,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-04",
      "url": "https://www.congreso.es/docbienes/leg15/000100/000100_000_e_0000424_20230804.pdf",
      "parcial": false,
@@ -25796,6 +25870,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000024/000024_000_e_0000108_20230802.pdf",
      "parcial": false,
@@ -26033,6 +26108,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "El saldo pendiente («70.764,4 €») toca el borde de la celda; podría faltar una última cifra.",
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000155/000155_000_e_0000668_20230808.pdf",
      "parcial": false,
@@ -26740,6 +26816,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000012/000012_000_e_0000053_20230802.pdf",
      "parcial": false,
@@ -27018,6 +27095,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000199/000199_000_e_0000855_20230809.pdf",
      "parcial": false,
@@ -27396,6 +27474,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-10-05",
      "url": "https://www.congreso.es/docbienes/leg15/000186/000186_001_e_0002205_20231005.pdf",
      "parcial": false,
@@ -27738,6 +27817,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000162/000162_000_e_0000691_20230808.pdf",
      "parcial": false,
@@ -28009,6 +28089,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000054/000054_000_e_0000235_20230803.pdf",
      "parcial": false,
@@ -28991,6 +29072,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000058/000058_000_e_0000258_20230803.pdf",
      "parcial": false,
@@ -29499,6 +29581,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000301/000301_000_e_0001257_20230816.pdf",
      "parcial": false,
@@ -29702,6 +29785,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-11",
      "url": "https://www.congreso.es/docbienes/leg15/000254/000254_000_e_0001067_20230811.pdf",
      "parcial": false,
@@ -29943,6 +30027,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-04-23",
      "url": "https://www.congreso.es/docbienes/leg15/000380/000380_000_e_0022508_20240423.pdf",
      "parcial": false,
@@ -30180,6 +30265,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000026/000026_000_e_0000120_20230802.pdf",
      "parcial": false,
@@ -30448,6 +30534,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-04",
      "url": "https://www.congreso.es/docbienes/leg15/000097/000097_000_e_0000416_20230804.pdf",
      "parcial": false,
@@ -31011,6 +31098,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000038/000038_000_e_0000175_20230802.pdf",
      "parcial": false,
@@ -31402,6 +31490,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-02-20",
      "url": "https://www.congreso.es/docbienes/leg15/000182/000182_001_e_0057279_20250220.pdf",
      "parcial": false,
@@ -31649,6 +31738,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000090/000090_000_e_0000383_20230803.pdf",
      "parcial": false,
@@ -31926,6 +32016,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-04",
      "url": "https://www.congreso.es/docbienes/leg15/000105/000105_000_e_0000448_20230804.pdf",
      "parcial": false,
@@ -32193,6 +32284,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000041/000041_000_e_0000184_20230802.pdf",
      "parcial": false,
@@ -32465,6 +32557,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000240/000240_000_e_0001007_20230810.pdf",
      "parcial": false,
@@ -33197,6 +33290,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "La fecha del primer préstamo («OCTUBRE 2012») toca el borde de la celda; podría faltar algún carácter.",
      "fecha": "2025-02-18",
      "url": "https://www.congreso.es/docbienes/leg15/000394/000394_000_e_0056886_20250218.pdf",
      "parcial": false,
@@ -33451,6 +33545,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000217/000217_000_e_0000915_20230810.pdf",
      "parcial": false,
@@ -33625,6 +33720,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-02-05",
      "url": "https://www.congreso.es/docbienes/leg15/000406/000406_000_e_0097697_20260205.pdf",
      "parcial": false,
@@ -33906,6 +34002,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000156/000156_000_e_0000671_20230808.pdf",
      "parcial": false,
@@ -34204,6 +34301,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000189/000189_000_e_0000806_20230809.pdf",
      "parcial": false,
@@ -34680,6 +34778,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-01-16",
      "url": "https://www.congreso.es/docbienes/leg15/000369/000369_000_e_0008387_20240116.pdf",
      "parcial": false,
@@ -34949,6 +35048,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000214/000214_000_e_0000909_20230810.pdf",
      "parcial": false,
@@ -35277,6 +35377,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "La impresión es muy tenue: el separador decimal del saldo pendiente apenas se ve.",
      "fecha": "2023-10-17",
      "url": "https://www.congreso.es/docbienes/leg15/000352/000352_000_e_0002620_20231017.pdf",
      "parcial": false,
@@ -36086,6 +36187,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000222/000222_000_e_0000938_20230810.pdf",
      "parcial": false,
@@ -36498,6 +36600,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000336/000336_000_e_0001402_20230816.pdf",
      "parcial": false,
@@ -36780,6 +36883,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000221/000221_000_e_0000937_20230810.pdf",
      "parcial": false,
@@ -37054,6 +37158,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "El saldo pendiente («4.362,2») toca el borde de la celda; podría faltar una última cifra.",
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000173/000173_000_e_0000742_20230809.pdf",
      "parcial": false,
@@ -37401,6 +37506,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000269/000269_000_e_0001126_20230814.pdf",
      "parcial": false,
@@ -37895,6 +38001,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-06-11",
      "url": "https://www.congreso.es/docbienes/leg15/000381/000381_000_e_0029253_20240611.pdf",
      "parcial": false,
@@ -38719,6 +38826,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000171/000171_000_e_0000727_20230808.pdf",
      "parcial": false,
@@ -39444,6 +39552,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000280/000280_000_e_0001180_20230814.pdf",
      "parcial": false,
@@ -39681,6 +39790,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000022/000022_000_e_0000093_20230802.pdf",
      "parcial": false,
@@ -39944,6 +40054,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000035/000035_000_e_0000166_20230802.pdf",
      "parcial": false,
@@ -40199,6 +40310,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "El saldo pendiente («88.019,1») toca el borde de la celda; podría faltar una última cifra.",
      "fecha": "2025-09-09",
      "url": "https://www.congreso.es/docbienes/leg15/000402/000402_000_e_0078912_20250909.pdf",
      "parcial": false,
@@ -40546,6 +40658,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000216/000216_000_e_0000913_20230810.pdf",
      "parcial": false,
@@ -40977,6 +41090,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-04",
      "url": "https://www.congreso.es/docbienes/leg15/000102/000102_000_e_0000432_20230804.pdf",
      "parcial": false,
@@ -41199,6 +41313,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000181/000181_000_e_0000774_20230809.pdf",
      "parcial": false,
@@ -42014,6 +42129,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000321/000321_000_e_0001350_20230816.pdf",
      "parcial": false,
@@ -42289,6 +42405,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-07-24",
      "url": "https://www.congreso.es/docbienes/leg15/000344/000344_001_e_0123135_20260724.pdf",
      "parcial": false,
@@ -42539,6 +42656,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-08-05",
      "url": "https://www.congreso.es/docbienes/leg15/000253/000253_001_e_0077236_20250805.pdf",
      "parcial": false,
@@ -43106,6 +43224,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-12-20",
      "url": "https://www.congreso.es/docbienes/leg15/000364/000364_000_e_0006663_20231220.pdf",
      "parcial": false,
@@ -43370,6 +43489,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000042/000042_000_e_0000186_20230802.pdf",
      "parcial": false,
@@ -43917,6 +44037,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-01-22",
      "url": "https://www.congreso.es/docbienes/leg15/000353/000353_001_e_0054218_20250122.pdf",
      "parcial": true,
@@ -43933,7 +44054,7 @@
      "otras": null,
      "nota": null,
      "totalPendiente": 0,
-     "totalIncompleto": false
+     "totalIncompleto": true
     },
     "anteriores": [],
     "sinDeudas": false
@@ -44107,6 +44228,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000285/000285_000_e_0001194_20230814.pdf",
      "parcial": false,
@@ -44605,6 +44727,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-11",
      "url": "https://www.congreso.es/docbienes/leg15/000252/000252_000_e_0001058_20230811.pdf",
      "parcial": false,
@@ -44863,6 +44986,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-04",
      "url": "https://www.congreso.es/docbienes/leg15/000098/000098_000_e_0000419_20230804.pdf",
      "parcial": false,
@@ -45131,6 +45255,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000310/000310_000_e_0001296_20230816.pdf",
      "parcial": false,
@@ -45400,6 +45525,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000176/000176_000_e_0000751_20230809.pdf",
      "parcial": false,
@@ -45891,6 +46017,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-12-27",
      "url": "https://www.congreso.es/docbienes/leg15/000244/000244_001_e_0052800_20241227.pdf",
      "parcial": false,
@@ -46123,6 +46250,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-11",
      "url": "https://www.congreso.es/docbienes/leg15/000251/000251_000_e_0001054_20230811.pdf",
      "parcial": false,
@@ -46336,6 +46464,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000068/000068_000_e_0000303_20230803.pdf",
      "parcial": false,
@@ -46556,6 +46685,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000166/000166_000_e_0000705_20230808.pdf",
      "parcial": false,
@@ -46784,6 +46914,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-06-11",
      "url": "https://www.congreso.es/docbienes/leg15/000142/000142_001_e_0072406_20250611.pdf",
      "parcial": true,
@@ -46804,6 +46935,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-08",
       "url": "https://www.congreso.es/docbienes/leg15/000142/000142_000_e_0000610_20230808.pdf",
       "parcial": false,
@@ -47345,6 +47477,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000137/000137_000_e_0000589_20230808.pdf",
      "parcial": false,
@@ -47644,6 +47777,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000220/000220_000_e_0000936_20230810.pdf",
      "parcial": false,
@@ -47968,6 +48102,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000303/000303_000_e_0001269_20230816.pdf",
      "parcial": false,
@@ -48407,6 +48542,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000086/000086_000_e_0000363_20230803.pdf",
      "parcial": false,
@@ -48637,6 +48773,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000201/000201_000_e_0000858_20230809.pdf",
      "parcial": false,
@@ -49324,6 +49461,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000180/000180_000_e_0000769_20230809.pdf",
      "parcial": false,
@@ -50022,6 +50160,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000282/000282_000_e_0001187_20230814.pdf",
      "parcial": false,
@@ -50219,6 +50358,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-11-12",
      "url": "https://www.congreso.es/docbienes/leg15/000361/000361_001_e_0088688_20251112.pdf",
      "parcial": false,
@@ -50694,6 +50834,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-09-19",
      "url": "https://www.congreso.es/docbienes/leg15/000351/000351_000_e_0001785_20230919.pdf",
      "parcial": false,
@@ -50986,6 +51127,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000198/000198_000_e_0000849_20230809.pdf",
      "parcial": false,
@@ -51253,6 +51395,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-12-23",
      "url": "https://www.congreso.es/docbienes/leg15/000159/000159_001_e_0052664_20241223.pdf",
      "parcial": true,
@@ -51528,6 +51671,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000191/000191_000_e_0000814_20230809.pdf",
      "parcial": false,
@@ -51826,6 +51970,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000183/000183_000_e_0000786_20230809.pdf",
      "parcial": false,
@@ -52071,6 +52216,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000092/000092_000_e_0000387_20230803.pdf",
      "parcial": false,
@@ -52678,6 +52824,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000158/000158_000_e_0000678_20230808.pdf",
      "parcial": false,
@@ -52930,6 +53077,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000067/000067_000_e_0000300_20230803.pdf",
      "parcial": false,
@@ -53105,6 +53253,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-08-27",
      "url": "https://www.congreso.es/docbienes/leg15/000410/000410_000_e_0124307_20260827.pdf",
      "parcial": false,
@@ -53374,6 +53523,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000190/000190_000_e_0000813_20230809.pdf",
      "parcial": false,
@@ -53802,6 +53952,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000203/000203_000_e_0000864_20230809.pdf",
      "parcial": false,
@@ -54267,6 +54418,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000078/000078_000_e_0000343_20230803.pdf",
      "parcial": false,
@@ -54474,6 +54626,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-07-11",
      "url": "https://www.congreso.es/docbienes/leg15/000385/000385_000_e_0033920_20240711.pdf",
      "parcial": false,
@@ -54696,6 +54849,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-12-20",
      "url": "https://www.congreso.es/docbienes/leg15/000363/000363_000_e_0006661_20231220.pdf",
      "parcial": false,
@@ -55498,6 +55652,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-12-03",
      "url": "https://www.congreso.es/docbienes/leg15/000333/000333_001_e_0091694_20251203.pdf",
      "parcial": true,
@@ -55518,6 +55673,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-16",
       "url": "https://www.congreso.es/docbienes/leg15/000333/000333_000_e_0001395_20230816.pdf",
       "parcial": false,
@@ -55737,6 +55893,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000341/000341_000_e_0001417_20230816.pdf",
      "parcial": false,
@@ -56645,6 +56802,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000205/000205_000_e_0000869_20230809.pdf",
      "parcial": false,
@@ -57301,6 +57459,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-07",
      "url": "https://www.congreso.es/docbienes/leg15/000130/000130_000_e_0000558_20230807.pdf",
      "parcial": false,
@@ -57752,6 +57911,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-01-31",
      "url": "https://www.congreso.es/docbienes/leg15/000373/000373_000_e_0010136_20240131.pdf",
      "parcial": false,
@@ -58054,6 +58214,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-02-19",
      "url": "https://www.congreso.es/docbienes/leg15/000396/000396_000_e_0057138_20250219.pdf",
      "parcial": false,
@@ -58372,6 +58533,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000147/000147_000_e_0000640_20230808.pdf",
      "parcial": false,
@@ -58778,6 +58940,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-12-04",
      "url": "https://www.congreso.es/docbienes/leg15/000309/000309_001_e_0050658_20241204.pdf",
      "parcial": true,
@@ -59082,6 +59245,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-05-27",
      "url": "https://www.congreso.es/docbienes/leg15/000398/000398_000_e_0069775_20250527.pdf",
      "parcial": false,
@@ -59345,6 +59509,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-07-22",
      "url": "https://www.congreso.es/docbienes/leg15/000386/000386_000_e_0034512_20240722.pdf",
      "parcial": false,
@@ -59568,6 +59733,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-03-12",
      "url": "https://www.congreso.es/docbienes/leg15/000377/000377_000_e_0016001_20240312.pdf",
      "parcial": false,
@@ -59725,6 +59891,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-06-11",
      "url": "https://www.congreso.es/docbienes/leg15/000409/000409_000_e_0118719_20260611.pdf",
      "parcial": false,
@@ -60009,6 +60176,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "El importe concedido figura como «75.6000,00€», un formato que no permite saber la cifra exacta.",
      "fecha": "2024-12-12",
      "url": "https://www.congreso.es/docbienes/leg15/000392/000392_000_e_0051602_20241212.pdf",
      "parcial": false,
@@ -60283,6 +60451,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-07-31",
      "url": "https://www.congreso.es/docbienes/leg15/000002/000002_000_e_0000007_20230731.pdf",
      "parcial": false,
@@ -60568,6 +60737,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000308/000308_000_e_0001293_20230816.pdf",
      "parcial": false,
@@ -60799,6 +60969,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-01-09",
      "url": "https://www.congreso.es/docbienes/leg15/000368/000368_000_e_0007832_20240109.pdf",
      "parcial": false,
@@ -61202,6 +61373,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000164/000164_000_e_0000702_20230808.pdf",
      "parcial": false,
@@ -61491,6 +61663,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-01-29",
      "url": "https://www.congreso.es/docbienes/leg15/000202/000202_001_e_0054646_20250129.pdf",
      "parcial": true,
@@ -61511,6 +61684,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-09",
       "url": "https://www.congreso.es/docbienes/leg15/000202/000202_000_e_0000859_20230809.pdf",
       "parcial": false,
@@ -61812,6 +61986,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "Una franja del escaneo tapa una cifra del importe concedido de los dos préstamos («25.?23» y «130.?00»).",
      "fecha": "2026-09-08",
      "url": "https://www.congreso.es/docbienes/leg15/000328/000328_001_e_0125395_20260908.pdf",
      "parcial": true,
@@ -61840,6 +62015,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-16",
       "url": "https://www.congreso.es/docbienes/leg15/000328/000328_000_e_0001376_20230816.pdf",
       "parcial": false,
@@ -62152,6 +62328,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000079/000079_000_e_0000347_20230803.pdf",
      "parcial": false,
@@ -62520,6 +62697,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000015/000015_000_e_0000073_20230802.pdf",
      "parcial": false,
@@ -62738,6 +62916,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000037/000037_000_e_0000170_20230802.pdf",
      "parcial": false,
@@ -63025,6 +63204,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000025/000025_000_e_0000116_20230802.pdf",
      "parcial": false,
@@ -63340,6 +63520,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-01",
      "url": "https://www.congreso.es/docbienes/leg15/000008/000008_000_e_0000034_20230801.pdf",
      "parcial": false,
@@ -63555,6 +63736,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000016/000016_000_e_0000074_20230802.pdf",
      "parcial": false,
@@ -64091,6 +64273,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000318/000318_000_e_0001338_20230816.pdf",
      "parcial": false,
@@ -64388,6 +64571,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000065/000065_000_e_0000293_20230803.pdf",
      "parcial": false,
@@ -65408,6 +65592,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000064/000064_000_e_0000289_20230803.pdf",
      "parcial": false,
@@ -65643,6 +65828,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "El importe concedido de la segunda hipoteca figura como «232.00,00», un formato que no permite saber la cifra exacta.",
      "fecha": "2025-07-15",
      "url": "https://www.congreso.es/docbienes/leg15/000074/000074_001_e_0075932_20250715.pdf",
      "parcial": false,
@@ -65991,6 +66177,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-07-23",
      "url": "https://www.congreso.es/docbienes/leg15/000192/000192_001_e_0076590_20250723.pdf",
      "parcial": true,
@@ -66002,6 +66189,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-09",
       "url": "https://www.congreso.es/docbienes/leg15/000192/000192_000_e_0000826_20230809.pdf",
       "parcial": false,
@@ -66326,6 +66514,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000187/000187_000_e_0000799_20230809.pdf",
      "parcial": false,
@@ -66606,6 +66795,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-03-12",
      "url": "https://www.congreso.es/docbienes/leg15/000172/000172_001_e_0060447_20250312.pdf",
      "parcial": true,
@@ -66626,6 +66816,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-09",
       "url": "https://www.congreso.es/docbienes/leg15/000172/000172_000_e_0000732_20230809.pdf",
       "parcial": false,
@@ -67635,6 +67826,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-10-30",
      "url": "https://www.congreso.es/docbienes/leg15/000088/000088_001_e_0003436_20231030.pdf",
      "parcial": false,
@@ -67899,6 +68091,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000061/000061_000_e_0000271_20230803.pdf",
      "parcial": false,
@@ -68406,6 +68599,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-10-23",
      "url": "https://www.congreso.es/docbienes/leg15/000005/000005_001_e_0002977_20231023.pdf",
      "parcial": false,
@@ -69207,6 +69401,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-07-24",
      "url": "https://www.congreso.es/docbienes/leg15/000089/000089_001_e_0034619_20240724.pdf",
      "parcial": false,
@@ -69808,6 +70003,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000224/000224_000_e_0000944_20230810.pdf",
      "parcial": false,
@@ -70124,6 +70320,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-05-08",
      "url": "https://www.congreso.es/docbienes/leg15/000397/000397_000_e_0067526_20250508.pdf",
      "parcial": false,
@@ -70422,6 +70619,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-07",
      "url": "https://www.congreso.es/docbienes/leg15/000119/000119_000_e_0000516_20230807.pdf",
      "parcial": false,
@@ -70659,6 +70857,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-09-16",
      "url": "https://www.congreso.es/docbienes/leg15/000010/000010_001_e_0038180_20240916.pdf",
      "parcial": false,
@@ -70956,6 +71155,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-01-18",
      "url": "https://www.congreso.es/docbienes/leg15/000235/000235_001_e_0008540_20240118.pdf",
      "parcial": false,
@@ -70972,7 +71172,7 @@
      "otras": null,
      "nota": null,
      "totalPendiente": 0,
-     "totalIncompleto": false
+     "totalIncompleto": true
     },
     "anteriores": [],
     "sinDeudas": false
@@ -71282,6 +71482,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000151/000151_000_e_0000650_20230808.pdf",
      "parcial": false,
@@ -71536,6 +71737,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000226/000226_000_e_0000965_20230810.pdf",
      "parcial": false,
@@ -71793,6 +71995,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000305/000305_000_e_0001271_20230816.pdf",
      "parcial": false,
@@ -72130,6 +72333,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000246/000246_000_e_0001029_20230810.pdf",
      "parcial": false,
@@ -72435,6 +72639,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000045/000045_000_e_0000194_20230802.pdf",
      "parcial": false,
@@ -72846,6 +73051,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-05-28",
      "url": "https://www.congreso.es/docbienes/leg15/000126/000126_001_e_0117139_20260528.pdf",
      "parcial": false,
@@ -73305,6 +73511,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-12-05",
      "url": "https://www.congreso.es/docbienes/leg15/000355/000355_000_e_0005732_20231205.pdf",
      "parcial": false,
@@ -73577,6 +73784,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-07",
      "url": "https://www.congreso.es/docbienes/leg15/000120/000120_000_e_0000518_20230807.pdf",
      "parcial": false,
@@ -73862,6 +74070,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000091/000091_000_e_0000385_20230803.pdf",
      "parcial": false,
@@ -74077,6 +74286,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "La fecha de concesión que figura (20 oct 2024) es posterior a la de la declaración (20/12/2023); puede ser una errata del original.",
      "fecha": "2023-12-20",
      "url": "https://www.congreso.es/docbienes/leg15/000362/000362_000_e_0006659_20231220.pdf",
      "parcial": false,
@@ -74548,6 +74758,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "Los préstamos 6 y 7 están escritos en «Otras deudas» porque no cabían en la tabla, y no se suman al total.",
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000014/000014_000_e_0001375_20230816.pdf",
      "parcial": false,
@@ -74802,6 +75013,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000148/000148_000_e_0000641_20230808.pdf",
      "parcial": false,
@@ -75078,6 +75290,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000163/000163_000_e_0000697_20230808.pdf",
      "parcial": false,
@@ -75698,6 +75911,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-04",
      "url": "https://www.congreso.es/docbienes/leg15/000107/000107_000_e_0000454_20230804.pdf",
      "parcial": false,
@@ -76191,6 +76405,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000048/000048_000_e_0000212_20230803.pdf",
      "parcial": false,
@@ -76505,6 +76720,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "Escaneo de baja calidad: los separadores de los importes parecen puntos pero podrían ser comas.",
      "fecha": "2024-10-30",
      "url": "https://www.congreso.es/docbienes/leg15/000277/000277_001_e_0046638_20241030.pdf",
      "parcial": true,
@@ -76533,6 +76749,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2024-09-27",
       "url": "https://www.congreso.es/docbienes/leg15/000277/000277_001_e_0042121_20240927.pdf",
       "parcial": true,
@@ -76552,6 +76769,7 @@
       "totalIncompleto": false
      },
      {
+      "aviso": null,
       "fecha": "2023-08-14",
       "url": "https://www.congreso.es/docbienes/leg15/000277/000277_000_e_0001169_20230814.pdf",
       "parcial": false,
@@ -76903,6 +77121,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000299/000299_000_e_0001249_20230816.pdf",
      "parcial": false,
@@ -77136,6 +77355,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000060/000060_000_e_0000269_20230803.pdf",
      "parcial": false,
@@ -77474,6 +77694,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-09-25",
      "url": "https://www.congreso.es/docbienes/leg15/000358/000358_001_e_0041818_20240925.pdf",
      "parcial": false,
@@ -77682,6 +77903,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000274/000274_000_e_0001162_20230814.pdf",
      "parcial": false,
@@ -78052,6 +78274,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000050/000050_000_e_0000224_20230803.pdf",
      "parcial": false,
@@ -78338,6 +78561,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-07",
      "url": "https://www.congreso.es/docbienes/leg15/000129/000129_000_e_0000557_20230807.pdf",
      "parcial": false,
@@ -78735,6 +78959,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000298/000298_000_e_0001246_20230816.pdf",
      "parcial": false,
@@ -79032,6 +79257,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-01",
      "url": "https://www.congreso.es/docbienes/leg15/000009/000009_000_e_0000038_20230801.pdf",
      "parcial": false,
@@ -79618,6 +79844,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000073/000073_000_e_0000324_20230803.pdf",
      "parcial": false,
@@ -79857,6 +80084,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000072/000072_000_e_0000321_20230803.pdf",
      "parcial": false,
@@ -80259,6 +80487,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000094/000094_000_e_0000393_20230803.pdf",
      "parcial": false,
@@ -80508,6 +80737,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000144/000144_000_e_0000628_20230808.pdf",
      "parcial": false,
@@ -80777,6 +81007,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000204/000204_000_e_0000866_20230809.pdf",
      "parcial": false,
@@ -81017,6 +81248,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000177/000177_000_e_0000756_20230809.pdf",
      "parcial": false,
@@ -81944,6 +82176,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000169/000169_000_e_0000713_20230808.pdf",
      "parcial": false,
@@ -82253,6 +82486,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-06-04",
      "url": "https://www.congreso.es/docbienes/leg15/000122/000122_001_e_0117759_20260604.pdf",
      "parcial": true,
@@ -82533,6 +82767,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-09-01",
      "url": "https://www.congreso.es/docbienes/leg15/000125/000125_001_e_0124667_20260901.pdf",
      "parcial": true,
@@ -82839,6 +83074,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "La fecha de concesión del tercer préstamo (25/08/2024) es posterior a la de la declaración (agosto de 2023); puede ser una errata del original.",
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000030/000030_000_e_0000147_20230802.pdf",
      "parcial": false,
@@ -83190,6 +83426,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "Bajo los importes hay una segunda línea cortada por el borde de la celda que no se puede leer (parece «(50%)»).",
      "fecha": "2023-08-07",
      "url": "https://www.congreso.es/docbienes/leg15/000116/000116_000_e_0000506_20230807.pdf",
      "parcial": false,
@@ -83659,6 +83896,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000085/000085_000_e_0000361_20230803.pdf",
      "parcial": false,
@@ -83940,6 +84178,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000209/000209_000_e_0000880_20230810.pdf",
      "parcial": false,
@@ -84141,6 +84380,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000196/000196_000_e_0000837_20230809.pdf",
      "parcial": false,
@@ -84447,6 +84687,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-01-21",
      "url": "https://www.congreso.es/docbienes/leg15/000138/000138_001_e_0054066_20250121.pdf",
      "parcial": false,
@@ -84620,6 +84861,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-09-06",
      "url": "https://www.congreso.es/docbienes/leg15/000347/000347_000_e_0001598_20230906.pdf",
      "parcial": false,
@@ -84879,6 +85121,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000017/000017_000_e_0000076_20230802.pdf",
      "parcial": false,
@@ -85187,6 +85430,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-04-02",
      "url": "https://www.congreso.es/docbienes/leg15/000019/000019_001_e_0063713_20250402.pdf",
      "parcial": false,
@@ -85416,6 +85660,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-09-15",
      "url": "https://www.congreso.es/docbienes/leg15/000237/000237_001_e_0126817_20260915.pdf",
      "parcial": false,
@@ -85705,6 +85950,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000260/000260_000_e_0001090_20230814.pdf",
      "parcial": false,
@@ -86599,6 +86845,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-14",
      "url": "https://www.congreso.es/docbienes/leg15/000281/000281_000_e_0001182_20230814.pdf",
      "parcial": false,
@@ -87140,6 +87387,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-02-24",
      "url": "https://www.congreso.es/docbienes/leg15/000071/000071_001_e_0102207_20260224.pdf",
      "parcial": false,
@@ -87387,6 +87635,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-09-09",
      "url": "https://www.congreso.es/docbienes/leg15/000338/000338_001_e_0078322_20250909.pdf",
      "parcial": true,
@@ -87407,6 +87656,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-16",
       "url": "https://www.congreso.es/docbienes/leg15/000338/000338_000_e_0001409_20230816.pdf",
       "parcial": false,
@@ -87715,6 +87965,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000043/000043_000_e_0000189_20230802.pdf",
      "parcial": false,
@@ -87962,6 +88213,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": "Las observaciones mencionan el pago pendiente de una vivienda nueva que no figura en la tabla de deudas.",
      "fecha": "2025-09-16",
      "url": "https://www.congreso.es/docbienes/leg15/000111/000111_001_e_0079969_20250916.pdf",
      "parcial": false,
@@ -88442,6 +88694,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000208/000208_000_e_0000878_20230810.pdf",
      "parcial": false,
@@ -88738,6 +88991,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-02-07",
      "url": "https://www.congreso.es/docbienes/leg15/000375/000375_000_e_0010821_20240207.pdf",
      "parcial": false,
@@ -89365,6 +89619,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2025-10-29",
      "url": "https://www.congreso.es/docbienes/leg15/000033/000033_001_e_0086940_20251029.pdf",
      "parcial": true,
@@ -89385,6 +89640,7 @@
     },
     "anteriores": [
      {
+      "aviso": null,
       "fecha": "2023-08-02",
       "url": "https://www.congreso.es/docbienes/leg15/000033/000033_000_e_0000153_20230802.pdf",
       "parcial": false,
@@ -89709,6 +89965,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-10",
      "url": "https://www.congreso.es/docbienes/leg15/000212/000212_000_e_0000903_20230810.pdf",
      "parcial": false,
@@ -90177,6 +90434,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000297/000297_000_e_0001240_20230816.pdf",
      "parcial": false,
@@ -90613,6 +90871,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000184/000184_000_e_0000788_20230809.pdf",
      "parcial": false,
@@ -90844,6 +91103,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-03",
      "url": "https://www.congreso.es/docbienes/leg15/000083/000083_000_e_0000357_20230803.pdf",
      "parcial": false,
@@ -91119,6 +91379,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2024-06-18",
      "url": "https://www.congreso.es/docbienes/leg15/000382/000382_000_e_0030900_20240618.pdf",
      "parcial": false,
@@ -91370,6 +91631,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-08",
      "url": "https://www.congreso.es/docbienes/leg15/000152/000152_000_e_0000655_20230808.pdf",
      "parcial": false,
@@ -91698,6 +91960,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000032/000032_000_e_0000150_20230802.pdf",
      "parcial": false,
@@ -91912,6 +92175,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-09",
      "url": "https://www.congreso.es/docbienes/leg15/000175/000175_000_e_0000749_20230809.pdf",
      "parcial": false,
@@ -92232,6 +92496,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000335/000335_000_e_0001399_20230816.pdf",
      "parcial": false,
@@ -92476,6 +92741,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-02",
      "url": "https://www.congreso.es/docbienes/leg15/000021/000021_000_e_0000092_20230802.pdf",
      "parcial": false,
@@ -92677,6 +92943,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2026-02-20",
      "url": "https://www.congreso.es/docbienes/leg15/000407/000407_000_e_0101047_20260220.pdf",
      "parcial": false,
@@ -93266,6 +93533,7 @@
    },
    "deudas": {
     "principal": {
+     "aviso": null,
      "fecha": "2023-08-16",
      "url": "https://www.congreso.es/docbienes/leg15/000313/000313_000_e_0001313_20230816.pdf",
      "parcial": false,

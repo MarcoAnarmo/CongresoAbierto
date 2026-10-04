@@ -14,6 +14,10 @@ const porPdf = new Map<string, DeudaRaw>(
 );
 
 /** Textos que no declaran nada («NINGUNA», «No hay», guiones). */
+/** Avisos públicos sobre lecturas no confirmadas al 100 % (data/raw/deudas/avisos.json). */
+const RUTA_AVISOS = 'data/raw/deudas/avisos.json';
+const avisos: Record<string, string> = existsSync(RUTA_AVISOS) ? JSON.parse(readFileSync(RUTA_AVISOS, 'utf8')).avisos : {};
+
 const vacio = (t: string) => !t.trim() || /^(-+|ningun[oa]s?|no hay|no|nada|n\/a)\.?$/i.test(t.trim());
 
 /**
@@ -58,11 +62,14 @@ export function construirDeudas(fuentes: { url: string; fecha: string | null; pa
         concedidoEuros: p.concedido ? importe(p.concedido) : null, pendienteEuros: p.pendiente ? importe(p.pendiente) : null,
       }));
     const pendientes = prestamos.filter((p) => p.pendiente);
+    const pdf = f.url.split('/').pop()!;
     declaraciones.push({
+      aviso: avisos[pdf] ?? null,
       fecha: f.fecha, url: f.url, parcial: f.parcial, prestamos,
       otras: vacio(d.otras) ? null : d.otras, nota: d.obs || null,
       totalPendiente: pendientes.reduce((a, p) => a + (p.pendienteEuros ?? 0), 0),
-      totalIncompleto: pendientes.some((p) => p.pendienteEuros === null),
+      // Incompleto si algún saldo no se lee como número o está en blanco en el original
+      totalIncompleto: prestamos.some((p) => !p.pendiente || p.pendienteEuros === null),
     });
   }
   if (!declaraciones.length) return null;

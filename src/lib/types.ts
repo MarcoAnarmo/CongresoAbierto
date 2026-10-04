@@ -136,8 +136,10 @@ export interface DeclaracionDeudas {
   nota: string | null;
   /** Suma de los saldos pendientes de la tabla de préstamos de esta declaración. */
   totalPendiente: number;
-  /** true si algún saldo no se puede leer como número (se muestra el texto literal). */
+  /** true si algún saldo no se puede leer como número o está en blanco (el total es «al menos»). */
   totalIncompleto: boolean;
+  /** Lectura que no se ha podido confirmar al 100 % o dato incoherente en el original. */
+  aviso: string | null;
 }
 /** Deudas declaradas en las mismas declaraciones de bienes que se usan para su patrimonio. */
 export interface Deudas {

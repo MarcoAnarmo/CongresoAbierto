@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError } from '../../lib/data';
 import type { Diputado } from '../../lib/types';
 import TablaPrestamos from '../../components/TablaPrestamos.astro';
+import AvisoDudoso from '../../components/AvisoDudoso.astro';
 
 export function getStaticPaths() {
   return diputados.map((d) => ({ params: { slug: slug(d) }, props: { d } }));
@@ -177,11 +178,13 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
             Según su {dd.principal.parcial ? 'modificación de la declaración de bienes' : 'declaración de bienes'} del {fmtFecha(dd.principal.fecha)}.
             Los importes se copian tal y como los escribe el diputado.
           </p>
+          {dd.principal.aviso && <AvisoDudoso texto={dd.principal.aviso} url={dd.principal.url} nombre={d.nombreCompleto} />}
           {dd.principal.prestamos.length > 0 && (
             <>
               <div class="card stat deuda-total">
                 <div class="v">{dd.principal.totalIncompleto && <span class="small">al menos </span>}{fmtEur(dd.principal.totalPendiente)}</div>
                 <div class="l">de saldo pendiente en {dd.principal.prestamos.length} {dd.principal.prestamos.length === 1 ? 'préstamo' : 'préstamos'} (suma de la tabla oficial)</div>
+                {dd.principal.totalIncompleto && <div class="l">Algún saldo está en blanco o no se puede leer en el original y no se suma.</div>}
               </div>
               <TablaPrestamos prestamos={dd.principal.prestamos} />
             </>
@@ -195,6 +198,7 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
               {dd.anteriores.map((a) => (
                 <div class="anterior">
                   <p class="small"><a href={a.url} rel="noopener">{a.parcial ? 'Modificación' : 'Declaración'} del {fmtFecha(a.fecha)} (PDF) ↗</a></p>
+                  {a.aviso && <AvisoDudoso texto={a.aviso} url={a.url} nombre={d.nombreCompleto} />}
                   {a.prestamos.length > 0 && <TablaPrestamos prestamos={a.prestamos} />}
                   {a.otras && <p class="small"><strong>Otras deudas y obligaciones:</strong> {a.otras}</p>}
                   {a.nota && <p class="small muted">Observación: «{a.nota}»</p>}

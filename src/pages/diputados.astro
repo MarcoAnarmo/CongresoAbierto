@@ -14,6 +14,7 @@ const alfabetico = [...diputados].sort((a, b) => a.apellidos.localeCompare(b.ape
 const etTipo = { publica: 'Universidad pública', privada: 'Universidad privada', ambas: 'Universidad pública y privada' } as Record<string, string>;
 const formacionCorta = (d: Diputado) => d.perfil?.formacion[0]?.texto ?? null;
 const nLeg = (d: Diputado) => d.perfil?.legislaturas.length ?? 0;
+const conAviso = (d: Diputado) => !!(d.deudas?.principal?.aviso || d.deudas?.anteriores.some((x) => x.aviso));
 const busca = (d: Diputado) => [d.nombreCompleto, d.circunscripcion, d.partido, d.grupoCorto, ...(d.perfil?.formacion.map((f) => f.texto) ?? []), ...(d.perfil?.trayectoria ?? [])].join(' ').toLowerCase();
 const datos = (d: Diputado) => ({
   'data-n': d.apellidos, 'data-busca': busca(d), 'data-g': d.grupoCorto, 'data-c': d.circunscripcion, 'data-f': d.perfil?.tipoFormacion ?? 'sin-datos',
@@ -114,7 +115,7 @@ const columnas = [
           <tr {...datos(d)}>
             <td class="num muted pos">{i + 1}</td>
             <td class="quien">
-              <a href={url(`/diputado/${slug(d)}`)}>{d.nombreCompleto}</a>{d.patrimonio.revisar && <span title="Ficha con alguna lectura dudosa en el PDF oficial" class="aviso">*</span>}
+              <a href={url(`/diputado/${slug(d)}`)}>{d.nombreCompleto}</a>{(d.patrimonio.revisar || conAviso(d)) && <span title="Ficha con alguna lectura no confirmada en el PDF oficial" class="aviso">*</span>}
               <span class="sub"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span> {etiquetaPartido(d)} · {d.circunscripcion}</span>
             </td>
             <td class="num dato" data-k="pr" data-label="Propiedades" data-corto="Prop."><strong>{d.patrimonio.propiedades ?? '—'}</strong></td>
@@ -127,7 +128,7 @@ const columnas = [
     </table>
   </div>
   <p class="small muted">
-    <span class="aviso">*</span> Ficha con alguna lectura dudosa en el PDF o un cambio comunicado que no identifica el bien. Consulta la ficha y el documento original.
+    <span class="aviso">*</span> Ficha con alguna lectura no confirmada en el PDF o un cambio comunicado que no identifica el bien. La ficha explica cuál es y enlaza al documento original.
     Propiedades: inmuebles urbanos y rústicos a su nombre. <a href={url('/metodologia#propiedades')}>Cómo se cuentan</a>.
   </p>
   </div>
