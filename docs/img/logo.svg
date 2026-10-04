@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 9 78 42" fill="none" stroke="#16181d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <title>Congreso Abierto</title>
+  <rect x="-7" y="9" width="78" height="42" rx="12" fill="#fff3e6" stroke="none"/>
+  <g transform="translate(32 46) scale(.94) translate(-32 -46)" stroke-width="1.1">
+    <circle cx="20.9" cy="41.4" r="2.2" fill="#ffd36e"/>
+    <circle cx="27.4" cy="34.9" r="2.2" fill="#ffd36e"/>
+    <circle cx="36.6" cy="34.9" r="2.2" fill="#ffd36e"/>
+    <circle cx="43.1" cy="41.4" r="2.2" fill="#ffd36e"/>
+    <circle cx="14.6" cy="41.5" r="2.2" fill="#f7a04b"/>
+    <circle cx="16.5" cy="36.8" r="2.2" fill="#f7a04b"/>
+    <circle cx="22.8" cy="30.5" r="2.2" fill="#f7a04b"/>
+    <circle cx="27.5" cy="28.6" r="2.2" fill="#f7a04b"/>
+    <circle cx="36.5" cy="28.6" r="2.2" fill="#f7a04b"/>
+    <circle cx="41.2" cy="30.5" r="2.2" fill="#f7a04b"/>
+    <circle cx="47.5" cy="36.8" r="2.2" fill="#f7a04b"/>
+    <circle cx="49.4" cy="41.5" r="2.2" fill="#f7a04b"/>
+    <circle cx="8.4" cy="41.5" r="2.2" fill="#f7a04b"/>
+    <circle cx="9.8" cy="36.8" r="2.2" fill="#f7a04b"/>
+    <circle cx="12.2" cy="32.5" r="2.2" fill="#f7a04b"/>
+    <circle cx="18.5" cy="26.2" r="2.2" fill="#f7a04b"/>
+    <circle cx="22.8" cy="23.8" r="2.2" fill="#f7a04b"/>
+    <circle cx="27.5" cy="22.4" r="2.2" fill="#f7a04b"/>
+    <circle cx="36.5" cy="22.4" r="2.2" fill="#f7a04b"/>
+    <circle cx="41.2" cy="23.8" r="2.2" fill="#f7a04b"/>
+    <circle cx="45.5" cy="26.2" r="2.2" fill="#f7a04b"/>
+    <circle cx="51.8" cy="32.5" r="2.2" fill="#f7a04b"/>
+    <circle cx="54.2" cy="36.8" r="2.2" fill="#f7a04b"/>
+    <circle cx="55.6" cy="41.5" r="2.2" fill="#f7a04b"/>
+    <circle cx="2.3" cy="41.5" r="2.2" fill="#e2852f"/>
+    <circle cx="3.4" cy="36.8" r="2.2" fill="#e2852f"/>
+    <circle cx="5.3" cy="32.3" r="2.2" fill="#e2852f"/>
+    <circle cx="7.9" cy="28.2" r="2.2" fill="#e2852f"/>
+    <circle cx="14.2" cy="21.9" r="2.2" fill="#e2852f"/>
+    <circle cx="18.3" cy="19.3" r="2.2" fill="#e2852f"/>
+    <circle cx="22.8" cy="17.4" r="2.2" fill="#e2852f"/>
+    <circle cx="27.5" cy="16.3" r="2.2" fill="#e2852f"/>
+    <circle cx="36.5" cy="16.3" r="2.2" fill="#e2852f"/>
+    <circle cx="41.2" cy="17.4" r="2.2" fill="#e2852f"/>
+    <circle cx="45.7" cy="19.3" r="2.2" fill="#e2852f"/>
+    <circle cx="49.8" cy="21.9" r="2.2" fill="#e2852f"/>
+    <circle cx="56.1" cy="28.2" r="2.2" fill="#e2852f"/>
+    <circle cx="58.7" cy="32.3" r="2.2" fill="#e2852f"/>
+    <circle cx="60.6" cy="36.8" r="2.2" fill="#e2852f"/>
+    <circle cx="61.7" cy="41.5" r="2.2" fill="#e2852f"/>
+  </g>
+</svg>
