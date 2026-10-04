@@ -303,7 +303,9 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   .tip { position: absolute; z-index: 15; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: .9rem; line-height: 1.5; box-shadow: 0 8px 28px rgb(0 0 0 / .18); max-width: 300px; pointer-events: none; }
   .tip .nombre { font-size: 1rem; }
   .tip .ver, .tip .cerrar { display: none; }
-  .tip.hoja { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); top: auto; max-width: none; pointer-events: auto; padding: 14px 16px 12px; }
+  .tip.hoja { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); top: auto; max-width: none; pointer-events: auto; padding: 14px 16px 12px; border-radius: 16px; }
+  /* Con el menú abajo (móvil), la ficha rápida queda justo encima de él */
+  @media (max-width: 720px) { .tip.hoja { bottom: calc(70px + env(safe-area-inset-bottom)); } }
   .tip.hoja .ver { display: flex; justify-content: center; align-items: center; margin-top: 10px; text-decoration: none; }
   .tip.hoja .cerrar { display: block; position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; color: var(--muted); cursor: pointer; }
   .leyenda { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
@@ -311,4 +313,22 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   .leyenda :global(.dot.vacio) { box-shadow: none; border: 1px dashed var(--muted); }
   .leyenda :global(.guia) { padding: 0 2px; }
   .nota { margin-top: 8px; }
+  /* Móvil: el hemiciclo justo debajo de los modos para que se vea entero al entrar;
+     el selector de votaciones y las explicaciones van debajo */
+  @media (max-width: 640px) {
+    .hemi { display: flex; flex-direction: column; }
+    .controles { display: contents; }
+    .modos { order: 1; }
+    .lienzo { order: 2; margin: 10px -6px 0; }
+    .leyenda { order: 3; justify-content: center; gap: 4px; margin-top: 8px; }
+    .leyenda :global(.pill) { font-size: .75rem; padding: 1px 7px; gap: 4px; }
+    .leyenda :global(.dot) { width: 9px; height: 9px; }
+    .selector { order: 4; margin-top: 14px; }
+    .desc { order: 5; min-height: 0; margin: 10px 0 0; }
+    .grupos-movil { order: 6; justify-content: center; margin-top: 10px; }
+    .hemi[data-modo='grupo'] .grupos-movil { display: none; }
+    .nota { order: 7; }
+    .centro { font-size: 66px; }
+    .centro-sub { font-size: 28px; }
+  }
 </style>
