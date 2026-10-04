@@ -118,15 +118,15 @@ export async function tarjetaProvincia(id: string, formato: Formato) {
     .sort((a, b) => (ordenGrupo.get(a.grupoCorto)! - ordenGrupo.get(b.grupoCorto)!) || a.apellidos.localeCompare(b.apellidos, 'es'));
   const conDatos = ds.filter((d) => d.patrimonio.viviendas !== null);
   const viv = conDatos.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
-  const media = conDatos.length ? viv / conDatos.length : null;
+  const prop = conDatos.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
   const porGrupo = [...new Set(ds.map((d) => d.grupoCorto))].map((g) => ({ g, n: ds.filter((d) => d.grupoCorto === g).length }));
   const e = formato === 'historia' ? 1.45 : 1;
   const composicion = h('div', { flexWrap: 'wrap', gap: 12 * e },
     ...porGrupo.map(({ g, n: k }) => h('div', { alignItems: 'center', gap: 10 * e, padding: `${8 * e}px ${16 * e}px`, borderRadius: 999, background: C.blanco, border: `${2 * e}px solid ${C.borde}`, fontSize: 24 * e, fontWeight: 700 }, puntoGrupo(colorGrupo(g), 16 * e), `${g} ${k}`)));
   const cifras = h('div', { gap: 18 * e },
     cifra(String(ds.length), ds.length === 1 ? 'diputado elegido' : 'diputados elegidos', true, e),
-    cifra(fmtNum(viv), 'viviendas declaradas', false, e),
-    cifra(media === null ? '—' : fmtNum(Math.round(media * 10) / 10), 'viviendas por diputado', false, e));
+    cifra(conDatos.length ? fmtNum(prop) : '—', prop === 1 ? 'propiedad declarada' : 'propiedades declaradas', false, e),
+    cifra(conDatos.length ? fmtNum(viv) : '—', viv === 1 ? 'es vivienda' : 'son viviendas', false, e));
   const titulo = (tam: number) => h('div', { flexDirection: 'column', gap: 8 * e },
     h('div', { fontSize: 28 * e, color: C.apagado }, 'Tus diputados por'),
     h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 }, c.legible));
@@ -142,8 +142,8 @@ export async function tarjetaProvincia(id: string, formato: Formato) {
       ...ds.map((d, i) => retrato(fotos[i], d.nombreCompleto, w, Math.round(w * 1.27), colorGrupo(d.grupoCorto)))),
     composicion,
     h('div', { flexDirection: 'column', gap: 18 },
-      h('div', { gap: 18 }, cifra(String(ds.length), ds.length === 1 ? 'diputado' : 'diputados', true, 1.3), cifra(fmtNum(viv), 'viviendas declaradas', false, 1.3)),
-      h('div', { fontSize: 30, color: C.apagado }, media === null ? '' : `${fmtNum(Math.round(media * 10) / 10)} viviendas por diputado, de media`)),
+      h('div', { gap: 18 }, cifra(String(ds.length), ds.length === 1 ? 'diputado' : 'diputados', true, 1.3), cifra(conDatos.length ? fmtNum(prop) : '—', prop === 1 ? 'propiedad declarada' : 'propiedades declaradas', false, 1.3)),
+      h('div', { fontSize: 30, color: C.apagado }, conDatos.length ? `De ellas, ${fmtNum(viv)} ${viv === 1 ? 'es vivienda' : 'son viviendas'}` : '')),
     pie(1.4),
   ), 'historia');
 }
