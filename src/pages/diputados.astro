@@ -33,7 +33,7 @@ const columnas = [
     Todo sale de su ficha oficial en el Congreso y de sus declaraciones; cada ficha enlaza al documento original.
   </p>
 
-  <div class="filtros" role="search" aria-label="Buscar diputados">
+  <div class="filtros" id="filtros" role="search" aria-label="Buscar diputados">
     <label class="sr-only" for="f-texto">Buscar por nombre, partido, provincia, estudios o trayectoria</label>
     <input type="search" id="f-texto" placeholder="Nombre, provincia, estudios, profesión…" autocomplete="off" />
     <label class="sr-only" for="f-grupo">Grupo parlamentario</label>
@@ -68,7 +68,8 @@ const columnas = [
   <div class="vista-barra">
     <div class="segmentado" role="group" aria-label="Cómo ver la lista">
       <button class="btn" type="button" data-vista="tarjetas" aria-pressed="true">Fichas</button>
-      <button class="btn" type="button" data-vista="tabla" aria-pressed="false">Tabla de patrimonio</button>
+      <button class="btn" type="button" data-vista="tabla" aria-pressed="false"><span class="largo">Tabla de patrimonio</span><span class="corto">Patrimonio</span></button>
+      <button class="btn" type="button" data-vista="grupos" aria-pressed="false"><span class="largo">Propiedades por grupo parlamentario</span><span class="corto">Por grupo</span></button>
     </div>
     <span class="small muted" id="f-cuenta" aria-live="polite"></span>
   </div>
@@ -130,27 +131,58 @@ const columnas = [
     Propiedades: inmuebles urbanos y rústicos a su nombre. <a href={url('/metodologia#propiedades')}>Cómo se cuentan</a>.
   </p>
   </div>
-  <p class="small muted">
+  <p class="small muted" id="nota-formacion">
     Formación: texto literal de la ficha oficial. Si nombra una universidad española, se indica si es pública o privada según el
     <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades" rel="noopener">registro oficial de universidades (RUCT) ↗</a>.{' '}
     <a href={url('/metodologia#perfil')}>Cómo se obtiene</a>.
   </p>
 
-  <h2>Propiedades por grupo parlamentario</h2>
-  <div class="barras card" role="list">
-    {porGrupo.map((g) => (
-      <div class="barra" role="listitem">
-        <span class="et"><span class="dot" style={`background:${g.color}`}></span> {g.corto}</span>
-        <span class="pista" aria-hidden="true">
-          <span class="relleno" style={`width:${(100 * g.propiedades) / max}%;--c:${g.color}`}>
-            <span class="viv" style={`width:${(100 * g.viviendas) / Math.max(1, g.propiedades)}%`}></span>
-          </span>
-        </span>
-        <span class="cifras"><strong>{fmtNum(g.propiedades)}</strong> prop. · {fmtNum(g.viviendas)} viv.</span>
-      </div>
-    ))}
-    <p class="small muted leyenda-barras"><span class="muestra m-prop"></span> propiedades <span class="muestra m-viv"></span> de ellas, viviendas</p>
-  </div>
+  <section id="vista-grupos" hidden aria-labelledby="h-grupos">
+    <h2 id="h-grupos" class="sr-only">Propiedades por grupo parlamentario</h2>
+    <div class="table-scroll card" style="padding:0">
+      <table class="tabla-grupos">
+        <thead>
+          <tr>
+            <th scope="col">Grupo</th>
+            <th scope="col" class="num"><span class="largo">Diputados</span><abbr class="corto" title="Diputados">Dip.</abbr></th>
+            <th scope="col" class="col-barra">Propiedades <span class="muted">(de ellas, viviendas)</span></th>
+            <th scope="col" class="num"><span class="largo">Propiedades</span><abbr class="corto" title="Propiedades">Prop.</abbr></th>
+            <th scope="col" class="num"><span class="largo">Viviendas</span><abbr class="corto" title="Viviendas">Viv.</abbr></th>
+            <th scope="col" class="num"><span class="largo">Vehículos</span><abbr class="corto" title="Vehículos">Veh.</abbr></th>
+          </tr>
+        </thead>
+        <tbody>
+          {porGrupo.map((g) => (
+            <tr>
+              <th scope="row"><span class="dot" style={`background:${g.color}`}></span> {g.corto}</th>
+              <td class="num" data-label="Diputados">{g.diputados}</td>
+              <td class="col-barra" aria-hidden="true">
+                <span class="pista">
+                  <span class="relleno" style={`width:${(100 * g.propiedades) / max}%;--c:${g.color}`}>
+                    <span class="viv" style={`width:${(100 * g.viviendas) / Math.max(1, g.propiedades)}%`}></span>
+                  </span>
+                </span>
+              </td>
+              <td class="num" data-label="Propiedades"><strong>{fmtNum(g.propiedades)}</strong></td>
+              <td class="num" data-label="Viviendas">{fmtNum(g.viviendas)}</td>
+              <td class="num" data-label="Vehículos">{fmtNum(g.vehiculos)}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row">Total</th>
+            <td class="num" data-label="Diputados">{porGrupo.reduce((a, g) => a + g.diputados, 0)}</td>
+            <td class="col-barra"></td>
+            <td class="num" data-label="Propiedades"><strong>{fmtNum(porGrupo.reduce((a, g) => a + g.propiedades, 0))}</strong></td>
+            <td class="num" data-label="Viviendas">{fmtNum(porGrupo.reduce((a, g) => a + g.viviendas, 0))}</td>
+            <td class="num" data-label="Vehículos">{fmtNum(porGrupo.reduce((a, g) => a + g.vehiculos, 0))}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="small muted leyenda-barras"><span class="ley-barras"><span class="muestra m-prop"></span> propiedades <span class="muestra m-viv"></span> de ellas, viviendas ·</span> Suma de lo que declara cada diputado del grupo · <a href={url('/metodologia#propiedades')}>Cómo se cuentan</a></p>
+  </section>
 
 </Base>
 
@@ -161,6 +193,9 @@ const columnas = [
   const lista = document.getElementById('tarjetas') as HTMLUListElement;
   const tarjetas = [...lista.children] as HTMLLIElement[];
   const vistaTabla = document.getElementById('vista-tabla')!;
+  const vistaGrupos = document.getElementById('vista-grupos')!;
+  const filtros = document.getElementById('filtros')!;
+  const notaFormacion = document.getElementById('nota-formacion')!;
   const botonesVista = [...document.querySelectorAll<HTMLButtonElement>('[data-vista]')];
   const texto = document.getElementById('f-texto') as HTMLInputElement;
   const grupo = document.getElementById('f-grupo') as HTMLSelectElement;
@@ -198,7 +233,8 @@ const columnas = [
     orden.value = clave;
   }
   function verVista(v: string) {
-    vista = v; vistaTabla.hidden = v !== 'tabla'; lista.hidden = v === 'tabla';
+    vista = v; vistaTabla.hidden = v !== 'tabla'; lista.hidden = v !== 'tarjetas'; vistaGrupos.hidden = v !== 'grupos';
+    filtros.hidden = v === 'grupos'; cuenta.hidden = v === 'grupos'; notaFormacion.hidden = v !== 'tarjetas';
     botonesVista.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === v)));
   }
   orden.addEventListener('change', () => { clave = orden.value; desc = clave !== 'n'; marcar(); aplicar(); });
@@ -245,7 +281,15 @@ const columnas = [
   @media (max-width: 640px) { .filtros select { flex-basis: calc(50% - 4px); } }
   .vista-barra { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 4px 0 14px; }
   .tarjetas { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
-  .tarjeta[hidden] { display: none; }
+  .tarjeta[hidden], .tarjetas[hidden], .filtros[hidden] { display: none; }
+  .segmentado { flex-wrap: wrap; }
+  .tabla-grupos .col-barra { width: 38%; }
+  .tabla-grupos .pista { display: block; }
+  .tabla-grupos tfoot th, .tabla-grupos tfoot td { border-top: 2px solid var(--border); }
+  @media (max-width: 640px) { .tabla-grupos .col-barra { display: none; } .tabla-grupos th, .tabla-grupos td { padding-left: 8px; padding-right: 8px; } }
+  .leyenda-barras { flex-wrap: wrap; }
+  .ley-barras { display: inline-flex; align-items: center; gap: 6px; }
+  @media (max-width: 640px) { .ley-barras { display: none; } }
   .tarjeta a { display: flex; gap: 12px; height: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); text-decoration: none; color: inherit; transition: border-color .12s, box-shadow .12s; }
   .tarjeta a:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); color: inherit; }
   .tarjeta img { width: 60px; height: 76px; object-fit: cover; border-radius: 8px; background: var(--chip); flex: none; }
