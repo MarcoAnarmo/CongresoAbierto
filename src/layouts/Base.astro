@@ -128,16 +128,33 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
       <slot />
     </main>
     <footer class="site-footer">
-      <div class="wrap pie small muted">
-        <p class="lema-pie"><strong>Conoce a quien te representa.</strong> Transparencia y acceso fácil a datos oficiales del Congreso.</p>
+      <div class="wrap pie-rejilla">
+        <div class="pie-marca">
+          <a class="pie-logo" href={url('/')} aria-label="Congreso Abierto, inicio">
+            <span class="pie-placa"><img src={url('/logo.svg')} alt="" width="62" height="30" /></span>
+            <span>Congreso Abierto</span>
+          </a>
+          <p class="pie-lema">Conoce a quien te representa.</p>
+          <p class="pie-sub">Transparencia y acceso fácil a datos oficiales del Congreso.</p>
+        </div>
+        <div class="pie-col">
+          <h2 class="pie-t">Explora</h2>
+          <ul>{nav.map((n) => <li><a href={url(n.href)}>{n.label}</a></li>)}</ul>
+        </div>
+        <div class="pie-col">
+          <h2 class="pie-t">Participa</h2>
+          <ul>
+            <li><a href={url('/colabora')}>¿Querrías colaborar?</a></li>
+            <li><a class="con-icono" href={REPO} rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5" /></svg>Código en GitHub</a></li>
+            <li><a href={enlaceSugerencia} rel="noopener">Hacer una sugerencia</a></li>
+            <li><a href={enlaceError()} rel="noopener">Avisar de un error</a></li>
+            <li><a href="mailto:congresoabierto.help@gmail.com">congresoabierto.help@gmail.com</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="wrap pie-base">
         <p>Solo datos oficiales del <a href="https://www.congreso.es/es/datos-abiertos">Congreso de los Diputados</a> y del <a href="https://www.boe.es">BOE</a>, sin interpretaciones. Cada dato enlaza a su documento original.</p>
-        <p>Proyecto independiente y de código abierto (MIT).</p>
-        <ul class="enlaces-pie">
-          <li><a href={url('/colabora')}>¿Querrías colaborar?</a></li>
-          <li><a class="con-icono" href={REPO} rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5" /></svg>Código en GitHub</a></li>
-          <li><a href={enlaceSugerencia} rel="noopener">Hacer una sugerencia</a></li>
-          <li><a href={enlaceError()} rel="noopener">Avisar de un error</a></li>
-        </ul>
+        <p>Proyecto independiente · Código abierto (MIT)</p>
       </div>
     </footer>
     </div>
@@ -165,11 +182,36 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
   nav a { padding: 10px 12px; font-size: .95rem; color: var(--muted); white-space: nowrap; transition: color .15s; }
   nav a[aria-current='page'] { color: var(--text); font-weight: 650; background: none; box-shadow: none; border-radius: 0; }
   main { padding-top: 24px; padding-bottom: 40px; min-height: 70vh; }
-  .site-footer { border-top: 1px solid var(--border); background: var(--surface); padding: 14px 0 calc(14px + env(safe-area-inset-bottom)); }
-  .pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 24px; }
-  .pie p { margin: 0; }
-  .con-icono { display: inline-flex; align-items: center; gap: 5px; }
-  .enlaces-pie { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+  /* Pie: banda oscura en ambos temas, con la marca y una línea naranja arriba */
+  .site-footer {
+    --pie-bg: #15171c; --pie-texto: #eceae4; --pie-suave: #a9aeb7; --pie-borde: #2c2f37;
+    position: relative; background: radial-gradient(120% 140% at 0% 0%, #22252c 0%, var(--pie-bg) 55%); color: var(--pie-texto);
+    padding: 44px 0 calc(22px + env(safe-area-inset-bottom)); margin-top: 24px;
+  }
+  :global(:root[data-theme='dark']) .site-footer { --pie-bg: #0b0c0e; --pie-borde: #24262c; border-top: 1px solid var(--pie-borde); }
+  .site-footer::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, #ffd36e, #f7a04b 35%, #f26a1b 70%, #c2410c); }
+  .site-footer a { color: var(--pie-texto); text-decoration: none; background-image: none; transition: color .15s; }
+  .site-footer a:hover { color: #fdba74; }
+  .site-footer a:focus-visible { outline: 3px solid #fb8a3c; outline-offset: 2px; border-radius: 4px; }
+  .pie-rejilla { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 32px 40px; }
+  .pie-logo { display: inline-flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
+  .pie-placa { display: inline-flex; padding: 6px 8px; border-radius: 12px; background: #fff3e6; box-shadow: 0 6px 20px rgba(242, 106, 27, .25); }
+  .pie-placa img { display: block; width: 62px; height: 30px; }
+  .pie-lema { margin: 18px 0 4px; font-size: clamp(1.3rem, 3vw, 1.6rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15;
+    background: linear-gradient(90deg, #ffd36e, #fb8a3c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .pie-sub { margin: 0; color: var(--pie-suave); max-width: 40ch; }
+  .pie-t { margin: 6px 0 12px; font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--pie-suave); font-weight: 700; }
+  .pie-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; font-size: .95rem; }
+  .pie-col li a { overflow-wrap: anywhere; }
+  .con-icono { display: inline-flex; align-items: center; gap: 6px; }
+  .pie-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--pie-borde); font-size: .82rem; color: var(--pie-suave); }
+  .pie-base p { margin: 0; }
+  .pie-base a { color: var(--pie-suave); text-decoration: underline; text-decoration-color: rgba(251, 138, 60, .6); text-underline-offset: 3px; }
+  @media (max-width: 760px) {
+    .pie-rejilla { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .pie-marca { grid-column: 1 / -1; }
+  }
+  @media (max-width: 420px) { .pie-rejilla { grid-template-columns: minmax(0, 1fr); gap: 26px; } }
 
   /* Móvil: marca arriba y menú en una fila desplazable de pestañas */
   @media (max-width: 720px) {
