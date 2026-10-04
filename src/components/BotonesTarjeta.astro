@@ -66,11 +66,15 @@ const { whatsapp, x } = enlacesRedes(texto, absoluta);
 
 <style>
   .compartir { display: flex; flex-direction: column; gap: 8px; }
-  .compartir.con-vista { flex-direction: row; align-items: center; gap: 18px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin: 18px 0; }
+  .compartir.con-vista { flex-direction: row; align-items: stretch; gap: 20px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin: 18px 0; }
+  /* La miniatura ocupa toda la altura de la columna de botones y textos */
+  /* (el ancho lo calcula compartir.ts a partir de esa altura, para mantener la proporción 9:16) */
+  .con-vista .miniatura { flex: none; align-self: stretch; position: relative; width: 120px; }
+  .con-vista .miniatura img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
   .miniatura { flex-shrink: 0; line-height: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); background: var(--chip); transition: transform .15s; }
   .miniatura:hover { transform: translateY(-2px); }
-  .miniatura img { width: 108px; height: auto; aspect-ratio: 9 / 16; }
-  .acciones { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .miniatura img { display: block; }
+  .acciones { display: flex; flex-direction: column; justify-content: center; gap: 12px; min-width: 0; }
   .corto { display: none; }
   .compartir:not(.con-vista) .largo { display: none; }
   .compartir:not(.con-vista) .corto { display: inline; }
@@ -89,7 +93,7 @@ const { whatsapp, x } = enlacesRedes(texto, absoluta);
     .compartir.con-vista { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px 14px; padding: 14px; }
     .con-vista .acciones { display: contents; }
     .con-vista .fila, .con-vista .c-descargas, .con-vista .c-aviso { grid-column: 1 / -1; }
-    .miniatura img { width: 72px; }
+    .con-vista .miniatura { align-self: center; width: 72px !important; height: 128px; }
     .con-vista .fila { display: grid; grid-template-columns: 1fr 1fr; }
     .con-vista .fila .btn { justify-content: center; padding: 8px 10px; }
     .con-vista .fila .btn.primario { grid-column: 1 / -1; }

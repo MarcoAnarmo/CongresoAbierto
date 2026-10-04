@@ -41,6 +41,13 @@ export function prepararCaja(caja: HTMLElement) {
     document.body.append(a); a.click(); a.remove();
   };
 
+  // La miniatura mide lo mismo que la columna de botones y textos (proporción 9:16)
+  const mini = caja.querySelector<HTMLElement>('.miniatura');
+  const acciones = caja.querySelector<HTMLElement>('.acciones');
+  if (mini && acciones && 'ResizeObserver' in window) {
+    new ResizeObserver(() => { mini.style.width = `${Math.round((acciones.offsetHeight * 9) / 16)}px`; }).observe(acciones);
+  }
+
   caja.querySelector('.c-historia')!.addEventListener('click', async () => {
     if (!puedeImagen()) {
       descargar();
