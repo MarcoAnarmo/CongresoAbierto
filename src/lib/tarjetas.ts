@@ -1,5 +1,5 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
-import { diputados, votaciones, grupos, colorGrupo, fmtEur, fmtNum, slug, resumen } from './data';
+import { diputados, votaciones, grupos, colorGrupo, fmtEur, fmtNum, slug, resumen, candidaturaDistinta } from './data';
 import type { Diputado, VotacionClave, Voto } from './types';
 import { C, h, lienzo, cabecera, pie, cifra, retrato, barraVotos, fotoDataUri, aPng, type Formato } from './og';
 
@@ -16,54 +16,126 @@ const pastilla = (texto: string, color: string, escala: number) =>
 const resultadoColor = (r: string) => (/Aprobada|Convalidado/.test(r) ? C.si : C.no);
 
 /* ---------- Diputado ---------- */
+/**
+ * Rótulos cortos de las votaciones clave para las tarjetas, con palabras de su título oficial.
+ * «mini» es el rótulo de la tira de votos de la tarjeta horizontal. Si falta una votación, se usa su tema.
+ */
+const ROTULOS: Record<string, { corto: string; mini: string; quien: string }> = {
+  'pl-ley-vivienda-sumar-2026': { corto: 'Modificar la Ley de vivienda', mini: 'Ley de vivienda', quien: 'Propuesta de SUMAR' },
+  'pnl-especulacion-2026': { corto: 'Frenar la especulación inmobiliaria', mini: 'Especulación', quien: 'Propuesta (no de ley) de SUMAR' },
+  'pl-okupacion-pp-2026': { corto: 'Contra la ocupación ilegal', mini: 'Ocupación ilegal', quien: 'Propuesta del PP' },
+  'rdl-8-2026': { corto: 'Medidas en el alquiler', mini: 'Decreto alquiler', quien: 'Decreto ley del Gobierno' },
+  'pl-suelo-vivienda-pp-2026': { corto: 'Ordenación urbanística y vivienda', mini: 'Urbanismo', quien: 'Propuesta del PP' },
+  'pl-pisos-turisticos-2025': { corto: 'Regular los pisos turísticos', mini: 'Pisos turísticos', quien: 'Propuesta de EH Bildu' },
+  'pl-alquiler-temporada-2024-12': { corto: 'Alquiler temporal y de habitaciones', mini: 'Alquiler temporal', quien: 'Propuesta de SUMAR, ERC, Bildu y Mixto' },
+};
+export const rotulo = (v: VotacionClave) => ROTULOS[v.id] ?? { corto: temaCorto(v.tema), mini: temaCorto(v.tema), quien: v.tipo.replace(/\.$/, '') };
+
+/** Etiqueta de un voto; sin voto registrado es porque aún no era diputado o diputada. */
+const textoVoto = (voto: Voto | undefined, d: Diputado) => voto ?? (d.genero === 'F' ? 'No era diputada' : 'No era diputado');
+function chipVoto(voto: Voto | undefined, d: Diputado, ancho: number, alto: number, tam: number) {
+  const color = voto ? colorVoto[voto] : C.chip;
+  return h('div', {
+    width: ancho, height: alto, borderRadius: alto / 2, background: color, color: voto ? (voto === 'Abstención' ? C.texto : '#fff') : C.apagado,
+    alignItems: 'center', justifyContent: 'center', fontSize: voto ? Math.round(voto === 'Abstención' ? tam * 0.86 : tam) : Math.round(tam * 0.68), fontWeight: 800, flexShrink: 0,
+  }, textoVoto(voto, d));
+}
+
+/** Cifra grande con su rótulo; «tono» decide el fondo (blanco, naranja suave u oscuro). */
+function dato(valor: string, etiqueta: string, tono: 'claro' | 'acento' | 'oscuro', e: number, flex = 1, tamValor = 96) {
+  const fondo = { claro: C.blanco, acento: C.acentoSuave, oscuro: C.texto }[tono];
+  const borde = { claro: C.borde, acento: '#f7c9a6', oscuro: C.texto }[tono];
+  return h('div', {
+    flexDirection: 'column', justifyContent: 'space-between', flex, gap: 6 * e, padding: `${22 * e}px ${26 * e}px`,
+    borderRadius: 24 * e, background: fondo, border: `${2 * e}px solid ${borde}`,
+  },
+    h('div', { fontSize: tamValor * e, fontWeight: 800, letterSpacing: -3 * e, lineHeight: 1, color: tono === 'acento' ? C.acento : tono === 'oscuro' ? '#fff' : C.texto }, valor),
+    h('div', { fontSize: 25 * e, lineHeight: 1.25, color: tono === 'oscuro' ? '#d5d8de' : C.apagado }, etiqueta));
+}
+
 export async function tarjetaDiputado(d: Diputado, formato: Formato) {
   const p = d.patrimonio;
   const foto = await fotoDataUri(d.fotoUrl);
   const color = colorGrupo(d.grupoCorto);
-  const cargo = `${d.genero === 'F' ? 'Diputada' : 'Diputado'} por ${d.circunscripcion}`;
-  const cifras = [
-    cifra(n(p.propiedades), 'propiedades', true, formato === 'historia' ? 1.45 : 1),
-    cifra(n(p.viviendas), 'viviendas', false, formato === 'historia' ? 1.45 : 1),
-    cifra(n(p.vehiculos), 'vehículos', false, formato === 'historia' ? 1.45 : 1),
-    cifra(fmtEur(d.retribucion.totalMensual), 'al mes del Congreso', false, formato === 'historia' ? 1.45 : 1),
-  ];
+  const cargo = `${d.genero === 'F' ? 'Diputada' : 'Diputado'} por ${nombreLegible(d.circunscripcion)}`;
+  const sinDecl = p.propiedades === null;
+  const prop = sinDecl ? '—' : n(p.propiedades);
+  const etProp = sinDecl ? 'sin declaración de bienes publicada' : p.propiedades === 1 ? 'propiedad declarada' : 'propiedades declaradas';
+  const viv = sinDecl ? '—' : n(p.viviendas);
+  const etViv = sinDecl || !p.propiedades ? 'viviendas' : p.viviendas === 1 ? 'de ellas, vivienda' : 'de ellas, viviendas';
+  const sueldo = fmtEur(d.retribucion.totalMensual);
+  const etSueldo = 'al mes del Congreso';
+  const votos = [...votaciones].sort((a, b) => b.fecha.localeCompare(a.fecha))
+    .map((v) => ({ v, r: rotulo(v), voto: v.votos[String(d.codParlamentario)] as Voto | undefined }));
+  const veh = p.vehiculos ? `${n(p.vehiculos)} ${p.vehiculos === 1 ? 'vehículo' : 'vehículos'}` : null;
+  const notaBienes = sinDecl ? null : [p.declaracionFecha && `Declaración de bienes del ${fechaCorta(p.declaracionFecha)}`, veh && `también declara ${veh}`].filter(Boolean).join(' · ');
+  const nombre = d.nombreCompleto;
+
   if (formato === 'horizontal') {
-    const tam = d.nombreCompleto.length > 34 ? 50 : d.nombreCompleto.length > 24 ? 58 : 66;
-    return aPng(lienzo('horizontal',
-      cabecera(),
-      h('div', { alignItems: 'center', gap: 28 },
-        retrato(foto, d.nombreCompleto, 132, 168, color),
-        h('div', { flexDirection: 'column', gap: 10, flex: 1 },
-          h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 }, d.nombreCompleto),
-          h('div', { alignItems: 'center', gap: 12, fontSize: 28, color: C.apagado }, puntoGrupo(color, 20), `${d.grupoCorto} · ${cargo}`))),
-      h('div', { gap: 18 }, ...cifras),
-      pie(),
+    const tam = nombre.length > 34 ? 44 : nombre.length > 24 ? 50 : 58;
+    return aPng(h('div', {
+      width: 1200, height: 630, flexDirection: 'column', justifyContent: 'space-between', background: C.fondo, color: C.texto,
+      fontFamily: 'Inter', borderTop: `12px solid ${C.naranja}`, padding: '30px 52px 32px',
+    },
+      h('div', { justifyContent: 'space-between', alignItems: 'center' },
+        cabecera(0.78),
+        h('div', { fontSize: 22, fontWeight: 700, color: C.acento }, 'congresoabierto.pages.dev')),
+      h('div', { gap: 30, alignItems: 'stretch' },
+        retrato(foto, nombre, 206, 262, color),
+        h('div', { flexDirection: 'column', justifyContent: 'space-between', flex: 1, gap: 14 },
+          h('div', { flexDirection: 'column', gap: 8 },
+            h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 }, nombre),
+            h('div', { alignItems: 'center', gap: 10, fontSize: 24, color: C.apagado }, puntoGrupo(color, 18), h('div', { fontWeight: 700, color: C.texto }, d.grupoCorto), candidaturaDistinta(d) ? `(${d.partido}) · ${cargo}` : `· ${cargo}`)),
+          h('div', { gap: 14 },
+            dato(prop, etProp, 'claro', 0.68, 1, 100),
+            dato(viv, etViv, 'acento', 0.68, 1, 100),
+            dato(sueldo, etSueldo, 'oscuro', 0.68, 1.45, 96)))),
+      h('div', { flexDirection: 'column', gap: 10 },
+        h('div', { fontSize: 19, fontWeight: 700, color: C.apagado, letterSpacing: 0.3 }, 'CÓMO VOTÓ SOBRE VIVIENDA'),
+        h('div', { gap: 10 },
+          ...votos.map(({ r, voto }) => h('div', { flexDirection: 'column', alignItems: 'center', gap: 6, width: 146 },
+            chipVoto(voto, d, 146, 40, 22),
+            h('div', { fontSize: 17, color: C.apagado, textAlign: 'center', lineHeight: 1.15 }, r.mini))))),
     ), 'horizontal');
   }
-  const votos = [...votaciones].sort((a, b) => b.fecha.localeCompare(a.fecha))
-    .map((v) => ({ v, voto: v.votos[String(d.codParlamentario)] as Voto | undefined }))
-    .filter((x) => x.voto).slice(0, 4);
-  const tam = d.nombreCompleto.length > 30 ? 62 : 74;
-  return aPng(lienzo('historia',
-    cabecera(1.4),
-    h('div', { flexDirection: 'column', gap: 44 },
-      h('div', { alignItems: 'center', gap: 36 },
-        retrato(foto, d.nombreCompleto, 290, 370, color),
-        h('div', { flexDirection: 'column', gap: 18, flex: 1 },
-          h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 }, d.nombreCompleto),
-          h('div', { alignItems: 'center', gap: 14, fontSize: 34, fontWeight: 700 }, puntoGrupo(color, 26), d.grupoCorto),
-          h('div', { fontSize: 30, color: C.apagado, lineHeight: 1.3 }, cargo))),
-      h('div', { flexDirection: 'column', gap: 22 },
-        h('div', { gap: 22 }, cifras[0], cifras[1]),
-        h('div', { gap: 22 }, cifras[2], cifras[3])),
-      votos.length > 0 && h('div', { flexDirection: 'column', gap: 16, background: C.blanco, border: `3px solid ${C.borde}`, borderRadius: 26, padding: '28px 32px' },
-        h('div', { fontSize: 28, fontWeight: 700, color: C.apagado }, 'Cómo votó sobre vivienda'),
-        ...votos.map(({ v, voto }) => h('div', { alignItems: 'center', justifyContent: 'space-between', gap: 20 },
-          h('div', { flexDirection: 'column', flex: 1 },
-            h('div', { fontSize: 29, fontWeight: 700, lineHeight: 1.2 }, temaCorto(v.tema)),
-            h('div', { fontSize: 23, color: C.apagado }, fechaCorta(v.fecha))),
-          pastilla(voto!, colorVoto[voto!], 1.3))))),
-    pie(1.4),
+
+  const tam = nombre.length > 34 ? 60 : nombre.length > 22 ? 68 : 80;
+  return aPng(h('div', {
+    width: 1080, height: 1920, flexDirection: 'column', background: C.fondo, color: C.texto,
+    fontFamily: 'Inter', borderTop: `16px solid ${C.naranja}`, padding: '150px 72px 0',
+  },
+    // Cabecera (zona alta: la tapan en parte el nombre y la barra de la historia)
+    h('div', { justifyContent: 'space-between', alignItems: 'center' },
+      cabecera(1.15),
+      h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.pages.dev')),
+    // Quién es
+    h('div', { alignItems: 'center', gap: 40, marginTop: 48 },
+      retrato(foto, nombre, 280, 356, color),
+      h('div', { flexDirection: 'column', gap: 20, flex: 1 },
+        h('div', { alignSelf: 'flex-start', alignItems: 'center', gap: 12, padding: '8px 20px', borderRadius: 999, background: C.blanco, border: `2px solid ${C.borde}`, fontSize: 30, fontWeight: 800 }, puntoGrupo(color, 22), d.grupoCorto, candidaturaDistinta(d) && h('div', { fontWeight: 400, color: C.apagado }, `· ${d.partido}`)),
+        h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2.5, lineHeight: 1.04 }, nombre),
+        h('div', { fontSize: 32, color: C.apagado, lineHeight: 1.25 }, cargo))),
+    // Qué declara y cuánto cobra
+    h('div', { flexDirection: 'column', gap: 12, marginTop: 40 },
+      h('div', { gap: 16 },
+        dato(prop, etProp, 'claro', 1, 1, 104),
+        dato(viv, etViv, 'acento', 1, 1, 104),
+        dato(sueldo, etSueldo, 'oscuro', 1, 1.3, sueldo.length > 6 ? 70 : 78)),
+      notaBienes && h('div', { fontSize: 24, color: C.apagado, paddingLeft: 6 }, notaBienes),
+      p.revisar && h('div', { alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 700, color: C.acento, paddingLeft: 6 }, h('div', { width: 30, height: 30, borderRadius: 15, background: C.acento, color: '#fff', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800 }, '!'), 'Lectura no confirmada: compruébala en el PDF oficial')),
+    // Cómo votó
+    h('div', { flexDirection: 'column', marginTop: 32, background: C.blanco, border: `2px solid ${C.borde}`, borderRadius: 28, padding: '24px 30px 10px' },
+      h('div', { fontSize: 25, fontWeight: 800, color: C.apagado, letterSpacing: 0.5, marginBottom: 4 }, 'CÓMO VOTÓ SOBRE VIVIENDA'),
+      ...votos.map(({ v, r, voto }, i) => h('div', { alignItems: 'center', justifyContent: 'space-between', gap: 18, padding: '11px 0', borderTop: i ? `2px solid ${C.chip}` : 'none' },
+        h('div', { flexDirection: 'column', flex: 1, gap: 3 },
+          h('div', { fontSize: 30, fontWeight: 800, lineHeight: 1.15, letterSpacing: -0.5 }, r.corto),
+          h('div', { flexWrap: 'wrap', gap: 8, fontSize: 21, color: C.apagado, lineHeight: 1.25 },
+            `${r.quien} · ${fechaCorta(v.fecha)} ·`, h('div', { color: resultadoColor(v.resultado), fontWeight: 700 }, v.resultado))),
+        chipVoto(voto, d, 184, 56, 29)))),
+    // Pie (justo encima de la zona de respuesta de la historia)
+    h('div', { flexDirection: 'column', gap: 4, marginTop: 22, fontSize: 23, color: C.apagado, paddingLeft: 6 },
+      h('div', { fontWeight: 700, color: C.texto }, 'Conoce a quien te representa'),
+      h('div', {}, 'Datos oficiales del Congreso y del BOE, sin interpretaciones')),
   ), 'historia');
 }
 
