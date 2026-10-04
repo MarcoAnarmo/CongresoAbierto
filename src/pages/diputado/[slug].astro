@@ -39,6 +39,13 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
     </div>
   </div>
 
+  <div class="grid-stats resumen-ficha">
+    <div class="card stat destacada"><div class="v">{p.propiedades ?? '—'}</div><div class="l">propiedades a su nombre (viviendas, garajes, locales, fincas…)</div></div>
+    <div class="card stat"><div class="v">{p.viviendas ?? '—'}</div><div class="l">de ellas son viviendas</div></div>
+    <div class="card stat"><div class="v">{p.vehiculos ?? '—'}</div><div class="l">vehículos declarados</div></div>
+    <div class="card stat"><div class="v">{fmtEur(d.retribucion.totalMensual)}</div><div class="l">al mes del Congreso (importes oficiales 2026)</div></div>
+  </div>
+
   {pf && (
     <section class="perfil" aria-labelledby="h-perfil">
       <h2 id="h-perfil" class="sr-only">Formación y trayectoria</h2>
@@ -99,13 +106,6 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
     </section>
   )}
 
-  <h2>Patrimonio declarado</h2>
-  <div class="grid-stats">
-    <div class="card stat destacada"><div class="v">{p.propiedades ?? '—'}</div><div class="l">propiedades a su nombre (viviendas, garajes, locales, fincas…)</div></div>
-    <div class="card stat"><div class="v">{p.viviendas ?? '—'}</div><div class="l">de ellas son viviendas</div></div>
-    <div class="card stat"><div class="v">{p.vehiculos ?? '—'}</div><div class="l">vehículos declarados</div></div>
-    <div class="card stat"><div class="v">{fmtEur(d.retribucion.totalMensual)}</div><div class="l">al mes del Congreso (importes oficiales 2026)</div></div>
-  </div>
 
   {p.estado === 'verificado' && <p class="small muted">✓ Datos copiados literalmente del PDF oficial y revisados dos veces contra el original.</p>}
   {p.estado === 'transcrito' && !p.revisar && <p class="small muted">Transcripción del PDF oficial pendiente de una segunda revisión.</p>}
@@ -217,6 +217,7 @@ const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=uni
   .votos .voto { justify-self: start; }
   .ok-box { background: color-mix(in srgb, var(--si) 10%, transparent); border-left: 3px solid var(--si); padding: 10px 12px; border-radius: 6px; font-size: .9rem; }
   details { margin-top: 1rem; }
+  .resumen-ficha { margin-top: 1.2rem; }
   .perfil { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 1.4rem 0 .5rem; }
   .perfil .nota-perfil { grid-column: 1 / -1; margin: 0; }
   @media (max-width: 760px) { .perfil { grid-template-columns: minmax(0, 1fr); } }
