@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generado": "2026-10-04T11:29:38.655Z",
+  "generado": "2026-10-04T11:49:22.852Z",
   "fuente": "Congreso de los Diputados (datos abiertos y fichas oficiales)",
   "legislatura": "XV"
  },
@@ -836,11 +836,19 @@
        }
       ],
       "otroCentro": false
+     },
+     {
+      "texto": "Técnico Auxiliar Forestal. Escuela de Capataces Forestales de Coca (Segovia)",
+      "centros": [],
+      "otroCentro": true
+     },
+     {
+      "texto": "BUP - IES Cauca Romana",
+      "centros": [],
+      "otroCentro": false
      }
     ],
     "trayectoria": [
-     "Técnico Auxiliar Forestal. Escuela de Capataces Forestales de Coca (Segovia)",
-     "BUP - IES Cauca Romana",
      "Concejal del Ayuntamiento de Coca (Segovia) (2003-2015)",
      "Diputado Provincial Segovia (2003-2015)",
      "Procurador a Cortes de Castilla y León (2015-2019)",
@@ -4296,6 +4304,11 @@
     "legislaturasTexto": "Diputada de la XV Legislatura",
     "formacion": [
      {
+      "texto": "FP Superior Integración Social",
+      "centros": [],
+      "otroCentro": false
+     },
+     {
       "texto": "Técnico en Mediación Familiar, Civil, Mercantil",
       "centros": [],
       "otroCentro": false
@@ -4308,7 +4321,6 @@
     ],
     "trayectoria": [
      "Diplomatura Trabajo Social",
-     "FP Superior Integración Social",
      "Actividad profesional trabajo social \"Centro Sociosanitario\"",
      "Militante activa"
     ],
@@ -76042,13 +76054,18 @@
      "XV"
     ],
     "legislaturasTexto": "Diputada de la XIII, XIV y XV Legislaturas",
-    "formacion": [],
+    "formacion": [
+     {
+      "texto": "BUP.",
+      "centros": [],
+      "otroCentro": false
+     }
+    ],
     "trayectoria": [
-     "BUP.",
      "Comercial",
      "Vicepresidenta de VOX en Sevilla"
     ],
-    "tipoFormacion": "sin-datos",
+    "tipoFormacion": "sin-centro",
     "cargosActuales": [
      {
       "cargo": "Vocal de la Diputación Permanente",
@@ -84060,15 +84077,20 @@
      "XV"
     ],
     "legislaturasTexto": "Diputado de la XIII, XIV y XV Legislaturas",
-    "formacion": [],
+    "formacion": [
+     {
+      "texto": "BUP. COU.",
+      "centros": [],
+      "otroCentro": false
+     }
+    ],
     "trayectoria": [
-     "BUP. COU.",
      "Trabajador en excedencia RTVE-CV.",
      "Responsabilidad orgánica en el PSPV-PSOE.",
      "Diputado a Corts Valencianes 1999-2018",
      "Concejal y Teniente de Alcalde 2011-2015, 2015-2019"
     ],
-    "tipoFormacion": "sin-datos",
+    "tipoFormacion": "sin-centro",
     "cargosActuales": [
      {
       "cargo": "Adscrito de la Comisión de Transportes y Movilidad Sostenible",
