@@ -21,9 +21,11 @@
 }
 /* Modo claro por defecto; el modo oscuro se activa con el botón de la cabecera */
 :root[data-theme='dark'] {
-  --bg: #111215; --surface: #1b1d22; --text: #eceae4; --muted: #a9aeb7; --border: #2e3139;
-  --accent: #fb8a3c; --accent-text: #fdba74; --accent-strong: #c2410c; --accent-soft: #2b1c12; --chip: #24262c; --ok-soft: #1c2e20; --novota: #5b6069; color-scheme: dark;
-    --int-0: #2c2d31; --int-1: #4d4840; --int-2: #7a705f; --int-3: #a89a83; --int-4: #d3c4aa; --int-5: #fff3dc;
+  /* Gris pizarra templado (no negro) para que las tarjetas y los colores se distingan bien */
+  --bg: #1f2228; --surface: #2a2e35; --text: #f1efea; --muted: #bcc1ca; --border: #3d424b;
+  --accent: #fb8a3c; --accent-text: #fdba74; --accent-strong: #c2410c; --accent-soft: #3b2a1e; --chip: #343841; --ok-soft: #243a2a; --novota: #747a85; color-scheme: dark;
+  /* Escala de intensidad (hemiciclo y mapa): de gris visible a naranja claro; más = más luminoso */
+  --int-0: #525a66; --int-1: #7c6858; --int-2: #a8713f; --int-3: #d9842f; --int-4: #f7b15f; --int-5: #ffe6c2;
 }
 * { box-sizing: border-box; }
 ::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; }
