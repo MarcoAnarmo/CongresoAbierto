@@ -1,0 +1,10 @@
+---
+import { TRAZOS, type NombreIcono } from '../lib/iconos';
+/**
+ * Iconos de trazo de la web (mismo estilo que los de las tarjetas para compartir).
+ * Son decorativos: el texto de al lado dice lo mismo, así que van ocultos a los lectores de pantalla.
+ */
+interface Props { n: NombreIcono; tam?: number; class?: string }
+const { n, tam = 20, class: clase } = Astro.props;
+---
+<svg class:list={['icono', clase]} viewBox="0 0 24 24" width={tam} height={tam} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" set:html={TRAZOS[n]} />
