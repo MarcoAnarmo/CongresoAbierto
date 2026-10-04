@@ -35,17 +35,22 @@ export const h = (type: string, style: Record<string, unknown>, ...children: Hij
 export const img = (src: string, w: number, hgt: number, style: Record<string, unknown> = {}): Nodo => ({ type: 'img', props: { src, width: w, height: hgt, style } });
 
 /* ---------- Fotos oficiales ---------- */
+/** Copia de las fotos oficiales en el repositorio (scripts/browser/fotos.js): congreso.es no las sirve al build. */
+const FOTOS_REPO = join(process.cwd(), 'data', 'fotos');
 const CACHE_FOTOS = join(process.cwd(), 'node_modules', '.cache', 'congreso-fotos');
 const memoria = new Map<string, string | null>();
 /**
- * Descarga la foto oficial (una vez por build; se guarda en node_modules/.cache).
- * Si congreso.es no responde, la tarjeta sale con las iniciales: el build nunca falla por una foto.
+ * Foto oficial: primero la copia de data/fotos; si falta (diputado nuevo), se intenta descargar una vez por build
+ * (se guarda en node_modules/.cache). Si no hay foto, la tarjeta sale con las iniciales: el build nunca falla por una foto.
  */
 export async function fotoDataUri(url: string): Promise<string | null> {
   if (memoria.has(url)) return memoria.get(url)!;
-  const fichero = join(CACHE_FOTOS, url.split('/').pop()!);
+  const nombre = url.split('/').pop()!;
+  const enRepo = join(FOTOS_REPO, nombre);
+  const fichero = join(CACHE_FOTOS, nombre);
   let datos: Buffer | null = null;
-  if (existsSync(fichero)) datos = readFileSync(fichero);
+  if (existsSync(enRepo)) datos = readFileSync(enRepo);
+  else if (existsSync(fichero)) datos = readFileSync(fichero);
   else if (process.env.TARJETAS_SIN_FOTOS !== '1') {
     try {
       const r = await fetch(url, { signal: AbortSignal.timeout(8000), headers: { 'User-Agent': 'CongresoAbierto (+https://github.com/MarcoAnarmo/CongresoAbierto)' } });
