@@ -2,8 +2,13 @@
 import '../styles/global.css';
 import { url, REPO, enlaceSugerencia, enlaceError, enlaceHojaDeRuta } from '../lib/data';
 
-interface Props { title: string; description?: string; }
-const { title, description = 'Conoce a quien te representa · Transparencia y acceso fácil a datos oficiales del Congreso: quiénes son los 350 diputados, qué declaran y cómo votan.' } = Astro.props;
+interface Props { title: string; description?: string; /** Ruta de la tarjeta horizontal para la vista previa en redes (Open Graph). */ imagen?: string; }
+const { title, description = 'Conoce a quien te representa · Transparencia y acceso fácil a datos oficiales del Congreso: quiénes son los 350 diputados, qué declaran y cómo votan.', imagen: imagenProp } = Astro.props;
+// Tarjeta para la vista previa de enlaces: la que pase la página o, si no, la de su sección
+const seccion = Astro.url.pathname.replace(import.meta.env.BASE_URL, '/').split('/').filter(Boolean)[0] ?? '';
+const imagen = imagenProp ?? (['diputados', 'votaciones', 'metodologia', 'colabora', 'tarjetas'].includes(seccion) ? `/tarjetas/horizontal/pagina/${seccion}.png` : '/tarjetas/horizontal/resumen.png');
+const tituloCompleto = title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`;
+const absoluta = (p: string) => new URL(url(p), Astro.site).href;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const nav: { href: string; label: string; corto?: string }[] = [
   { href: '/', label: 'Hemiciclo' },
@@ -31,7 +36,20 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
         }
       })();
     </script>
-    <title>{title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`}</title>
+    <link rel="canonical" href={absoluta(Astro.url.pathname)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Congreso Abierto" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={absoluta(Astro.url.pathname)} />
+    <meta property="og:image" content={absoluta(imagen)} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${title}: datos oficiales del Congreso`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>{tituloCompleto}</title>
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href={url('/favicon.svg?v=5')} />
     <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png?v=5')} />
@@ -144,6 +162,7 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
         <div class="pie-col">
           <h2 class="pie-t">Participa</h2>
           <ul>
+            <li><a href={url('/tarjetas')}>Tarjetas para compartir</a></li>
             <li><a href={url('/colabora')}>¿Querrías colaborar?</a></li>
             <li><a href={enlaceHojaDeRuta} rel="noopener">Hoja de ruta</a></li>
             <li><a class="con-icono" href={REPO} rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5" /></svg>Código en GitHub</a></li>

@@ -1,0 +1,26 @@
+---
+/**
+ * Botón redondo con el icono de compartir. Abre la ventana emergente de compartir (DialogoCompartir),
+ * que tiene que estar una vez en la página y define el icono.
+ * Para no repetir datos en listas largas, el botón de un diputado solo lleva su slug, su nombre y el texto;
+ * las rutas de las imágenes y el enlace se montan en el navegador.
+ */
+import type { Diputado } from '../lib/types';
+import { slug } from '../lib/data';
+import { compartir } from '../lib/tarjetas';
+interface Props { d: Diputado; class?: string }
+const { d, class: clase } = Astro.props;
+const etiqueta = `Compartir la ficha de ${d.nombreCompleto}`;
+---
+<button class:list={['boton-compartir', clase]} type="button" data-compartir={slug(d)} data-cn={d.nombreCompleto} data-ct={compartir.diputado(d).texto} aria-label={etiqueta} title={etiqueta} aria-haspopup="dialog"><svg width="19" height="19" aria-hidden="true"><use href="#i-compartir" /></svg></button>
+
+<style>
+  .boton-compartir {
+    display: inline-grid; place-items: center; width: 40px; height: 40px; padding: 0; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+    transition: border-color .15s, color .15s, background .15s, transform .15s;
+  }
+  .boton-compartir:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft); }
+  .boton-compartir:active { transform: scale(.94); }
+  .boton-compartir:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>

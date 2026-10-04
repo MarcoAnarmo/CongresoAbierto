@@ -1,0 +1,64 @@
+---
+/** Ventana emergente de compartir: una por página, la abren los BotonCompartir con sus datos. */
+import BotonesTarjeta from './BotonesTarjeta.astro';
+---
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-compartir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" /><path d="m8.3 10.8 7.4-4.4M8.3 13.2l7.4 4.4" />
+  </symbol>
+</svg>
+<dialog class="dlg-compartir" id="dlg-compartir" aria-label="Compartir">
+  <button class="cerrar" type="button" aria-label="Cerrar">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+  </button>
+  <BotonesTarjeta historia="" horizontal="" nombre="" enlace="/" texto="" vista titulo="Compartir" />
+</dialog>
+
+<script>
+  import { rellenarCaja } from '../scripts/compartir';
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const sitio = import.meta.env.SITE.replace(/\/$/, '');
+  const dlg = document.getElementById('dlg-compartir') as HTMLDialogElement;
+  const caja = dlg.querySelector<HTMLElement>('.compartir')!;
+  let origen: HTMLElement | null = null;
+  document.addEventListener('click', (e) => {
+    const boton = (e.target as Element).closest<HTMLElement>('[data-compartir]');
+    if (!boton) return;
+    e.preventDefault();
+    origen = boton;
+    const s = boton.dataset.compartir!;
+    rellenarCaja(caja, {
+      historia: `${base}/tarjetas/historia/diputado/${s}.png`, horizontal: `${base}/tarjetas/horizontal/diputado/${s}.png`,
+      nombre: `congreso-abierto-${s}`, enlace: `${sitio}${base}/diputado/${s}`, texto: boton.dataset.ct!, titulo: `Comparte la ficha de ${boton.dataset.cn}`,
+    });
+    dlg.showModal();
+  });
+  dlg.querySelector('.cerrar')!.addEventListener('click', () => dlg.close());
+  // Cerrar al pulsar fuera de la caja
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('close', () => origen?.focus());
+</script>
+
+<style>
+  .dlg-compartir {
+    width: min(620px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--border); border-radius: 16px;
+    background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgb(0 0 0 / .25);
+  }
+  .dlg-compartir::backdrop { background: rgb(20 22 28 / .55); }
+  .dlg-compartir[open] { animation: aparecer .16s ease-out; }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(8px); } }
+  .dlg-compartir :global(.compartir.con-vista) { margin: 0; border: 0; padding: 22px 56px 22px 22px; }
+  .cerrar {
+    position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; display: grid; place-items: center;
+    border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .cerrar:hover { background: var(--chip); color: var(--text); }
+  @media (max-width: 560px) {
+    /* En el móvil, como hoja que sube desde abajo */
+    .dlg-compartir { width: 100vw; max-width: 100vw; margin: auto 0 0; border-radius: 18px 18px 0 0; border-bottom: 0; }
+    .dlg-compartir[open] { animation: subir .2s ease-out; }
+    @keyframes subir { from { transform: translateY(40px); opacity: .4; } }
+    .dlg-compartir :global(.compartir.con-vista) { padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
+    .dlg-compartir :global(.c-titulo) { padding-right: 40px; }
+  }
+</style>

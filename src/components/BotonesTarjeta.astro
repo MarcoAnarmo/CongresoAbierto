@@ -1,0 +1,101 @@
+---
+/**
+ * Compartir una tarjeta: historia de Instagram (imagen vertical), WhatsApp y X (enlace con su vista previa),
+ * copiar el enlace y descargar las dos imágenes.
+ * La historia usa el menú de compartir del móvil con la imagen; donde no se puede (ordenador), la descarga.
+ */
+import { url } from '../lib/data';
+import { enlacesRedes } from '../scripts/compartir';
+interface Props {
+  historia: string; horizontal: string; nombre: string;
+  /** Ruta de la página que se comparte (su vista previa es la tarjeta horizontal). */
+  enlace: string;
+  /** Texto que acompaña al enlace en WhatsApp y X. */
+  texto: string;
+  /** Muestra la miniatura de la tarjeta vertical al lado de los botones. */
+  vista?: boolean;
+  titulo?: string;
+}
+const { historia, horizontal, nombre, enlace, texto, vista = false, titulo = 'Compártelo' } = Astro.props;
+const absoluta = new URL(url(enlace), Astro.site).href;
+const { whatsapp, x } = enlacesRedes(texto, absoluta);
+---
+<div class:list={['compartir', { 'con-vista': vista }]} data-historia={url(historia)} data-nombre={`${nombre}.png`} data-enlace={absoluta} data-texto={texto}>
+  {vista && (
+    <a class="miniatura" href={url(historia)} target="_blank" rel="noopener" aria-label="Ver la tarjeta vertical a tamaño completo">
+      <img src={url(historia)} alt="" width="135" height="240" loading="lazy" />
+    </a>
+  )}
+  <div class="acciones">
+    {vista && <p class="c-titulo">{titulo}</p>}
+    <div class="fila">
+      <button class="btn primario c-historia" type="button">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="4 2.6" /><path d="M12 8v8M8 12h8" /></svg>
+        <span class="largo">Historia de Instagram</span><span class="corto">Historia</span>
+      </button>
+      <a class="btn c-red c-whatsapp" href={whatsapp} target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.6 19z" /></svg>
+        WhatsApp
+      </a>
+      <a class="btn c-red c-x" href={x} target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14v10H9l-4 4z" /></svg>
+        <span class="largo">Publicar en X</span><span class="corto">X</span>
+      </a>
+      <button class="btn c-copiar" type="button">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" /></svg>
+        <span class="largo">Copiar enlace</span><span class="corto">Enlace</span>
+      </button>
+      <button class="btn c-mas" type="button" hidden>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M5 13v6h14v-6" /></svg>
+        Más
+      </button>
+    </div>
+    <p class="small muted c-descargas">
+      Descargar imagen:{' '}
+      <a href={url(historia)} download={`${nombre}.png`}>vertical (historias)</a>{' · '}
+      <a href={url(horizontal)} download={`${nombre}-horizontal.png`}>horizontal</a>
+    </p>
+    <p class="small c-aviso" role="status" aria-live="polite"></p>
+  </div>
+</div>
+
+<script>
+  import { prepararCaja } from '../scripts/compartir';
+  document.querySelectorAll<HTMLElement>('.compartir').forEach(prepararCaja);
+</script>
+
+<style>
+  .compartir { display: flex; flex-direction: column; gap: 8px; }
+  .compartir.con-vista { flex-direction: row; align-items: stretch; gap: 20px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin: 18px 0; }
+  /* La miniatura ocupa toda la altura de la columna de botones y textos */
+  /* (el ancho lo calcula compartir.ts a partir de esa altura, para mantener la proporción 9:16) */
+  .con-vista .miniatura { flex: none; align-self: stretch; position: relative; width: 120px; }
+  .con-vista .miniatura img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .miniatura { flex-shrink: 0; line-height: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); background: var(--chip); transition: transform .15s; }
+  .miniatura:hover { transform: translateY(-2px); }
+  .miniatura img { display: block; }
+  .acciones { display: flex; flex-direction: column; justify-content: center; gap: 12px; min-width: 0; }
+  .corto { display: none; }
+  .compartir:not(.con-vista) .largo { display: none; }
+  .compartir:not(.con-vista) .corto { display: inline; }
+  .compartir:not(.con-vista) .fila .btn { padding: 8px 11px; }
+  .c-titulo { margin: 0; font-weight: 700; font-size: 1.05rem; }
+  .fila { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fila .btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+  .fila .btn.primario { color: #fff; }
+  .fila .btn[hidden] { display: none; }
+  .c-descargas, .c-aviso { margin: 0; }
+  .c-descargas a { color: var(--muted); }
+  .c-aviso:empty { display: none; }
+  .c-aviso { color: var(--accent-text); font-weight: 600; }
+  @media (max-width: 560px) {
+    /* Miniatura y título arriba; los botones ocupan todo el ancho debajo, de dos en dos */
+    .compartir.con-vista { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px 14px; padding: 14px; }
+    .con-vista .acciones { display: contents; }
+    .con-vista .fila, .con-vista .c-descargas, .con-vista .c-aviso { grid-column: 1 / -1; }
+    .con-vista .miniatura { align-self: center; width: 72px !important; height: 128px; }
+    .con-vista .fila { display: grid; grid-template-columns: 1fr 1fr; }
+    .con-vista .fila .btn { justify-content: center; padding: 8px 10px; }
+    .con-vista .fila .btn.primario { grid-column: 1 / -1; }
+  }
+</style>
