@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hemiciclo from '../components/Hemiciclo.astro';
+import MapaProvincias from '../components/MapaProvincias.astro';
 import { diputados, resumen, fmtNum, url, meta } from '../lib/data';
 
 const conDatos = diputados.filter((d) => d.patrimonio.viviendas !== null);
@@ -27,6 +28,7 @@ const porGrupo = [...resumen].sort((a, b) => b.propiedades - a.propiedades || b.
     <div class="card stat"><span class="v">{pct(tresOMas)}</span><span class="l">declara 3 viviendas o más</span></div>
   </div>
 
+  <MapaProvincias />
 
   <h2>Por grupo parlamentario</h2>
   <div class="table-scroll card tabla-grupos" style="padding:0">
