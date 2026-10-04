@@ -9,12 +9,14 @@ const porProvincia = PROVINCIAS.map((p) => {
     .sort((a, b) => (orden.get(a.grupoCorto)! - orden.get(b.grupoCorto)!) || a.apellidos.localeCompare(b.apellidos, 'es'));
   const conDatos = ds.filter((d) => d.patrimonio.viviendas !== null);
   const viviendas = conDatos.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
+  const propiedades = conDatos.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
   return {
     ...p,
     legible: nombreLegible(p.nombre),
     escanos: ds.length,
+    propiedades,
     viviendas,
-    media: conDatos.length ? viviendas / conDatos.length : null,
+    conDatos: conDatos.length,
     dips: ds.map((d) => ({ n: d.nombreCompleto, g: d.grupoCorto, c: colorGrupo(d.grupoCorto), p: etiquetaPartido(d), v: d.patrimonio.viviendas, pr: d.patrimonio.propiedades, f: d.fotoUrl, s: slug(d) })),
   };
 });
@@ -31,6 +33,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   <div class="controles">
     <div class="segmentado" role="group" aria-label="Qué mostrar en el mapa">
       <button class="btn" type="button" data-mmodo="escanos" aria-pressed="true">Diputados</button>
+      <button class="btn" type="button" data-mmodo="propiedades" aria-pressed="false">Propiedades</button>
       <button class="btn" type="button" data-mmodo="viviendas" aria-pressed="false">Viviendas</button>
     </div>
     <form class="buscar-cp" id="mapa-cp-form" novalidate>
@@ -45,7 +48,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
     <div>
       <div class="rejilla" style={`--cols:${COLUMNAS}`}>
         {celdas.map((p) => p
-          ? <button type="button" class="casilla" data-ab={p.abrev} data-escanos={p.escanos} data-media={p.media ?? ''} aria-label={`${p.legible}: ${p.escanos} ${p.escanos === 1 ? 'diputado' : 'diputados'}`} title={p.legible}>{p.abrev}</button>
+          ? <button type="button" class="casilla" data-ab={p.abrev} data-escanos={p.escanos} data-propiedades={p.conDatos ? p.propiedades : ''} data-viviendas={p.conDatos ? p.viviendas : ''} aria-label={`${p.legible}: ${p.escanos} ${p.escanos === 1 ? 'diputado' : 'diputados'}`} title={p.legible}>{p.abrev}</button>
           : <span class="hueco" aria-hidden="true"></span>)}
       </div>
       <div class="leyenda small" id="mapa-leyenda" aria-hidden="true"></div>
@@ -61,7 +64,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
 
 <script>
   type Dip = { n: string; g: string; c: string; p: string; v: number | null; pr: number | null; f: string; s: string };
-  type Prov = { abrev: string; legible: string; cp: number; escanos: number; viviendas: number; media: number | null; dips: Dip[] };
+  type Prov = { abrev: string; legible: string; cp: number; escanos: number; propiedades: number; viviendas: number; conDatos: number; dips: Dip[] };
   const raw = JSON.parse(document.getElementById('mapa-datos')!.textContent!) as { base: string; provincias: Prov[] };
   const casillas = [...document.querySelectorAll<HTMLButtonElement>('.mapa .casilla')];
   const botones = [...document.querySelectorAll<HTMLButtonElement>('.mapa [data-mmodo]')];
@@ -74,7 +77,8 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
   const modos = {
     escanos: { cortes: [1, 3, 5, 8, 16], etiquetas: ['1', '2–3', '4–5', '6–8', '9–16', '30 o más'], valor: (c: HTMLElement) => Number(c.dataset.escanos) },
-    viviendas: { cortes: [0.5, 1, 1.5, 2, 3], etiquetas: ['≤ 0,5', '≤ 1', '≤ 1,5', '≤ 2', '≤ 3', 'más de 3'], valor: (c: HTMLElement) => (c.dataset.media ? Number(c.dataset.media) : null) },
+    propiedades: { cortes: [5, 10, 15, 25, 40], etiquetas: ['1–5', '6–10', '11–15', '16–25', '26–40', 'más de 40'], valor: (c: HTMLElement) => (c.dataset.propiedades ? Number(c.dataset.propiedades) : null) },
+    viviendas: { cortes: [3, 6, 10, 15, 25], etiquetas: ['1–3', '4–6', '7–10', '11–15', '16–25', 'más de 25'], valor: (c: HTMLElement) => (c.dataset.viviendas ? Number(c.dataset.viviendas) : null) },
   };
   let actual: Prov | null = null;
   const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]!);
@@ -88,7 +92,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
       c.style.background = i < 0 ? 'transparent' : escala[i];
       c.classList.toggle('oscura', i >= 3);
     });
-    leyenda.innerHTML = (m === 'escanos' ? 'Diputados elegidos: ' : 'Viviendas declaradas por diputado (media): ')
+    leyenda.innerHTML = ({ escanos: 'Diputados elegidos: ', propiedades: 'Propiedades declaradas por sus diputados: ', viviendas: 'Viviendas declaradas por sus diputados: ' })[m]
       + escala.map((c, i) => `<span class="pill"><span class="dot" style="background:${c}"></span>${t.etiquetas[i]}</span>`).join(' ');
     if (actual) mostrar(actual, false);
   }
@@ -100,11 +104,11 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
       <li><a href="${raw.base}/diputado/${d.s}">
         <img src="${esc(d.f)}" alt="" width="40" height="50" loading="lazy" referrerpolicy="no-referrer" />
         <span class="quien"><strong>${esc(d.n)}</strong><span class="muted small"><span class="dot" style="background:${d.c}"></span> ${esc(d.p)}</span></span>
-        <span class="cifra small"><strong>${d.v ?? '—'}</strong> ${d.v === 1 ? 'vivienda' : 'viviendas'}</span>
+        <span class="cifra small">${d.pr === null ? '<strong>—</strong>' : `<span><strong>${d.pr}</strong> ${d.pr === 1 ? 'propiedad' : 'propiedades'}</span><span>(${d.v} ${d.v === 1 ? 'vivienda' : 'viviendas'})</span>`}</span>
       </a></li>`).join('');
     panel.innerHTML = `
       <h3>${esc(p.legible)}</h3>
-      <p class="small muted">${p.escanos} ${p.escanos === 1 ? 'diputado elegido' : 'diputados elegidos'} · ${num.format(p.viviendas)} viviendas declaradas${p.media !== null ? ` (${num.format(p.media)} por diputado)` : ''}</p>
+      <p class="small muted">${p.escanos} ${p.escanos === 1 ? 'diputado elegido' : 'diputados elegidos'} ${p.conDatos ? ` · ${num.format(p.propiedades)} ${p.propiedades === 1 ? 'propiedad declarada' : 'propiedades declaradas'} (${num.format(p.viviendas)} ${p.viviendas === 1 ? 'vivienda' : 'viviendas'})` : ''}</p>
       <ul class="lista">${filas}</ul>`;
     if (enfocar && matchMedia('(max-width: 860px)').matches) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -149,7 +153,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   .panel :global(.lista img) { width: 40px; height: 50px; object-fit: cover; border-radius: 6px; background: var(--chip); flex: none; }
   .panel :global(.quien) { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.3; }
   .panel :global(.quien strong) { font-size: .95rem; }
-  .panel :global(.cifra) { white-space: nowrap; color: var(--muted); }
+  .panel :global(.cifra) { white-space: nowrap; color: var(--muted); display: flex; flex-direction: column; align-items: flex-end; line-height: 1.3; }
   .panel :global(.cifra strong) { color: var(--text); }
   .leyenda :global(.pill) { font-size: .78rem; }
 </style>
