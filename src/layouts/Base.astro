@@ -33,16 +33,16 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
     </script>
     <title>{title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`}</title>
     <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg?v=4')} />
-    <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png?v=4')} />
-    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png?v=4')} />
+    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg?v=5')} />
+    <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png?v=5')} />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png?v=5')} />
   </head>
   <body>
     <a class="saltar" href="#contenido">Saltar al contenido</a>
     <header class="site">
       <div class="wrap bar">
         <a class="brand" href={url('/')} aria-label="Congreso Abierto, inicio">
-          <svg class="logo" viewBox="0 12 64 40" fill="none" stroke="#16181d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="51" height="32" aria-hidden="true">
+          <svg class="logo" viewBox="1 15 62 30" fill="none" stroke="#16181d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="74" height="36" aria-hidden="true">
             <g transform="translate(32 46) scale(.94) translate(-32 -46)" stroke-width="1.1">
               <circle cx="20.9" cy="41.4" r="2.2" fill="#ffd36e"/>
               <circle cx="27.4" cy="34.9" r="2.2" fill="#ffd36e"/>
@@ -85,7 +85,6 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
               <circle cx="60.6" cy="36.8" r="2.2" fill="#e2852f"/>
               <circle cx="61.7" cy="41.5" r="2.2" fill="#e2852f"/>
             </g>
-            <path d="M28.5 41h7l-1 7h-5Z" fill="#ffd36e" stroke-width="1.4"/>
           </svg>
           <span>Congreso Abierto</span>
         </a>
@@ -156,7 +155,7 @@ const activo = (href: string) => (href === '/' ? path === '/' || path === '' : p
   nav { display: flex; gap: 2px; margin-left: auto; }
   .tema { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--muted); cursor: pointer; transition: color .15s, border-color .15s, background-color .15s; }
   .tema:hover { color: var(--accent-text); border-color: var(--accent); }
-  .logo { flex: none; width: 54px; height: 38px; padding: 3px 4px; border-radius: 10px; transition: background-color .15s; }
+  .logo { flex: none; width: 84px; height: 44px; padding: 4px 5px; border-radius: 10px; transition: background-color .15s; }
   /* En modo oscuro el logo va sobre una placa clara, como un icono de app, para que se lea igual que en claro */
   :global(:root[data-theme='dark']) .logo { background: #fff3e6; }
   .tema .i-sol { display: none; }

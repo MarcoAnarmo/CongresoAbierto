@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#16181d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
   <title>Congreso Abierto</title>
   <rect width="64" height="64" rx="14" fill="#fff3e6" stroke="none"/>
-  <g transform="translate(5 5) scale(.84375)">
+  <g transform="translate(32 32) scale(.95) translate(-32 -29.95)">
   <g transform="translate(32 46) scale(.94) translate(-32 -46)" stroke-width="1.1">
     <circle cx="20.9" cy="41.4" r="2.2" fill="#ffd36e"/>
     <circle cx="27.4" cy="34.9" r="2.2" fill="#ffd36e"/>
@@ -44,6 +44,5 @@
     <circle cx="60.6" cy="36.8" r="2.2" fill="#e2852f"/>
     <circle cx="61.7" cy="41.5" r="2.2" fill="#e2852f"/>
   </g>
-  <path d="M28.5 41h7l-1 7h-5Z" fill="#ffd36e" stroke-width="1.4"/>
   </g>
 </svg>
