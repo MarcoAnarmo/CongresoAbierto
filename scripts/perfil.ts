@@ -37,7 +37,10 @@ const RE_CENTRO = /\b(Universidad|Universitat|Universidade|University|Universit[
 
 /** Frases de una línea («Licenciado en Derecho. Universidad de Valladolid.»). */
 const frases = (l: string) => l.split(/(?<!\b[A-Z]{1,3})\.\s+|;\s+/).map((x) => x.trim()).filter(Boolean);
-const esEstudio = (f: string) => RE_FORMACION.test(f) && !RE_TRABAJO.test(f);
+/** «Técnico en…» es un título solo en frases cortas; en las largas suele describir un puesto. */
+const RE_TECNICO = /t[eé]cnic[oa] (superior|en|de)/gi;
+const esEstudio = (f: string) => !RE_TRABAJO.test(f)
+  && (RE_FORMACION.test(f.replace(RE_TECNICO, '')) || (f.length < 120 && new RegExp(RE_TECNICO.source, 'i').test(f)));
 
 /**
  * Universidades donde estudió según una línea: solo las citadas en frases de estudios

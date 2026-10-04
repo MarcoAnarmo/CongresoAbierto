@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generado": "2026-10-04T10:39:45.961Z",
+  "generado": "2026-10-04T10:55:21.659Z",
   "fuente": "Congreso de los Diputados (datos abiertos y fichas oficiales)",
   "legislatura": "XV"
  },
@@ -22736,13 +22736,7 @@
      "XV"
     ],
     "legislaturasTexto": "Diputado de la XIII, XIV y XV Legislaturas",
-    "formacion": [
-     {
-      "texto": "1996-2000. Mediador intercultural y técnico en inmigración en el Centro de información a trabajadores extranjeros- CITE de Comisiones Obreras- CCOO en Las Palmas de Gran Canaria.",
-      "centros": [],
-      "otroCentro": false
-     }
-    ],
+    "formacion": [],
     "trayectoria": [
      "Secretario de Políticas Migratorias y de Refugiados de la CEF PSOE desde 2021-actualidad",
      "Secretario Ejecutivo de Políticas Refugiados de la CEF PSOE (2017-2021)",
@@ -22754,9 +22748,10 @@
      "2000-2012. Miembro del Consejo Superior de los senegaleses del exterior del Gobierno de Senegal.",
      "2000-2011. Presidente de la Comisión Permanente del Foro Canario de la Inmigración.",
      "2000-2008. Miembro del Grupo de Expertos en la Comisión de Cooperación al Desarrollo del Gobierno de Canarias.",
-     "2000-2005. Coordinador del Área de Migraciones de CCOO-Canarias."
+     "2000-2005. Coordinador del Área de Migraciones de CCOO-Canarias.",
+     "1996-2000. Mediador intercultural y técnico en inmigración en el Centro de información a trabajadores extranjeros- CITE de Comisiones Obreras- CCOO en Las Palmas de Gran Canaria."
     ],
-    "tipoFormacion": "sin-centro",
+    "tipoFormacion": "sin-datos",
     "cargosActuales": [
      {
       "cargo": "Vocal de la Diputación Permanente",
@@ -22931,6 +22926,11 @@
       "fecha": "2000",
       "tipo": "trayectoria",
       "texto": "2000-2005. Coordinador del Área de Migraciones de CCOO-Canarias."
+     },
+     {
+      "fecha": "1996",
+      "tipo": "trayectoria",
+      "texto": "1996-2000. Mediador intercultural y técnico en inmigración en el Centro de información a trabajadores extranjeros- CITE de Comisiones Obreras- CCOO en Las Palmas de Gran Canaria."
      }
     ],
     "declaracionActividades": "https://www.congreso.es/docinte/registro_intereses_diputado_142.pdf",
@@ -55319,11 +55319,6 @@
       "texto": "Técnico Superior en prevención de Riesgos Laborales, Seguridad, Higiene y Ergonomía",
       "centros": [],
       "otroCentro": false
-     },
-     {
-      "texto": "Técnico en Prevención de Riesgos Laborales y Coordinación de seguridad y salud en la conservación y explotación de obras nuevas y travesías de la Consejería de Fomento en las provincias de Ávila y Palencia",
-      "centros": [],
-      "otroCentro": false
      }
     ],
     "trayectoria": [
@@ -55332,6 +55327,7 @@
      "Gerente de la Fundación Óbila",
      "Labores de coordinación de seguridad y salud en fase de ejecución en las obras del Ministerio de Fomento en la provincia de Ávila: autovía Ávila Salamanca desdoblamiento de la circunvalación de Ávila.",
      "Asesoramiento en Prevención de Riesgos en I+D para MINTRA para las obras de ampliación de Metro de Madrid, trabajos del Ministerio de Medio Ambiente Demarcación de Carreteras de Madrid y Consorcio Urbanístico de la Ciudad Universitaria de Madrid.",
+     "Técnico en Prevención de Riesgos Laborales y Coordinación de seguridad y salud en la conservación y explotación de obras nuevas y travesías de la Consejería de Fomento en las provincias de Ávila y Palencia",
      "Miembro de la dirección facultativa en la construcción de la autopista y obra civil ASI Ávila Villacastín",
      "Concejal Coordinador del Área de Turismo, Patrimonio Histórico y Comercio del Ayuntamiento de Ávila 2011-2015",
      "Teniente de Alcalde de Servicios a la Ciudad, Turismo y Patrimonio Histórico del Excelentísimo Ayuntamiento de Ávila 2015-2019",
