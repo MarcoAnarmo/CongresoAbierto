@@ -24,8 +24,10 @@ export interface ItemVotacion {
   g?: [string, number, number, number, number][];
   /** Votación clave (con documentos y contenido revisados a mano) o con voto nominal pendiente. */
   cl?: 1; pe?: 1;
-  /** JSON oficial de la votación. */
-  fu: string;
+  /** JSON y PDF oficiales de la votación. */
+  fu: string; pdf?: string;
+  /** Sin voto de cada diputado en los datos abiertos (p. ej. votación secreta): solo hay totales. */
+  nv?: 1;
 }
 
 /** Clasificación por el tipo de punto del orden del día (campo oficial «titulo» de la votación). */
@@ -44,12 +46,14 @@ export const favorable = (r: string) => (/Aprobada|Convalidado/.test(r) ? 'si' :
 /** Etiqueta corta oficial sin la fecha final: «RDL 8/2026 · alquiler (28/04/2026)» → «RDL 8/2026 · alquiler». */
 export const sinFecha = (tema: string) => tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '');
 
+const pdfDe = (v: VotacionClave) => v.documentos.find((d) => d.tipo === 'votacion')?.url;
 export function aItem(v: VotacionClave): ItemVotacion {
   const t = v.totales;
   return {
     id: v.id, f: v.fecha, s: v.sesion, n: v.numeroVotacion, t: v.titulo, ...(v.automatica ? {} : { c: sinFecha(v.tema), cl: 1 as const }),
     ...(v.detalle ? { d: v.detalle } : {}), k: claseTipo(v.tipo), tp: v.tipo, te: v.temas ?? ['otros'], r: v.resultado,
-    to: [t.si, t.no, t.abstencion, t.noVota], ...(v.porGrupo ? { g: v.porGrupo } : {}), fu: v.fuenteUrl,
+    to: [t.si, t.no, t.abstencion, t.noVota], ...(v.porGrupo?.length ? { g: v.porGrupo } : {}), fu: v.fuenteUrl,
+    ...(pdfDe(v) ? { pdf: pdfDe(v) } : {}), ...(Object.keys(v.votos).length ? {} : { nv: 1 as const }),
   };
 }
 
@@ -64,6 +68,15 @@ export function itemPendiente(p: { id: string; fecha: string; titulo: string }):
 }
 /** Todas, de la más reciente a la más antigua (en cada día, las pendientes primero y luego por sesión y número). */
 export const ordenar = (xs: ItemVotacion[]) => xs.sort((a, b) => b.f.localeCompare(a.f) || (b.pe ?? 0) - (a.pe ?? 0) || b.s - a.s || b.n - a.n);
+
+/** Texto sin tildes y en minúsculas, para buscar. */
+export const normalizar = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+/** Cada palabra buscada tiene que aparecer, en cualquier orden. «Alquiler» encuentra también «arrendamiento» y viceversa. */
+const SINONIMOS: Record<string, string[]> = { alquiler: ['arrendamiento', 'arrendamientos', 'alquiler'], arrendamiento: ['alquiler', 'arrendamiento'], okupacion: ['ocupacion'] };
+export function coincide(texto: string, palabras: string[]) {
+  return palabras.every((w) => texto.includes(w) || (SINONIMOS[w]?.some((x) => texto.includes(x)) ?? false));
+}
+export const palabrasDe = (q: string) => normalizar(q.trim()).split(/\s+/).filter(Boolean);
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 const pct = (n: number, t: number) => `${t ? ((100 * n) / t).toFixed(2) : 0}%`;
@@ -84,7 +97,7 @@ export function filaHtml(i: ItemVotacion, base: string) {
     + `<span class="vf-meta"><span class="etq">${esc(nombreTipo(i.k, i.tp))}</span>${i.cl ? '<span class="etq clave">Votación clave</span>' : ''}</span>`
     + `<span class="vf-tit">${esc(tit)}</span>`
     + (i.d && !i.c ? `<span class="vf-det">${esc(finDe(i.d))}</span>` : '')
-    + `<span class="vf-res"><span class="insignia ${fav}">${esc(i.r)}</span>${i.pe ? '' : `<span class="vf-n">${totalesTexto(i.to)}</span>`}</span>`
+    + `<span class="vf-res"><span class="insignia ${fav}">${esc(i.r)}</span>${i.pe ? '' : `<span class="vf-n">${totalesTexto(i.to)}</span>`}${i.nv ? '<span class="vf-n">· solo totales</span>' : ''}</span>`
     + (i.pe ? '' : barraHtml(i.to))
     + `<svg class="vf-ir" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6" /></svg>`
     + `</a></li>`;

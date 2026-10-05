@@ -38,21 +38,21 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
 
   <div class="filtros" id="v-filtros" role="search" aria-label="Buscar votaciones">
     <label class="sr-only" for="v-texto">Buscar en las votaciones</label>
-    <input type="search" id="v-texto" placeholder="Buscar: alquiler, pensiones…" autocomplete="off" />
+    <input type="search" id="v-texto" placeholder="Buscar: alquiler, pensiones…" autocomplete="off" enterkeyhint="search" />
     <button class="btn boton-filtrar" type="button" id="v-abrir-filtros" aria-haspopup="dialog" aria-controls="v-dlg-filtros"><Icono n="filtros" tam={19} /><span>Filtrar</span><span class="n-filtros" id="v-n-filtros" hidden></span></button>
     <div class="filtros-mas" id="v-filtros-mas">
       <label class="sr-only" for="v-tema">Tema</label>
-      <select id="v-tema">
+      <select id="v-tema" autocomplete="off">
         <option value="">Todos los temas</option>
         {TEMAS.filter((t) => cuentaTema[t.id] > 0).map((t) => <option value={t.id}>{t.nombre} ({fmtNum(cuentaTema[t.id])})</option>)}
       </select>
       <label class="sr-only" for="v-tipo">Tipo de iniciativa</label>
-      <select id="v-tipo">
+      <select id="v-tipo" autocomplete="off">
         <option value="">Todos los tipos</option>
         {TIPOS.map((t) => <option value={t.id}>{t.plural}</option>)}
       </select>
       <label class="sr-only" for="v-res">Resultado</label>
-      <select id="v-res">
+      <select id="v-res" autocomplete="off">
         <option value="">Cualquier resultado</option>
         <option value="si">Aprobadas o convalidadas</option>
         <option value="no">Rechazadas o derogadas</option>
@@ -86,6 +86,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
 
   <!-- Calendario: un mes (o un día) -->
   <div id="vista-calendario" hidden>
+   <div class="cal-rejilla">
     <section class="card calendario" aria-label="Calendario de votaciones">
       <div class="cal-cab">
         <button class="btn icono" type="button" id="cal-ant" aria-label="Mes anterior con votaciones">‹</button>
@@ -97,8 +98,12 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
       <div class="cal-dias" id="cal-dias"></div>
       <p class="small muted cal-ley"><span><i class="punto si"></i> aprobadas o convalidadas</span><span><i class="punto no"></i> rechazadas o derogadas</span><span><i class="punto pend"></i> voto pendiente</span></p>
     </section>
-    <p class="small muted cal-cuenta"><span id="cal-cuenta" aria-live="polite"></span> <button type="button" class="enlace" id="cal-todo" hidden>Ver todo el mes</button></p>
-    <div class="v-lista" id="cal-lista"></div>
+    <div class="cal-derecha">
+      <div class="cal-resumen" id="cal-resumen" aria-live="polite"></div>
+      <p class="small muted cal-cuenta"><span id="cal-cuenta"></span> <button type="button" class="enlace" id="cal-todo" hidden>Ver todo el mes</button></p>
+      <div class="v-lista" id="cal-lista"></div>
+    </div>
+   </div>
   </div>
 
   <p class="vacio muted" id="v-vacio" hidden>Ninguna votación coincide con la búsqueda o los filtros.</p>
@@ -134,7 +139,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
 
 <script>
   import { deslizarParaCerrar } from '../scripts/hoja';
-  import { listaHtml, barraHtml, totalesTexto, nombreTipo, favorable, type ItemVotacion } from '../lib/votaciones';
+  import { listaHtml, barraHtml, totalesTexto, nombreTipo, favorable, normalizar, palabrasDe, coincide, type ItemVotacion } from '../lib/votaciones';
 
   interface Contenido { etiqueta: string; items: string[]; fuente: { titulo: string; url: string } }
   interface Extra { contenido: Contenido[]; documentos: { titulo: string; url: string; tipo?: string }[]; expediente?: string; expedienteUrl?: string; estado?: string }
@@ -177,16 +182,33 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   botonesVista.forEach((b) => b.addEventListener('click', () => ponerVista(b.dataset.vista as Vista)));
 
   // ---------- Filtros ----------
-  const textoDe = (i: ItemVotacion) => norm([i.c, i.t, i.d, i.tp, i.r, ...i.te.map((t) => cfg.temas[t]), ...(cfg.extra[i.id]?.contenido.flatMap((c) => c.items) ?? [])].filter(Boolean).join(' '));
+  const textoDe = (i: ItemVotacion) => normalizar([i.c, i.t, i.d, i.tp, i.r, ...i.te.map((t) => cfg.temas[t]), ...(cfg.extra[i.id]?.contenido.flatMap((c) => c.items) ?? [])].filter(Boolean).join(' '));
   const cache = new Map<string, string>();
   const buscable = (i: ItemVotacion) => { let s = cache.get(i.id); if (s === undefined) { s = textoDe(i); cache.set(i.id, s); } return s; };
+  /** Prepara el texto de búsqueda de todas las votaciones a ratos libres, para que buscar no trabe la página. */
+  function prepararBusqueda() {
+    let k = 0;
+    const lote = (dl?: { timeRemaining: () => number }) => {
+      const fin = performance.now() + 8;
+      while (k < todas.length && (dl ? dl.timeRemaining() > 1 : performance.now() < fin)) buscable(todas[k++]);
+      if (k < todas.length) programar(lote);
+    };
+    programar(lote);
+  }
+  const programar = (f: (dl?: { timeRemaining: () => number }) => void) => ('requestIdleCallback' in window ? (window as any).requestIdleCallback(f, { timeout: 300 }) : setTimeout(f, 16));
+  let ultimo = { clave: '', res: [] as ItemVotacion[] };
   function filtradas() {
-    const q = norm(texto.value.trim());
-    return todas.filter((i) =>
+    const q = texto.value.trim();
+    const clave = [q, selTema.value, selTipo.value, selRes.value, todas.length].join('|');
+    if (clave === ultimo.clave) return ultimo.res;
+    const palabras = palabrasDe(q);
+    const res = todas.filter((i) =>
       (!selTema.value || i.te.includes(selTema.value)) &&
       (!selTipo.value || i.k === selTipo.value) &&
       (!selRes.value || favorable(i.r) === selRes.value) &&
-      (!q || buscable(i).includes(q)));
+      (!palabras.length || coincide(buscable(i), palabras)));
+    ultimo = { clave, res };
+    return res;
   }
   const nFiltros = () => [selTema, selTipo, selRes].filter((s) => s.value).length;
 
@@ -241,6 +263,9 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
     ant.disabled = i <= 0; sig.disabled = i >= meses.length - 1;
     const vis = dia ? delMes.filter((x) => x.f === dia) : delMes;
     calLista.innerHTML = listaHtml(vis, base);
+    const nDias = new Set(delMes.map((x) => x.f)).size;
+    const nSi = delMes.filter((x) => favorable(x.r) === 'si').length, nNo = delMes.filter((x) => favorable(x.r) === 'no').length;
+    $('cal-resumen').innerHTML = `<p class="cr-t">${nombreMes(mes)}</p><div class="cr-cifras"><span><strong>${fmt(delMes.length)}</strong> ${delMes.length === 1 ? 'votación' : 'votaciones'}</span><span><strong>${nDias}</strong> ${nDias === 1 ? 'día de Pleno' : 'días de Pleno'}</span><span class="cr-si"><strong>${fmt(nSi)}</strong> aprobadas o convalidadas</span><span class="cr-no"><strong>${fmt(nNo)}</strong> rechazadas o derogadas</span></div>`;
     const v = vis.length === 1 ? 'votación' : 'votaciones';
     calCuenta.textContent = dia ? `${vis.length} ${v} el ${fechaLarga(dia)}` : `${vis.length} ${v} en ${nombreMes(mes).toLowerCase()}`;
     calTodo.hidden = !dia;
@@ -263,8 +288,12 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
     else if (vista === 'calendario') pintarCalendario();
     else vacio.hidden = true;
   }
+  // Buscar espera a que se deje de teclear un momento y pinta en el siguiente fotograma
   let espera = 0;
-  texto.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(() => { mostradas = cfg.primeras; aplicar(); }, 150); });
+  texto.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(() => requestAnimationFrame(() => { mostradas = cfg.primeras; aplicar(); }), 180); });
+  texto.addEventListener('keydown', (e) => { if (e.key === 'Enter') { clearTimeout(espera); mostradas = cfg.primeras; aplicar(); texto.blur(); } });
+  // El navegador puede recordar los filtros al volver a la página: siempre se empieza con todos los temas
+  addEventListener('pageshow', () => { if ([selTema, selTipo, selRes].some((x) => x.value) || texto.value) { selTema.value = ''; selTipo.value = ''; selRes.value = ''; texto.value = ''; ultimo.clave = ''; aplicar(); } });
   [selTema, selTipo, selRes].forEach((s) => s.addEventListener('change', () => { mostradas = cfg.primeras; aplicar(); }));
 
   // ---------- Filtros en una hoja (móvil), como en Diputados ----------
@@ -287,6 +316,8 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   const cuerpo = $('dlg-voto-c');
   let empujado = false, origen: HTMLElement | null = null;
   const etDoc: Record<string, string> = { boe: 'BOE', bocg: 'BOCG', ds: 'Diario', votacion: 'Votación' };
+  const iconoCompartir = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" /><path d="m8.3 10.8 7.4-4.4M8.3 13.2l7.4 4.4" /></svg>';
+  const pliegue = (t: string, html: string, abierto = false) => `<details class="pl"${abierto ? ' open' : ''}><summary>${t}</summary><div class="pl-c">${html}</div></details>`;
   function detalleHtml(i: ItemVotacion) {
     const x = cfg.extra[i.id];
     const grupos = (i.g ?? []).map(([g, si, no, ab, nv]) => {
@@ -295,21 +326,29 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
     }).join('');
     const docs = [
       ...(x?.documentos ?? []).map((d) => `<li><span class="tipo t-${d.tipo ?? 'otro'}">${etDoc[d.tipo ?? ''] ?? 'Doc.'}</span><a href="${esc(d.url)}" rel="noopener">${esc(d.titulo)} ↗</a></li>`),
-      ...(i.fu && !x?.documentos.some((d) => d.tipo === 'votacion') ? [`<li><span class="tipo t-votacion">Votación</span><a href="${esc(i.fu.replace(/\.json$/, '.pdf'))}" rel="noopener">Resultado de la votación (PDF oficial) ↗</a></li>`] : []),
-      ...(i.fu ? [`<li><span class="tipo t-json">Datos</span><a href="${esc(i.fu)}" rel="noopener">Voto de cada diputado (JSON, datos abiertos) ↗</a></li>`] : []),
+      ...(i.pdf && !x?.documentos.some((d) => d.tipo === 'votacion') ? [`<li><span class="tipo t-votacion">Votación</span><a href="${esc(i.pdf)}" rel="noopener">Resultado de la votación (PDF oficial) ↗</a></li>`] : []),
+      ...(i.fu ? [`<li><span class="tipo t-json">Datos</span><a href="${esc(i.fu)}" rel="noopener">${i.nv ? 'Totales de la votación' : 'Voto de cada diputado'} (JSON, datos abiertos) ↗</a></li>`] : []),
     ].join('');
-    return `<p class="d-meta small"><span class="etq">${esc(nombreTipo(i.k, i.tp))}</span>${i.cl ? '<span class="etq clave">Votación clave</span>' : ''}${i.s ? `<span>Sesión ${i.s}, votación ${i.n}</span>` : ''}</p>`
-      + (i.c ? `<h3 class="d-corto">${esc(i.c)}</h3>` : '')
-      + `<p class="d-titulo">${esc(i.t)}</p>`
+    const largo = i.t.length > 220;
+    // Qué se votó: el texto oficial completo, el subgrupo, los temas, el contenido y el expediente
+    const que = (i.c && largo ? `<p class="d-titulo">${esc(i.t)}</p>` : '')
       + (i.d ? `<p class="d-det small">${esc(i.d)}</p>` : '')
       + `<p class="d-temas small">${i.te.map((t) => `<span>${esc(cfg.temas[t] ?? 'Otros')}</span>`).join('')}</p>`
+      + (x?.contenido ?? []).map((c) => `<p class="docs-t">${esc(c.etiqueta)}</p><ul class="contenido">${c.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul><p class="small muted">Fuente: <a href="${esc(c.fuente.url)}" rel="noopener">${esc(c.fuente.titulo)} ↗</a></p>`).join('')
+      + (x?.expediente ? `<p class="small muted">Expediente <a href="${esc(x.expedienteUrl ?? '')}" rel="noopener">${esc(x.expediente)} ↗</a></p>` : '')
+      + (i.s ? `<p class="small muted">${esc(i.tp)} Sesión ${i.s}, votación ${i.n}.</p>` : '');
+    const acciones = i.pe ? '' : `<div class="d-acciones">${i.nv ? '' : `<a class="btn primario" href="${base}/?votacion=${encodeURIComponent(i.id)}#hemiciclo"><span class="largo">Ver escaño a escaño en el hemiciclo</span><span class="corto">Ver en el hemiciclo</span></a>`}<button class="d-compartir" type="button" id="d-compartir" aria-label="Compartir esta votación" title="Compartir esta votación">${iconoCompartir}${i.nv ? '<span>Compartir</span>' : ''}</button></div><p class="small c-aviso" id="d-aviso" role="status"></p>`;
+    return `<p class="d-meta small"><span class="etq">${esc(nombreTipo(i.k, i.tp))}</span>${i.cl ? '<span class="etq clave">Votación clave</span>' : ''}</p>`
+      + (i.c ? `<h3 class="d-corto">${esc(i.c)}</h3>` : `<p class="d-titulo${largo ? ' recorte' : ''}">${esc(i.t)}</p>`)
       + `<div class="d-res"><span class="insignia ${favorable(i.r)}">${esc(i.r)}</span>${i.pe ? '' : `<span class="small"><strong>${totalesTexto(i.to)}</strong></span>`}</div>`
       + (i.pe ? `<p class="small">${esc(x?.estado ?? '')}</p>` : barraHtml(i.to, false))
-      + (x?.expediente ? `<p class="small muted">Expediente <a href="${esc(x.expedienteUrl ?? '')}" rel="noopener">${esc(x.expediente)} ↗</a></p>` : '')
-      + (i.pe ? '' : `<div class="d-acciones"><a class="btn primario" href="${base}/?votacion=${encodeURIComponent(i.id)}#hemiciclo">Ver escaño a escaño en el hemiciclo</a><button class="btn" type="button" id="d-compartir">Compartir</button></div><p class="small c-aviso" id="d-aviso" role="status"></p>`)
-      + (grupos ? `<h4>Cómo votó cada grupo</h4><ul class="grupos">${grupos}</ul><p class="small muted">Grupo de cada diputado en la fecha de la votación, según los datos abiertos del Congreso.</p>` : '')
-      + (x?.contenido ?? []).map((c) => `<h4>${esc(c.etiqueta)}</h4><ul class="contenido">${c.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul><p class="small muted">Fuente: <a href="${esc(c.fuente.url)}" rel="noopener">${esc(c.fuente.titulo)} ↗</a></p>`).join('')
-      + (docs ? `<h4>Documentos oficiales</h4><ul class="docs">${docs}</ul>` : '');
+      + (i.nv ? `<p class="aviso-nv small"><strong>Solo hay totales.</strong> En esta votación el Congreso no publica el voto de cada diputado ni de cada grupo (por ejemplo, porque fue secreta), así que no se puede ver en el hemiciclo.</p>` : '')
+      + acciones
+      + `<div class="pliegues">`
+      + pliegue(i.c || largo ? 'Qué se votó' : 'Más información', que)
+      + (grupos ? pliegue('Cómo votó cada grupo', `<ul class="grupos">${grupos}</ul><p class="small muted">Grupo de cada diputado en la fecha de la votación, según los datos abiertos del Congreso.</p>`, !mqMovil.matches) : '')
+      + (docs ? pliegue('Documentos oficiales', `<ul class="docs">${docs}</ul>`) : '')
+      + `</div>`;
   }
   function textoCompartir(i: ItemVotacion) {
     const [si, no, ab] = i.to;
@@ -322,6 +361,12 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
     $('dlg-voto-t').textContent = `Votación del ${fechaLarga(i.f)}`;
     cuerpo.innerHTML = detalleHtml(i);
     cuerpo.scrollTop = 0;
+    const rec = cuerpo.querySelector<HTMLElement>('.d-titulo.recorte');
+    if (rec) {
+      const b = Object.assign(document.createElement('button'), { type: 'button', className: 'enlace ver-texto', textContent: 'Ver el texto completo' });
+      b.addEventListener('click', () => { rec.classList.remove('recorte'); b.remove(); });
+      rec.after(b);
+    }
     document.getElementById('d-compartir')?.addEventListener('click', async () => {
       const enlace = new URL(`${base}/votaciones?v=${encodeURIComponent(i.id)}`, location.href).href;
       const t = textoCompartir(i);
@@ -362,7 +407,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   ponerVista(vista);
   if (pedida) abrir(pedida, false);
   fetch(`${base}/datos/votaciones.json`).then((r) => r.json()).then((xs: ItemVotacion[]) => {
-    todas = xs; completo = true; indexar(); cache.clear();
+    todas = xs; completo = true; indexar(); cache.clear(); ultimo.clave = ''; prepararBusqueda();
     prepararMeses();
     aplicar();
     if (pedida && !dlg.open) abrir(pedida, false);
@@ -372,6 +417,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
 <style>
   .lead { max-width: 70ch; }
   .lead .corto, .segmentado .corto { display: none; }
+  .d-cuerpo :global(.d-acciones .corto) { display: none; }
   .vista-barra { margin: 18px 0 12px; }
   .vista-barra .segmentado .btn { display: inline-flex; align-items: center; gap: 8px; }
 
@@ -396,6 +442,8 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   :global(.v-filas) { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   :global(.v-filas.sueltas) { margin-top: 8px; }
   :global(.vf + .vf) { border-top: 1px solid var(--border); }
+  /* El navegador no dibuja los días que no se ven (la lista puede ser larga) */
+  .v-lista :global(.v-dia) { content-visibility: auto; contain-intrinsic-size: auto 600px; }
   :global(.vf-a) { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px; padding: 12px 44px 13px 16px; text-decoration: none; color: inherit; transition: background-color .12s; }
   :global(.vf-a:hover) { background: color-mix(in srgb, var(--accent) 6%, transparent); color: inherit; }
   :global(.vf-ir) { position: absolute; right: 14px; top: 50%; margin-top: -9px; color: var(--muted); }
@@ -442,6 +490,16 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   :global(.punto) { display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
   :global(.punto.si) { background: var(--si); } :global(.punto.no) { background: var(--no); } :global(.punto.pend) { background: var(--novota); }
   .cal-cuenta { margin: 14px 0 0; }
+  /* Ordenador: el calendario a la izquierda (fijo al bajar) y el mes o el día elegido a la derecha */
+  .cal-rejilla { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 8px; }
+  .cal-rejilla .calendario { position: sticky; top: 12px; max-width: none; }
+  .cal-derecha .cal-cuenta { margin: 12px 0 0; }
+  .cal-resumen { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .cal-resumen :global(.cr-t) { margin: 0 0 8px; font-weight: 750; font-size: 1.1rem; }
+  .cal-resumen :global(.cr-cifras) { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: .9rem; }
+  .cal-resumen :global(.cr-cifras strong) { color: var(--text); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+  .cal-resumen :global(.cr-si strong) { color: var(--si); }
+  .cal-resumen :global(.cr-no strong) { color: var(--no); }
   .enlace { border: 0; background: none; padding: 0 0 0 6px; color: var(--accent-text); text-decoration: underline; cursor: pointer; font: inherit; }
   .enlace[hidden] { display: none; }
   .vacio { padding: 24px 0; }
@@ -484,7 +542,22 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   .d-cuerpo :global(.d-temas) { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 12px; }
   .d-cuerpo :global(.d-temas span) { font-size: .72rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
   .d-cuerpo :global(.d-res) { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 8px; }
-  .d-cuerpo :global(.d-acciones) { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+  .d-cuerpo :global(.d-acciones) { display: flex; align-items: center; gap: 10px; margin: 16px 0 4px; }
+  .d-cuerpo :global(.d-acciones .btn.primario) { flex: 1 1 auto; justify-content: center; }
+  .d-cuerpo :global(.d-compartir) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: none; min-width: 44px; height: 44px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; cursor: pointer; transition: border-color .15s, color .15s, background .15s; }
+  .d-cuerpo :global(.d-compartir:hover) { border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft); }
+  .d-cuerpo :global(.d-titulo.recorte) { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 2px; }
+  .d-cuerpo :global(.ver-texto) { padding: 0; margin: 0 0 8px; font-size: .88rem; }
+  .d-cuerpo :global(.aviso-nv) { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--chip); }
+  .d-cuerpo :global(.pliegues) { margin-top: 18px; border-top: 1px solid var(--border); }
+  .d-cuerpo :global(.pl) { border-bottom: 1px solid var(--border); }
+  .d-cuerpo :global(.pl > summary) { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; cursor: pointer; list-style: none; font-weight: 650; }
+  .d-cuerpo :global(.pl > summary::-webkit-details-marker) { display: none; }
+  .d-cuerpo :global(.pl > summary::after) { content: ''; width: 9px; height: 9px; margin-right: 4px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translate(-2px, -2px); transition: transform .15s; }
+  .d-cuerpo :global(.pl[open] > summary::after) { transform: rotate(-135deg) translate(-2px, -2px); }
+  .d-cuerpo :global(.pl > summary:hover) { color: var(--accent-text); }
+  .d-cuerpo :global(.pl-c) { padding: 0 0 16px; }
+  .d-cuerpo :global(.docs-t) { margin: 8px 0 6px; font-weight: 650; color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
   .d-cuerpo :global(.d-acciones .btn) { text-decoration: none; display: inline-flex; align-items: center; }
   .d-cuerpo :global(.c-aviso) { margin: 4px 0 0; color: var(--accent-text); font-weight: 600; }
   .d-cuerpo :global(.c-aviso:empty) { display: none; }
@@ -513,11 +586,18 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
     :global(.vf-a) { padding: 11px 40px 12px 14px; }
     .v-lista :global(.v-dia h3) { font-size: .88rem; }
     .calendario { max-width: none; padding: 10px 10px 12px; }
+    .cal-rejilla { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .cal-rejilla .calendario { position: static; }
+    .cal-resumen { padding: 12px 14px; }
+    .cal-resumen :global(.cr-t) { display: none; }
     .cal-dias :global(.dia) { height: 38px; }
     .cal-sem { margin: 6px 0 2px; }
     .dlg-voto { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: 90dvh; border-radius: 20px 20px 0 0; border-bottom: 0; }
     .dlg-voto[open] { animation: subir .22s ease-out; }
     .d-cab { padding: 18px 8px 12px 16px; }
+    .d-cab h2 { font-size: 1rem; }
+    .d-cuerpo :global(.d-acciones .largo) { display: none; }
+    .d-cuerpo :global(.d-acciones .corto) { display: inline; }
     .d-cuerpo { padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
   }
   @media (min-width: 721px) { .dlg-filtros { display: none; } }
