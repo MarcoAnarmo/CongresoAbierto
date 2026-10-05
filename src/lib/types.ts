@@ -202,6 +202,8 @@ export interface VotacionClave {
   totales: { si: number; no: number; abstencion: number; noVota: number };
   /** codParlamentario -> voto */
   votos: Record<string, Voto>;
+  /** Recuento por grupo parlamentario según los datos abiertos de esa votación (grupo en esa fecha): [grupo, sí, no, abstención, no vota]. */
+  porGrupo?: [string, number, number, number, number][];
   /** codParlamentario -> asiento en el hemiciclo */
   asientos: Record<string, string>;
 }

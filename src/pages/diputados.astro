@@ -26,7 +26,9 @@ const etTipo = { publica: 'Universidad pública', privada: 'Universidad privada'
 const formacionCorta = (d: Diputado) => d.perfil?.formacion[0]?.texto ?? null;
 const nLeg = (d: Diputado) => d.perfil?.legislaturas.length ?? 0;
 const conAviso = (d: Diputado) => !!(d.deudas?.principal?.aviso || d.deudas?.anteriores.some((x) => x.aviso));
-const busca = (d: Diputado) => [d.nombreCompleto, d.circunscripcion, d.partido, d.grupoCorto, ...(d.perfil?.formacion.map((f) => f.texto) ?? []), ...(d.perfil?.trayectoria ?? [])].join(' ').toLowerCase();
+// Texto en el que se busca: nombre, provincia, partido, grupo (corto y oficial), cargos, formación y trayectoria, sin tildes
+const sinTildes = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const busca = (d: Diputado) => sinTildes([d.nombreCompleto, d.circunscripcion, d.partido, d.grupoCorto, grupos.find((g) => g.corto === d.grupoCorto)?.nombre ?? '', ...d.cargos, ...(d.perfil?.formacion.map((f) => f.texto) ?? []), ...(d.perfil?.trayectoria ?? [])].join(' '));
 const datos = (d: Diputado) => ({
   'data-n': d.apellidos, 'data-busca': busca(d), 'data-g': d.grupoCorto, 'data-c': d.circunscripcion, 'data-f': d.perfil?.tipoFormacion ?? 'sin-datos',
   'data-pr': d.patrimonio.propiedades ?? -1, 'data-v': d.patrimonio.viviendas ?? -1, 'data-co': d.patrimonio.vehiculos ?? -1, 'data-r': d.retribucion.totalMensual, 'data-l': nLeg(d),
@@ -276,17 +278,25 @@ const columnas = [
     if (r === 0 && clave !== 'n') r = (b.dataset.n ?? '').localeCompare(a.dataset.n ?? '', 'es');
     return desc ? -r : r;
   };
-  function aplicar() {
-    const q = quitarTildes(texto.value.trim().toLowerCase());
+  // Cada palabra de la búsqueda tiene que aparecer (en cualquier orden): «pp sevilla», «abogada icade»…
+  const textoBusca = new Map<HTMLElement, string>([...filas, ...tarjetas].map((f) => [f, f.dataset.busca ?? '']));
+  /** Reordena las filas y las fichas (solo cuando cambia el orden o la vista: mover nodos es lo que más cuesta). */
+  function ordenar() {
+    filas.sort(comparar); tarjetas.sort(comparar);
+    cuerpo.append(...filas); lista.append(...tarjetas);
+  }
+  function aplicar(reordenar = true) {
+    if (reordenar) ordenar();
+    const palabras = quitarTildes(texto.value.trim().toLowerCase()).split(/\s+/).filter(Boolean);
     const pasa = (f: HTMLElement) => (!grupo.value || f.dataset.g === grupo.value) && (!prov.value || f.dataset.c === prov.value)
-      && (!form.value || f.dataset.f === form.value) && (!q || quitarTildes(f.dataset.busca ?? '').includes(q));
+      && (!form.value || f.dataset.f === form.value) && palabras.every((w) => textoBusca.get(f)!.includes(w));
     let n = 0;
-    for (const f of filas.sort(comparar)) {
-      const ok = pasa(f); f.hidden = !ok;
-      if (ok) { (f.querySelector('.pos') as HTMLElement).textContent = String(++n); (f.querySelector('.quien') as HTMLElement).dataset.pos = String(n); }
-      cuerpo.appendChild(f);
+    for (const f of filas) {
+      const ok = pasa(f);
+      if (f.hidden === ok) f.hidden = !ok;
+      if (ok) { n++; const pos = f.querySelector('.pos') as HTMLElement; if (pos.textContent !== String(n)) { pos.textContent = String(n); (f.querySelector('.quien') as HTMLElement).dataset.pos = String(n); } }
     }
-    for (const t of tarjetas.sort(comparar)) { t.hidden = !pasa(t); lista.appendChild(t); }
+    for (const t of tarjetas) { const ok = pasa(t); if (t.hidden === ok) t.hidden = !ok; }
     cuenta.textContent = n === 1 ? '1 diputado' : `${n} diputados`;
     verResultados.textContent = n === 1 ? 'Ver 1 diputado' : `Ver ${n} diputados`;
     const activos = [grupo, prov, form].filter((x) => x.value).length;
@@ -321,7 +331,9 @@ const columnas = [
     clave = k; marcar(); aplicar();
   }));
   botonesVista.forEach((b) => b.addEventListener('click', () => { verVista(b.dataset.vista!); marcar(); aplicar(); }));
-  [texto].forEach((e) => e.addEventListener('input', aplicar));
+  // La búsqueda espera a que se deje de escribir un momento y no reordena la lista: así no se traba al teclear
+  let espera = 0;
+  texto.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(() => requestAnimationFrame(() => aplicar(false)), 140); });
 
   // Móvil: los selectores pasan a una hoja que sube desde abajo («Filtrar»); en el ordenador siguen en línea
   const movil = matchMedia('(max-width: 720px)');
@@ -337,7 +349,7 @@ const columnas = [
   deslizarParaCerrar(dlgFiltros, { cerrar: () => dlgFiltros.close() });
   dlgFiltros.addEventListener('click', (e) => { if (e.target === dlgFiltros) dlgFiltros.close(); });
   verResultados.addEventListener('click', () => dlgFiltros.close());
-  document.getElementById('quitar-filtros')!.addEventListener('click', () => { grupo.value = ''; prov.value = ''; form.value = ''; aplicar(); });
+  document.getElementById('quitar-filtros')!.addEventListener('click', () => { grupo.value = ''; prov.value = ''; form.value = ''; aplicar(false); });
 
   // Móvil: cada fila de la tabla enseña la cifra por la que se ordena; el botón despliega las cuatro
   cuerpo.addEventListener('click', (e) => {
@@ -349,7 +361,7 @@ const columnas = [
     const abierta = fila.classList.toggle('abierta');
     boton.setAttribute('aria-expanded', String(abierta));
   });
-  [grupo, prov, form].forEach((e) => e.addEventListener('change', aplicar));
+  [grupo, prov, form].forEach((e) => e.addEventListener('change', () => aplicar(false)));
   try {
     const s = JSON.parse(localStorage.getItem('diputados') ?? 'null');
     if (s) { grupo.value = s.g ?? ''; form.value = s.f ?? ''; vista = s.vista ?? 'tarjetas'; if (s.ordenes) Object.assign(ordenes, s.ordenes); }

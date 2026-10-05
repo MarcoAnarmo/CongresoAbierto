@@ -272,17 +272,18 @@ const LINEA_CORTA = 6;
         </p>
         <ul class="votos">
           {votosDip.map(({ v, voto }) => (
-            <li>
+            <li><a class="v-fila" href={url(`/votaciones?v=${encodeURIComponent(v.id)}`)} aria-label={`${rotulo(v).corto}: ${voto ?? sinEscano}. Ver la votación con el voto de cada grupo y sus documentos`}>
               <span class="pill voto" style={`border-color:${voto ? colorVoto[voto] : 'var(--border)'}`}><span class="dot" style={voto ? `background:${colorVoto[voto]}` : 'border:2px solid var(--novota)'}></span>{voto ?? sinEscano}</span>
               <span class="v-texto">
                 <strong>{rotulo(v).corto}</strong>
-                <span class="muted small">{rotulo(v).quien} · {fmtFecha(v.fecha)} · {v.resultado} · <a href={v.fuenteUrl} rel="noopener">fuente</a></span>
+                <span class="muted small">{rotulo(v).quien} · {fmtFecha(v.fecha)} · {v.resultado}</span>
                 <span class="small v-oficial">{v.titulo}</span>
               </span>
-            </li>
+              <span class="v-ir" aria-hidden="true"><Icono n="derecha" tam={18} /></span>
+            </a></li>
           ))}
         </ul>
-        <p class="fuente"><Icono n="info" tam={16} /><span>Votos nominales publicados en los datos abiertos del Congreso · <a href={url('/votaciones')}>Todas las votaciones</a></span></p>
+        <p class="fuente"><Icono n="info" tam={16} /><span>Votos nominales publicados en los datos abiertos del Congreso. Toca una votación para ver cómo votó cada grupo y sus documentos oficiales · <a href={url('/votaciones')}>Todas las votaciones</a></span></p>
       </div>
     </section>
   )}
@@ -450,7 +451,12 @@ const LINEA_CORTA = 6;
 
   .leyenda-votos { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
   .votos { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
-  .votos li { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .votos li { border-bottom: 1px solid var(--border); }
+  /* Cada votación abre su detalle en Votaciones (voto de cada grupo, texto y documentos) */
+  .v-fila { display: grid; grid-template-columns: 100px minmax(0, 1fr) 20px; gap: 12px; align-items: baseline; padding: 12px 8px; margin: 0 -8px; border-radius: 10px; color: inherit; text-decoration: none; transition: background-color .12s; }
+  .v-fila:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); color: inherit; }
+  .v-fila:hover strong { color: var(--accent-text); }
+  .v-ir { align-self: center; color: var(--muted); display: grid; }
   .votos li:last-child { border-bottom: 0; }
   .votos .voto { justify-self: start; }
   .v-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -539,7 +545,10 @@ const LINEA_CORTA = 6;
     .d-cab::before { content: ''; position: absolute; top: 7px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: var(--border); }
     .d-cab h2 { font-size: 1.15rem; }
     .d-cuerpo { padding: 14px 16px calc(24px + env(safe-area-inset-bottom)); }
-    .votos li { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .v-fila { grid-template-columns: minmax(0, 1fr) 20px; gap: 6px 10px; }
+    .v-fila .voto { grid-column: 1; }
+    .v-fila .v-texto { grid-column: 1; }
+    .v-fila .v-ir { grid-column: 2; grid-row: 1 / span 2; }
     .s-cifra strong { font-size: 1.6rem; }
     .bien { padding: 11px 14px; }
     .filtro-bienes .btn { padding: 6px 10px; font-size: .875rem; }

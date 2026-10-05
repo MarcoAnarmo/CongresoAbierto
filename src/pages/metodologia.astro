@@ -128,17 +128,18 @@ const secciones = [
       <section id="votaciones">
         <h2>Votaciones</h2>
         <p>
-          Cada votación muestra el texto oficial del expediente, el tipo de votación, el resultado y el voto de cada diputado según los datos abiertos del Congreso.
+          Cada votación muestra el texto oficial del expediente, el tipo de votación, el resultado, el voto de cada grupo (con el grupo de cada diputado en la fecha de la votación) y el voto de cada diputado según los datos abiertos del Congreso.
           El hemiciclo es un gráfico ordenado por grupos parlamentarios; no reproduce el plano real de asientos.
           Las votaciones por llamamiento (en voz alta) tardan más en publicarse en datos abiertos; se añaden cuando aparecen.
-          Con las Cortes disueltas, los decretos-leyes los convalida o deroga la Diputación Permanente (art. 78 de la Constitución). <a href={url('/votaciones')}>Ver votaciones</a>.
+          Con las Cortes disueltas, los decretos-leyes los convalida o deroga la Diputación Permanente (art. 78 de la Constitución).
+          Cuando el Congreso solo publica los totales de una votación, sin el voto de cada diputado (por ejemplo, en una votación secreta), la web muestra solo esos totales y lo indica. <a href={url('/votaciones')}>Ver votaciones</a>.
         </p>
       </section>
 
       <section id="temas">
         <h2>Temas de las votaciones</h2>
         <p>
-          La página de votaciones recoge todas las votaciones del Pleno publicadas en datos abiertos desde junio de 2026, además de las votaciones clave anteriores.
+          La página de votaciones recoge todas las votaciones del Pleno de la XV Legislatura publicadas en datos abiertos (desde septiembre de 2023). Las votaciones por llamamiento, como las investiduras, no tienen el voto de cada diputado en datos abiertos y no aparecen.
           Las <strong>votaciones clave</strong> llevan además documentos oficiales (BOE, BOCG, Diario de Sesiones) y extractos literales del texto, revisados a mano; las demás muestran el título oficial, los totales, el voto por grupo y el JSON y el PDF oficiales.
         </p>
         <p>

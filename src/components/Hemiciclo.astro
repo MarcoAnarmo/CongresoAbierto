@@ -26,8 +26,9 @@ const etiquetas = sectores.map((s, i) => {
   return { texto: gruposOrden[i].corto, x, y, color: gruposOrden[i].color, ancla: Math.cos(ang) > 0.25 ? 'start' : Math.cos(ang) < -0.25 ? 'end' : 'middle' };
 });
 
-// Selector de votaciones: todas las del Pleno, agrupadas por tema y de la más reciente a la más antigua.
+// Selector de votaciones: las votaciones clave y, por tema, las más recientes del Pleno (el resto se busca en Votaciones).
 // Una votación con varios temas aparece en cada uno. Las que no son clave se descargan al elegirlas.
+const POR_TEMA = 12;
 const fechaCorta = (iso: string) => iso.split('-').reverse().join('/');
 const recorta = (t: string, n = 95) => (t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t);
 /** El final del detalle es lo que distingue votaciones del mismo asunto («Enmienda 14», «Punto 2»). */
@@ -36,11 +37,11 @@ const etiquetaVoto = (v: (typeof votacionesPleno)[number]) =>
   v.automatica
     ? `${fechaCorta(v.fecha)} · nº ${v.numeroVotacion} · ${recorta(v.titulo, 70)}${v.detalle ? ` · ${finDe(v.detalle.replace(/\.$/, ''), 50)}` : ''}`
     : `${fechaCorta(v.fecha)} · ${v.tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '')} (votación clave)`;
-const gruposVoto = TEMAS.map((t) => ({
-  nombre: t.nombre,
-  votaciones: votacionesPleno.filter((v) => temasDe(v).includes(t.id))
-    .sort((a, b) => b.fecha.localeCompare(a.fecha) || b.sesion - a.sesion || b.numeroVotacion - a.numeroVotacion),
-})).filter((g) => g.votaciones.length > 0);
+const recientes = (xs: typeof votacionesPleno) => [...xs].sort((a, b) => b.fecha.localeCompare(a.fecha) || b.sesion - a.sesion || b.numeroVotacion - a.numeroVotacion);
+const gruposVoto = [
+  { nombre: 'Votaciones clave de vivienda', votaciones: recientes(votacionesPleno.filter((v) => !v.automatica)) },
+  ...TEMAS.map((t) => ({ nombre: `${t.nombre}: las más recientes`, votaciones: recientes(votacionesPleno.filter((v) => v.automatica && temasDe(v).includes(t.id))).slice(0, POR_TEMA) })),
+].filter((g) => g.votaciones.length > 0);
 
 const votosCliente = Object.fromEntries(votaciones.map((v) => [v.id, Object.fromEntries(Object.entries(v.votos).map(([c, x]) => [c, x === 'Sí' ? 'S' : x === 'No' ? 'N' : x === 'Abstención' ? 'A' : 'X']))]));
 const datos = Object.fromEntries(ordenados.map((d) => [d.codParlamentario, {
@@ -64,10 +65,13 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
         <select id="hemi-voto">
           <option value="">Ver una votación…</option>
           {gruposVoto.map((g) => (
-            <optgroup label={`${g.nombre} (${g.votaciones.length})`}>
+            <optgroup label={g.nombre}>
               {g.votaciones.map((v) => <option value={`voto:${v.id}`}>{etiquetaVoto(v)}</option>)}
             </optgroup>
           ))}
+          <optgroup label="Más votaciones">
+            <option value="ir:votaciones">{`Buscar entre las ${votacionesPleno.length.toLocaleString('es-ES')} votaciones del Pleno…`}</option>
+          </optgroup>
         </select>
       </div>
     )}
@@ -299,8 +303,11 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     }
     pintar(m);
   }
-  selVoto?.addEventListener('change', () => { if (selVoto.value) verVotacion(selVoto.value); });
-  const validos = [...botones.map((b) => b.dataset.modo!), ...(selVoto ? [...selVoto.options].map((o) => o.value).filter(Boolean) : [])];
+  selVoto?.addEventListener('change', () => {
+    if (selVoto.value === 'ir:votaciones') { location.href = `${raw.base}/votaciones`; return; }
+    if (selVoto.value) verVotacion(selVoto.value);
+  });
+  const validos = [...botones.map((b) => b.dataset.modo!), ...(selVoto ? [...selVoto.options].map((o) => o.value).filter((x) => x.startsWith('voto:')) : [])];
   let inicial = 'propiedades';
   try { const g = localStorage.getItem('hemi-modo'); if (g && validos.includes(g)) inicial = g; } catch {}
 

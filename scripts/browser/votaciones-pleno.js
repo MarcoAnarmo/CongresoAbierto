@@ -13,10 +13,12 @@
   window._bajarVotaciones = async () => {
     const urls = [...new Set([...document.querySelectorAll('a[href*="/opendata/votaciones/"][href$=".json"]')].map((a) => new URL(a.getAttribute('href'), location.href).href))];
     if (!urls.length) { console.warn('No hay enlaces JSON de votaciones en esta página. Elige antes un día con votaciones.'); return; }
+    // El PDF de cada votación está en la misma carpeta que su JSON, pero con otro nombre
+    const pdfDe = (url) => { const dir = url.replace(/[^/]+$/, ''); const a = document.querySelector(`a[href*="${new URL(dir).pathname}"][href$=".pdf"]`); return a ? new URL(a.getAttribute('href'), location.href).href : undefined; };
     const lineas = [];
     for (const url of urls) {
       const datos = await fetch(url).then((r) => r.json());
-      lineas.push(JSON.stringify({ url, datos }));
+      lineas.push(JSON.stringify({ url, pdf: pdfDe(url), datos }));
       await sleep(300);
     }
     const dia = (urls[0].match(/\/(\d{8})\//) || [])[1] || 'dia';
