@@ -37,20 +37,20 @@ const secciones = [
         <p>
           Aquí solo hay información oficial del Estado, presentada tal y como la publica la institución que la produce.
           No hacemos interpretaciones ni valoraciones: ordenamos y simplificamos para que cualquiera pueda consultarla y sacar sus propias conclusiones.
-          Si algo no coincide con el documento oficial, manda el documento oficial.
+          Si algo no coincide con el documento oficial, prevalece el documento oficial.
         </p>
       </section>
 
       <section id="fuentes">
         <h2>Fuentes oficiales</h2>
         <ul>
-          <li><strong>Diputados, grupos y cargos:</strong> buscador y fichas oficiales de <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> (XV Legislatura). Consultados el {new Date(meta.generado).toLocaleDateString('es-ES')}.</li>
+          <li><strong>Diputados, grupos y cargos:</strong> buscador y fichas oficiales de <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> (XV Legislatura). Consultados el {fmtFecha(meta.generado.slice(0, 10))}.</li>
           <li><strong>Propiedades y vehículos:</strong> las <em>Declaraciones de Bienes y Rentas</em> que cada diputado presenta ante el Congreso y que este publica en su ficha: {pdfs} documentos de {conDecl} diputados; el más reciente es del {fmtFecha(ultimaDecl)}.</li>
           <li><strong>Votaciones:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos de votaciones</a> del Congreso, con el texto oficial de cada expediente.</li>
           <li><strong>Normas:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decretos-leyes y acuerdos de convalidación o derogación).</li>
           <li><strong>Retribuciones:</strong> <a href={FUENTE_RETRIBUCIONES}>Régimen económico y ayudas de los miembros de la Cámara</a>, importes de 2026.</li>
         </ul>
-        <p><strong>Grupo y candidatura.</strong> El Congreso registra dos datos distintos: la candidatura con la que cada diputado fue elegido en las elecciones y el grupo parlamentario al que pertenece hoy. Pueden no coincidir: quien deja su grupo pasa al Grupo Mixto aunque fuera elegido en otra lista. El hemiciclo ordena por grupo actual; cuando la candidatura es distinta, se indica entre paréntesis.</p>
+        <p><strong>Grupo y candidatura.</strong> El Congreso registra dos datos distintos: la candidatura con la que cada diputado fue elegido en las elecciones y el grupo parlamentario al que pertenece en la fecha de consulta. Pueden no coincidir: quien deja su grupo pasa al Grupo Mixto aunque fuera elegido en otra lista. El hemiciclo ordena por ese grupo parlamentario; cuando la candidatura es distinta, se indica entre paréntesis.</p>
       </section>
 
       <section id="perfil">
@@ -64,7 +64,7 @@ const secciones = [
           <li><strong>Universidad pública o privada:</strong> solo cuando la línea nombra el centro. El tipo es el que figura en el <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades">Registro de Universidades, Centros y Títulos (RUCT)</a> del Ministerio. Se reconocen también otras formas de nombrarla (en otras lenguas oficiales, siglas como UCM o UNED, y centros que forman parte de una universidad, como ICADE, ESADE o IESE). La lista está en <code>data/manual/universidades.json</code>.</li>
           <li>Si nombra un centro que no está en el RUCT (por ejemplo, una universidad extranjera), se indica así, sin clasificarlo. Si no nombra el centro, se dice que la ficha no lo indica: no se deduce nada.</li>
           <li>No se recogen datos familiares (estado civil, hijos) aunque aparezcan en la ficha.</li>
-          <li><strong>Línea de tiempo:</strong> las legislaturas en las que ha sido diputado (con sus fechas oficiales), sus cargos actuales en la Cámara con la fecha de inicio, las líneas de su trayectoria que citan un año y sus declaraciones de bienes y de intereses económicos de esta legislatura, cada una con su PDF.</li>
+          <li><strong>Línea de tiempo:</strong> las legislaturas en las que ha sido diputado (con sus fechas oficiales), sus cargos en la Cámara en la fecha de consulta, con la fecha de inicio, las líneas de su trayectoria que citan un año y sus declaraciones de bienes y de intereses económicos de esta legislatura, cada una con su PDF.</li>
         </ul>
       </section>
 
@@ -73,7 +73,7 @@ const secciones = [
         <p>Se usan las tablas de «Bienes inmuebles» de cada declaración, copiadas literalmente. Cada ficha enlaza a sus PDF originales.</p>
         <ul>
           <li><strong>Propiedades:</strong> todos los inmuebles urbanos y rústicos que el diputado declara a su nombre, en propiedad total o parcial: viviendas, garajes, trasteros, locales, naves, solares, fincas… Cada línea de la tabla oficial cuenta como una propiedad; si la línea indica un número de unidades («16 viviendas», «8 fincas rústicas», «piso y dos plazas de garaje»), se cuentan esas unidades.</li>
-          <li><strong>Viviendas:</strong> de esas propiedades, las que el propio diputado describe como vivienda, piso, casa, chalet, apartamento, ático, dúplex, estudio o similar, también en suelo rústico.</li>
+          <li><strong>Viviendas:</strong> de esas propiedades, las que el propio diputado describe como vivienda, piso, casa, chalet, apartamento, ático, dúplex, estudio, adosado, unifamiliar, bungaló o residencial, también en suelo rústico. No cuentan como vivienda los que solo se describen como garaje, plaza de aparcamiento, cochera, trastero, local, oficina, almacén, nave, solar, parcela, terreno o finca rústica.</li>
           <li>Se muestran el porcentaje y el tipo de derecho (pleno dominio, nuda propiedad, ganancial…) tal y como los escribe el diputado.</li>
           <li>Los inmuebles de sociedades en las que participa el diputado se listan aparte en su ficha y no se suman.</li>
           <li>Si la última declaración solo comunica un cambio (por ejemplo, una compra), se muestra junto a la declaración completa anterior. Un bien solo deja de contarse cuando una declaración oficial posterior comunica su venta o baja; la ficha indica cuál.</li>
@@ -105,17 +105,17 @@ const secciones = [
         <p>
           Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila
           (las deudas, con dos transcripciones independientes cuyas diferencias se resuelven mirando el PDF),
-          incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura dudosa llevan un aviso (*) y un enlace al PDF para comprobarlo.
+          incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura no confirmada llevan un aviso (*) y un enlace al PDF para comprobarlo.
         </p>
       </section>
 
       <section id="retribuciones">
         <h2>Retribuciones</h2>
-        <p>Se muestran los importes mensuales oficiales de 2026 que corresponden a cada diputado según su circunscripción y sus cargos:</p>
+        <p>Se muestran los importes mensuales oficiales de 2026 que corresponden a cada diputado durante su mandato, según su circunscripción y sus cargos:</p>
         <ul>
           <li>Asignación constitucional, igual para todos: {fmtEur2(ASIGNACION)}.</li>
           <li>Indemnización por gastos, exenta de IRPF: {fmtEur2(INDEMNIZACION_OTRAS)} (fuera de Madrid) o {fmtEur2(INDEMNIZACION_MADRID)} (electos por Madrid).</li>
-          <li>Complementos por cargo, no acumulables dentro de cada grupo (Mesa y Junta de Portavoces; Comisiones):
+          <li>Complementos por cargo, no acumulables dentro de cada bloque (Mesa y Junta de Portavoces; Comisiones):
             <ul>
               {Object.values(CARGOS_CAMARA).map((c) => <li>{c.etiqueta}: {fmtEur2(c.complementoMesa + c.gastosRepresentacion + c.gastosLibreDisposicion)}</li>)}
               {Object.values(CARGOS_COMISION).map((c) => <li>{c.etiqueta}: {fmtEur2(c.gastosRepresentacion)}</li>)}
@@ -130,7 +130,8 @@ const secciones = [
         <p>
           Cada votación muestra el texto oficial del expediente, el tipo de votación, el resultado y el voto de cada diputado según los datos abiertos del Congreso.
           El hemiciclo es un gráfico ordenado por grupos parlamentarios; no reproduce el plano real de asientos.
-          Las votaciones por llamamiento (en voz alta) tardan más en publicarse en datos abiertos; se añaden cuando aparecen. <a href={url('/votaciones')}>Ver votaciones</a>.
+          Las votaciones por llamamiento (en voz alta) tardan más en publicarse en datos abiertos; se añaden cuando aparecen.
+          Con las Cortes disueltas, los decretos-leyes los convalida o deroga la Diputación Permanente (art. 78 de la Constitución). <a href={url('/votaciones')}>Ver votaciones</a>.
         </p>
       </section>
 
@@ -155,7 +156,7 @@ const secciones = [
       <section id="errores">
         <h2>¿Has visto un error?</h2>
         <p>
-          <a href={enlaceError()} rel="noopener">Abre una incidencia en GitHub</a> con el diputado, el dato y el enlace al documento oficial (con la página).
+          <a href={enlaceError()} rel="noopener">Avisa del error en GitHub</a> con el diputado, el dato y el enlace al documento oficial (con la página).
           Solo se aceptan correcciones respaldadas por un documento oficial.
         </p>
         <p>
@@ -194,6 +195,7 @@ const secciones = [
 </script>
 
 <style>
+  .prosa code { overflow-wrap: anywhere; }
   .disposicion { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: start; }
   .lateral { position: sticky; top: calc(var(--tope) + 20px); }
   .lateral h1 { font-size: 1.6rem; margin: .2rem 0 1.2rem; }
