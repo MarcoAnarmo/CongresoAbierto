@@ -5,7 +5,7 @@ import { url, REPO, enlaceSugerencia, enlaceError, enlaceGuia, enlacePrimerasTar
 <Base title="Colabora" description="Cómo ayudar a mantener Congreso Abierto: avisar de errores, proponer mejoras o contribuir al código.">
   <h1>Colabora</h1>
   <p class="lead">
-    Congreso Abierto es un proyecto independiente y de código abierto. Todo el código y todos los datos están públicos en GitHub,
+    Congreso Abierto es un proyecto independiente y de código abierto. Todo el código y los datos que muestra la web son públicos y están en GitHub,
     y cualquiera puede ayudar a que sean más completos y exactos.
   </p>
 
@@ -25,7 +25,7 @@ import { url, REPO, enlaceSugerencia, enlaceError, enlaceGuia, enlacePrimerasTar
     <section class="card via">
       <p class="etiqueta">Con código o datos</p>
       <h2>Contribuye al proyecto</h2>
-      <p>Corrige una transcripción, mejora el diseño o añade un parlamento autonómico mediante un <em>pull request</em>.</p>
+      <p>Corrige una transcripción, mejora el diseño o ayuda a incorporar las comunidades autónomas mediante un <em>pull request</em>.</p>
       <a class="btn" href={enlaceGuia} rel="noopener">Guía para colaborar ↗</a>
     </section>
   </div>
@@ -34,8 +34,9 @@ import { url, REPO, enlaceSugerencia, enlaceError, enlaceGuia, enlacePrimerasTar
   <p>La intención es mantener la web <strong>actualizada mes a mes</strong> con los datos oficiales y seguir ampliándola. Estos son los próximos pasos:</p>
   <ul class="ruta">
     <li><strong>Actualización mensual</strong> de diputados, declaraciones y votaciones.</li>
+    <li><strong>Nueva legislatura</strong>: conservar los datos de la XV y cargar los 350 diputados que salgan de las elecciones del 29 de noviembre de 2026 cuando se constituyan las Cortes.</li>
     <li><strong>Gobiernos autonómicos</strong> y, después, sus parlamentos.</li>
-    <li><strong>Lenguas cooficiales</strong>: la web en català, galego, euskara, valencià y aranés.</li>
+    <li><strong>Lenguas cooficiales</strong>: la web en català/valencià, galego, euskara y aranés.</li>
     <li><strong>Más datos de cada diputado</strong>: acciones y sociedades, trabajos anteriores con su empleador, y saldos y rentas declarados.</li>
     <li><strong>Datos abiertos</strong>: descargas en JSON y CSV para que cualquiera pueda reutilizarlos.</li>
   </ul>
@@ -46,12 +47,12 @@ import { url, REPO, enlaceSugerencia, enlaceError, enlaceGuia, enlacePrimerasTar
     <li><strong>Necesitas una cuenta gratuita de GitHub.</strong> Es la plataforma donde vive el proyecto; los formularios de avisos y sugerencias te pedirán iniciar sesión.</li>
     <li><strong>Todo es público.</strong> Puedes ver los <a href={enlaceIncidencias} rel="noopener">avisos y propuestas abiertos</a> y comentar en ellos.</li>
     <li><strong>Los cambios se revisan.</strong> Nadie publica directamente: cada cambio llega como <em>pull request</em> y se acepta solo si está respaldado por un documento oficial.</li>
-    <li><strong>¿Primera vez en un proyecto de código abierto?</strong> Empieza por las <a href={enlacePrimerasTareas} rel="noopener">tareas para empezar</a> y sigue la <a href={enlaceGuia} rel="noopener">guía para colaborar</a>, que explica paso a paso cómo enviar tu primer cambio.</li>
+    <li><strong>¿Primera vez en un proyecto de código abierto?</strong> Echa un vistazo a las <a href={enlacePrimerasTareas} rel="noopener">propuestas abiertas</a> y sigue la <a href={enlaceGuia} rel="noopener">guía para colaborar</a>, que explica paso a paso cómo enviar tu primer cambio.</li>
   </ol>
 
   <h2>Qué se acepta</h2>
   <ul>
-    <li>Datos que se puedan comprobar en un documento oficial (Congreso, BOE, BOCG o parlamentos autonómicos).</li>
+    <li>Datos que se puedan comprobar en un documento oficial (Congreso, BOE, BOCG o fuentes oficiales autonómicas: boletines, portales de transparencia, gobiernos y parlamentos).</li>
     <li>Mejoras de diseño, accesibilidad y rendimiento.</li>
     <li>No se aceptan opiniones, valoraciones ni datos de fuentes no oficiales. Ver <a href={url('/metodologia')}>fuentes y método</a>.</li>
   </ul>

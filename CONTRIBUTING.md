@@ -11,13 +11,13 @@ Gracias por querer ayudar. Este proyecto vive de que cada dato sea **exacto y ve
 | Comentar o votar propuestas | [Issues abiertas](https://github.com/MarcoAnarmo/CongresoAbierto/issues) | No |
 | Corregir datos, código o diseño | *Pull request* (ver abajo) | Un poco |
 
-Si es tu primera vez, mira las [tareas para empezar](https://github.com/MarcoAnarmo/CongresoAbierto/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) (etiqueta `good first issue`).
+Si es tu primera vez, mira las [propuestas abiertas](https://github.com/MarcoAnarmo/CongresoAbierto/issues?q=is%3Aissue+is%3Aopen): revisar una ficha marcada como «Lectura no confirmada» contra su PDF es un buen comienzo.
 
 Solo necesitas una [cuenta gratuita de GitHub](https://github.com/signup).
 
 ## Principios
 
-1. **Solo fuentes oficiales.** Cada dato debe poder comprobarse en un documento público (Congreso, BOE, BOCG, parlamentos autonómicos).
+1. **Solo fuentes oficiales.** Cada dato debe poder comprobarse en un documento público (Congreso, BOE, BOCG o fuentes oficiales autonómicas: boletines, portales de transparencia, gobiernos y parlamentos).
 2. **Literalidad.** Se copia lo que pone el documento, sin interpretar. Los criterios de recuento (qué cuenta como vivienda o propiedad) están en `scripts/patrimonio.ts` y documentados en `docs/metodologia.md`.
 3. **Sin opiniones.** No se añaden resúmenes propios, valoraciones ni datos de fuentes no oficiales.
 4. **Privacidad.** No se publican datos que el propio formulario oficial pide omitir (por ejemplo, matrículas).
@@ -59,12 +59,14 @@ Al abrir el *pull request*, GitHub Actions comprueba automáticamente que la web
 
 ## Mantener los datos al día
 
-Cuando un diputado presente una nueva declaración o haya altas y bajas en la Cámara, hay que descargarla, transcribirla literalmente y revisarla. Las fichas marcadas con * en el ranking tienen alguna lectura dudosa que conviene comprobar. Ver `data/raw/patrimonio/INSTRUCCIONES.md`.
+Cuando un diputado presente una declaración nueva, hay que descargarla, transcribirla literalmente y revisarla dos veces (ver `data/raw/patrimonio/INSTRUCCIONES.md`). Cuando haya altas o bajas, hay que volver a descargar las listas (ver «Actualizar los datos» en el README). En la lista de diputados (`/diputados`), las fichas marcadas con * tienen alguna lectura no confirmada que conviene comprobar.
 
-## Añadir un parlamento autonómico
+## Añadir una comunidad autónoma
 
-El esquema (`src/lib/types.ts`) ya tiene el campo `camara`. Propón primero en una [sugerencia](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=sugerencia.yml) la fuente oficial de ese parlamento (lista de diputados, declaraciones de bienes, votaciones) para acordar el formato.
+El primer paso es el gobierno de cada comunidad y después su parlamento (ver la [issue #15](https://github.com/MarcoAnarmo/CongresoAbierto/issues/15)). El esquema (`src/lib/types.ts`) ya tiene el campo `camara`. Propón primero en una [sugerencia](https://github.com/MarcoAnarmo/CongresoAbierto/issues/new?template=sugerencia.yml) la fuente oficial (lista de cargos o diputados, declaraciones de bienes, votaciones) para acordar el formato.
 
 ## Código de conducta
 
 Este proyecto sigue un [código de conducta](CODE_OF_CONDUCT.md). Al participar, te comprometes a respetarlo.
+
+¿Dudas? Escribe a [congresoabierto.help@gmail.com](mailto:congresoabierto.help@gmail.com).

@@ -111,6 +111,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
 <script type="application/json" id="hemi-datos" set:html={JSON.stringify({ datos, votos: votosCliente, colores, base: url(''), votaciones: votaciones.map((v) => ({ id: v.id, titulo: v.titulo, tipo: v.tipo, fecha: v.fecha, resultado: v.resultado, totales: v.totales })) })} />
 
 <script>
+  import { deslizarParaCerrar } from '../scripts/hoja';
   type Info = { n: string; g: string; p: string; ci: string; pr: number | null; v: number | null; co: number | null; r: number; s: string; rv: boolean };
   type Voto = 'S' | 'N' | 'A' | 'X';
   const raw = JSON.parse(document.getElementById('hemi-datos')!.textContent!) as {
@@ -271,6 +272,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   });
   document.querySelector('.hemi svg')!.addEventListener('pointerleave', () => { if (!tactil()) ocultar(); });
   tip.querySelector('.cerrar')!.addEventListener('click', ocultar);
+  deslizarParaCerrar(tip, { cerrar: ocultar, medio: '(pointer: coarse)' });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') ocultar(); });
   // En pantallas estrechas no hay etiquetas: se recorta el margen para que el hemiciclo se vea más grande
   const svg = document.querySelector('.hemi svg') as SVGSVGElement;
@@ -361,6 +363,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   .tip.hoja { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); top: auto; max-width: none; pointer-events: auto; padding: 14px 16px 12px; border-radius: 16px; }
   /* Con el menú abajo (móvil), la ficha rápida queda justo encima de él */
   @media (max-width: 720px) { .tip.hoja { bottom: calc(70px + env(safe-area-inset-bottom)); } }
+  .tip:not(.hoja) > :global(.asa-hoja) { display: none; }
   .tip.hoja .ver { display: flex; justify-content: center; align-items: center; margin-top: 10px; text-decoration: none; }
   .tip.hoja .cerrar { display: block; position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; color: var(--muted); cursor: pointer; }
   .leyenda { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }

@@ -1,9 +1,9 @@
 {
   "name": "congreso-abierto",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Datos públicos de los diputados del Congreso: retribuciones, patrimonio declarado y votaciones clave.",
+  "description": "Datos públicos de los 350 diputados del Congreso: formación, trayectoria, retribuciones, patrimonio y deudas declarados y votaciones del Pleno.",
   "license": "MIT",
   "engines": {
     "node": ">=22.12"

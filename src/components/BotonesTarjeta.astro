@@ -1,8 +1,8 @@
 ---
 /**
- * Compartir una tarjeta: historia de Instagram (imagen vertical), WhatsApp y X (enlace con su vista previa),
- * copiar el enlace y descargar las dos imágenes.
- * La historia usa el menú de compartir del móvil con la imagen; donde no se puede (ordenador), la descarga.
+ * Compartir una tarjeta: historia de Instagram, WhatsApp y X, copiar el texto con el enlace y descargar las dos imágenes.
+ * En el móvil todo se comparte con la tarjeta vertical (menú de compartir del sistema: Instagram → Historia);
+ * en el ordenador WhatsApp y X mandan el enlace con su vista previa. Solo descargan los enlaces de descarga y la miniatura.
  */
 import { url } from '../lib/data';
 import { enlacesRedes } from '../scripts/compartir';
@@ -10,7 +10,7 @@ interface Props {
   historia: string; horizontal: string; nombre: string;
   /** Ruta de la página que se comparte (su vista previa es la tarjeta horizontal). */
   enlace: string;
-  /** Texto que acompaña al enlace en WhatsApp y X. */
+  /** Texto que acompaña al enlace en WhatsApp, X y al copiar. */
   texto: string;
   /** Muestra la miniatura de la tarjeta vertical al lado de los botones. */
   vista?: boolean;

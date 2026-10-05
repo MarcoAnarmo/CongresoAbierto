@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { diputados, resumen, grupos, colorGrupo, fmtNum, url, slug, etiquetaPartido, meta } from '../lib/data';
+import { diputados, resumen, grupos, colorGrupo, fmtNum, fmtFecha, url, slug, etiquetaPartido, meta } from '../lib/data';
 import MapaProvincias from '../components/MapaProvincias.astro';
 import type { Diputado } from '../lib/types';
 import BotonCompartir from '../components/BotonCompartir.astro';
@@ -178,7 +178,7 @@ const columnas = [
   <section id="vista-grupos" hidden aria-labelledby="h-grupos">
     <h2 id="h-grupos" class="sr-only">Propiedades por grupo parlamentario</h2>
     <div class="grid-stats cifras-congreso">
-      <div class="card stat destacada"><span class="c-ico"><Icono n="propiedades" /></span><span class="v">{fmtNum(totalProp)}</span><span class="l">propiedades declaradas por los 350 diputados</span></div>
+      <div class="card stat destacada"><span class="c-ico"><Icono n="propiedades" /></span><span class="v">{fmtNum(totalProp)}</span><span class="l">propiedades declaradas en total</span></div>
       <div class="card stat"><span class="c-ico"><Icono n="vivienda" /></span><span class="v">{fmtNum(totalViv)}</span><span class="l">de ellas son viviendas</span></div>
       <div class="card stat"><span class="c-ico"><Icono n="vivienda" /></span><span class="v">{pct(conVivienda)}</span><span class="l">tiene al menos una vivienda</span></div>
       <div class="card stat"><span class="c-ico"><Icono n="viviendas" /></span><span class="v">{pct(tresOMas)}</span><span class="l">declara 3 viviendas o más</span></div>
@@ -228,7 +228,9 @@ const columnas = [
     <p class="small muted leyenda-barras"><span class="ley-barras"><span class="muestra m-prop"></span> propiedades <span class="muestra m-viv"></span> de ellas, viviendas ·</span> Suma de lo que declara cada diputado del grupo · <a href={url('/metodologia#propiedades')}>Cómo se cuentan</a></p>
     <p class="small muted">
       Propiedades: inmuebles urbanos y rústicos a nombre del diputado (viviendas, garajes, trasteros, locales, solares, fincas…), en propiedad total o parcial.
-      Los de sociedades en las que participa se muestran aparte en su ficha. Datos consultados el {new Date(meta.generado).toLocaleDateString('es-ES')}.
+      Los de sociedades en las que participa se muestran aparte en su ficha.
+      {conDatos.length < diputados.length && <>{conDatos.length} de los {diputados.length} diputados tienen publicada su declaración de bienes; los porcentajes se calculan sobre ellos. </>}
+      Datos consultados el {fmtFecha(meta.generado.slice(0, 10))}.
     </p>
   </section>
 
@@ -239,6 +241,7 @@ const columnas = [
 </Base>
 
 <script>
+  import { deslizarParaCerrar } from '../scripts/hoja';
   const tabla = document.getElementById('tabla-ranking') as HTMLTableElement;
   const cuerpo = tabla.tBodies[0];
   const filas = [...cuerpo.rows];
@@ -331,6 +334,7 @@ const columnas = [
   abrirFiltros.addEventListener('click', () => { document.documentElement.classList.add('dlg-abierto'); dlgFiltros.showModal(); });
   dlgFiltros.addEventListener('close', () => { document.documentElement.classList.remove('dlg-abierto'); abrirFiltros.focus(); });
   dlgFiltros.querySelector('.df-cerrar')!.addEventListener('click', () => dlgFiltros.close());
+  deslizarParaCerrar(dlgFiltros, { cerrar: () => dlgFiltros.close() });
   dlgFiltros.addEventListener('click', (e) => { if (e.target === dlgFiltros) dlgFiltros.close(); });
   verResultados.addEventListener('click', () => dlgFiltros.close());
   document.getElementById('quitar-filtros')!.addEventListener('click', () => { grupo.value = ''; prov.value = ''; form.value = ''; aplicar(); });

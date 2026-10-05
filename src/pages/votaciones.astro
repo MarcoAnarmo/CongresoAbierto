@@ -41,7 +41,7 @@ const fechas = [...new Set([...votacionesPleno.map((v) => v.fecha), ...pendiente
       </div>
       <div class="cal-sem" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
       <div class="cal-dias" id="cal-dias" role="grid" aria-labelledby="cal-mes"></div>
-      <p class="small muted cal-ley"><span><i class="punto si"></i> aprobadas o convalidados</span><span><i class="punto no"></i> rechazadas o derogados</span><span><i class="punto pend"></i> voto pendiente</span><span>El número indica cuántas votaciones hubo ese día.</span></p>
+      <p class="small muted cal-ley"><span><i class="punto si"></i> aprobadas o convalidadas</span><span><i class="punto no"></i> rechazadas o derogadas</span><span><i class="punto pend"></i> voto pendiente</span><span>El número indica cuántas votaciones hubo ese día.</span></p>
     </section>
 
     <div class="filtros" role="search" aria-label="Filtrar votaciones">
@@ -65,8 +65,8 @@ const fechas = [...new Set([...votacionesPleno.map((v) => v.fecha), ...pendiente
         </div>
         <div class="chips" role="group" aria-label="Resultado">
           <button class="chip" type="button" data-f="res" data-v="" aria-pressed="true">Cualquier resultado</button>
-          <button class="chip" type="button" data-f="res" data-v="si" aria-pressed="false">Aprobadas o convalidados</button>
-          <button class="chip" type="button" data-f="res" data-v="no" aria-pressed="false">Rechazadas o derogados</button>
+          <button class="chip" type="button" data-f="res" data-v="si" aria-pressed="false">Aprobadas o convalidadas</button>
+          <button class="chip" type="button" data-f="res" data-v="no" aria-pressed="false">Rechazadas o derogadas</button>
         </div>
         <div class="chips" role="group" aria-label="Votaciones clave">
           <button class="chip" type="button" data-f="clave" data-v="" aria-pressed="true">Todas</button>
@@ -288,6 +288,7 @@ const fechas = [...new Set([...votacionesPleno.map((v) => v.fecha), ...pendiente
   .cal-dias :global(.cnt) { font-size: .62rem; font-weight: 600; color: var(--muted); line-height: 1; }
   .cal-ley { margin: 10px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; }
   .cal-ley span { white-space: nowrap; }
+  .cal-ley span:last-child { white-space: normal; }
   @media (max-width: 760px) { .cal-dias :global(.dia) { aspect-ratio: auto; height: 38px; } }
   :global(.punto) { display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
   :global(.punto.si) { background: var(--si); } :global(.punto.no) { background: var(--no); } :global(.punto.pend) { background: var(--novota); }

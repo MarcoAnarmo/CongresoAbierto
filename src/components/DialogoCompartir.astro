@@ -16,6 +16,7 @@ import BotonesTarjeta from './BotonesTarjeta.astro';
 
 <script>
   import { rellenarCaja } from '../scripts/compartir';
+  import { deslizarParaCerrar } from '../scripts/hoja';
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   const sitio = import.meta.env.SITE.replace(/\/$/, '');
   const dlg = document.getElementById('dlg-compartir') as HTMLDialogElement;
@@ -27,6 +28,13 @@ import BotonesTarjeta from './BotonesTarjeta.astro';
     e.preventDefault();
     origen = boton;
     const s = boton.dataset.compartir!;
+    const b = boton.dataset;
+    if (b.historia) {
+      // Botón con sus propios datos (p. ej. la portada: resumen de todo el Congreso)
+      rellenarCaja(caja, { historia: b.historia, horizontal: b.horizontal!, nombre: b.nombre!, enlace: `${sitio}${base}${b.enlace}`, texto: b.ct!, titulo: b.titulo! });
+      dlg.showModal();
+      return;
+    }
     rellenarCaja(caja, {
       historia: `${base}/tarjetas/historia/diputado/${s}.png`, horizontal: `${base}/tarjetas/horizontal/diputado/${s}.png`,
       nombre: `congreso-abierto-${s}`, enlace: `${sitio}${base}/diputado/${s}`, texto: boton.dataset.ct!, titulo: `Comparte la ficha de ${boton.dataset.cn}`,
@@ -34,6 +42,7 @@ import BotonesTarjeta from './BotonesTarjeta.astro';
     dlg.showModal();
   });
   dlg.querySelector('.cerrar')!.addEventListener('click', () => dlg.close());
+  deslizarParaCerrar(dlg, { cerrar: () => dlg.close(), medio: '(max-width: 560px)' });
   // Cerrar al pulsar fuera de la caja
   dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
   dlg.addEventListener('close', () => origen?.focus());
