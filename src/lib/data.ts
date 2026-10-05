@@ -71,5 +71,8 @@ export const etiquetaPartido = (d: Diputado) => (candidaturaDistinta(d) ? `${d.g
 export const TEMAS = (votacionesJson as any).temas as { id: string; nombre: string }[];
 export const temasDe = (v: { temas?: string[] }) => v.temas ?? ['otros'];
 /** Todas las votaciones del Pleno importadas de datos abiertos, más las votaciones clave. Más recientes primero. */
-export const votacionesPleno = [...votaciones, ...((plenoJson as any).votaciones as VotacionClave[])]
+const LETRA: Record<string, VotacionClave['votos'][string]> = { S: 'Sí', N: 'No', A: 'Abstención', X: 'No vota' };
+/** votaciones-pleno.json guarda el voto de cada diputado compacto ({ S: 'cod cod …' }). */
+const expandir = (v: Record<string, string>) => Object.fromEntries(Object.entries(v).flatMap(([l, cs]) => cs.split(' ').filter(Boolean).map((c) => [c, LETRA[l]])));
+export const votacionesPleno = [...votaciones, ...((plenoJson as any).votaciones as VotacionClave[]).map((v) => ({ ...v, votos: expandir(v.votos as unknown as Record<string, string>) }))]
   .sort((a, b) => b.fecha.localeCompare(a.fecha) || b.sesion - a.sesion || b.numeroVotacion - a.numeroVotacion);

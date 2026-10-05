@@ -125,7 +125,29 @@ for (const v of votaciones) v.temas = (v as any).temas ?? temasPorTexto(v.id, v.
 const RUTA_PLENO = join(RAW, 'votaciones', 'pleno.jsonl');
 const clavesPorFuente = new Set(votaciones.map((v) => v.fuenteUrl));
 const LETRA_PLENO: Record<string, Voto> = { S: 'Sí', N: 'No', A: 'Abstención', X: 'No vota' };
-const pleno: VotacionClave[] = existsSync(RUTA_PLENO) ? readFileSync(RUTA_PLENO, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l))
+/** Códigos de grupo de los datos abiertos de votaciones → nombre corto de la web (data/manual/grupos.json). */
+const GRUPO_OFICIAL: Record<string, string> = {
+  GP: 'PP', GS: 'PSOE', GVOX: 'VOX', GSUMAR: 'SUMAR', GR: 'ERC', GJxCAT: 'Junts', 'GEH Bildu': 'EH Bildu', 'GV (EAJ-PNV)': 'PNV', GMx: 'Mixto', '?': 'Sin grupo',
+};
+/** Voto de cada diputado: formato compacto ({ S: 'cod cod …' }) o antiguo ({ cod: 'S' }). */
+function expandirVotos(v: Record<string, string>): Record<string, Voto> {
+  const r: Record<string, Voto> = {};
+  if (Object.keys(v).every((k) => /^[SNAX]$/.test(k))) {
+    for (const [l, cods] of Object.entries(v)) for (const c of cods.split(' ').filter(Boolean)) r[c] = LETRA_PLENO[l];
+  } else for (const [c, l] of Object.entries(v)) r[c] = LETRA_PLENO[l];
+  return r;
+}
+/** Recuento por grupo oficial en la fecha de la votación: [corto, sí, no, abstención, no vota]. */
+const gruposDe = (g?: Record<string, number[]>) => g
+  ? Object.entries(g).map(([k, x]) => [GRUPO_OFICIAL[k] ?? (k || 'Sin grupo'), ...x] as [string, number, number, number, number])
+    .sort((a, b) => (grupos.find((x) => x.corto === a[0])?.orden ?? 99) - (grupos.find((x) => x.corto === b[0])?.orden ?? 99))
+  : undefined;
+const oficialPorFuente = new Map<string, any>();
+const plenoRaw = existsSync(RUTA_PLENO) ? readFileSync(RUTA_PLENO, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)) : [];
+plenoRaw.forEach((p: any) => oficialPorFuente.set(p.fuente, p));
+// Las votaciones clave toman también el recuento por grupo oficial de su votación
+for (const v of votaciones) v.porGrupo = gruposDe(oficialPorFuente.get(v.fuenteUrl)?.grupos);
+const pleno: VotacionClave[] = plenoRaw
   .filter((p: any) => !clavesPorFuente.has(p.fuente))
   .map((p: any) => {
     const [titulo, ...modalidad] = String(p.texto).split('\n').map((s: string) => s.trim()).filter(Boolean);
@@ -135,8 +157,7 @@ const pleno: VotacionClave[] = existsSync(RUTA_PLENO) ? readFileSync(RUTA_PLENO,
     const organica = /Org[aá]nica/.test(titulo) && /conjunto/i.test([titulo, ...p.subgrupo].join(' '));
     const aprobada = organica ? t.si >= 176 : t.si > t.no;
     const esRdl = /Decretos-leyes/.test(p.tipo) && /^Real Decreto-ley/.test(titulo);
-    const votos: Record<string, Voto> = {};
-    for (const [cod, x] of Object.entries(p.votos as Record<string, string>)) votos[cod] = LETRA_PLENO[x];
+    const votos = expandirVotos(p.votos);
     return {
       id: p.id, fecha: p.fecha, sesion: p.sesion, numeroVotacion: p.numero, tema: '', tipo: p.tipo, titulo,
       detalle: [...p.subgrupo, ...modalidad].join(' · ') || undefined,
@@ -144,8 +165,9 @@ const pleno: VotacionClave[] = existsSync(RUTA_PLENO) ? readFileSync(RUTA_PLENO,
       documentos: [{ titulo: `Resultado de la votación (PDF oficial)`, url: p.fuente.replace(/\.json$/, '.pdf'), tipo: 'votacion' }],
       resultado: esRdl ? (aprobada ? 'Convalidado' : 'Derogado') : aprobada ? 'Aprobada' : 'Rechazada',
       totales: t, votos, asientos: {}, temas: temasPorTexto(p.id, p.texto + ' ' + p.subgrupo.join(' '), p.tipo), automatica: true,
+      porGrupo: gruposDe(p.grupos),
     } satisfies VotacionClave;
-  }) : [];
+  });
 
 // --- Resumen por grupo
 const resumen = grupos.map((g) => {
@@ -170,7 +192,13 @@ const resumen = grupos.map((g) => {
 const meta = { generado: new Date().toISOString(), fuente: 'Congreso de los Diputados (datos abiertos y fichas oficiales)', legislatura: 'XV' };
 writeFileSync(join(OUT, 'diputados.json'), JSON.stringify({ meta, diputados }, null, 1));
 writeFileSync(join(OUT, 'votaciones.json'), JSON.stringify({ meta, votaciones, pendientes, temas: [...TEMAS.map(({ id, nombre }) => ({ id, nombre })), { id: 'otros', nombre: 'Otros' }] }, null, 1));
-writeFileSync(join(OUT, 'votaciones-pleno.json'), JSON.stringify({ meta, votaciones: pleno }));
+// El voto de cada diputado se guarda compacto ({ S: 'cod cod …' }); src/lib/data.ts lo expande
+const compacto = (v: Record<string, Voto>) => {
+  const r: Record<string, string[]> = {};
+  for (const [c, x] of Object.entries(v)) (r[Object.entries(LETRA_PLENO).find(([, y]) => y === x)![0]] ??= []).push(c);
+  return Object.fromEntries(Object.entries(r).map(([k, cs]) => [k, cs.join(' ')]));
+};
+writeFileSync(join(OUT, 'votaciones-pleno.json'), JSON.stringify({ meta, votaciones: pleno.map((v) => ({ ...v, votos: compacto(v.votos) })) }));
 writeFileSync(join(OUT, 'resumen.json'), JSON.stringify({ meta, grupos: resumen }, null, 1));
 console.log(`OK: ${diputados.length} diputados, ${votaciones.length} votaciones clave y ${pleno.length} votaciones más del Pleno`);
 console.log(`Propiedades: ${diputados.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0)} · Viviendas declaradas: ${diputados.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0)} · a revisar: ${diputados.filter((d) => d.patrimonio.revisar).length}`);

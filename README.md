@@ -39,7 +39,7 @@ Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien.
   - una línea de tiempo con sus legislaturas, cargos y declaraciones.
 
   Con buscador, filtros por grupo, provincia y formación, tabla de patrimonio, propiedades por grupo parlamentario y un mapa por provincia (pulsa la tuya o escribe tu código postal).
-- **Votaciones**: todas las votaciones del Pleno publicadas en datos abiertos desde junio de 2026, por temas (vivienda, economía, sanidad…) con calendario, y votaciones clave anteriores con el contenido literal del texto y sus documentos oficiales.
+- **Votaciones**: todas las votaciones del Pleno de la XV Legislatura publicadas en datos abiertos (desde septiembre de 2023), con buscador, filtros por tema, tipo y resultado, calendario y el voto de cada grupo; y las votaciones clave de vivienda con el contenido literal del texto y sus documentos oficiales.
 - **Retribuciones** según los importes oficiales del régimen económico de la Cámara (2026).
 - Modo claro y oscuro, y diseño pensado para el móvil.
 
