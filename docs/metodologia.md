@@ -47,6 +47,25 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 - Nombres de particulares que no son el diputado → «[nombre omitido]».
 - Lecturas no confirmadas al 100 % o datos incoherentes del original: aviso público por declaración en `data/raw/deudas/avisos.json` (clave: nombre del PDF), que la ficha muestra como «Lectura no confirmada» con enlace al PDF. Si un saldo está en blanco o no se puede leer, el total se marca «al menos».
 
+## Rentas, cuentas y acciones
+
+- Páginas 1 a 3 de las declaraciones de bienes: rentas del año anterior (sin el sueldo del Congreso), cuota de IRPF, saldo de depósitos, deuda pública, acciones y participaciones, sociedades participadas en más de un 5 % y otros bienes o derechos.
+- Transcripción literal (`data/raw/rentas/revisado.jsonl`, instrucciones en `data/raw/rentas/INSTRUCCIONES.md`), comparada con un OCR independiente; los importes que no coinciden se revisan otra vez en el PDF ampliado.
+- Cada tabla se toma de la declaración más reciente que la rellena. Las sumas solo incluyen importes que se pueden leer como número sin interpretar («al menos» si falta alguno). Sin medias.
+
+## Cargos y actividades
+
+- Registro de Intereses - Actividades (`data/raw/intereses/actividades.jsonl`), extraído con `scripts/extraer-actividades.py` de los PDF oficiales con capa de texto. Secciones A a H, texto literal y fecha del acuerdo del Pleno.
+
+## Trabajos anteriores e intereses
+
+- Declaraciones de Intereses Económicos (`data/raw/intereses/economicos.jsonl`, instrucciones en `data/raw/intereses/INSTRUCCIONES.md`): actividades de los cinco años anteriores, donaciones, contribuciones a fundaciones y asociaciones y otros intereses. Misma revisión con OCR que las rentas.
+
+## Sus votos en el Pleno
+
+- Todas las votaciones del Pleno con voto nominal (`data/raw/votaciones/pleno.jsonl`). Por diputado: votaciones con escaño, sí, no, abstención y no vota.
+- Voto distinto de su grupo (campo `di`, calculado en `scripts/importar-votaciones.ts`): votó sí, no o abstención y la opción mayoritaria de su grupo en esa votación (grupo publicado por el Congreso en esa fecha) fue otra. Sin el Grupo Mixto ni empates.
+
 ## Retribución
 
 Se muestran solo importes mensuales oficiales: asignación + complementos por cargo (el mayor de Mesa/Junta de Portavoces y el mayor de Comisiones, porque no son acumulables dentro de cada bloque) + indemnización. No se estiman pagas anuales. No incluye sueldos de miembros del Gobierno, transporte ni dietas de viajes oficiales.

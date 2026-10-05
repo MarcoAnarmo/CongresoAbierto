@@ -4,6 +4,8 @@
  *   data/raw/fichas.tsv           (ficha de cada diputado: cargos y declaración)
  *   data/raw/patrimonio/*.jsonl   (transcripción de las declaraciones de bienes)
  *   data/raw/deudas/revisado.jsonl (deudas y préstamos de las declaraciones de bienes)
+ *   data/raw/rentas/revisado.jsonl (rentas, cuentas, valores y sociedades de las declaraciones de bienes)
+ *   data/raw/intereses/*.jsonl    (registro de actividades y declaraciones de intereses económicos)
  *   data/raw/fichas-personales.jsonl (ficha personal: formación, trayectoria, cargos y declaraciones)
  *   data/raw/votaciones/*.json    (votaciones clave descargadas de datos abiertos)
  *   data/manual/*.json            (grupos, votaciones clave y correcciones manuales)
@@ -15,6 +17,7 @@ import { calcularRetribucion } from './retribuciones.ts';
 import { construirPatrimonio, type DeclRaw } from './patrimonio.ts';
 import { construirPerfil } from './perfil.ts';
 import { construirDeudas } from './deudas.ts';
+import { construirFinanzas, construirActividades, construirIntereses, construirParticipacion } from './finanzas.ts';
 import type { Diputado, GrupoInfo, VotacionClave, Voto } from '../src/lib/types.ts';
 
 const RAW = 'data/raw';
@@ -79,6 +82,10 @@ const diputados: Diputado[] = leerTsv('diputados_base.tsv').map(([cod, apellidos
     patrimonio,
     perfil: construirPerfil(+cod, genero === '2' ? 'F' : 'M', decls.get(+cod) ?? [], URL_BIENES),
     deudas: construirDeudas(patrimonio.fuentes),
+    finanzas: construirFinanzas(+cod),
+    actividades: construirActividades(+cod),
+    intereses: construirIntereses(+cod),
+    participacion: construirParticipacion(+cod),
   } satisfies Diputado;
 });
 

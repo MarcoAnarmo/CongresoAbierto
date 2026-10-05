@@ -15,3 +15,5 @@ data/raw/patrimonio/revision2.json
 data/raw/pdf_faltan.txt
 # JSON oficiales de votaciones descargados (el resultado compacto es data/raw/votaciones/pleno.jsonl)
 data/raw/votaciones/descargas/
+# PDF oficiales del registro de intereses (el resultado está en data/raw/intereses/*.jsonl)
+data/raw/intereses/pdf/

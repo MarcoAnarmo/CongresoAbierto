@@ -12,9 +12,13 @@ const secciones = [
   { id: 'propiedades', t: 'Propiedades y viviendas' },
   { id: 'vehiculos', t: 'Vehículos' },
   { id: 'deudas', t: 'Deudas y préstamos' },
+  { id: 'rentas', t: 'Rentas, cuentas y acciones' },
+  { id: 'actividades', t: 'Cargos y actividades' },
+  { id: 'intereses', t: 'Trabajos anteriores e intereses' },
   { id: 'revision', t: 'Cómo se han copiado los datos' },
   { id: 'retribuciones', t: 'Retribuciones' },
   { id: 'votaciones', t: 'Votaciones' },
+  { id: 'participacion', t: 'Sus votos en el Pleno' },
   { id: 'temas', t: 'Temas de las votaciones' },
   { id: 'errores', t: '¿Has visto un error?' },
 ];
@@ -46,6 +50,8 @@ const secciones = [
         <ul>
           <li><strong>Diputados, grupos y cargos:</strong> buscador y fichas oficiales de <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> (XV Legislatura). Consultados el {fmtFecha(meta.generado.slice(0, 10))}.</li>
           <li><strong>Propiedades y vehículos:</strong> las <em>Declaraciones de Bienes y Rentas</em> que cada diputado presenta ante el Congreso y que este publica en su ficha: {pdfs} documentos de {conDecl} diputados; el más reciente es del {fmtFecha(ultimaDecl)}.</li>
+          <li><strong>Rentas, cuentas, acciones y sociedades:</strong> páginas 1 a 3 de esas mismas declaraciones de bienes.</li>
+          <li><strong>Cargos, actividades, trabajos anteriores y donaciones:</strong> el <em>Registro de Intereses - Actividades</em> y las <em>Declaraciones de Intereses Económicos</em> que el Congreso publica en la ficha de cada diputado.</li>
           <li><strong>Votaciones:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos de votaciones</a> del Congreso, con el texto oficial de cada expediente.</li>
           <li><strong>Normas:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decretos-leyes y acuerdos de convalidación o derogación).</li>
           <li><strong>Retribuciones:</strong> <a href={FUENTE_RETRIBUCIONES}>Régimen económico y ayudas de los miembros de la Cámara</a>, importes de 2026.</li>
@@ -100,12 +106,36 @@ const secciones = [
         </ul>
       </section>
 
+      <section id="rentas">
+        <h2>Rentas, cuentas y acciones</h2>
+        <p>Se copian de las páginas 1 a 3 de las declaraciones de bienes, con el texto y el importe <strong>tal y como los escribe el diputado</strong>:</p>
+        <ul>
+          <li><strong>Rentas:</strong> las que percibió en el año anterior a la declaración (sueldos, honorarios, dividendos, intereses, alquileres, ventas y otras), y la cuota de IRPF que pagó ese año. El sueldo del Congreso no se declara aquí porque ya lo publica la Cámara (ver <a href="#retribuciones">Retribuciones</a>); por eso muchas tablas aparecen vacías aunque el diputado declare el IRPF.</li>
+          <li><strong>Cuentas y depósitos:</strong> el saldo de todos sus depósitos en la fecha que indica el formulario. Los números de cuenta no se publican.</li>
+          <li><strong>Acciones, fondos y sociedades:</strong> deuda pública, acciones y participaciones, sociedades participadas en más de un 5 % por sus sociedades, y otros bienes o derechos (seguros de vida, planes de pensiones…), con el valor que declara.</li>
+          <li>Cada tabla se toma de la declaración más reciente que la rellena, y la ficha indica su fecha. Las modificaciones que solo comunican otros cambios (por ejemplo, un vehículo) no la sustituyen.</li>
+          <li>Las cifras grandes de la ficha son la suma de cada tabla. Si un importe no se puede leer como número sin interpretarlo (formatos como «47.268.27» o un texto en lugar de una cifra), no se suma y se indica «al menos». No se calculan medias.</li>
+          <li>El nombre de personas particulares que no son el diputado se sustituye por «[nombre omitido]».</li>
+        </ul>
+      </section>
+
+      <section id="actividades">
+        <h2>Cargos y actividades</h2>
+        <p>Del <em>Registro de Intereses - Actividades</em>: cargos públicos, actividades públicas a las que ha renunciado, pensiones, docencia, cargos en partidos, colaboraciones, actividades privadas autorizadas y otras. Es lo que cada diputado declara y el Pleno del Congreso considera compatible con el escaño. El texto se extrae automáticamente del PDF oficial (tiene capa de texto) y se publica literalmente, con la fecha del acuerdo del Pleno. Si el Pleno aún no se ha pronunciado, el Congreso no publica el contenido y la ficha lo indica.</p>
+      </section>
+
+      <section id="intereses">
+        <h2>Trabajos anteriores e intereses</h2>
+        <p>De las <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales): actividades de los cinco años anteriores al escaño que le dieron ingresos o pueden condicionar su actividad política (período, empleador, sector y descripción), donaciones y obsequios recibidos, fundaciones y asociaciones a las que contribuye y otros intereses. Se toma cada apartado de la declaración más reciente que lo rellena. El nombre de un particular (por ejemplo, un familiar como benefactor) se sustituye por «[nombre omitido]».</p>
+      </section>
+
       <section id="revision">
         <h2>Cómo se han copiado los datos</h2>
         <p>
           Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila
           (las deudas, con dos transcripciones independientes cuyas diferencias se resuelven mirando el PDF),
           incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura no confirmada llevan un aviso (*) y un enlace al PDF para comprobarlo.
+          Las rentas, cuentas, acciones y declaraciones de intereses se han transcrito del PDF y comparado con una lectura automática (OCR) independiente: cada importe o palabra que no coincide se ha vuelto a mirar en el original ampliado.
         </p>
       </section>
 
@@ -134,6 +164,12 @@ const secciones = [
           Con las Cortes disueltas, los decretos-leyes los convalida o deroga la Diputación Permanente (art. 78 de la Constitución).
           Cuando el Congreso solo publica los totales de una votación, sin el voto de cada diputado (por ejemplo, en una votación secreta), la web muestra solo esos totales y lo indica. <a href={url('/votaciones')}>Ver votaciones</a>.
         </p>
+      </section>
+
+      <section id="participacion">
+        <h2>Sus votos en el Pleno</h2>
+        <p>Para cada diputado se cuentan todas las votaciones del Pleno de la XV Legislatura con voto nominal publicado en las que tenía escaño: cuántas veces votó sí, no o abstención y cuántas no votó (por ausencia o porque no emitió voto). No se incluyen las votaciones secretas, porque no hay voto de cada diputado.</p>
+        <p><strong>Voto distinto de su grupo:</strong> se cuenta cuando votó sí, no o abstención y la mayoría de su grupo en esa votación (con el grupo que publica el Congreso para esa fecha) votó otra cosa. No cuenta «no vota», ni las votaciones en las que su grupo empató, ni el Grupo Mixto, donde conviven varios partidos.</p>
       </section>
 
       <section id="temas">
