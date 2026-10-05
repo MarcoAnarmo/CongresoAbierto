@@ -67,6 +67,30 @@ function panelCifras(cifras: Cifra[], e: number) {
         h('div', { fontSize: 24 * e, lineHeight: 1.22, color: C.apagado, marginTop: 6 * e, flex: 1 }, c.etiqueta)))));
 }
 
+/** Formación (texto literal de su ficha) y cargos en la Cámara, para la tarjeta vertical. */
+const TIPO_FORMACION: Record<string, string> = { publica: 'Universidad pública', privada: 'Universidad privada', ambas: 'Universidad pública y privada', 'sin-centro': 'No indica el centro de estudios' };
+const recortar = (t: string, max: number) => (t.length <= max ? t : `${t.slice(0, max).replace(/\s+\S*$/, '')}…`);
+function perfilTarjeta(d: Diputado) {
+  const lineas = d.perfil?.formacion ?? [];
+  // La línea que nombra un centro (universidad) es la más informativa; si no hay, la primera
+  const principal = lineas.find((f) => f.centros?.length) ?? lineas[0];
+  // Tipo de centro de esa línea (según el RUCT); el de la ficha entera puede mezclar varias líneas
+  const tipos = new Set((principal?.centros ?? []).map((c) => c.tipo));
+  const tipo = !principal ? null
+    : tipos.has('pública') && tipos.has('privada') ? TIPO_FORMACION.ambas
+    : tipos.has('pública') ? TIPO_FORMACION.publica
+    : tipos.has('privada') ? TIPO_FORMACION.privada
+    : principal.otroCentro ? 'Centro no incluido en el registro de universidades (RUCT)'
+    : TIPO_FORMACION['sin-centro'];
+  return {
+    formacion: principal ? recortar(principal.texto.replace(/\.$/, ''), 92) : null,
+    otras: Math.max(0, lineas.length - 1),
+    tipo, tipoAviso: !tipos.size,
+    cargos: d.cargos.slice(0, 2).map((c) => recortar(c, 110)),
+    masCargos: Math.max(0, d.cargos.length - 2),
+  };
+}
+
 export async function tarjetaDiputado(d: Diputado, formato: Formato) {
   const p = d.patrimonio;
   const foto = await fotoDataUri(d.fotoUrl);
@@ -118,37 +142,58 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
   const tam = nombre.length > 34 ? 60 : nombre.length > 22 ? 68 : 80;
   return aPng(h('div', {
     width: 1080, height: 1920, flexDirection: 'column', background: C.fondo, color: C.texto,
-    fontFamily: 'Inter', borderTop: `16px solid ${C.naranja}`, padding: '150px 72px 0',
+    fontFamily: 'Inter', borderTop: `16px solid ${C.naranja}`, padding: '124px 72px 0',
   },
     // Cabecera (zona alta: la tapan en parte el nombre y la barra de la historia)
     h('div', { justifyContent: 'space-between', alignItems: 'center' },
       cabecera(1.15),
       h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.org')),
     // Quién es
-    h('div', { alignItems: 'center', gap: 40, marginTop: 48 },
-      retrato(foto, nombre, 264, 352, color),
+    h('div', { alignItems: 'center', gap: 40, marginTop: 36 },
+      retrato(foto, nombre, 240, 320, color),
       h('div', { flexDirection: 'column', gap: 20, flex: 1 },
         h('div', { alignSelf: 'flex-start', alignItems: 'center', gap: 12, padding: '8px 20px', borderRadius: 999, background: C.blanco, border: `2px solid ${C.borde}`, fontSize: 30, fontWeight: 800 }, puntoGrupo(color, 22), d.grupoCorto, candidaturaDistinta(d) && h('div', { fontWeight: 400, color: C.apagado }, `· ${d.partido}`)),
         h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2.5, lineHeight: 1.04 }, nombre),
         h('div', { fontSize: 32, color: C.apagado, lineHeight: 1.25 }, cargo))),
     // Qué declara y cuánto cobra
-    h('div', { flexDirection: 'column', gap: 12, marginTop: 40 },
+    h('div', { flexDirection: 'column', gap: 12, marginTop: 30 },
       panelCifras(cifras(false), 1),
       notaBienes && h('div', { fontSize: 24, color: C.apagado, paddingLeft: 6 }, notaBienes),
       p.revisar && h('div', { alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 700, color: C.acento, paddingLeft: 6 }, h('div', { width: 30, height: 30, borderRadius: 15, background: C.acento, color: '#fff', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800 }, '!'), 'Lectura no confirmada: compruébala en el PDF oficial')),
+    // Formación y cargos en el Congreso (texto de su ficha oficial)
+    (() => {
+      const pf = perfilTarjeta(d);
+      const etq = (t: string) => h('div', { fontSize: 22, fontWeight: 800, color: C.apagado, letterSpacing: 0.5 }, t);
+      const pastillaTipo = (t: string, aviso = false) => h('div', { alignSelf: 'flex-start', padding: '4px 14px', borderRadius: 999, fontSize: 21, fontWeight: 700, background: aviso ? C.chip : C.acentoSuave, color: aviso ? C.apagado : C.acento }, t);
+      return h('div', { flexDirection: 'column', gap: 16, marginTop: 24, background: C.blanco, border: `2px solid ${C.borde}`, borderRadius: 28, padding: '22px 30px' },
+        h('div', { flexDirection: 'column', gap: 6 },
+          etq('FORMACIÓN'),
+          pf.formacion
+            ? h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25 }, pf.formacion)
+            : h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25, color: C.apagado }, 'No consta formación en su ficha oficial'),
+          (pf.tipo || pf.otras > 0) && h('div', { gap: 10, alignItems: 'center', flexWrap: 'wrap' },
+            pf.tipo && pastillaTipo(pf.tipo, pf.tipoAviso),
+            pf.otras > 0 && h('div', { fontSize: 21, color: C.apagado }, `y ${pf.otras} ${pf.otras === 1 ? 'línea más' : 'líneas más'} en su ficha`))),
+        h('div', { height: 2, background: C.chip }),
+        h('div', { flexDirection: 'column', gap: 6 },
+          etq('EN EL CONGRESO'),
+          ...(pf.cargos.length
+            ? pf.cargos.map((c) => h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25 }, c))
+            : [h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25, color: C.apagado }, 'Sin cargos en la Cámara según su ficha oficial')]),
+          pf.masCargos > 0 && h('div', { fontSize: 21, color: C.apagado }, `y ${pf.masCargos} ${pf.masCargos === 1 ? 'cargo más' : 'cargos más'}`)));
+    })(),
     // Cómo votó
-    h('div', { flexDirection: 'column', marginTop: 32, background: C.blanco, border: `2px solid ${C.borde}`, borderRadius: 28, padding: '24px 30px 10px' },
-      h('div', { fontSize: 25, fontWeight: 800, color: C.apagado, letterSpacing: 0.5, marginBottom: 4 }, 'CÓMO VOTÓ SOBRE VIVIENDA'),
-      ...votos.map(({ v, r, voto }, i) => h('div', { alignItems: 'center', justifyContent: 'space-between', gap: 18, padding: '11px 0', borderTop: i ? `2px solid ${C.chip}` : 'none' },
-        h('div', { flexDirection: 'column', flex: 1, gap: 3 },
-          h('div', { fontSize: 30, fontWeight: 800, lineHeight: 1.15, letterSpacing: -0.5 }, r.corto),
-          h('div', { flexWrap: 'wrap', gap: 8, fontSize: 21, color: C.apagado, lineHeight: 1.25 },
+    h('div', { flexDirection: 'column', marginTop: 24, background: C.blanco, border: `2px solid ${C.borde}`, borderRadius: 28, padding: '20px 30px 8px' },
+      h('div', { fontSize: 22, fontWeight: 800, color: C.apagado, letterSpacing: 0.5, marginBottom: 2 }, 'CÓMO VOTÓ SOBRE VIVIENDA'),
+      ...votos.map(({ v, r, voto }, i) => h('div', { alignItems: 'center', justifyContent: 'space-between', gap: 18, padding: '5px 0', borderTop: i ? `2px solid ${C.chip}` : 'none' },
+        h('div', { flexDirection: 'column', flex: 1, gap: 2 },
+          h('div', { fontSize: 27, fontWeight: 800, lineHeight: 1.15, letterSpacing: -0.5 }, r.corto),
+          h('div', { flexWrap: 'wrap', gap: 8, fontSize: 19, color: C.apagado, lineHeight: 1.25 },
             `${r.quien} · ${fechaCorta(v.fecha)} ·`, h('div', { color: resultadoColor(v.resultado), fontWeight: 700 }, v.resultado))),
-        chipVoto(voto, d, 184, 56, 29)))),
+        chipVoto(voto, d, 170, 48, 26)))),
     // Pie (justo encima de la zona de respuesta de la historia)
-    h('div', { flexDirection: 'column', gap: 4, marginTop: 22, fontSize: 23, color: C.apagado, paddingLeft: 6 },
-      h('div', { fontWeight: 700, color: C.texto }, 'Conoce a quien te representa'),
-      h('div', {}, antesDeElecciones() ? `Elecciones generales del 29-N · Datos oficiales, sin interpretaciones` : 'Datos oficiales del Congreso y del BOE, sin interpretaciones')),
+    h('div', { marginTop: 18, fontSize: 23, color: C.apagado, paddingLeft: 6 },
+      antesDeElecciones() ? 'Elecciones generales del 29-N · Datos oficiales, sin interpretaciones' : 'Conoce a quien te representa · Datos oficiales, sin interpretaciones'),
   ), 'historia');
 }
 
