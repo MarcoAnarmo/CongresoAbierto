@@ -6,10 +6,22 @@ export interface DatosCompartir {
   enlace: string; texto: string; titulo: string;
 }
 
-const prueba = typeof File !== 'undefined' ? new File([new Blob()], 'x.png', { type: 'image/png' }) : null;
-const puedeImagen = () => !!(prueba && navigator.canShare?.({ files: [prueba] }));
+/*
+ * Una web no puede publicar por sí sola en una historia de Instagram: Instagram solo acepta imágenes que le llegan
+ * desde el menú de compartir del sistema. Así que el botón abre ese menú con la tarjeta vertical ya puesta, y ahí
+ * se elige Instagram → Historia. Nunca se descarga nada por este camino: descargar solo lo hacen los enlaces de
+ * descarga y la miniatura.
+ */
+// PNG de 1×1 para preguntar al navegador si sabe compartir imágenes (con un fichero vacío Safari dice que no)
+const PNG_PRUEBA = Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='), (c) => c.charCodeAt(0));
+let prueba: File | null = null;
+try { prueba = new File([PNG_PRUEBA], 'prueba.png', { type: 'image/png' }); } catch { /* navegador antiguo */ }
+const puedeImagen = (f: File | null = prueba) => { try { return !!(f && navigator.canShare?.({ files: [f] })); } catch { return false; } };
+const tactil = () => matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 /** Móvil o tableta con menú de compartir que acepta imágenes: ahí se comparte la tarjeta vertical. */
-const movil = () => matchMedia('(pointer: coarse)').matches && puedeImagen();
+const movil = () => tactil() && puedeImagen();
+/** Navegador dentro de una app (Instagram, Facebook, TikTok…), que no tiene menú de compartir. */
+const dentroDeApp = () => /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|BytedanceWebview|LinkedInApp|Line\//i.test(navigator.userAgent);
 
 /** Texto completo que se pega o se manda: el texto de la tarjeta y el enlace. */
 export const textoConEnlace = (texto: string, enlace: string) => `${texto} ${enlace}`;
@@ -64,11 +76,6 @@ export function prepararCaja(caja: HTMLElement) {
   const aviso = caja.querySelector<HTMLElement>('.c-aviso')!;
   const avisar = (t: string) => { aviso.textContent = t; };
   const datos = () => caja.dataset as { historia: string; nombre: string; enlace: string; texto: string };
-  const descargar = () => {
-    const a = Object.assign(document.createElement('a'), { href: datos().historia, download: datos().nombre });
-    document.body.append(a); a.click(); a.remove();
-  };
-
   // En el móvil, la imagen se prepara en cuanto la caja se ve o se toca
   if (movil()) {
     const pre = () => void precargar(datos().historia, datos().nombre);
@@ -102,6 +109,7 @@ export function prepararCaja(caja: HTMLElement) {
     }
     let envio: ShareData = conTexto ? { files: [fichero], text: textoConEnlace(texto, enlace) } : { files: [fichero] };
     if (navigator.canShare && !navigator.canShare(envio)) envio = { files: [fichero] };
+    if (navigator.canShare && !navigator.canShare(envio)) { avisar(''); return false; }
     try {
       await navigator.share(envio);
       avisar('');
@@ -110,27 +118,30 @@ export function prepararCaja(caja: HTMLElement) {
       if (n === 'AbortError') { avisar(''); return true; }
       // Si hubo que esperar a la imagen, el navegador ya no deja abrir el menú: el segundo toque sí funciona
       if (n === 'NotAllowedError' && esperado) { avisar('La imagen ya está lista: vuelve a pulsar el botón.'); return true; }
+      console.warn('[compartir]', n, (e as Error).message);
       avisar('');
       return false;
     }
     return true;
   }
 
+  // Historia de Instagram: abre el menú de compartir del móvil con la tarjeta vertical (Instagram → Historia).
+  // No descarga nada: si este navegador no puede, explica cómo hacerlo.
   caja.querySelector('.c-historia')!.addEventListener('click', async () => {
+    if (dentroDeApp()) {
+      avisar('Instagram y otras apps no dejan compartir imágenes desde su navegador interno. Abre esta página en Safari o Chrome (menú ··· → «Abrir en el navegador») y vuelve a pulsar: se abrirá Instagram con la imagen lista para tu historia.');
+      return;
+    }
     if (movil()) {
       if (await compartirImagen(false)) return;
-      descargar();
-      avisar('No se pudo abrir el menú de compartir; la imagen se ha descargado para que la subas a tu historia.');
+      avisar('Este navegador no ha dejado abrir el menú de compartir con la imagen. Prueba en Safari (iPhone) o Chrome (Android), o descarga la imagen vertical aquí debajo.');
       return;
     }
-    if (matchMedia('(pointer: coarse)').matches) {
-      // Navegador dentro de una app (Instagram, WhatsApp…) sin menú de compartir: se abre la imagen para guardarla
-      window.open(datos().historia, '_blank', 'noopener');
-      avisar('Mantén pulsada la imagen para guardarla y súbela a tu historia. Si abres esta página en el navegador del móvil, este botón la manda directamente.');
+    if (tactil()) {
+      avisar('Este navegador no permite compartir imágenes. Abre la página en Safari (iPhone) o Chrome (Android) para mandarla directamente a tu historia, o descarga la imagen vertical aquí debajo.');
       return;
     }
-    descargar();
-    avisar('Imagen descargada. Súbela a tu historia desde Instagram; desde el móvil este botón la manda directamente.');
+    avisar('Las historias de Instagram se publican desde el móvil: abre esta página en tu móvil y pulsa este botón; se abrirá Instagram con la imagen. Desde el ordenador puedes descargarla aquí debajo.');
   });
 
   // WhatsApp y X: en el móvil, la tarjeta vertical con el texto y el enlace; en el ordenador, el enlace con su vista previa
