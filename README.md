@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://congresoabierto.pages.dev"><img src="docs/img/logo.svg" alt="Logo de Congreso Abierto: el hemiciclo dibujado con sus escaños" width="180"></a>
+  <a href="https://congresoabierto.org"><img src="docs/img/logo.svg" alt="Logo de Congreso Abierto: el hemiciclo dibujado con sus escaños" width="180"></a>
 </p>
 
 <h1 align="center">Congreso Abierto</h1>
@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://congresoabierto.pages.dev"><strong>congresoabierto.pages.dev</strong></a> ·
-  <a href="https://congresoabierto.pages.dev/colabora">Colabora</a> ·
+  <a href="https://congresoabierto.org"><strong>congresoabierto.org</strong></a> ·
+  <a href="https://congresoabierto.org/colabora">Colabora</a> ·
   <a href="#hoja-de-ruta">Hoja de ruta</a>
 </p>
 
@@ -33,7 +33,9 @@ Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien.
 
 - **Hemiciclo interactivo**: los 350 escaños por grupo, por propiedades o por viviendas declaradas, y el voto de cada diputado en cualquier votación del Pleno, elegida por tema.
 - **Diputados**: una ficha de cada diputado con
-  - un resumen de un vistazo: propiedades, viviendas, vehículos y retribución mensual;
+  - un resumen de un vistazo: propiedades, rentas, cuentas, acciones y fondos, deudas, vehículos y retribución mensual;
+  - sus votos en todas las votaciones del Pleno y las veces que votó distinto de su grupo;
+  - sus cargos y actividades compatibles (Registro de Intereses), sus trabajos de los cinco años anteriores al escaño, donaciones y contribuciones;
   - su formación (y si la universidad es pública o privada según el registro oficial de universidades, el RUCT), trayectoria y cargos;
   - las deudas y préstamos que declara;
   - una línea de tiempo con sus legislaturas, cargos y declaraciones.
@@ -45,7 +47,7 @@ Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien.
 
 **Principio:** solo información oficial del Estado (Congreso de los Diputados, BOE y Boletín Oficial de las Cortes Generales), sin interpretaciones ni opiniones. Cada dato enlaza a su documento original para que cada persona juzgue por sí misma.
 
-> Las 429 declaraciones de bienes de la XV Legislatura, las vigentes y las anteriores (PDF escaneados), se han copiado literalmente y revisado dos veces contra el original, incluidas sus deudas y préstamos. Las lecturas que no se han podido confirmar al 100 % se marcan en la web como «Lectura no confirmada» para que cualquiera pueda revisarlas. Ver [docs/metodologia.md](docs/metodologia.md).
+> Las 429 declaraciones de bienes de la XV Legislatura, las vigentes y las anteriores (PDF escaneados), se han copiado literalmente y revisado dos veces contra el original, incluidas sus deudas y préstamos, rentas, cuentas y acciones; también las 381 declaraciones de intereses económicos. Las lecturas que no se han podido confirmar al 100 % se marcan en la web como «Lectura no confirmada» para que cualquiera pueda revisarlas. Ver [docs/metodologia.md](docs/metodologia.md).
 
 ## Colabora
 
@@ -67,7 +69,6 @@ La intención es mantener la web **actualizada mes a mes** con los datos oficial
 - **Nueva legislatura**: conservar los datos de la XV y cargar los 350 diputados que salgan de las elecciones del 29 de noviembre de 2026 cuando se constituyan las Cortes.
 - **Gobiernos autonómicos** y, después, sus parlamentos ([#15](https://github.com/MarcoAnarmo/CongresoAbierto/issues/15)).
 - **Lenguas cooficiales**: la web en català/valencià, galego, euskara y aranés ([#16](https://github.com/MarcoAnarmo/CongresoAbierto/issues/16)).
-- **Más datos de cada diputado**: acciones y sociedades, trabajos anteriores con su empleador, y saldos y rentas declarados ([#17](https://github.com/MarcoAnarmo/CongresoAbierto/issues/17)–[#19](https://github.com/MarcoAnarmo/CongresoAbierto/issues/19)).
 - **Datos abiertos**: descargas en JSON y CSV para que cualquiera pueda reutilizarlos ([#20](https://github.com/MarcoAnarmo/CongresoAbierto/issues/20)).
 
 ## Puesta en marcha
@@ -128,7 +129,7 @@ congreso.es bloquea muchas descargas automáticas, así que la descarga se hace 
 
 ## Despliegue
 
-La web se publica en **Cloudflare Pages**, conectada a este repositorio: https://congresoabierto.pages.dev
+La web se publica en **Cloudflare Pages**, conectada a este repositorio, con el dominio propio https://congresoabierto.org (la dirección de Cloudflare, congresoabierto.pages.dev, sigue funcionando y debería redirigir al dominio propio).
 
 - Cada *merge* en `main` publica la web en producción.
 - Cada *pull request* desde una rama de este repositorio genera una vista previa con su propia URL. Los que llegan desde un *fork* no la tienen, pero GitHub Actions comprueba que la web compila en todos.
@@ -138,13 +139,13 @@ Es una web 100 % estática, así que también funciona en cualquier otro hosting
 
 ## Contacto
 
-Escribe a [congresoabierto.help@gmail.com](mailto:congresoabierto.help@gmail.com). Para errores en los datos o sugerencias, mejor abre una *issue* para que quede pública.
+Escribe a [ayuda@congresoabierto.org](mailto:ayuda@congresoabierto.org). Para errores en los datos o sugerencias, mejor abre una *issue* para que quede pública.
 
 Congreso Abierto es un proyecto independiente, sin relación con el Congreso de los Diputados ni con ningún partido. Si un dato no coincide con su documento oficial, prevalece el documento oficial.
 
 ## Cómo citar
 
-> Congreso Abierto (2026). *Datos de los diputados de la XV Legislatura*. https://congresoabierto.pages.dev (consultado el [fecha]).
+> Congreso Abierto (2026). *Datos de los diputados de la XV Legislatura*. https://congresoabierto.org (consultado el [fecha]).
 
 ## Licencia
 

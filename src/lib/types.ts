@@ -151,6 +151,63 @@ export interface Deudas {
   sinDeudas: boolean;
 }
 
+/** Fila literal de una tabla de la declaración, con su importe leído como número solo si no deja dudas. */
+export interface FilaImporte { texto: string; importe: string; euros: number | null }
+/** Una tabla de la declaración de bienes, tomada de la declaración más reciente que la rellena. */
+export interface TablaDeclarada<F extends FilaImporte = FilaImporte> {
+  fecha: string | null; url: string; parcial: boolean;
+  filas: F[];
+  /** Suma de los importes de la tabla (los que se pueden leer como número). */
+  total: number;
+  /** true si algún importe está en blanco o no se puede leer como número (el total es «al menos»). */
+  totalIncompleto: boolean;
+}
+/** Rentas, cuentas, valores y sociedades declarados en las páginas 1 a 3 de la declaración de bienes. */
+export interface Finanzas {
+  /** Rentas del ejercicio anterior a la declaración (sin el sueldo del Congreso, que no se declara). */
+  rentas: (TablaDeclarada<FilaImporte & { tipo: 'salariales' | 'dividendos' | 'intereses' | 'otras' }> & { irpf: string | null; irpfEuros: number | null }) | null;
+  depositos: TablaDeclarada | null;
+  /** Deuda pública, acciones y participaciones (incluye fondos). */
+  valores: TablaDeclarada | null;
+  /** Sociedades participadas en más de un 5 % por sociedades del declarante. */
+  sociedades: TablaDeclarada | null;
+  otrosBienes: TablaDeclarada | null;
+  /** Lecturas no confirmadas al 100 %. */
+  avisos: string[];
+}
+/** Registro de Intereses - Actividades (secciones A-H), copia literal del PDF oficial. */
+export interface Actividades {
+  url: string;
+  /** true si el Pleno aún no ha resuelto sobre su compatibilidad y el Congreso no publica el contenido. */
+  pendiente: boolean;
+  secciones: { id: string; titulo: string; items: { texto: string; fechaAcuerdo: string | null }[] }[];
+  total: number;
+}
+/** Declaraciones de intereses económicos (actividades de los cinco años anteriores, donaciones, contribuciones). */
+export interface InteresesEconomicos {
+  declaraciones: { fecha: string | null; url: string; tipo: 'inicial' | 'modificacion' | '' }[];
+  /** De la declaración más reciente que rellena cada apartado. */
+  trabajos: { periodo: string; empleador: string; sector: string; descripcion: string }[];
+  trabajosFuente: { fecha: string | null; url: string } | null;
+  donaciones: { benefactor: string; descripcion: string }[];
+  donacionesFuente: { fecha: string | null; url: string } | null;
+  contribuciones: { destinatario: string; descripcion: string }[];
+  contribucionesFuente: { fecha: string | null; url: string } | null;
+  otros: string[];
+  avisos: string[];
+}
+/** Su voto en todas las votaciones del Pleno de la XV Legislatura con voto nominal publicado. */
+export interface Participacion {
+  /** Votaciones en las que tenía escaño. */
+  enEscano: number;
+  si: number; no: number; abstencion: number; noVota: number;
+  /** Veces que votó sí, no o abstención distinto de la mayoría de su grupo (sin el Grupo Mixto). */
+  distintoGrupo: number;
+  /** Ejemplos más recientes de esas votaciones (ids). */
+  distintoGrupoIds: string[];
+  desde: string | null; hasta: string | null;
+}
+
 export interface Diputado {
   id: string;
   camara: Camara;
@@ -172,6 +229,10 @@ export interface Diputado {
   patrimonio: Patrimonio;
   perfil: Perfil | null;
   deudas: Deudas | null;
+  finanzas: Finanzas | null;
+  actividades: Actividades | null;
+  intereses: InteresesEconomicos | null;
+  participacion: Participacion | null;
 }
 
 export interface VotacionClave {

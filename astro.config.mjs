@@ -5,6 +5,6 @@ import { defineConfig } from 'astro/config';
 // (sirve igual en cualquier hosting estático).
 export default defineConfig({
   output: 'static',
-  site: 'https://congresoabierto.pages.dev',
+  site: 'https://congresoabierto.org',
   trailingSlash: 'ignore',
 });

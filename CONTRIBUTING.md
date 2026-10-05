@@ -69,4 +69,4 @@ El primer paso es el gobierno de cada comunidad y después su parlamento (ver la
 
 Este proyecto sigue un [código de conducta](CODE_OF_CONDUCT.md). Al participar, te comprometes a respetarlo.
 
-¿Dudas? Escribe a [congresoabierto.help@gmail.com](mailto:congresoabierto.help@gmail.com).
+¿Dudas? Escribe a [ayuda@congresoabierto.org](mailto:ayuda@congresoabierto.org).
