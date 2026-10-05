@@ -22,6 +22,8 @@ export interface VotacionPleno {
   totales: { si: number; no: number; abstencion: number; noVota: number };
   /** Códigos de los diputados actuales que votaron cada opción, separados por espacios (S, N, A, X). */
   votos: Record<string, string>;
+  /** PDF oficial con el resultado (su nombre no coincide con el del JSON, así que se toma de la página del día). */
+  pdf?: string;
   /** Recuento por grupo oficial (código del Congreso: GP, GS, GVOX…): [sí, no, abstención, no vota]. */
   grupos: Record<string, [number, number, number, number]>;
 }
@@ -42,7 +44,7 @@ const sinDiputado = new Set<string>();
 
 for (const f of readdirSync(join(DIR, 'descargas')).filter((x) => x.endsWith('.jsonl')).sort()) {
   for (const linea of readFileSync(join(DIR, 'descargas', f), 'utf8').split('\n').filter(Boolean)) {
-    const { url, datos } = JSON.parse(linea);
+    const { url, datos, pdf } = JSON.parse(linea);
     const d = datos.data ?? datos;
     const i = d.informacion; const t = d.totales;
     const [dia, mes, anio] = String(i.fecha).split('/').map(Number);
@@ -68,10 +70,15 @@ for (const f of readdirSync(join(DIR, 'descargas')).filter((x) => x.endsWith('.j
       tipo: String(i.titulo ?? '').trim(), texto: String(i.textoExpediente ?? '').trim(),
       subgrupo: [i.tituloSubGrupo, i.textoSubGrupo].map((s) => String(s ?? '').trim()).filter(Boolean),
       asentimiento: t.asentimiento === 'Sí', totales, votos: compactar(votos), grupos: porGrupo,
+      ...(pdf ? { pdf } : existentes.get(id)?.pdf ? { pdf: existentes.get(id)!.pdf } : {}),
     });
   }
 }
 
+// Enlaces a los PDF oficiales recogidos aparte (descargas/pdfs.json: { urlJson: urlPdf })
+const RUTA_PDFS = join(DIR, 'descargas', 'pdfs.json');
+const pdfs: Record<string, string> = existsSync(RUTA_PDFS) ? JSON.parse(readFileSync(RUTA_PDFS, 'utf8')) : {};
+for (const v of existentes.values()) if (pdfs[v.fuente]) v.pdf = pdfs[v.fuente];
 const todas = [...existentes.values()].map((v) => ({ ...v, votos: compactar(v.votos) })).sort((a, b) => a.fecha.localeCompare(b.fecha) || a.sesion - b.sesion || a.numero - b.numero);
 writeFileSync(SALIDA, todas.map((v) => JSON.stringify(v)).join('\n') + '\n');
 console.log(`OK: ${todas.length} votaciones del Pleno (${todas.length - antes} nuevas) en ${SALIDA}`);

@@ -162,7 +162,7 @@ const pleno: VotacionClave[] = plenoRaw
       id: p.id, fecha: p.fecha, sesion: p.sesion, numeroVotacion: p.numero, tema: '', tipo: p.tipo, titulo,
       detalle: [...p.subgrupo, ...modalidad].join(' · ') || undefined,
       expediente: '', expedienteUrl: '', fuenteUrl: p.fuente,
-      documentos: [{ titulo: `Resultado de la votación (PDF oficial)`, url: p.fuente.replace(/\.json$/, '.pdf'), tipo: 'votacion' }],
+      documentos: p.pdf ? [{ titulo: 'Resultado de la votación (PDF oficial)', url: p.pdf, tipo: 'votacion' }] : [],
       resultado: esRdl ? (aprobada ? 'Convalidado' : 'Derogado') : aprobada ? 'Aprobada' : 'Rechazada',
       totales: t, votos, asientos: {}, temas: temasPorTexto(p.id, p.texto + ' ' + p.subgrupo.join(' '), p.tipo), automatica: true,
       porGrupo: gruposDe(p.grupos),
