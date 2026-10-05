@@ -1,8 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hemiciclo from '../components/Hemiciclo.astro';
+import { ELECCIONES, antesDeElecciones } from '../lib/data';
 ---
 <Base title="Congreso Abierto">
+  {antesDeElecciones() && <p class="elecciones"><span class="e-punto" aria-hidden="true"></span><span class="e-largo">{ELECCIONES.texto}</span><span class="e-corto">Elecciones generales: 29 de noviembre</span></p>}
   <h1>Conoce a quien te representa</h1>
   <p class="lema">Transparencia y acceso fácil a datos oficiales del Congreso</p>
   <script is:inline>
@@ -36,7 +38,7 @@ import Hemiciclo from '../components/Hemiciclo.astro';
     })();
   </script>
   <p class="lead largo">
-    Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien. Aquí están los 350 diputados: quiénes son, qué han estudiado,
+    Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien. Aquí están los 350 diputados de la XV Legislatura: quiénes son, qué han estudiado,
     a qué se han dedicado, lo que cobran, lo que ellos mismos declaran tener y cómo votan. Solo datos oficiales, sin interpretaciones,
     cada uno con un enlace a su documento original. Para que juzgues con criterio.
   </p>
@@ -55,11 +57,17 @@ import Hemiciclo from '../components/Hemiciclo.astro';
   .lead { max-width: 92ch; }
   .lema { margin: -.2rem 0 .5rem; font-size: clamp(1.05rem, 2.8vw, 1.25rem); font-weight: 650; color: var(--accent-text); }
   .lead.corto { display: none; }
+  .elecciones { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 .7rem; padding: 4px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-text); font-size: .85rem; font-weight: 650; }
+  .e-corto { display: none; }
+  .e-punto { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
   @media (max-width: 720px) {
     .lead.largo { display: none; }
     .lead.corto { display: block; margin: .5rem 0 .9rem; font-size: .95rem; line-height: 1.5; text-wrap: pretty; }
     /* El tamaño exacto lo ajusta el script de arriba para que cada uno quepa en una línea */
     h1 { margin: 0 0 .2rem; letter-spacing: -.025em; text-wrap: balance; }
     .lema { margin: 0; font-size: .95rem; line-height: 1.35; text-wrap: balance; }
+    .elecciones { margin-bottom: .5rem; font-size: .8rem; white-space: nowrap; }
+    .e-largo { display: none; }
+    .e-corto { display: inline; }
   }
 </style>

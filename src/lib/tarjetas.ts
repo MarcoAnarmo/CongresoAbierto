@@ -1,5 +1,5 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
-import { diputados, votaciones, grupos, colorGrupo, fmtEur, fmtNum, slug, resumen, candidaturaDistinta } from './data';
+import { diputados, votaciones, grupos, colorGrupo, fmtEur, fmtNum, slug, resumen, candidaturaDistinta, ELECCIONES, antesDeElecciones } from './data';
 import type { Diputado, VotacionClave, Voto } from './types';
 import { C, h, img, lienzo, cabecera, pie, cifra, retrato, barraVotos, fotoDataUri, aPng, type Formato } from './og';
 
@@ -147,7 +147,7 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
     // Pie (justo encima de la zona de respuesta de la historia)
     h('div', { flexDirection: 'column', gap: 4, marginTop: 22, fontSize: 23, color: C.apagado, paddingLeft: 6 },
       h('div', { fontWeight: 700, color: C.texto }, 'Conoce a quien te representa'),
-      h('div', {}, 'Datos oficiales del Congreso y del BOE, sin interpretaciones')),
+      h('div', {}, antesDeElecciones() ? `Elecciones generales del 29-N · Datos oficiales, sin interpretaciones` : 'Datos oficiales del Congreso y del BOE, sin interpretaciones')),
   ), 'historia');
 }
 
@@ -298,7 +298,7 @@ export const compartir = {
       : `declara ${cuenta(p.propiedades, 'propiedad', 'propiedades')}${p.propiedades && p.viviendas !== null ? ` (${cuenta(p.viviendas, 'vivienda', 'viviendas')})` : ''}`;
     return {
       enlace: `/diputado/${slug(d)}`,
-      texto: `${d.nombreCompleto} (${d.grupoCorto}, ${nombreLegible(d.circunscripcion)}) ${bienes} y cobra ${fmtEur(d.retribucion.totalMensual)} al mes del Congreso. Así votó sobre vivienda:`,
+      texto: `${antesDeElecciones() ? ELECCIONES.llamada : ''}${d.nombreCompleto} (${d.grupoCorto}, ${nombreLegible(d.circunscripcion)}) ${bienes} y cobra ${fmtEur(d.retribucion.totalMensual)} al mes del Congreso. Así votó sobre vivienda:`,
     };
   },
   votacion: (v: VotacionClave) => ({
@@ -308,8 +308,8 @@ export const compartir = {
   provincia: (id: string) => {
     const c = circunscripciones.find((x) => x.id === id)!;
     const k = diputados.filter((d) => d.circunscripcion === c.nombre).length;
-    return { enlace: `/diputados?provincia=${encodeURIComponent(c.nombre)}`, texto: `${k === 1 ? 'El diputado elegido' : `Los ${k} diputados elegidos`} por ${c.legible}: qué declaran, cuánto cobran y cómo votan.` };
+    return { enlace: `/diputados?provincia=${encodeURIComponent(c.nombre)}`, texto: `${antesDeElecciones() ? ELECCIONES.llamada : ''}${k === 1 ? 'El diputado elegido' : `Los ${k} diputados elegidos`} por ${c.legible}: qué declaran, cuánto cobran y cómo votan.` };
   },
-  resumen: () => ({ enlace: '/', texto: 'Los 350 diputados del Congreso: qué declaran, cuánto cobran y cómo votan, con sus datos oficiales.' }),
+  resumen: () => ({ enlace: '/', texto: `${antesDeElecciones() ? `${ELECCIONES.texto}. ` : ''}Los 350 diputados de la XV Legislatura: qué declaran, cuánto cobran y cómo votan, con sus datos oficiales.` }),
 };
 

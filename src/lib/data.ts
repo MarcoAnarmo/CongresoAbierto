@@ -32,13 +32,20 @@ export const url = (p: string) => `${base}${p}`;
 export const REPO = 'https://github.com/MarcoAnarmo/CongresoAbierto';
 export const enlaceSugerencia = `${REPO}/issues/new?template=sugerencia.yml`;
 export const enlaceGuia = `${REPO}/blob/main/CONTRIBUTING.md`;
-export const enlacePrimerasTareas = `${REPO}/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22`;
+export const enlacePrimerasTareas = `${REPO}/issues?q=is%3Aissue+is%3Aopen`;
 export const enlaceIncidencias = `${REPO}/issues`;
-export const enlaceHojaDeRuta = `${REPO}/issues?q=is%3Aissue+label%3Ahoja-de-ruta`;
+export const enlaceHojaDeRuta = `${REPO}/issues?q=is%3Aissue+is%3Aopen+label%3Ahoja-de-ruta`;
 export const enlaceError = (que?: string) =>
   `${REPO}/issues/new?template=error-en-un-dato.yml${que ? `&title=${encodeURIComponent(`Error: ${que}`)}&diputado=${encodeURIComponent(que)}` : ''}`;
 
-/** Datos compactos para los scripts de cliente (hemiciclo y ranking). */
+/**
+ * Elecciones generales convocadas tras la disolución de las Cortes de la XV Legislatura.
+ * Mientras no se hayan celebrado (fecha de la build), la portada y los textos para compartir las mencionan.
+ */
+export const ELECCIONES = { fecha: '2026-11-29', texto: 'Elecciones generales el 29 de noviembre de 2026', corto: 'elecciones del 29 de noviembre', llamada: 'Antes de votar el 29 de noviembre, conoce a quien te representa. ' };
+export const antesDeElecciones = () => new Date().toISOString().slice(0, 10) <= ELECCIONES.fecha;
+
+/** Datos compactos para los scripts de cliente (hemiciclo y lista de diputados). */
 export function datosCliente() {
   return diputados.map((d) => ({
     c: d.codParlamentario,
