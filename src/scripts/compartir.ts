@@ -16,7 +16,12 @@ export interface DatosCompartir {
 const PNG_PRUEBA = Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='), (c) => c.charCodeAt(0));
 let prueba: File | null = null;
 try { prueba = new File([PNG_PRUEBA], 'prueba.png', { type: 'image/png' }); } catch { /* navegador antiguo */ }
-const puedeImagen = (f: File | null = prueba) => { try { return !!(f && navigator.canShare?.({ files: [f] })); } catch { return false; } };
+// Si el navegador tiene menú de compartir pero no canShare (algunas versiones de Firefox para Android), se intenta igualmente
+const puedeImagen = (f: File | null = prueba) => {
+  if (!f || typeof navigator.share !== 'function') return false;
+  if (typeof navigator.canShare !== 'function') return true;
+  try { return navigator.canShare({ files: [f] }); } catch { return false; }
+};
 const tactil = () => matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 /** Móvil o tableta con menú de compartir que acepta imágenes: ahí se comparte la tarjeta vertical. */
 const movil = () => tactil() && puedeImagen();
@@ -134,11 +139,15 @@ export function prepararCaja(caja: HTMLElement) {
     }
     if (movil()) {
       if (await compartirImagen(false)) return;
-      avisar('Este navegador no ha dejado abrir el menú de compartir con la imagen. Prueba en Safari (iPhone) o Chrome (Android), o descarga la imagen vertical aquí debajo.');
+      avisar(/Firefox|FxiOS/i.test(navigator.userAgent)
+        ? 'Esta versión de Firefox no deja compartir imágenes desde una web. Actualízalo o abre la página en Chrome (Android) o Safari (iPhone), o descarga la imagen vertical aquí debajo.'
+        : 'Este navegador no ha dejado abrir el menú de compartir con la imagen. Prueba en Safari (iPhone) o Chrome (Android), o descarga la imagen vertical aquí debajo.');
       return;
     }
     if (tactil()) {
-      avisar('Este navegador no permite compartir imágenes. Abre la página en Safari (iPhone) o Chrome (Android) para mandarla directamente a tu historia, o descarga la imagen vertical aquí debajo.');
+      avisar(/Firefox|FxiOS/i.test(navigator.userAgent)
+        ? 'Esta versión de Firefox no permite compartir imágenes desde una web. Actualízalo o abre la página en Chrome (Android) o Safari (iPhone) para mandarla a tu historia, o descarga la imagen vertical aquí debajo.'
+        : 'Este navegador no permite compartir imágenes. Abre la página en Safari (iPhone) o Chrome (Android) para mandarla directamente a tu historia, o descarga la imagen vertical aquí debajo.');
       return;
     }
     avisar('Las historias de Instagram se publican desde el móvil: abre esta página en tu móvil y pulsa este botón; se abrirá Instagram con la imagen. Desde el ordenador puedes descargarla aquí debajo.');

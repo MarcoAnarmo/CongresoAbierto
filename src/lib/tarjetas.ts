@@ -1,5 +1,6 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
-import { diputados, votaciones, grupos, colorGrupo, fmtEur, fmtNum, slug, resumen, candidaturaDistinta, ELECCIONES, antesDeElecciones } from './data';
+import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, fmtEur, fmtNum, slug, resumen, candidaturaDistinta, ELECCIONES, antesDeElecciones } from './data';
+import { disponerPorGrupos } from './hemiciclo';
 import type { Diputado, VotacionClave, Voto } from './types';
 import { C, h, img, lienzo, cabecera, pie, cifra, retrato, barraVotos, fotoDataUri, aPng, type Formato } from './og';
 
@@ -245,7 +246,7 @@ export async function tarjetaResumen(formato: Formato) {
   const titulo = (tam: number) => h('div', { flexDirection: 'column', gap: 12 * e },
     h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 }, '¿Quién te representa y qué tiene?'),
     h('div', { fontSize: 28 * e, color: C.apagado }, 'Los 350 diputados del Congreso, según sus declaraciones oficiales'));
-  if (formato === 'horizontal') return aPng(lienzo('horizontal', cabecera(), titulo(60), h('div', { gap: 16 }, ...c), pie()), 'horizontal');
+  if (formato === 'horizontal') return tarjetaPagina('inicio');
   const filas = [...resumen].sort((a, b) => b.propiedades - a.propiedades);
   const max = Math.max(...filas.map((f) => f.propiedades));
   return aPng(lienzo('historia',
@@ -262,21 +263,69 @@ export async function tarjetaResumen(formato: Formato) {
   ), 'historia');
 }
 
-/* ---------- Páginas genéricas (solo vista previa de enlaces) ---------- */
-export const PAGINAS: Record<string, { titulo: string; subtitulo: string }> = {
-  diputados: { titulo: 'Los 350 diputados', subtitulo: 'Quiénes son, qué declaran y cuánto cobran, según sus declaraciones oficiales.' },
-  votaciones: { titulo: 'Votaciones sobre vivienda', subtitulo: 'Qué se votó en el Pleno del Congreso y qué votó cada diputado.' },
-  metodologia: { titulo: 'Metodología', subtitulo: 'De dónde sale cada dato y cómo se cuenta.' },
-  colabora: { titulo: 'Colabora', subtitulo: 'Proyecto independiente y de código abierto.' },
-  tarjetas: { titulo: 'Tarjetas para compartir', subtitulo: 'Diputados, votaciones y provincias, listas para historias y redes.' },
+/* ---------- Vista previa de enlaces (portada y páginas) ---------- */
+/** Hemiciclo con los 350 escaños coloreados por grupo, como imagen SVG para satori. */
+let hemiciclo: string | null = null;
+function hemicicloUri() {
+  if (hemiciclo) return hemiciclo;
+  const orden = [...grupos].sort((a, b) => a.orden - b.orden).map((g) => ({ g, n: diputados.filter((d) => d.grupoCorto === g.corto).length })).filter((x) => x.n);
+  const { escanos } = disponerPorGrupos(orden.map((x) => x.n), 11);
+  const colores = orden.flatMap((x) => Array(x.n).fill(x.g.color) as string[]);
+  const puntos = escanos.map((e, i) => `<circle cx="${e.x.toFixed(4)}" cy="${(-e.y).toFixed(4)}" r="${(e.r * 0.92).toFixed(4)}" fill="${colores[i]}"/>`).join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="840" height="444" viewBox="-1.04 -1.06 2.08 1.1" preserveAspectRatio="xMidYMid meet">${puntos}</svg>`;
+  return (hemiciclo = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`);
+}
+
+const conDeclaracion = () => diputados.filter((d) => d.patrimonio.viviendas !== null);
+const totalPropiedades = () => conDeclaracion().reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
+const totalViviendas = () => conDeclaracion().reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
+const cifrasCongreso = (): [string, string][] => [[fmtNum(totalPropiedades()), 'propiedades declaradas'], [fmtNum(totalViviendas()), 'de ellas, viviendas'], [String(diputados.length), 'diputados']];
+const cifrasVotaciones = (): [string, string][] => [
+  [fmtNum(votacionesPleno.length), 'votaciones del Pleno'],
+  [fmtNum(votacionesPleno.filter((v) => temasDe(v).includes('vivienda')).length), 'sobre vivienda'],
+  [String(diputados.length), 'diputados, uno a uno'],
+];
+
+export const PAGINAS: Record<string, { titulo: string; subtitulo: string; cifras: () => [string, string][]; llamada: string }> = {
+  inicio: { titulo: 'Prepárate para votar', subtitulo: 'Qué declaran tener, cuánto cobran y cómo votan los 350 diputados del Congreso', cifras: cifrasCongreso, llamada: 'Míralo escaño a escaño' },
+  diputados: { titulo: 'Los 350 diputados', subtitulo: 'Quiénes son, qué declaran tener y cuánto cobran, con sus documentos oficiales', cifras: cifrasCongreso, llamada: 'Busca a los de tu provincia' },
+  votaciones: { titulo: 'Cómo votó cada diputado', subtitulo: 'Todas las votaciones del Pleno de la XV Legislatura, por tema y fecha', cifras: cifrasVotaciones, llamada: 'Míralo escaño a escaño' },
+  metodologia: { titulo: 'De dónde sale cada dato', subtitulo: 'Solo documentos oficiales del Congreso y del BOE, copiados y revisados uno a uno', cifras: cifrasCongreso, llamada: 'Compruébalo en el original' },
+  colabora: { titulo: 'Ayuda a mantenerlo al día', subtitulo: 'Proyecto independiente y de código abierto: avisa de un error o propón una mejora', cifras: cifrasCongreso, llamada: 'Míralo escaño a escaño' },
+  tarjetas: { titulo: 'Compártelo en tus redes', subtitulo: 'Tarjetas con los datos de cada diputado, provincia y votación, listas para historias', cifras: cifrasCongreso, llamada: 'Busca a tu diputado' },
 };
+
+const FLECHA = `data:image/svg+xml;base64,${Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>').toString('base64')}`;
+/** Vista previa de enlaces (1200×630): elecciones, titular, cifras en cajitas y el hemiciclo. */
 export function tarjetaPagina(id: string) {
   const p = PAGINAS[id];
-  return aPng(lienzo('horizontal', cabecera(),
-    h('div', { flexDirection: 'column', gap: 22 },
-      h('div', { fontSize: 72, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 }, p.titulo),
-      h('div', { fontSize: 32, color: C.apagado, lineHeight: 1.35 }, p.subtitulo)),
-    pie()), 'horizontal');
+  const elecciones = antesDeElecciones();
+  const etiqueta = h('div', { alignItems: 'center', gap: 10, padding: '9px 20px', borderRadius: 999, background: C.naranja, color: '#fff', fontSize: 22, fontWeight: 800 },
+    h('div', { width: 12, height: 12, borderRadius: 6, background: '#fff' }),
+    elecciones ? 'Elecciones generales · 29 de noviembre' : 'Conoce a quien te representa');
+  const caja = ([v, t]: [string, string], i: number) => h('div', {
+    flexDirection: 'column', flex: 1, gap: 2, padding: '14px 18px', borderRadius: 16,
+    background: i === 0 ? C.acentoSuave : C.blanco, border: `2px solid ${i === 0 ? '#f7c9a6' : C.borde}`,
+  },
+    h('div', { fontSize: 44, fontWeight: 800, letterSpacing: -1, color: i === 0 ? C.acento : C.texto, lineHeight: 1.05 }, v),
+    h('div', { fontSize: 19, color: C.apagado, lineHeight: 1.2 }, t));
+  return aPng(h('div', {
+    width: 1200, height: 630, flexDirection: 'column', justifyContent: 'space-between', background: C.fondo, color: C.texto,
+    fontFamily: 'Inter', borderTop: `14px solid ${C.naranja}`, padding: '34px 56px 30px',
+  },
+    h('div', { justifyContent: 'space-between', alignItems: 'center' }, cabecera(0.9), etiqueta),
+    h('div', { gap: 36, alignItems: 'center' },
+      h('div', { flexDirection: 'column', gap: 18, width: 620 },
+        h('div', { fontSize: id === 'inicio' && elecciones ? 70 : 62, fontWeight: 800, letterSpacing: -2.5, lineHeight: 1.02 }, id === 'inicio' && !elecciones ? 'Conoce a quien te representa' : p.titulo),
+        h('div', { fontSize: 26, color: C.apagado, lineHeight: 1.3 }, p.subtitulo),
+        h('div', { gap: 12, marginTop: 6 }, ...p.cifras().map(caja))),
+      h('div', { flexDirection: 'column', alignItems: 'center', gap: 16, flex: 1 },
+        img(hemicicloUri(), 420, 222),
+        h('div', { alignItems: 'center', gap: 12, padding: '12px 22px 12px 26px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 23, fontWeight: 800 }, p.llamada, img(FLECHA, 22, 22)))),
+    h('div', { justifyContent: 'space-between', alignItems: 'center', fontSize: 20, color: C.apagado, borderTop: `2px solid ${C.borde}`, paddingTop: 16 },
+      h('div', {}, 'Datos oficiales del Congreso y del BOE, sin interpretaciones'),
+      h('div', { color: C.acento, fontWeight: 800, fontSize: 22 }, 'congresoabierto.pages.dev')),
+  ), 'horizontal');
 }
 
 /** Rutas de las imágenes (relativas a la raíz de la web). */
