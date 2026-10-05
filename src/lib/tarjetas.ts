@@ -1,5 +1,5 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
-import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, fmtEur, fmtNum, slug, resumen, candidaturaDistinta, ELECCIONES, antesDeElecciones } from './data';
+import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, fmtEur, fmtNum, slug, candidaturaDistinta, ELECCIONES, antesDeElecciones } from './data';
 import { disponerPorGrupos } from './hemiciclo';
 import type { Diputado, VotacionClave, Voto } from './types';
 import { C, h, img, lienzo, cabecera, pie, cifra, retrato, barraVotos, fotoDataUri, aPng, type Formato } from './og';
@@ -235,31 +235,41 @@ export async function tarjetaProvincia(id: string, formato: Formato) {
 
 /* ---------- Resumen del Congreso ---------- */
 export async function tarjetaResumen(formato: Formato) {
+  // Horizontal: la vista previa de la portada. Historia: enfocada en las elecciones, con las cifras y el hemiciclo
+  if (formato === 'horizontal') return tarjetaPagina('inicio');
   const con = diputados.filter((d) => d.patrimonio.viviendas !== null);
   const prop = con.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
   const viv = con.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
-  const pct = (k: number) => `${Math.round((100 * k) / con.length)} %`;
-  const alguna = con.filter((d) => (d.patrimonio.viviendas ?? 0) > 0).length;
-  const tres = con.filter((d) => (d.patrimonio.viviendas ?? 0) >= 3).length;
-  const e = formato === 'historia' ? 1.45 : 1;
-  const c = [cifra(fmtNum(prop), 'propiedades declaradas', true, e), cifra(fmtNum(viv), 'son viviendas', false, e), cifra(pct(alguna), 'tiene al menos una vivienda', false, e), cifra(pct(tres), 'declara 3 viviendas o más', false, e)];
-  const titulo = (tam: number) => h('div', { flexDirection: 'column', gap: 12 * e },
-    h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 }, '¿Quién te representa y qué tiene?'),
-    h('div', { fontSize: 28 * e, color: C.apagado }, 'Los 350 diputados del Congreso, según sus declaraciones oficiales'));
-  if (formato === 'horizontal') return tarjetaPagina('inicio');
-  const filas = [...resumen].sort((a, b) => b.propiedades - a.propiedades);
-  const max = Math.max(...filas.map((f) => f.propiedades));
-  return aPng(lienzo('historia',
-    cabecera(1.4),
-    titulo(84),
-    h('div', { flexDirection: 'column', gap: 22 }, h('div', { gap: 22 }, c[0], c[1]), h('div', { gap: 22 }, c[2], c[3])),
-    h('div', { flexDirection: 'column', gap: 14, background: C.blanco, border: `3px solid ${C.borde}`, borderRadius: 26, padding: '28px 32px' },
-      h('div', { fontSize: 28, fontWeight: 700, color: C.apagado }, 'Propiedades declaradas por grupo'),
-      ...filas.map((f) => h('div', { alignItems: 'center', gap: 16 },
-        h('div', { alignItems: 'center', gap: 12, width: 190, fontSize: 27, fontWeight: 700 }, puntoGrupo(f.color, 18), f.corto),
-        h('div', { width: Math.max(8, Math.round((560 * f.propiedades) / max)), height: 22, borderRadius: 11, background: f.color }),
-        h('div', { fontSize: 27, fontWeight: 700 }, fmtNum(f.propiedades))))),
-    pie(1.4),
+  const elecciones = antesDeElecciones();
+  const orden = [...grupos].sort((a, b) => a.orden - b.orden).filter((g) => diputados.some((d) => d.grupoCorto === g.corto));
+  const caja = (v: string, t: string, destacada = false) => h('div', {
+    flexDirection: 'column', flex: 1, gap: 2, padding: '20px 26px', borderRadius: 24,
+    background: destacada ? C.acentoSuave : C.blanco, border: `3px solid ${destacada ? '#f7c9a6' : C.borde}`,
+  },
+    h('div', { fontSize: 66, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05, color: destacada ? C.acento : C.texto }, v),
+    h('div', { fontSize: 28, color: C.apagado, lineHeight: 1.2 }, t));
+  const fijo = { flexShrink: 0 };
+  return aPng(h('div', {
+    width: 1080, height: 1920, flexDirection: 'column', background: C.fondo, color: C.texto, fontFamily: 'Inter',
+    borderTop: `16px solid ${C.naranja}`, padding: '150px 72px 0',
+  },
+    // Cabecera (zona alta: la tapan en parte el nombre y la barra de la historia)
+    h('div', { ...fijo, justifyContent: 'space-between', alignItems: 'center' }, cabecera(1.15), h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.pages.dev')),
+    h('div', { ...fijo, alignSelf: 'flex-start', alignItems: 'center', gap: 14, marginTop: 44, padding: '12px 28px', borderRadius: 999, background: C.naranja, color: '#fff', fontSize: 32, fontWeight: 800 },
+      h('div', { width: 15, height: 15, borderRadius: 8, background: '#fff' }), elecciones ? 'Elecciones generales · 29 de noviembre' : 'Conoce a quien te representa'),
+    h('div', { ...fijo, fontSize: elecciones ? 116 : 96, fontWeight: 800, letterSpacing: -4, lineHeight: 1.02, marginTop: 26 }, elecciones ? 'Prepárate para votar' : 'Conoce a quien te representa'),
+    h('div', { ...fijo, fontSize: 36, color: C.apagado, lineHeight: 1.3, marginTop: 18 }, 'Qué declaran tener, cuánto cobran y cómo votan los 350 diputados del Congreso'),
+    // Hemiciclo con los 350 escaños por grupo
+    h('div', { ...fijo, flexDirection: 'column', alignItems: 'center', marginTop: 32, background: C.blanco, border: `3px solid ${C.borde}`, borderRadius: 30, padding: '26px 24px 24px' },
+      img(hemicicloUri(), 780, 412),
+      h('div', { flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px', marginTop: 12, fontSize: 22, fontWeight: 700, color: C.apagado },
+        ...orden.map((g) => h('div', { alignItems: 'center', gap: 7 }, puntoGrupo(g.color, 14), g.corto))),
+      h('div', { alignItems: 'center', gap: 14, marginTop: 20, padding: '14px 32px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 32, fontWeight: 800 }, 'Míralo escaño a escaño', img(FLECHA, 30, 30))),
+    // Cifras del Congreso
+    h('div', { ...fijo, flexDirection: 'column', gap: 16, marginTop: 26 },
+      h('div', { gap: 16 }, caja(fmtNum(prop), 'propiedades declaradas', true), caja(fmtNum(viv), 'de ellas, viviendas')),
+      h('div', { gap: 16 }, caja(fmtNum(votacionesPleno.length), 'votaciones del Pleno'), caja(String(diputados.length), 'diputados, uno a uno'))),
+    h('div', { ...fijo, marginTop: 18, fontSize: 24, color: C.apagado, paddingLeft: 6 }, 'Datos oficiales del Congreso y del BOE, sin interpretaciones'),
   ), 'historia');
 }
 
