@@ -101,3 +101,7 @@ td.num, th.num { text-align: right; }
   .table-scroll th:last-child, .table-scroll td:last-child { padding-right: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+/* Asa de las hojas que suben desde abajo en el móvil (se cierran arrastrándolas hacia abajo, ver scripts/hoja.ts) */
+.asa-hoja { display: none; }
+.es-hoja > .asa-hoja { display: block; position: absolute; top: 7px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: color-mix(in srgb, var(--muted) 45%, transparent); pointer-events: none; z-index: 2; }
+.es-hoja { touch-action: pan-y; will-change: transform; }

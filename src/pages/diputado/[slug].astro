@@ -566,6 +566,7 @@ const LINEA_CORTA = 6;
 </style>
 
 <script>
+  import { deslizarParaCerrar } from '../../scripts/hoja';
   // Línea de tiempo: filtros y, si es larga, solo las primeras fechas hasta pulsar «Ver todas»
   const linea = document.querySelector<HTMLOListElement>('.linea');
   if (linea) {
@@ -634,6 +635,7 @@ const LINEA_CORTA = 6;
     origen?.focus();
   });
   dlg.querySelector('.d-cerrar')!.addEventListener('click', () => dlg.close());
+  deslizarParaCerrar(dlg, { cerrar: () => dlg.close() });
   dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
   addEventListener('popstate', () => {
     if (dlg.open) { empujado = false; dlg.close(); return; }
