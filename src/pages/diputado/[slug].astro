@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { diputados, votaciones, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError, candidaturaDistinta } from '../../lib/data';
+import { diputados, votaciones, votacionesPleno, colorGrupo, fmtEur2, fmtEur, fmtNum, fmtFecha, url, slug, enlaceError, candidaturaDistinta } from '../../lib/data';
 import type { Diputado } from '../../lib/types';
 import type { NombreIcono } from '../../lib/iconos';
 import BotonCompartir from '../../components/BotonCompartir.astro';
@@ -59,25 +59,75 @@ const deuda = !dd
       ? { valor: fmtEur(dd.principal.totalPendiente), sub: `${dd.principal.totalIncompleto ? 'al menos, ' : ''}pendientes en ${prestamos.length} ${prestamos.length === 1 ? 'préstamo' : 'préstamos'}` }
       : { valor: 'Sí', sub: 'otras deudas u obligaciones' };
 
+// Rentas, cuentas, acciones y sociedades (páginas 1 a 3 de la declaración de bienes)
+const fz = d.finanzas;
+const alMenos = (t: { totalIncompleto: boolean } | null | undefined) => (t?.totalIncompleto ? 'al menos ' : '');
+const TIPO_RENTA: Record<string, string> = { salariales: 'Sueldos, honorarios y otras retribuciones', dividendos: 'Dividendos y participación en beneficios', intereses: 'Intereses y rendimientos de cuentas y activos', otras: 'Otras rentas o percepciones' };
+const tiposRenta = fz?.rentas ? Object.keys(TIPO_RENTA).filter((k) => fz.rentas!.filas.some((f) => f.tipo === k)) : [];
+const inversiones = [fz?.valores, fz?.sociedades, fz?.otrosBienes].filter((x) => !!x);
+const totalInversiones = inversiones.reduce((a, t) => a + t!.total, 0);
+const filasInversiones = inversiones.reduce((a, t) => a + t!.filas.length, 0);
+const fechaDecl = (t: { fecha: string | null; parcial: boolean }) => `${t.parcial ? 'modificación de su declaración' : 'declaración'} del ${fmtFecha(t.fecha)}`;
+const rentas = fz?.rentas;
+const tRentas = !fz ? { valor: '—', sub: 'sin declaración publicada' }
+  : !rentas ? { valor: 'Ninguna', sub: 'no declara rentas' }
+  : rentas.filas.some((f) => f.euros !== null) ? { valor: fmtEur(rentas.total), sub: `${alMenos(rentas)}en el año anterior a su declaración` }
+  : { valor: rentas.irpf ? 'IRPF' : '—', sub: rentas.irpf ? `pagó ${rentas.irpfEuros !== null ? fmtEur(rentas.irpfEuros) : rentas.irpf} de IRPF; no detalla rentas` : 'no detalla importes' };
+const tCuentas = !fz ? { valor: '—', sub: 'sin declaración publicada' }
+  : !fz.depositos ? { valor: '0', sub: 'no declara saldo en cuentas' }
+  : { valor: fmtEur(fz.depositos.total), sub: `${alMenos(fz.depositos)}en cuentas y depósitos` };
+const tInv = !fz ? { valor: '—', sub: 'sin declaración publicada' }
+  : !filasInversiones ? { valor: 'Ninguno', sub: 'no declara acciones, fondos ni otros bienes' }
+  : { valor: fmtEur(totalInversiones), sub: `${inversiones.some((t) => t!.totalIncompleto) ? 'al menos ' : ''}en acciones, fondos, seguros y otros` };
+
+// Registro de actividades y declaraciones de intereses económicos
+const act = d.actividades;
+const inter = d.intereses;
+const nTrab = inter?.trabajos.length ?? 0;
+// Sus votos en todas las votaciones del Pleno
+const pa = d.participacion;
+const votoEmitido = pa ? pa.si + pa.no + pa.abstencion : 0;
+const pctDe = (n: number, t: number) => (t ? `${fmtNum(Math.round((1000 * n) / t) / 10)} %` : '—');
+const porId = new Map(votacionesPleno.map((v) => [v.id, v]));
+const distintas = (pa?.distintoGrupoIds ?? []).map((id) => porId.get(id)).filter((v) => !!v).slice(0, 12);
+
 /** Cada cajita del resumen abre su sección (en el móvil, como hoja desde abajo; en el ordenador, en una ventana). */
-type Tesela = { id: string; icono: NombreIcono; titulo: string; corto?: string; prefijo?: string; valor: string; sub: string; acento?: string; texto?: boolean; aviso?: boolean; destacada?: boolean; votos?: boolean };
+type Tesela = { grupo?: string; id: string; icono: NombreIcono; titulo: string; corto?: string; prefijo?: string; valor: string; sub: string; acento?: string; texto?: boolean; aviso?: boolean; destacada?: boolean; votos?: boolean };
 const teselas: Tesela[] = [
   {
-    id: 'propiedades', icono: 'propiedades', titulo: 'Propiedades', destacada: true, aviso: p.revisar,
+    grupo: 'Dinero y bienes', id: 'propiedades', icono: 'propiedades', titulo: 'Propiedades', destacada: true, aviso: p.revisar,
     valor: sinDeclaracion ? '—' : String(p.propiedades ?? '—'),
     sub: sinDeclaracion || p.viviendas === null ? 'sin declaración publicada' : 'de ellas, ',
     acento: sinDeclaracion || p.viviendas === null ? undefined : `${p.viviendas} ${p.viviendas === 1 ? 'vivienda' : 'viviendas'}`,
   },
+  { id: 'rentas', icono: 'rentas', titulo: 'Rentas declaradas', corto: 'Rentas', valor: tRentas.valor, sub: tRentas.sub, aviso: fz?.avisos.includes('rentas') },
+  { id: 'cuentas', icono: 'cuenta', titulo: 'Cuentas', valor: tCuentas.valor, sub: tCuentas.sub, aviso: fz?.avisos.includes('depositos') },
+  { id: 'inversiones', icono: 'acciones', titulo: 'Acciones y fondos', corto: 'Inversiones', valor: tInv.valor, sub: tInv.sub, aviso: fz?.avisos.some((a) => a !== 'rentas' && a !== 'depositos') },
+  { id: 'deudas', icono: 'deuda', titulo: 'Deudas', valor: deuda.valor, sub: deuda.sub, aviso: avisoDeudas },
   {
     id: 'vehiculos', icono: 'vehiculo', titulo: 'Vehículos',
     valor: sinDeclaracion ? '—' : String(p.vehiculos ?? '—'),
     sub: sinDeclaracion ? 'sin declaración publicada' : p.vehiculos === 0 ? 'no declara vehículos' : p.vehiculos === 1 ? 'vehículo declarado' : 'vehículos declarados',
   },
-  { id: 'deudas', icono: 'deuda', titulo: 'Deudas', valor: deuda.valor, sub: deuda.sub, aviso: avisoDeudas },
   { id: 'retribucion', icono: 'sueldo', titulo: 'Retribución', valor: fmtEur(d.retribucion.totalMensual), sub: 'al mes del Congreso' },
+  ...(pa ? [{
+    grupo: 'En el Congreso', id: 'participacion', icono: 'votaciones' as const, titulo: 'Sus votos en el Pleno', corto: 'Votos en el Pleno',
+    valor: fmtNum(votoEmitido), sub: `de ${fmtNum(pa.enEscano)} votaciones con escaño · `,
+    acento: pa.distintoGrupo ? `${fmtNum(pa.distintoGrupo)} distinto de su grupo` : 'siempre con su grupo',
+  }] : []),
   ...(votosDip.length ? [{ id: 'votaciones', icono: 'voto' as const, titulo: 'Votos sobre vivienda', corto: 'Votos', prefijo: 'sobre vivienda: ', valor: '', sub: resumenVotos, votos: true }] : []),
   {
-    id: 'formacion', icono: 'formacion', titulo: 'Formación', texto: !!pf?.formacion.length,
+    id: 'actividades', icono: 'actividades', titulo: 'Cargos y actividades', corto: 'Actividades',
+    valor: !act ? '—' : act.pendiente ? '…' : String(act.total),
+    sub: !act ? 'sin registro publicado' : act.pendiente ? 'pendiente de aprobar por el Pleno' : act.total === 1 ? 'cargo o actividad compatible' : 'cargos y actividades compatibles',
+  },
+  {
+    id: 'trabajos', icono: 'trabajos', titulo: 'Trabajos anteriores', corto: 'Antes',
+    valor: !inter ? '—' : String(nTrab), sub: !inter ? 'sin declaración publicada' : nTrab ? `${nTrab === 1 ? 'trabajo' : 'trabajos'} en los 5 años antes de su escaño` : 'no declara trabajos anteriores',
+    aviso: !!inter?.avisos.length,
+  },
+  {
+    grupo: 'Perfil', id: 'formacion', icono: 'formacion', titulo: 'Formación', texto: !!pf?.formacion.length,
     valor: pf?.formacion[0]?.texto ?? '—',
     sub: pf?.formacion.length ? (etTipo[pf.tipoFormacion] ?? 'Formación según su ficha') : 'su ficha no detalla estudios',
   },
@@ -87,7 +137,7 @@ const teselas: Tesela[] = [
 const iconoDe = Object.fromEntries(teselas.map((t) => [t.id, t.icono])) as Record<string, NombreIcono>;
 const LINEA_CORTA = 6;
 ---
-<Base title={d.nombreCompleto} imagen={rutaTarjeta.diputado(d, 'horizontal')} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): retribución, viviendas y vehículos declarados y votaciones clave.`}>
+<Base title={d.nombreCompleto} imagen={rutaTarjeta.diputado(d, 'horizontal')} description={`${d.nombreCompleto} (${d.partido}, ${d.circunscripcion}): rentas, cuentas, acciones, propiedades y deudas declaradas, trabajos anteriores, actividades y cómo vota.`}>
   <p class="volver-p"><a class="volver" href={url('/diputados')}>← Diputados</a></p>
   <div class="cabecera">
     <BotonCompartir class="compartir-ficha" d={d} />
@@ -111,7 +161,8 @@ const LINEA_CORTA = 6;
   {p.revisar && <p class="warn aviso-general">Algún dato de esta ficha tiene una lectura dudosa en el PDF o un cambio comunicado que no identifica el bien. Está marcado con «Lectura no confirmada». Compruébalo en el PDF oficial y, si ves un error, <a href={url('/metodologia#errores')}>avísanos</a>.</p>}
 
   <nav class="mosaico" aria-label={`Resumen de la ficha de ${d.nombreCompleto}`}>
-    {teselas.map((t) => (
+    {teselas.map((t) => (<>
+      {t.grupo && <h2 class="m-grupo">{t.grupo}</h2>}
       <a class:list={['tesela', { destacada: t.destacada }]} href={`#${t.id}`} data-detalle={t.id} aria-haspopup="dialog">
         <span class="t-cab"><span class="t-ico"><Icono n={t.icono} /></span><span class="t-tit">{t.corto ? <><span class="tt-largo">{t.titulo}</span><span class="tt-corto">{t.corto}</span></> : t.titulo}</span><Icono n="derecha" tam={18} class="t-ir" /></span>
         {t.votos
@@ -120,7 +171,7 @@ const LINEA_CORTA = 6;
         <span class="t-sub" aria-hidden={t.votos ? 'true' : undefined}>{t.prefijo && <span class="tt-corto">{t.prefijo}</span>}{t.sub}{t.acento && <span class="t-acento">{t.acento}</span>}</span>
         {t.aviso && <span class="t-aviso"><Icono n="aviso" tam={14} />Lectura no confirmada</span>}
       </a>
-    ))}
+    </>))}
   </nav>
   <p class="ver-todo-p"><button class="ver-todo" type="button" id="ver-todo" aria-controls="secciones" aria-expanded="false">Ver toda la ficha en una página</button></p>
 
@@ -180,6 +231,80 @@ const LINEA_CORTA = 6;
           </p>
         </>
       )}
+    </div>
+  </section>
+
+  <section class="seccion" id="rentas" aria-labelledby="h-rentas">
+    <h2 id="h-rentas"><span class="s-ico"><Icono n="rentas" /></span>Rentas declaradas</h2>
+    <div class="s-cuerpo">
+      {!fz ? <p class="muted">No hay declaración de bienes publicada todavía.</p> : !rentas ? <p>No declara rentas ni IRPF en sus declaraciones de bienes.</p> : (
+        <>
+          <p class="small muted">Rentas del año anterior a su {fechaDecl(rentas)}, tal y como las escribe. El sueldo del Congreso no se declara aquí: se publica aparte (ver <a href="#retribucion">Retribución</a>).</p>
+          {fz.avisos.includes('rentas') && <AvisoDudoso texto="Alguna cifra de sus rentas no se lee con seguridad en el PDF (marcada con «?»)." url={rentas.url} nombre={d.nombreCompleto} />}
+          {rentas.filas.some((f) => f.euros !== null) && (
+            <p class="s-cifra"><strong>{rentas.totalIncompleto && <span class="small">al menos </span>}{fmtEur(rentas.total)}</strong><span>suma de las rentas que declara</span></p>
+          )}
+          {tiposRenta.map((k) => (
+            <>
+              <h3>{TIPO_RENTA[k]}</h3>
+              <ul class="importes">{rentas.filas.filter((f) => f.tipo === k).map((f) => <li><span>{f.texto || <span class="muted">Sin concepto</span>}</span><span class="imp">{f.importe || <span class="muted">sin importe</span>}</span></li>)}</ul>
+            </>
+          ))}
+          {rentas.filas.length === 0 && <p>No detalla rentas en la tabla.</p>}
+          {rentas.irpf && <p class="irpf"><span>IRPF pagado el año anterior (cuota líquida)</span><strong>{rentas.irpf}{rentas.irpfEuros !== null && !/€/.test(rentas.irpf) && ' €'}</strong></p>}
+          {rentas.totalIncompleto && <p class="small muted">Algún importe está en blanco o no se puede leer como número y no se suma.</p>}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{rentas && <><a href={rentas.url} rel="noopener">Página 1 de su {fechaDecl(rentas)} (PDF) ↗</a> · </>}<a href={url('/metodologia#rentas')}>Cómo se obtiene</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="cuentas" aria-labelledby="h-cuentas">
+    <h2 id="h-cuentas"><span class="s-ico"><Icono n="cuenta" /></span>Cuentas y depósitos</h2>
+    <div class="s-cuerpo">
+      {!fz ? <p class="muted">No hay declaración de bienes publicada todavía.</p> : !fz.depositos ? <p>No declara saldo en cuentas ni depósitos.</p> : (
+        <>
+          <p class="small muted">Saldo de todos sus depósitos según su {fechaDecl(fz.depositos)}. Los números de cuenta no se publican.</p>
+          <p class="s-cifra"><strong>{fz.depositos.totalIncompleto && <span class="small">al menos </span>}{fmtEur(fz.depositos.total)}</strong><span>en cuentas corrientes, de ahorro y otras imposiciones</span></p>
+          <ul class="importes">{fz.depositos.filas.map((f) => <li><span>{f.texto || <span class="muted">Sin descripción</span>}</span><span class="imp">{f.importe || <span class="muted">sin saldo</span>}</span></li>)}</ul>
+          {fz.depositos.totalIncompleto && <p class="small muted">Algún saldo está en blanco o no se puede leer como número y no se suma.</p>}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{fz?.depositos && <><a href={fz.depositos.url} rel="noopener">Página 2 de su {fechaDecl(fz.depositos)} (PDF) ↗</a> · </>}<a href={url('/metodologia#rentas')}>Cómo se obtiene</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="inversiones" aria-labelledby="h-inversiones">
+    <h2 id="h-inversiones"><span class="s-ico"><Icono n="acciones" /></span>Acciones, fondos y sociedades</h2>
+    <div class="s-cuerpo">
+      {!fz ? <p class="muted">No hay declaración de bienes publicada todavía.</p> : !filasInversiones ? <p>No declara acciones, participaciones, fondos, sociedades ni otros bienes o derechos.</p> : (
+        <>
+          <p class="s-cifra"><strong>{inversiones.some((t) => t!.totalIncompleto) && <span class="small">al menos </span>}{fmtEur(totalInversiones)}</strong><span>valor que declara (suma de las tablas oficiales)</span></p>
+          {fz.valores && (
+            <>
+              <h3>Deuda pública, acciones y participaciones</h3>
+              <p class="small muted">Según su {fechaDecl(fz.valores)}.</p>
+              <ul class="importes">{fz.valores.filas.map((f) => <li><span>{f.texto || <span class="muted">Sin descripción</span>}</span><span class="imp">{f.importe || <span class="muted">sin valor</span>}</span></li>)}</ul>
+            </>
+          )}
+          {fz.sociedades && (
+            <>
+              <h3>Sociedades participadas en más de un 5 % por sus sociedades</h3>
+              <p class="small muted">Según su {fechaDecl(fz.sociedades)}.</p>
+              <ul class="importes">{fz.sociedades.filas.map((f) => <li><span>{f.texto || <span class="muted">Sin descripción</span>}</span><span class="imp">{f.importe || <span class="muted">sin valor</span>}</span></li>)}</ul>
+            </>
+          )}
+          {fz.otrosBienes && (
+            <>
+              <h3>Otros bienes y derechos (seguros, planes de pensiones…)</h3>
+              <p class="small muted">Según su {fechaDecl(fz.otrosBienes)}.</p>
+              <ul class="importes">{fz.otrosBienes.filas.map((f) => <li><span>{f.texto || <span class="muted">Sin descripción</span>}</span><span class="imp">{f.importe || <span class="muted">sin valor</span>}</span></li>)}</ul>
+            </>
+          )}
+          {p.inmueblesSociedad.length > 0 && <p class="small muted">Los inmuebles de sus sociedades están en <a href="#propiedades">Propiedades</a>.</p>}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>Apartado «Otros bienes o derechos» (página 3) de su declaración de bienes · <a href={url('/metodologia#rentas')}>Cómo se obtiene</a></span></p>
     </div>
   </section>
 
@@ -263,6 +388,43 @@ const LINEA_CORTA = 6;
     </div>
   </section>
 
+  {pa && (
+    <section class="seccion" id="participacion" aria-labelledby="h-participacion">
+      <h2 id="h-participacion"><span class="s-ico"><Icono n="votaciones" /></span>Sus votos en el Pleno</h2>
+      <div class="s-cuerpo">
+        <p class="small muted">Todas las votaciones del Pleno de la XV Legislatura con voto nominal publicado, desde que {fem ? 'es diputada' : 'es diputado'} ({fmtFecha(pa.desde)} – {fmtFecha(pa.hasta)}).</p>
+        <p class="s-cifra"><strong>{fmtNum(votoEmitido)}</strong><span>votos de {fmtNum(pa.enEscano)} votaciones en las que tenía escaño ({pctDe(votoEmitido, pa.enEscano)})</span></p>
+        <span class="barra" aria-hidden="true"><span class="b-si" style={`width:${pctDe(pa.si, pa.enEscano).replace(',', '.').replace(' ', '')}`}></span><span class="b-no" style={`width:${pctDe(pa.no, pa.enEscano).replace(',', '.').replace(' ', '')}`}></span><span class="b-abs" style={`width:${pctDe(pa.abstencion, pa.enEscano).replace(',', '.').replace(' ', '')}`}></span><span class="b-nv" style={`width:${pctDe(pa.noVota, pa.enEscano).replace(',', '.').replace(' ', '')}`}></span></span>
+        <p class="leyenda-votos small">
+          <span class="pill"><span class="dot" style="background:var(--si)"></span>{fmtNum(pa.si)} sí</span>
+          <span class="pill"><span class="dot" style="background:var(--no)"></span>{fmtNum(pa.no)} no</span>
+          <span class="pill"><span class="dot" style="background:var(--abs)"></span>{fmtNum(pa.abstencion)} abstención</span>
+          <span class="pill"><span class="dot" style="background:var(--novota)"></span>{fmtNum(pa.noVota)} no votó</span>
+        </p>
+        <h3>Votos distintos de su grupo</h3>
+        {d.grupoCorto === 'Mixto'
+          ? <p class="small">En el Grupo Mixto conviven varios partidos, así que no se cuenta como voto distinto del grupo.</p>
+          : pa.distintoGrupo === 0
+            ? <p>Siempre votó lo mismo que la mayoría de su grupo (o no votó).</p>
+            : (
+              <>
+                <p><strong>{fmtNum(pa.distintoGrupo)}</strong> {pa.distintoGrupo === 1 ? 'vez votó' : 'veces votó'} sí, no o abstención distinto de la mayoría de su grupo en esa votación{distintas.length < pa.distintoGrupo ? `. Las ${distintas.length} más recientes:` : ':'}</p>
+                <ul class="votos">
+                  {distintas.map((v) => (
+                    <li><a class="v-fila" href={url(`/votaciones?v=${encodeURIComponent(v!.id)}`)}>
+                      <span class="pill voto" style={`border-color:${colorVoto[v!.votos[String(d.codParlamentario)]] ?? 'var(--border)'}`}><span class="dot" style={`background:${colorVoto[v!.votos[String(d.codParlamentario)]] ?? 'transparent'}`}></span>{v!.votos[String(d.codParlamentario)]}</span>
+                      <span class="v-texto"><strong class="v-oficial-t">{v!.titulo}</strong><span class="muted small">{fmtFecha(v!.fecha)} · {v!.resultado}{v!.detalle && ` · ${v!.detalle}`}</span></span>
+                      <span class="v-ir" aria-hidden="true"><Icono n="derecha" tam={18} /></span>
+                    </a></li>
+                  ))}
+                </ul>
+              </>
+            )}
+        <p class="fuente"><Icono n="info" tam={16} /><span>Votos nominales de los datos abiertos del Congreso. El grupo de cada votación es el que publica el Congreso para esa fecha; las votaciones secretas no cuentan · <a href={url('/metodologia#participacion')}>Cómo se calcula</a> · <a href={url('/votaciones')}>Todas las votaciones</a></span></p>
+      </div>
+    </section>
+  )}
+
   {votosDip.length > 0 && (
     <section class="seccion" id="votaciones" aria-labelledby="h-votaciones">
       <h2 id="h-votaciones"><span class="s-ico"><Icono n="voto" /></span>Votaciones sobre vivienda</h2>
@@ -287,6 +449,62 @@ const LINEA_CORTA = 6;
       </div>
     </section>
   )}
+
+  <section class="seccion" id="actividades" aria-labelledby="h-actividades">
+    <h2 id="h-actividades"><span class="s-ico"><Icono n="actividades" /></span>Cargos y actividades compatibles</h2>
+    <div class="s-cuerpo">
+      {!act ? <p class="muted">No hay registro de actividades publicado.</p> : act.pendiente ? (
+        <p>El Pleno del Congreso aún no ha resuelto sobre la compatibilidad de sus actividades, así que el Congreso no publica todavía su contenido.</p>
+      ) : act.total === 0 ? <p>No declara cargos ni actividades además de su escaño.</p> : (
+        <>
+          <p class="small muted">Lo que {fem ? 'la diputada' : 'el diputado'} ha declarado y el Pleno ha considerado compatible con el escaño, copiado literalmente del Registro de Intereses.</p>
+          {act.secciones.map((sc) => (
+            <>
+              <h3>{sc.titulo}</h3>
+              <ul class="lineas">{sc.items.map((i) => <li>{i.texto}{i.fechaAcuerdo && <span class="muted small"> · acuerdo del Pleno del {fmtFecha(i.fechaAcuerdo)}</span>}</li>)}</ul>
+            </>
+          ))}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{act && <><a href={act.url} rel="noopener">Registro de Intereses - Actividades (PDF) ↗</a> · </>}<a href={url('/metodologia#actividades')}>Cómo se obtiene</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="trabajos" aria-labelledby="h-trabajos">
+    <h2 id="h-trabajos"><span class="s-ico"><Icono n="trabajos" /></span>Trabajos anteriores e intereses</h2>
+    <div class="s-cuerpo">
+      {!inter ? <p class="muted">No hay declaración de intereses económicos publicada.</p> : (
+        <>
+          {inter.avisos.map((a) => <AvisoDudoso texto={a} url={inter.declaraciones[0]?.url} nombre={d.nombreCompleto} />)}
+          <h3>Actividades en los cinco años anteriores a su escaño</h3>
+          {nTrab === 0 ? <p>No declara actividades en ese periodo.</p> : (
+            <>
+              <p class="small muted">Según su declaración de intereses económicos del {fmtFecha(inter.trabajosFuente!.fecha)}: las que pueden condicionar su actividad política o le dieron ingresos.</p>
+              <ul class="trabajos">{inter.trabajos.map((t) => (
+                <li>
+                  <span class="tr-l1"><strong>{t.empleador || t.descripcion}</strong>{t.sector && <span class="pill tag">{t.sector}</span>}</span>
+                  <span class="tr-l2">{[t.periodo, t.empleador && t.descripcion].filter(Boolean).join(' · ')}</span>
+                </li>
+              ))}</ul>
+            </>
+          )}
+          <h3>Donaciones y obsequios recibidos</h3>
+          {inter.donaciones.length === 0 ? <p class="small">No declara donaciones, obsequios ni beneficios no remunerados.</p>
+            : <ul class="lineas">{inter.donaciones.map((x) => <li>{x.benefactor && <strong>{x.benefactor}: </strong>}{x.descripcion}</li>)}</ul>}
+          <h3>Fundaciones y asociaciones a las que contribuye</h3>
+          {inter.contribuciones.length === 0 ? <p class="small">No declara contribuciones.</p>
+            : <ul class="lineas">{inter.contribuciones.map((x) => <li>{x.destinatario && <strong>{x.destinatario}: </strong>}{x.descripcion}</li>)}</ul>}
+          {inter.otros.length > 0 && (
+            <>
+              <h3>Otros intereses y observaciones</h3>
+              <ul class="lineas">{inter.otros.map((o) => <li>{o}</li>)}</ul>
+            </>
+          )}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{inter && inter.declaraciones.map((x, i) => <>{i > 0 && ' · '}<a href={x.url} rel="noopener">{x.tipo === 'modificacion' ? 'Modificación' : 'Declaración'} del {fmtFecha(x.fecha)} (PDF) ↗</a></>)}{inter && ' · '}<a href={url('/metodologia#intereses')}>Cómo se obtiene</a></span></p>
+    </div>
+  </section>
 
   <section class="seccion" id="formacion" aria-labelledby="h-formacion">
     <h2 id="h-formacion"><span class="s-ico"><Icono n="formacion" /></span>Formación</h2>
@@ -429,6 +647,26 @@ const LINEA_CORTA = 6;
   .fuente { display: flex; gap: 8px; align-items: flex-start; margin: 16px 0 0; padding-top: 12px; border-top: 1px dashed var(--border); font-size: .85rem; line-height: 1.5; color: var(--muted); }
   .fuente :global(.icono) { flex: none; margin-top: 2px; color: var(--accent-text); }
 
+  .m-grupo { grid-column: 1 / -1; margin: 10px 0 -2px; padding: 0; border: 0; font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .m-grupo:first-child { margin-top: 0; }
+  /* Importes: texto literal a la izquierda, importe literal a la derecha */
+  .importes { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .importes li { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; padding: 11px 16px; border-bottom: 1px solid var(--border); line-height: 1.45; }
+  .importes li:last-child { border-bottom: 0; }
+  .importes li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  .imp { flex: none; max-width: 45%; text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .irpf { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; margin: 16px 0 0; padding: 12px 16px; border-radius: var(--radius); background: var(--accent-soft); }
+  .irpf strong { font-variant-numeric: tabular-nums; }
+  .barra { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--chip); margin: 0 0 10px; }
+  .barra > span { display: block; height: 100%; }
+  .b-si { background: var(--si); } .b-no { background: var(--no); } .b-abs { background: var(--abs); } .b-nv { background: var(--novota); }
+  .trabajos { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .trabajos li { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .trabajos li:last-child { border-bottom: 0; }
+  .tr-l1 { overflow-wrap: anywhere; }
+  .tr-l2 { font-size: .875rem; color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
+  .v-oficial-t { font-weight: 600; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
   /* Propiedades: una fila por bien (descripción literal arriba, resto de datos debajo) */
   .filtro-bienes { margin: 4px 0 12px; max-width: 100%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
   .filtro-bienes .btn { flex: none; white-space: nowrap; min-height: 40px; padding: 6px 12px; }
@@ -551,6 +789,8 @@ const LINEA_CORTA = 6;
     .v-fila .v-ir { grid-column: 2; grid-row: 1 / span 2; }
     .s-cifra strong { font-size: 1.6rem; }
     .bien { padding: 11px 14px; }
+    .importes li { padding: 10px 14px; }
+    .imp { max-width: 50%; }
     .filtro-bienes .btn { padding: 6px 10px; font-size: .875rem; }
   }
   @media (max-width: 560px) {
@@ -564,6 +804,7 @@ const LINEA_CORTA = 6;
   }
   @media (max-width: 359px) {
     .tesela { padding: 10px; }
+    .tesela :global(.t-ir) { display: none; }
     .t-cab { font-size: .8rem; }
     .t-ico { width: 28px; height: 28px; }
     .t-v { font-size: 1.3rem; }
