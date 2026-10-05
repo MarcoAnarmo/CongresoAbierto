@@ -1,284 +1,435 @@
 ---
 import Base from '../layouts/Base.astro';
-import { votacionesPleno, pendientes, diputados, grupos, fmtFecha, url, TEMAS, temasDe } from '../lib/data';
+import Icono from '../components/Icono.astro';
+import { votacionesPleno, pendientes, grupos, fmtFecha, fmtNum, url, TEMAS } from '../lib/data';
+import { aItem, itemPendiente, ordenar, listaHtml, filaHtml, TIPOS, type ItemVotacion } from '../lib/votaciones';
 
-/** Clasificación por el tipo de punto del orden del día (campo oficial «titulo» de la votación). */
-const claseTipo = (t: string) => (/Decretos-leyes/.test(t) ? 'rdl' : /no de Ley/i.test(t) ? 'pnl' : /Proposici[oó]n(es)? de Ley/i.test(t) ? 'pl' : /Mociones/.test(t) ? 'mocion' : /Dict[aá]menes de Comisiones sobre iniciativas legislativas|totalidad de iniciativas legislativas|Enmiendas del Senado|Avocaci|lectura [uú]nica/i.test(t) ? 'leg' : /Convenios internacionales/.test(t) ? 'int' : 'otro');
-const nombreTipo: Record<string, string> = { rdl: 'Decreto-ley', pnl: 'Proposición no de ley', pl: 'Proposición de ley', mocion: 'Moción', leg: 'Tramitación de leyes', int: 'Convenio internacional' };
-const favorable = (r: string) => (/Aprobada|Convalidado/.test(r) ? 'si' : 'no');
-const busca = (...xs: (string | undefined)[]) => xs.filter(Boolean).join(' ').toLowerCase();
-/** Etiqueta corta oficial sin la fecha final: «RDL 8/2026 · alquiler (28/04/2026)» → «RDL 8/2026 · alquiler». */
-const corto = (tema: string) => tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '');
-const etDoc: Record<string, string> = { boe: 'BOE', bocg: 'BOCG', ds: 'Diario', votacion: 'Votación' };
-
-const nombreTema = Object.fromEntries(TEMAS.map((t) => [t.id, t.nombre]));
-const cuentaTema = Object.fromEntries(TEMAS.map((t) => [t.id, votacionesPleno.filter((v) => temasDe(v).includes(t.id)).length]));
-const lista = votacionesPleno.map((v) => ({
-  v,
-  porGrupo: grupos.map((g) => {
-    const ds = diputados.filter((d) => d.grupoCorto === g.corto);
-    const c = { 'Sí': 0, 'No': 0, 'Abstención': 0, 'No vota': 0 } as Record<string, number>;
-    ds.forEach((d) => { const x = v.votos[String(d.codParlamentario)]; if (x) c[x]++; });
-    return { g, c, total: c['Sí'] + c['No'] + c['Abstención'] + c['No vota'] };
-  }).filter((x) => x.total > 0),
-}));
-const pct = (n: number, t: number) => `${((100 * n) / t).toFixed(2)}%`;
-const fechas = [...new Set([...votacionesPleno.map((v) => v.fecha), ...pendientes.map((p) => p.fecha)])];
+const base = url('');
+const items = votacionesPleno.map(aItem);
+const todas = ordenar([...pendientes.map(itemPendiente), ...items]);
+const clave = todas.filter((i) => i.cl);
+// Primera carga: las más recientes ya en el HTML; el resto llega con el índice (/datos/votaciones.json)
+const PRIMERAS = 40;
+const porDia: Record<string, number> = {};
+todas.forEach((i) => { porDia[i.f] = (porDia[i.f] ?? 0) + 1; });
+const primera = todas.at(-1)!.f;
+const cuentaTema = Object.fromEntries(TEMAS.map((t) => [t.id, todas.filter((i) => i.te.includes(t.id)).length]));
+// Lo que solo tienen las votaciones clave y las pendientes: contenido literal, documentos y expediente
+const extra = Object.fromEntries([
+  ...votacionesPleno.filter((v) => !v.automatica).map((v) => [v.id, { contenido: v.contenido ? [v.contenido] : [], documentos: v.documentos, expediente: v.expediente, expedienteUrl: v.expedienteUrl }]),
+  ...pendientes.map((p) => [p.id, { contenido: p.contenidos ?? [], documentos: p.fuentes, estado: p.estado }]),
+]);
+const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="etq clave">Votación clave</span>', '').replace('<span class="vf-meta">', `<span class="vf-meta"><time datetime="${i.f}">${fmtFecha(i.f)}</time>`);
 ---
-<Base title="Votaciones" description="Votaciones del Pleno del Congreso por tema y fecha, con el resultado y el voto de cada grupo según los datos abiertos oficiales.">
-  <h1>Votaciones del Pleno</h1>
-  <p class="muted lead">
-    Qué se votó en el Pleno del Congreso y cuál fue el resultado. Elige un mes o un día en el calendario, o filtra por tema; cada votación se despliega para ver el texto oficial, el voto por grupo y los documentos.
-    Los temas se asignan por palabras del título oficial (<a href={url('/metodologia#temas')}>cómo</a>).
+<Base title="Votaciones" description={`Las ${fmtNum(items.length)} votaciones del Pleno del Congreso de la XV Legislatura publicadas en datos abiertos, por tema y fecha, con el resultado y el voto de cada grupo.`}>
+  <h1>Votaciones</h1>
+  <p class="lead">
+    <span class="largo">Todas las votaciones del Pleno de la XV Legislatura publicadas en los datos abiertos del Congreso, desde el {fmtFecha(primera)}: qué se votó, el resultado y cómo votó cada grupo. Toca una para ver el texto oficial y sus documentos.</span>
+    <span class="corto">Qué se votó en el Pleno desde {new Date(primera + 'T12:00:00').getFullYear()}, el resultado y cómo votó cada grupo.</span>
   </p>
 
-  <div class="arriba">
-    <section class="card calendario" aria-labelledby="cal-mes">
-      <div class="cal-cab">
-        <button class="btn icono" type="button" id="cal-ant" aria-label="Mes anterior con votaciones">‹</button>
-        <h2 id="cal-mes" aria-live="polite"></h2>
-        <button class="btn icono" type="button" id="cal-sig" aria-label="Mes siguiente con votaciones">›</button>
-      </div>
-      <div class="cal-sem" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
-      <div class="cal-dias" id="cal-dias" role="grid" aria-labelledby="cal-mes"></div>
-      <p class="small muted cal-ley"><span><i class="punto si"></i> aprobadas o convalidadas</span><span><i class="punto no"></i> rechazadas o derogadas</span><span><i class="punto pend"></i> voto pendiente</span><span>El número indica cuántas votaciones hubo ese día.</span></p>
-    </section>
-
-    <div class="filtros" role="search" aria-label="Filtrar votaciones">
-      <label class="sr-only" for="v-texto">Buscar en las votaciones</label>
-      <input type="search" id="v-texto" placeholder="Buscar: alquiler, SOCIMI, ocupación…" autocomplete="off" />
-      <div class="chips temas-chips" role="group" aria-label="Tema">
-        <button class="chip" type="button" data-f="tema" data-v="" aria-pressed="true">Todos los temas</button>
-        {TEMAS.filter((t) => cuentaTema[t.id] > 0).map((t) => <button class="chip" type="button" data-f="tema" data-v={t.id} aria-pressed="false">{t.nombre} <span class="n-chip">{cuentaTema[t.id]}</span></button>)}
-      </div>
-      <details class="mas-filtros">
-        <summary>Más filtros</summary>
-        <div class="chips" role="group" aria-label="Tipo de iniciativa">
-          <button class="chip" type="button" data-f="tipo" data-v="" aria-pressed="true">Todos los tipos</button>
-          <button class="chip" type="button" data-f="tipo" data-v="rdl" aria-pressed="false">Decretos-leyes</button>
-          <button class="chip" type="button" data-f="tipo" data-v="pl" aria-pressed="false">Proposiciones de ley</button>
-          <button class="chip" type="button" data-f="tipo" data-v="pnl" aria-pressed="false">No de ley</button>
-          <button class="chip" type="button" data-f="tipo" data-v="mocion" aria-pressed="false">Mociones</button>
-          <button class="chip" type="button" data-f="tipo" data-v="leg" aria-pressed="false">Tramitación de leyes</button>
-          <button class="chip" type="button" data-f="tipo" data-v="int" aria-pressed="false">Convenios internacionales</button>
-          <button class="chip" type="button" data-f="tipo" data-v="otro" aria-pressed="false">Otros</button>
-        </div>
-        <div class="chips" role="group" aria-label="Resultado">
-          <button class="chip" type="button" data-f="res" data-v="" aria-pressed="true">Cualquier resultado</button>
-          <button class="chip" type="button" data-f="res" data-v="si" aria-pressed="false">Aprobadas o convalidadas</button>
-          <button class="chip" type="button" data-f="res" data-v="no" aria-pressed="false">Rechazadas o derogadas</button>
-        </div>
-        <div class="chips" role="group" aria-label="Votaciones clave">
-          <button class="chip" type="button" data-f="clave" data-v="" aria-pressed="true">Todas</button>
-          <button class="chip" type="button" data-f="clave" data-v="si" aria-pressed="false">Solo votaciones clave</button>
-        </div>
-      </details>
-      <p class="small muted cuenta"><span id="v-cuenta" aria-live="polite"></span> <button type="button" class="enlace" id="v-todas" hidden>Ver todo el mes</button></p>
+  <div class="vista-barra">
+    <div class="segmentado" role="group" aria-label="Cómo ver las votaciones">
+      <button class="btn" type="button" data-vista="todas" aria-pressed="true"><Icono n="votaciones" tam={19} /><span>Todas</span></button>
+      <button class="btn" type="button" data-vista="clave" aria-pressed="false"><Icono n="vivienda" tam={19} /><span class="largo">Clave de vivienda</span><span class="corto">Vivienda</span></button>
+      <button class="btn" type="button" data-vista="calendario" aria-pressed="false"><Icono n="calendario" tam={19} /><span>Calendario</span></button>
     </div>
   </div>
 
-  <div class="lista">
-    {pendientes.map((p) => (
-      <article class="card votacion pendiente" data-fecha={p.fecha} data-tema="vivienda" data-tipo="rdl" data-res="pend" data-clave="si" data-busca={busca(p.titulo, p.estado, ...(p.contenidos ?? []).flatMap((c) => c.items))}>
-        <p class="meta small"><time datetime={p.fecha}>{fmtFecha(p.fecha)}</time><span class="etq">Decreto-ley</span></p>
-        <h2>{p.titulo}</h2>
-        <p class="resultado"><span class="insignia pend">Voto nominal pendiente</span></p>
-        <p class="small">{p.estado}</p>
-        {(p.contenidos ?? []).map((c) => (
-          <details class="pliegue">
-            <summary>{c.etiqueta}</summary>
-            <ul>{c.items.map((i) => <li>{i}</li>)}</ul>
-            <p class="small muted">Fuente: <a href={c.fuente.url} rel="noopener">{c.fuente.titulo} ↗</a></p>
-          </details>
-        ))}
-        <details class="pliegue">
-          <summary>Documentos oficiales</summary>
-          <ul class="docs">{p.fuentes.map((f) => <li><a href={f.url} rel="noopener">{f.titulo} ↗</a></li>)}</ul>
-        </details>
-      </article>
-    ))}
+  <div class="filtros" id="v-filtros" role="search" aria-label="Buscar votaciones">
+    <label class="sr-only" for="v-texto">Buscar en las votaciones</label>
+    <input type="search" id="v-texto" placeholder="Buscar: alquiler, pensiones…" autocomplete="off" />
+    <button class="btn boton-filtrar" type="button" id="v-abrir-filtros" aria-haspopup="dialog" aria-controls="v-dlg-filtros"><Icono n="filtros" tam={19} /><span>Filtrar</span><span class="n-filtros" id="v-n-filtros" hidden></span></button>
+    <div class="filtros-mas" id="v-filtros-mas">
+      <label class="sr-only" for="v-tema">Tema</label>
+      <select id="v-tema">
+        <option value="">Todos los temas</option>
+        {TEMAS.filter((t) => cuentaTema[t.id] > 0).map((t) => <option value={t.id}>{t.nombre} ({fmtNum(cuentaTema[t.id])})</option>)}
+      </select>
+      <label class="sr-only" for="v-tipo">Tipo de iniciativa</label>
+      <select id="v-tipo">
+        <option value="">Todos los tipos</option>
+        {TIPOS.map((t) => <option value={t.id}>{t.plural}</option>)}
+      </select>
+      <label class="sr-only" for="v-res">Resultado</label>
+      <select id="v-res">
+        <option value="">Cualquier resultado</option>
+        <option value="si">Aprobadas o convalidadas</option>
+        <option value="no">Rechazadas o derogadas</option>
+      </select>
+    </div>
+    <p class="small muted cuenta" id="v-cuenta" aria-live="polite">{fmtNum(todas.length)} votaciones</p>
+  </div>
+  <dialog class="dlg-filtros" id="v-dlg-filtros" aria-labelledby="v-dlg-filtros-t">
+    <div class="df-cab">
+      <h2 id="v-dlg-filtros-t">Filtrar votaciones</h2>
+      <button class="df-cerrar" type="button" aria-label="Cerrar"><Icono n="cerrar" /></button>
+    </div>
+    <div class="df-cuerpo" id="v-df-cuerpo" tabindex="-1" autofocus></div>
+    <div class="df-pie">
+      <button class="btn" type="button" id="v-quitar">Quitar filtros</button>
+      <button class="btn primario" type="button" id="v-ver">Ver resultados</button>
+    </div>
+  </dialog>
 
-    {lista.map(({ v, porGrupo }) => {
-      const t = v.totales; const total = t.si + t.no + t.abstencion + t.noVota; const tipo = claseTipo(v.tipo);
-      return (
-        <article class="card votacion" data-fecha={v.fecha} data-tema={temasDe(v).join(' ')} data-tipo={tipo} data-res={favorable(v.resultado)} data-clave={v.automatica ? '' : 'si'} data-busca={busca(v.titulo, v.tema, v.tipo, v.detalle, v.resultado, ...temasDe(v).map((t) => nombreTema[t]), ...(v.contenido?.items ?? []))}>
-          <p class="meta small"><time datetime={v.fecha}>{fmtFecha(v.fecha)}</time><span class="etq">{nombreTipo[tipo] ?? v.tipo.replace(/\.$/, '')}</span>{!v.automatica && <span class="etq clave">Votación clave</span>}</p>
-          {v.automatica ? <h2 class="largo">{v.titulo}</h2> : <h2>{corto(v.tema)}</h2>}
-          {v.detalle && <p class="detalle small">{v.detalle}</p>}
-          <p class="temas small">{temasDe(v).map((t) => <span>{nombreTema[t] ?? t}</span>)}</p>
-          <p class="resultado">
-            <span class={`insignia ${favorable(v.resultado)}`}>{v.resultado}</span>
-            <span class="small"><strong>{t.si}</strong> sí · <strong>{t.no}</strong> no · <strong>{t.abstencion}</strong> abst. · {t.noVota} no vota</span>
-          </p>
-          <div class="barra" role="img" aria-label={`Sí ${t.si}, No ${t.no}, Abstención ${t.abstencion}, No vota ${t.noVota}`}>
-            <span class="b-si" style={`width:${pct(t.si, total)}`}></span><span class="b-no" style={`width:${pct(t.no, total)}`}></span><span class="b-abs" style={`width:${pct(t.abstencion, total)}`}></span><span class="b-nv" style={`width:${pct(t.noVota, total)}`}></span>
-          </div>
-
-          <details class="pliegue">
-            <summary>Qué se votó</summary>
-            <p class="titulo-oficial">{v.titulo}</p>
-            <p class="small muted">{v.tipo} Sesión {v.sesion}, votación {v.numeroVotacion}{v.expediente && <> · Expediente <a href={v.expedienteUrl} rel="noopener">{v.expediente} ↗</a></>}</p>
-            {v.contenido && (
-              <div class="contenido">
-                <p class="docs-t">{v.contenido.etiqueta}</p>
-                <ul>{v.contenido.items.map((i) => <li>{i}</li>)}</ul>
-                <p class="small muted">Fuente: <a href={v.contenido.fuente.url} rel="noopener">{v.contenido.fuente.titulo} ↗</a></p>
-              </div>
-            )}
-          </details>
-
-          <details class="pliegue">
-            <summary>Voto por grupo</summary>
-            <ul class="grupos" data-g={porGrupo.map(({ g, c }) => [g.corto, c['Sí'], c['No'], c['Abstención'], c['No vota']].join(',')).join(';')}></ul>
-            <p class="small muted">Composición actual de cada grupo. <a href={url(`/?votacion=${encodeURIComponent(v.id)}#hemiciclo`)}>Ver esta votación escaño a escaño en el hemiciclo</a>.</p>
-          </details>
-
-          <details class="pliegue">
-            <summary>Documentos oficiales</summary>
-            <ul class="docs">
-              {v.documentos.map((d) => <li><span class={`tipo t-${d.tipo ?? 'otro'}`}>{etDoc[d.tipo ?? ''] ?? 'Doc.'}</span><a href={d.url} rel="noopener">{d.titulo} ↗</a></li>)}
-              <li><span class="tipo t-json">Datos</span><a href={v.fuenteUrl} rel="noopener">Voto de cada diputado (JSON, datos abiertos) ↗</a></li>
-            </ul>
-          </details>
-        </article>
-      );
-    })}
+  <!-- Todas: más recientes primero, agrupadas por día -->
+  <div id="vista-todas">
+    <div class="v-lista" id="v-lista" set:html={listaHtml(todas.slice(0, PRIMERAS), base, porDia)} />
+    <p class="mas"><button class="btn" type="button" id="v-mas">Ver más votaciones</button></p>
   </div>
 
-  <p class="vacio muted" id="v-vacio" hidden>Ninguna votación coincide con el filtro.</p>
+  <!-- Votaciones clave de vivienda (con contenido y documentos revisados a mano) -->
+  <div id="vista-clave" hidden>
+    <p class="small muted nota-vista">Votaciones sobre vivienda con el contenido literal del texto votado y sus documentos oficiales (BOE, BOCG, Diario de Sesiones). Son las que aparecen en las fichas y en las tarjetas para compartir.</p>
+    <ul class="v-filas sueltas" set:html={clave.map(conFecha).join('')} />
+  </div>
+
+  <!-- Calendario: un mes (o un día) -->
+  <div id="vista-calendario" hidden>
+    <section class="card calendario" aria-label="Calendario de votaciones">
+      <div class="cal-cab">
+        <button class="btn icono" type="button" id="cal-ant" aria-label="Mes anterior con votaciones">‹</button>
+        <label class="sr-only" for="cal-mes">Mes</label>
+        <select id="cal-mes"></select>
+        <button class="btn icono" type="button" id="cal-sig" aria-label="Mes siguiente con votaciones">›</button>
+      </div>
+      <div class="cal-sem" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div class="cal-dias" id="cal-dias"></div>
+      <p class="small muted cal-ley"><span><i class="punto si"></i> aprobadas o convalidadas</span><span><i class="punto no"></i> rechazadas o derogadas</span><span><i class="punto pend"></i> voto pendiente</span></p>
+    </section>
+    <p class="small muted cal-cuenta"><span id="cal-cuenta" aria-live="polite"></span> <button type="button" class="enlace" id="cal-todo" hidden>Ver todo el mes</button></p>
+    <div class="v-lista" id="cal-lista"></div>
+  </div>
+
+  <p class="vacio muted" id="v-vacio" hidden>Ninguna votación coincide con la búsqueda o los filtros.</p>
 
   <details class="card glosario">
     <summary>Glosario de procedimiento</summary>
     <ul class="small">
-      <li><strong>Convalidación o derogación de Reales Decretos-leyes:</strong> el Congreso decide si un decreto-ley del Gobierno sigue en vigor (convalidación) o queda derogado (art. 86 de la Constitución).</li>
+      <li><strong>Convalidación o derogación de Reales Decretos-leyes:</strong> el Congreso decide si un decreto-ley del Gobierno sigue en vigor (convalidación) o queda derogado (art. 86 de la Constitución). Con las Cortes disueltas, lo decide la Diputación Permanente (art. 78).</li>
       <li><strong>Toma en consideración de Proposiciones de Ley:</strong> el Pleno decide si una propuesta de ley presentada por grupos parlamentarios empieza a tramitarse (art. 126 del Reglamento del Congreso).</li>
       <li><strong>Proposiciones no de Ley:</strong> propuestas sin rango de ley en las que la Cámara fija posición o insta al Gobierno (arts. 193 a 195 del Reglamento del Congreso).</li>
+      <li><strong>Votación por llamamiento:</strong> cada diputado dice su voto en voz alta (por ejemplo, en las investiduras). El voto de cada diputado en estas votaciones no aparece en los datos abiertos, o lo hace más tarde.</li>
     </ul>
   </details>
-  <p class="small muted">Los votos son los publicados en los <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos del Congreso</a>; los textos, los oficiales del BOE y del BOCG.</p>
+  <p class="small muted">Los votos son los publicados en los <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos del Congreso</a>; los textos, los oficiales del BOE y del BOCG. <a href={url('/metodologia#votaciones')}>Cómo se presentan</a>.</p>
+
+  <dialog class="dlg-voto" id="dlg-voto" aria-labelledby="dlg-voto-t">
+    <div class="d-cab">
+      <span class="d-ico"><Icono n="votaciones" /></span>
+      <h2 id="dlg-voto-t">Votación</h2>
+      <button class="d-cerrar" type="button" aria-label="Cerrar"><Icono n="cerrar" /></button>
+    </div>
+    <div class="d-cuerpo" id="dlg-voto-c" tabindex="-1" autofocus></div>
+  </dialog>
 </Base>
 
-<script type="application/json" id="v-fechas" set:html={JSON.stringify(fechas)} />
-<script type="application/json" id="v-colores" set:html={JSON.stringify(Object.fromEntries(grupos.map((g) => [g.corto, g.color])))} />
+<script type="application/json" id="v-datos" set:html={JSON.stringify({
+  base, primeras: PRIMERAS, extra,
+  temas: Object.fromEntries(TEMAS.map((t) => [t.id, t.nombre])),
+  colores: Object.fromEntries(grupos.map((g) => [g.corto, g.color])),
+  // Mientras llega el índice completo, la página funciona con las votaciones de la primera carga y las clave
+  inicial: [...todas.slice(0, PRIMERAS), ...clave.filter((i) => todas.indexOf(i) >= PRIMERAS)],
+})} />
 
 <script>
-  const cards = [...document.querySelectorAll<HTMLElement>('article.votacion')];
-  const texto = document.getElementById('v-texto') as HTMLInputElement;
-  const cuenta = document.getElementById('v-cuenta')!;
-  const todas = document.getElementById('v-todas') as HTMLButtonElement;
-  const vacio = document.getElementById('v-vacio')!;
-  const estado: Record<string, string> = { tema: '', tipo: '', res: '', clave: '', dia: '' };
-  const norm = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  import { deslizarParaCerrar } from '../scripts/hoja';
+  import { listaHtml, barraHtml, totalesTexto, nombreTipo, favorable, type ItemVotacion } from '../lib/votaciones';
+
+  interface Contenido { etiqueta: string; items: string[]; fuente: { titulo: string; url: string } }
+  interface Extra { contenido: Contenido[]; documentos: { titulo: string; url: string; tipo?: string }[]; expediente?: string; expedienteUrl?: string; estado?: string }
+  const cfg = JSON.parse(document.getElementById('v-datos')!.textContent!) as {
+    base: string; primeras: number; extra: Record<string, Extra>; temas: Record<string, string>; colores: Record<string, string>; inicial: ItemVotacion[];
+  };
+  const { base } = cfg;
+  let todas: ItemVotacion[] = cfg.inicial;
+  let completo = false;
+  const porId = new Map<string, ItemVotacion>();
+  const indexar = () => { porId.clear(); todas.forEach((i) => porId.set(i.id, i)); };
+  indexar();
+
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const texto = $<HTMLInputElement>('v-texto');
+  const selTema = $<HTMLSelectElement>('v-tema'), selTipo = $<HTMLSelectElement>('v-tipo'), selRes = $<HTMLSelectElement>('v-res');
+  const cuenta = $('v-cuenta'), vacio = $('v-vacio'), lista = $('v-lista'), mas = $<HTMLButtonElement>('v-mas');
+  const norm = (x: string) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const fmt = (n: number) => n.toLocaleString('es-ES');
   const fechaLarga = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
-  const busqueda = () => norm(texto.value.trim());
-  /** Filtros de tema, tipo, resultado y texto (sin fecha). */
-  function porFiltros() {
-    const q = busqueda();
-    return cards.filter((c) =>
-      (!estado.tema || (c.dataset.tema ?? '').split(' ').includes(estado.tema)) &&
-      (!estado.tipo || c.dataset.tipo === estado.tipo) &&
-      (!estado.res || c.dataset.res === estado.res) &&
-      (!estado.clave || c.dataset.clave === estado.clave) &&
-      (!q || norm(c.dataset.busca ?? '').includes(q)));
+  // ---------- Vistas ----------
+  type Vista = 'todas' | 'clave' | 'calendario';
+  const VISTAS: Vista[] = ['todas', 'clave', 'calendario'];
+  const botonesVista = [...document.querySelectorAll<HTMLButtonElement>('[data-vista]')];
+  const params = new URLSearchParams(location.search);
+  let vista: Vista = VISTAS.find((x) => x === params.get('vista')) ?? 'todas';
+  function ponerVista(v: Vista) {
+    vista = v;
+    botonesVista.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === v)));
+    VISTAS.forEach((x) => { $(`vista-${x}`).hidden = x !== v; });
+    $('v-filtros').hidden = v === 'clave';
+    cuenta.hidden = v !== 'todas';
+    const u = new URL(location.href);
+    if (v === 'todas') u.searchParams.delete('vista'); else u.searchParams.set('vista', v);
+    history.replaceState(history.state, '', u);
+    aplicar();
   }
-  // Sin búsqueda de texto, la lista muestra el mes del calendario (o el día elegido); con búsqueda, todos los meses
-  function visibles() {
-    const base = porFiltros();
-    if (estado.dia) return base.filter((c) => c.dataset.fecha === estado.dia);
-    if (busqueda()) return base;
-    return base.filter((c) => (c.dataset.fecha ?? '').startsWith(mes));
+  botonesVista.forEach((b) => b.addEventListener('click', () => ponerVista(b.dataset.vista as Vista)));
+
+  // ---------- Filtros ----------
+  const textoDe = (i: ItemVotacion) => norm([i.c, i.t, i.d, i.tp, i.r, ...i.te.map((t) => cfg.temas[t]), ...(cfg.extra[i.id]?.contenido.flatMap((c) => c.items) ?? [])].filter(Boolean).join(' '));
+  const cache = new Map<string, string>();
+  const buscable = (i: ItemVotacion) => { let s = cache.get(i.id); if (s === undefined) { s = textoDe(i); cache.set(i.id, s); } return s; };
+  function filtradas() {
+    const q = norm(texto.value.trim());
+    return todas.filter((i) =>
+      (!selTema.value || i.te.includes(selTema.value)) &&
+      (!selTipo.value || i.k === selTipo.value) &&
+      (!selRes.value || favorable(i.r) === selRes.value) &&
+      (!q || buscable(i).includes(q)));
   }
-  const nombreMes = (m: string) => new Date(+m.slice(0, 4), +m.slice(5, 7) - 1, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-  function aplicar() {
-    const ok = new Set(visibles());
-    cards.forEach((c) => { c.hidden = !ok.has(c); });
-    const n = ok.size; const v = n === 1 ? 'votación' : 'votaciones';
-    cuenta.textContent = estado.dia ? `${n} ${v} el ${fechaLarga(estado.dia)}` : busqueda() ? `${n} ${v} en todos los meses` : `${n} ${v} en ${nombreMes(mes)}`;
-    todas.hidden = !estado.dia;
-    vacio.hidden = n > 0;
-    pintarCalendario();
+  const nFiltros = () => [selTema, selTipo, selRes].filter((s) => s.value).length;
+
+  // ---------- Todas: paginación ----------
+  const PAGINA = 50;
+  let mostradas = cfg.primeras;
+  function pintarTodas() {
+    const fs = filtradas();
+    const porDia: Record<string, number> = {};
+    fs.forEach((i) => { porDia[i.f] = (porDia[i.f] ?? 0) + 1; });
+    lista.innerHTML = listaHtml(fs.slice(0, mostradas), base, porDia);
+    mas.hidden = !completo || fs.length <= mostradas;
+    mas.textContent = `Ver más votaciones (quedan ${fmt(fs.length - mostradas)})`;
+    if (completo) cuenta.textContent = `${fmt(fs.length)} ${fs.length === 1 ? 'votación' : 'votaciones'}`;
+    vacio.hidden = fs.length > 0;
+  }
+  mas.addEventListener('click', () => { mostradas += PAGINA; pintarTodas(); });
+  // Al llegar al final de la lista se cargan más solas
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((es) => { if (es[0].isIntersecting && !mas.hidden && vista === 'todas') { mostradas += PAGINA; pintarTodas(); } }, { rootMargin: '400px' }).observe(mas);
   }
 
-  // Calendario: solo se navega entre meses que tienen votaciones
-  const fechas = JSON.parse(document.getElementById('v-fechas')!.textContent!) as string[];
-  const meses = [...new Set(fechas.map((f) => f.slice(0, 7)))].sort();
-  let mes = meses[meses.length - 1];
-  const tituloMes = document.getElementById('cal-mes')!;
-  const dias = document.getElementById('cal-dias')!;
-  const ant = document.getElementById('cal-ant') as HTMLButtonElement;
-  const sig = document.getElementById('cal-sig') as HTMLButtonElement;
-
+  // ---------- Calendario ----------
+  const selMes = $<HTMLSelectElement>('cal-mes'), dias = $('cal-dias'), calLista = $('cal-lista');
+  const ant = $<HTMLButtonElement>('cal-ant'), sig = $<HTMLButtonElement>('cal-sig');
+  const calCuenta = $('cal-cuenta'), calTodo = $<HTMLButtonElement>('cal-todo');
+  let meses: string[] = [], mes = '', dia = '';
+  const nombreMes = (m: string) => { const s = new Date(+m.slice(0, 4), +m.slice(5, 7) - 1, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }); return s.charAt(0).toUpperCase() + s.slice(1); };
+  function prepararMeses() {
+    meses = [...new Set(todas.map((i) => i.f.slice(0, 7)))].sort();
+    if (!meses.includes(mes)) mes = meses.at(-1)!;
+    selMes.innerHTML = [...meses].reverse().map((m) => `<option value="${m}">${nombreMes(m)}</option>`).join('');
+  }
   function pintarCalendario() {
+    selMes.value = mes;
     const [a, m] = mes.split('-').map(Number);
-    const nombre = new Date(a, m - 1, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-    tituloMes.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
-    const enFiltro = porFiltros();
+    const delMes = filtradas().filter((i) => i.f.startsWith(mes));
     const primero = (new Date(a, m - 1, 1).getDay() + 6) % 7;
     const n = new Date(a, m, 0).getDate();
     let html = '<span></span>'.repeat(primero);
     for (let d = 1; d <= n; d++) {
       const iso = `${mes}-${String(d).padStart(2, '0')}`;
-      const delDia = enFiltro.filter((c) => c.dataset.fecha === iso);
+      const delDia = delMes.filter((i) => i.f === iso);
       if (!delDia.length) { html += `<span class="dia">${d}</span>`; continue; }
-      // Mini barra: proporción de votaciones aprobadas (verde), rechazadas (rojo) y pendientes (gris)
-      const n = (r: string) => delDia.filter((c) => c.dataset.res === r).length;
-      const puntos = delDia.length === 1 ? `<i class="punto ${delDia[0].dataset.res}"></i>`
-        : `<span class="mini">${['si', 'no', 'pend'].map((r) => n(r) ? `<i class="${r}" style="flex:${n(r)}"></i>` : '').join('')}</span><span class="cnt">${delDia.length}</span>`;
-      html += `<button type="button" class="dia con" data-dia="${iso}" aria-pressed="${estado.dia === iso}" aria-label="${fechaLarga(iso)}: ${delDia.length} ${delDia.length === 1 ? 'votación' : 'votaciones'}">${d}<span class="puntos">${puntos}</span></button>`;
+      const k = (r: string) => delDia.filter((i) => favorable(i.r) === r).length;
+      const puntos = delDia.length === 1 ? `<i class="punto ${favorable(delDia[0].r)}"></i>`
+        : `<span class="mini">${['si', 'no', 'pend'].map((r) => k(r) ? `<i class="${r}" style="flex:${k(r)}"></i>` : '').join('')}</span><span class="cnt">${delDia.length}</span>`;
+      html += `<button type="button" class="dia con" data-dia="${iso}" aria-pressed="${dia === iso}" aria-label="${fechaLarga(iso)}: ${delDia.length} ${delDia.length === 1 ? 'votación' : 'votaciones'}">${d}<span class="puntos">${puntos}</span></button>`;
     }
     dias.innerHTML = html;
     const i = meses.indexOf(mes);
     ant.disabled = i <= 0; sig.disabled = i >= meses.length - 1;
+    const vis = dia ? delMes.filter((x) => x.f === dia) : delMes;
+    calLista.innerHTML = listaHtml(vis, base);
+    const v = vis.length === 1 ? 'votación' : 'votaciones';
+    calCuenta.textContent = dia ? `${vis.length} ${v} el ${fechaLarga(dia)}` : `${vis.length} ${v} en ${nombreMes(mes).toLowerCase()}`;
+    calTodo.hidden = !dia;
+    vacio.hidden = true;
   }
   dias.addEventListener('click', (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-dia]');
-    if (!b) return;
-    estado.dia = estado.dia === b.dataset.dia ? '' : b.dataset.dia!;
-    aplicar();
+    if (b) { dia = dia === b.dataset.dia ? '' : b.dataset.dia!; pintarCalendario(); }
   });
-  ant.addEventListener('click', () => { const i = meses.indexOf(mes); if (i > 0) { mes = meses[i - 1]; estado.dia = ''; aplicar(); } });
-  sig.addEventListener('click', () => { const i = meses.indexOf(mes); if (i < meses.length - 1) { mes = meses[i + 1]; estado.dia = ''; aplicar(); } });
-  todas.addEventListener('click', () => { estado.dia = ''; aplicar(); });
+  const irMes = (m: string) => { mes = m; dia = ''; pintarCalendario(); };
+  ant.addEventListener('click', () => { const i = meses.indexOf(mes); if (i > 0) irMes(meses[i - 1]); });
+  sig.addEventListener('click', () => { const i = meses.indexOf(mes); if (i < meses.length - 1) irMes(meses[i + 1]); });
+  selMes.addEventListener('change', () => irMes(selMes.value));
+  calTodo.addEventListener('click', () => { dia = ''; pintarCalendario(); });
 
-  document.querySelectorAll<HTMLButtonElement>('.chip').forEach((b) => b.addEventListener('click', () => {
-    estado[b.dataset.f!] = b.dataset.v!;
-    document.querySelectorAll<HTMLButtonElement>(`.chip[data-f="${b.dataset.f}"]`).forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
-    aplicar();
-  }));
-  texto.addEventListener('input', aplicar);
+  function aplicar() {
+    const n = nFiltros();
+    const nf = $('v-n-filtros'); nf.hidden = !n; nf.textContent = String(n);
+    if (vista === 'todas') pintarTodas();
+    else if (vista === 'calendario') pintarCalendario();
+    else vacio.hidden = true;
+  }
+  let espera = 0;
+  texto.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(() => { mostradas = cfg.primeras; aplicar(); }, 150); });
+  [selTema, selTipo, selRes].forEach((s) => s.addEventListener('change', () => { mostradas = cfg.primeras; aplicar(); }));
 
-  // El voto por grupo se dibuja al abrir el desplegable (así la página pesa mucho menos)
-  const colores = JSON.parse(document.getElementById('v-colores')!.textContent!) as Record<string, string>;
-  const pct = (n: number, t: number) => `${((100 * n) / t).toFixed(2)}%`;
-  document.querySelectorAll<HTMLUListElement>('ul.grupos[data-g]').forEach((ul) => {
-    ul.closest('details')!.addEventListener('toggle', () => {
-      if (ul.childElementCount) return;
-      ul.innerHTML = ul.dataset.g!.split(';').map((f) => {
-        const [g, ...xs] = f.split(','); const [si, no, ab, nv] = xs.map(Number); const t = si + no + ab + nv;
-        const txt = [si && `${si} sí`, no && `${no} no`, ab && `${ab} abst.`, nv && `${nv} no vota`].filter(Boolean).join(' · ');
-        return `<li><span class="g"><span class="dot" style="background:${colores[g]}"></span>${g}</span>`
-          + `<span class="barra fina" role="img" aria-label="${g}: ${txt}"><span class="b-si" style="width:${pct(si, t)}"></span><span class="b-no" style="width:${pct(no, t)}"></span><span class="b-abs" style="width:${pct(ab, t)}"></span><span class="b-nv" style="width:${pct(nv, t)}"></span></span>`
-          + `<span class="n small">${txt}</span></li>`;
-      }).join('');
+  // ---------- Filtros en una hoja (móvil), como en Diputados ----------
+  const mqMovil = matchMedia('(max-width: 720px)');
+  const dlgF = $<HTMLDialogElement>('v-dlg-filtros');
+  const abrirF = $<HTMLButtonElement>('v-abrir-filtros');
+  const filtrosMas = $('v-filtros-mas');
+  const colocar = () => { if (mqMovil.matches) $('v-df-cuerpo').append(filtrosMas); else { if (dlgF.open) dlgF.close(); abrirF.after(filtrosMas); } };
+  colocar(); mqMovil.addEventListener?.('change', colocar);
+  abrirF.addEventListener('click', () => { document.documentElement.classList.add('dlg-abierto'); dlgF.showModal(); });
+  dlgF.addEventListener('close', () => { document.documentElement.classList.remove('dlg-abierto'); abrirF.focus(); });
+  dlgF.querySelector('.df-cerrar')!.addEventListener('click', () => dlgF.close());
+  dlgF.addEventListener('click', (e) => { if (e.target === dlgF) dlgF.close(); });
+  $('v-ver').addEventListener('click', () => dlgF.close());
+  $('v-quitar').addEventListener('click', () => { selTema.value = ''; selTipo.value = ''; selRes.value = ''; mostradas = cfg.primeras; aplicar(); });
+  deslizarParaCerrar(dlgF, { cerrar: () => dlgF.close() });
+
+  // ---------- Ventana de detalle ----------
+  const dlg = $<HTMLDialogElement>('dlg-voto');
+  const cuerpo = $('dlg-voto-c');
+  let empujado = false, origen: HTMLElement | null = null;
+  const etDoc: Record<string, string> = { boe: 'BOE', bocg: 'BOCG', ds: 'Diario', votacion: 'Votación' };
+  function detalleHtml(i: ItemVotacion) {
+    const x = cfg.extra[i.id];
+    const grupos = (i.g ?? []).map(([g, si, no, ab, nv]) => {
+      const txt = [si && `${si} sí`, no && `${no} no`, ab && `${ab} abst.`, nv && `${nv} no vota`].filter(Boolean).join(' · ');
+      return `<li><span class="g"><span class="dot" style="background:${cfg.colores[g] ?? 'var(--novota)'}"></span>${esc(g)}</span>${barraHtml([si, no, ab, nv])}<span class="n small">${txt}</span></li>`;
+    }).join('');
+    const docs = [
+      ...(x?.documentos ?? []).map((d) => `<li><span class="tipo t-${d.tipo ?? 'otro'}">${etDoc[d.tipo ?? ''] ?? 'Doc.'}</span><a href="${esc(d.url)}" rel="noopener">${esc(d.titulo)} ↗</a></li>`),
+      ...(i.fu && !x?.documentos.some((d) => d.tipo === 'votacion') ? [`<li><span class="tipo t-votacion">Votación</span><a href="${esc(i.fu.replace(/\.json$/, '.pdf'))}" rel="noopener">Resultado de la votación (PDF oficial) ↗</a></li>`] : []),
+      ...(i.fu ? [`<li><span class="tipo t-json">Datos</span><a href="${esc(i.fu)}" rel="noopener">Voto de cada diputado (JSON, datos abiertos) ↗</a></li>`] : []),
+    ].join('');
+    return `<p class="d-meta small"><span class="etq">${esc(nombreTipo(i.k, i.tp))}</span>${i.cl ? '<span class="etq clave">Votación clave</span>' : ''}${i.s ? `<span>Sesión ${i.s}, votación ${i.n}</span>` : ''}</p>`
+      + (i.c ? `<h3 class="d-corto">${esc(i.c)}</h3>` : '')
+      + `<p class="d-titulo">${esc(i.t)}</p>`
+      + (i.d ? `<p class="d-det small">${esc(i.d)}</p>` : '')
+      + `<p class="d-temas small">${i.te.map((t) => `<span>${esc(cfg.temas[t] ?? 'Otros')}</span>`).join('')}</p>`
+      + `<div class="d-res"><span class="insignia ${favorable(i.r)}">${esc(i.r)}</span>${i.pe ? '' : `<span class="small"><strong>${totalesTexto(i.to)}</strong></span>`}</div>`
+      + (i.pe ? `<p class="small">${esc(x?.estado ?? '')}</p>` : barraHtml(i.to, false))
+      + (x?.expediente ? `<p class="small muted">Expediente <a href="${esc(x.expedienteUrl ?? '')}" rel="noopener">${esc(x.expediente)} ↗</a></p>` : '')
+      + (i.pe ? '' : `<div class="d-acciones"><a class="btn primario" href="${base}/?votacion=${encodeURIComponent(i.id)}#hemiciclo">Ver escaño a escaño en el hemiciclo</a><button class="btn" type="button" id="d-compartir">Compartir</button></div><p class="small c-aviso" id="d-aviso" role="status"></p>`)
+      + (grupos ? `<h4>Cómo votó cada grupo</h4><ul class="grupos">${grupos}</ul><p class="small muted">Grupo de cada diputado en la fecha de la votación, según los datos abiertos del Congreso.</p>` : '')
+      + (x?.contenido ?? []).map((c) => `<h4>${esc(c.etiqueta)}</h4><ul class="contenido">${c.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul><p class="small muted">Fuente: <a href="${esc(c.fuente.url)}" rel="noopener">${esc(c.fuente.titulo)} ↗</a></p>`).join('')
+      + (docs ? `<h4>Documentos oficiales</h4><ul class="docs">${docs}</ul>` : '');
+  }
+  function textoCompartir(i: ItemVotacion) {
+    const [si, no, ab] = i.to;
+    const tit = i.c ?? (i.t.length > 140 ? `${i.t.slice(0, 138).trimEnd()}…` : i.t);
+    return `${tit} (${fechaLarga(i.f)}): ${i.r.toLowerCase()} con ${si} sí, ${no} no y ${ab} abstenciones. Qué votó cada grupo:`;
+  }
+  function abrir(id: string, empujar: boolean) {
+    const i = porId.get(id);
+    if (!i) return false;
+    $('dlg-voto-t').textContent = `Votación del ${fechaLarga(i.f)}`;
+    cuerpo.innerHTML = detalleHtml(i);
+    cuerpo.scrollTop = 0;
+    document.getElementById('d-compartir')?.addEventListener('click', async () => {
+      const enlace = new URL(`${base}/votaciones?v=${encodeURIComponent(i.id)}`, location.href).href;
+      const t = textoCompartir(i);
+      const aviso = document.getElementById('d-aviso')!;
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) { navigator.share({ text: t, url: enlace }).catch(() => {}); return; }
+      try { await navigator.clipboard.writeText(`${t} ${enlace}`); aviso.textContent = 'Texto y enlace copiados.'; } catch { aviso.textContent = enlace; }
     });
+    document.documentElement.classList.add('dlg-abierto');
+    if (!dlg.open) dlg.showModal();
+    if (empujar) {
+      const u = new URL(location.href); u.searchParams.set('v', id);
+      history.pushState({ voto: id }, '', u); empujado = true;
+    }
+    return true;
+  }
+  dlg.addEventListener('close', () => {
+    document.documentElement.classList.remove('dlg-abierto');
+    if (empujado) { empujado = false; history.back(); }
+    else if (new URLSearchParams(location.search).has('v')) { const u = new URL(location.href); u.searchParams.delete('v'); history.replaceState(history.state, '', u); }
+    origen?.focus();
   });
-  aplicar();
+  dlg.querySelector('.d-cerrar')!.addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  deslizarParaCerrar(dlg, { cerrar: () => dlg.close() });
+  addEventListener('popstate', () => { if (dlg.open) { empujado = false; dlg.close(); } });
+  document.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a[data-v]');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (!porId.has(a.dataset.v!)) return;
+    e.preventDefault();
+    origen = a;
+    abrir(a.dataset.v!, true);
+  });
+
+  // ---------- Índice completo ----------
+  const pedida = params.get('v');
+  prepararMeses();
+  ponerVista(vista);
+  if (pedida) abrir(pedida, false);
+  fetch(`${base}/datos/votaciones.json`).then((r) => r.json()).then((xs: ItemVotacion[]) => {
+    todas = xs; completo = true; indexar(); cache.clear();
+    prepararMeses();
+    aplicar();
+    if (pedida && !dlg.open) abrir(pedida, false);
+  }).catch(() => { cuenta.textContent = 'No se ha podido cargar el índice completo; se muestran las más recientes.'; });
 </script>
 
 <style>
-  .lead { max-width: 62ch; }
-  .arriba { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 20px; align-items: start; margin: 18px 0 8px; }
-  @media (max-width: 760px) { .arriba { grid-template-columns: minmax(0, 1fr); } }
+  .lead { max-width: 70ch; }
+  .lead .corto, .segmentado .corto { display: none; }
+  .vista-barra { margin: 18px 0 12px; }
+  .vista-barra .segmentado .btn { display: inline-flex; align-items: center; gap: 8px; }
 
-  .calendario { padding: 12px 14px; }
+  /* Buscador y filtros (en el móvil, los filtros van en una hoja) */
+  .filtros { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin-bottom: 8px; }
+  .filtros[hidden] { display: none; }
+  .filtros input { flex: 1 1 260px; min-width: 0; }
+  .filtros-mas { display: flex; flex-wrap: wrap; gap: 8px; }
+  .filtros-mas select { max-width: 260px; }
+  .boton-filtrar { display: none; align-items: center; gap: 8px; }
+  .n-filtros { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent-strong); color: #fff; font-size: .75rem; }
+  .n-filtros[hidden] { display: none; }
+  .cuenta { flex-basis: 100%; margin: 0; }
+  .cuenta[hidden] { display: none; }
+
+  /* Lista: días y filas */
+  .v-lista { display: grid; gap: 18px; margin-top: 8px; }
+  .v-lista :global(.v-dia h3) { position: sticky; top: var(--tope, 0px); z-index: 2; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0; padding: 8px 2px; font-size: .95rem; background: var(--bg); }
+  .v-lista :global(.v-dia h3 span) { color: var(--muted); font-weight: 500; font-size: .82rem; white-space: nowrap; }
+  .v-lista > :global(*) { min-width: 0; }
+  .v-lista :global(.v-dia h3) { flex-wrap: wrap; row-gap: 0; }
+  :global(.v-filas) { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  :global(.v-filas.sueltas) { margin-top: 8px; }
+  :global(.vf + .vf) { border-top: 1px solid var(--border); }
+  :global(.vf-a) { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px; padding: 12px 44px 13px 16px; text-decoration: none; color: inherit; transition: background-color .12s; }
+  :global(.vf-a:hover) { background: color-mix(in srgb, var(--accent) 6%, transparent); color: inherit; }
+  :global(.vf-ir) { position: absolute; right: 14px; top: 50%; margin-top: -9px; color: var(--muted); }
+  :global(.vf-meta) { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: .78rem; color: var(--muted); }
+  :global(.vf-tit) { font-weight: 650; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  :global(.vf-det) { font-size: .82rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+  :global(.vf-res) { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: .85rem; }
+  :global(.vf-n) { color: var(--muted); font-variant-numeric: tabular-nums; }
+  :global(.vf .barra) { max-width: 420px; }
+  .mas { text-align: center; margin: 16px 0 0; }
+  .mas .btn[hidden] { display: none; }
+  .nota-vista { margin: 0 0 4px; max-width: 70ch; }
+
+  :global(.etq) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .72rem; font-weight: 650; padding: 1px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); }
+  :global(.etq.clave) { background: var(--accent-soft); color: var(--accent-text); }
+  :global(.insignia) { font-size: .8rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+  :global(.insignia.si) { background: color-mix(in srgb, var(--si) 14%, transparent); color: var(--si); }
+  :global(.insignia.no) { background: color-mix(in srgb, var(--no) 12%, transparent); color: var(--no); }
+  :global(.insignia.pend) { background: var(--chip); color: var(--muted); }
+  :global(:root[data-theme='dark'] .insignia.si) { color: #7ccf80; }
+  :global(:root[data-theme='dark'] .insignia.no) { color: #ff8a80; }
+  :global(.barra) { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--chip); }
+  :global(.barra.fina) { height: 6px; }
+  :global(.b-si) { background: var(--si); } :global(.b-no) { background: var(--no); } :global(.b-abs) { background: var(--abs); } :global(.b-nv) { background: var(--novota); }
+
+  /* Calendario */
+  .calendario { padding: 12px 14px; max-width: 460px; }
   .cal-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .cal-cab h2 { margin: 0; font-size: 1.05rem; }
-  .btn.icono { min-height: 40px; width: 40px; padding: 0; font-size: 1.3rem; line-height: 1; }
+  .cal-cab select { flex: 1; min-width: 0; text-align: center; font-weight: 650; }
+  .btn.icono { min-height: 40px; width: 40px; padding: 0; font-size: 1.3rem; line-height: 1; flex: none; }
   .btn.icono:disabled { opacity: .35; cursor: default; }
   .cal-sem, .cal-dias { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; text-align: center; }
   .cal-sem { margin: 10px 0 4px; font-size: .72rem; color: var(--muted); font-weight: 650; }
-  .cal-dias :global(.dia) { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: .85rem; color: var(--muted); border-radius: 8px; }
+  .cal-dias :global(.dia) { height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: .85rem; color: var(--muted); border-radius: 8px; }
   .cal-dias :global(button.dia) { border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 650; cursor: pointer; padding: 0; gap: 2px; }
   .cal-dias :global(button.dia:hover) { border-color: var(--accent); }
   .cal-dias :global(button.dia[aria-pressed='true']) { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); box-shadow: 0 0 0 2px var(--accent); }
@@ -288,68 +439,86 @@ const fechas = [...new Set([...votacionesPleno.map((v) => v.fecha), ...pendiente
   .cal-dias :global(.cnt) { font-size: .62rem; font-weight: 600; color: var(--muted); line-height: 1; }
   .cal-ley { margin: 10px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; }
   .cal-ley span { white-space: nowrap; }
-  .cal-ley span:last-child { white-space: normal; }
-  @media (max-width: 760px) { .cal-dias :global(.dia) { aspect-ratio: auto; height: 38px; } }
   :global(.punto) { display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
   :global(.punto.si) { background: var(--si); } :global(.punto.no) { background: var(--no); } :global(.punto.pend) { background: var(--novota); }
-
-  .filtros { display: grid; gap: 10px; align-content: start; }
-  .filtros input { width: 100%; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 6px 14px; min-height: 38px; cursor: pointer; font-size: .9rem; color: var(--muted); transition: border-color .15s, color .15s, background-color .15s; }
-  .chip:hover { border-color: var(--accent); color: var(--accent-text); }
-  .chip[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
-  @media (max-width: 760px) {
-    .temas-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 2px 16px; }
-    .temas-chips::-webkit-scrollbar { display: none; }
-    .temas-chips .chip { flex: none; }
-  }
-  .mas-filtros summary { cursor: pointer; color: var(--muted); font-size: .9rem; padding: 4px 0; }
-  .mas-filtros[open] { display: grid; gap: 8px; }
-  .cuenta { margin: 0; }
+  .cal-cuenta { margin: 14px 0 0; }
   .enlace { border: 0; background: none; padding: 0 0 0 6px; color: var(--accent-text); text-decoration: underline; cursor: pointer; font: inherit; }
-
-  .lista { display: grid; gap: 12px; margin-top: 16px; }
-  article.votacion[hidden] { display: none; }
-  .votacion h2 { margin: .15rem 0 .4rem; font-size: 1.15rem; line-height: 1.3; }
-  .votacion h2.largo { font-size: 1.02rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .detalle { margin: -.2rem 0 .4rem; color: var(--muted); }
-  .temas { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; }
-  .temas span { font-size: .72rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
-  .etq.clave { background: var(--accent-soft); color: var(--accent-text); }
-  .n-chip { font-size: .75rem; opacity: .7; }
-  .meta { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; color: var(--muted); }
-  .etq { font-size: .72rem; font-weight: 650; padding: 1px 8px; border-radius: 999px; background: var(--chip); }
-  .resultado { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 8px; }
-  .insignia { font-size: .82rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
-  .insignia.si { background: color-mix(in srgb, var(--si) 14%, transparent); color: var(--si); }
-  .insignia.no { background: color-mix(in srgb, var(--no) 12%, transparent); color: var(--no); }
-  .insignia.pend { background: var(--chip); color: var(--muted); }
-  .pendiente { border-style: dashed; }
-:global(.barra) { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--chip); }
-  :global(.barra.fina) { height: 8px; }
-  :global(.b-si) { background: var(--si); } :global(.b-no) { background: var(--no); } :global(.b-abs) { background: var(--abs); } :global(.b-nv) { background: var(--novota); }
-
-  .pliegue { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 4px; }
-  .pliegue + .pliegue { margin-top: 0; }
-  .pliegue summary { cursor: pointer; font-weight: 600; font-size: .93rem; padding: 8px 0; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .pliegue summary::-webkit-details-marker { display: none; }
-  .pliegue summary::after { content: '+'; color: var(--muted); font-size: 1.2rem; font-weight: 400; }
-  .pliegue[open] summary::after { content: '−'; }
-  .pliegue summary:hover { color: var(--accent-text); }
-  .pliegue ul { margin: 0 0 8px; padding-left: 1.1rem; display: grid; gap: 4px; font-size: .92rem; }
-  .titulo-oficial { margin: 0 0 6px; }
-  .contenido { background: var(--bg); border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
-  .docs-t { margin: 0 0 6px; font-weight: 650; color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
-  .grupos { list-style: none; padding: 0 !important; gap: 8px !important; }
-  .grupos :global(li) { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 2px 10px; align-items: center; }
-  .grupos :global(.g) { display: flex; white-space: nowrap; align-items: center; gap: 6px; font-weight: 650; font-size: .88rem; grid-row: span 2; }
-  .grupos :global(.n) { color: var(--muted); }
-  ul.docs { list-style: none; padding: 0 !important; gap: 6px !important; }
-  .docs li { display: flex; gap: 8px; align-items: baseline; }
-  .tipo { flex: none; min-width: 64px; text-align: center; font-size: .7rem; font-weight: 700; letter-spacing: .03em; padding: 1px 6px; border-radius: 6px; background: var(--chip); color: var(--muted); }
-  .t-boe, .t-bocg { background: var(--accent-soft); color: var(--accent-text); }
+  .enlace[hidden] { display: none; }
   .vacio { padding: 24px 0; }
   .glosario { margin-top: 2rem; }
   .glosario summary { cursor: pointer; font-weight: 650; }
+
+  /* Hoja de filtros (móvil) */
+  .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; padding: 0; max-height: 90dvh; border: 1px solid var(--border); border-bottom: 0; border-radius: 20px 20px 0 0; background: var(--surface); color: var(--text); box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
+  .dlg-filtros[open] { display: flex; flex-direction: column; animation: subir .22s ease-out; }
+  .dlg-filtros::backdrop { background: rgb(20 22 28 / .55); }
+  @keyframes subir { from { transform: translateY(48px); opacity: .5; } }
+  .df-cab { position: relative; display: flex; align-items: center; gap: 12px; padding: 20px 8px 8px 16px; }
+  .df-cab h2 { flex: 1; margin: 0; font-size: 1.15rem; }
+  .df-cerrar { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+  .df-cuerpo { overflow-y: auto; padding: 8px 16px 16px; }
+  .df-cuerpo:focus { outline: none; }
+  .df-cuerpo :global(.filtros-mas) { display: grid; gap: 10px; }
+  .df-cuerpo :global(.filtros-mas select) { max-width: none; width: 100%; }
+  .df-pie { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }
+
+  /* Ventana de detalle: centrada en el ordenador; en el móvil, hoja que sube desde abajo */
+  .dlg-voto {
+    width: min(760px, calc(100vw - 48px)); max-height: min(88vh, 940px); padding: 0; border: 1px solid var(--border); border-radius: 18px;
+    background: var(--bg); color: var(--text); box-shadow: 0 24px 70px rgb(0 0 0 / .28); overflow: hidden;
+  }
+  .dlg-voto[open] { display: flex; flex-direction: column; animation: aparecer .18s ease-out; }
+  .dlg-voto::backdrop { background: rgb(20 22 28 / .55); }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(10px); } }
+  .d-cab { display: flex; align-items: center; gap: 12px; padding: 16px 14px 14px 22px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .d-ico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); flex: none; }
+  .d-cab h2 { flex: 1; min-width: 0; margin: 0; font-size: 1.1rem; }
+  .d-cerrar { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+  .d-cerrar:hover { background: var(--chip); color: var(--text); }
+  .d-cuerpo { overflow-y: auto; overscroll-behavior: contain; padding: 18px 22px 26px; }
+  .d-cuerpo:focus { outline: none; }
+  .d-cuerpo :global(.d-meta) { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; margin: 0 0 8px; color: var(--muted); }
+  .d-cuerpo :global(.d-corto) { margin: 0 0 4px; font-size: 1.25rem; }
+  .d-cuerpo :global(.d-titulo) { margin: 0 0 6px; font-weight: 600; line-height: 1.45; }
+  .d-cuerpo :global(.d-det) { margin: 0 0 8px; color: var(--muted); }
+  .d-cuerpo :global(.d-temas) { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 12px; }
+  .d-cuerpo :global(.d-temas span) { font-size: .72rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .d-cuerpo :global(.d-res) { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 8px; }
+  .d-cuerpo :global(.d-acciones) { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+  .d-cuerpo :global(.d-acciones .btn) { text-decoration: none; display: inline-flex; align-items: center; }
+  .d-cuerpo :global(.c-aviso) { margin: 4px 0 0; color: var(--accent-text); font-weight: 600; }
+  .d-cuerpo :global(.c-aviso:empty) { display: none; }
+  .d-cuerpo :global(h4) { margin: 22px 0 8px; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .d-cuerpo :global(ul.grupos) { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+  .d-cuerpo :global(.grupos li) { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 2px 10px; align-items: center; }
+  .d-cuerpo :global(.grupos .g) { display: flex; white-space: nowrap; align-items: center; gap: 6px; font-weight: 650; font-size: .88rem; grid-row: span 2; }
+  .d-cuerpo :global(.grupos .n) { color: var(--muted); }
+  .d-cuerpo :global(ul.contenido) { margin: 0 0 6px; padding: 10px 14px 10px 30px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; display: grid; gap: 4px; font-size: .92rem; }
+  .d-cuerpo :global(ul.docs) { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: .92rem; }
+  .d-cuerpo :global(.docs li) { display: flex; gap: 8px; align-items: baseline; }
+  .d-cuerpo :global(.tipo) { flex: none; min-width: 64px; text-align: center; font-size: .7rem; font-weight: 700; letter-spacing: .03em; padding: 1px 6px; border-radius: 6px; background: var(--chip); color: var(--muted); }
+  .d-cuerpo :global(.t-boe), .d-cuerpo :global(.t-bocg) { background: var(--accent-soft); color: var(--accent-text); }
+  :global(html.dlg-abierto), :global(html.dlg-abierto body) { overflow: hidden; }
+
+  @media (max-width: 720px) {
+    .lead .largo { display: none; }
+    .lead .corto { display: inline; }
+    .vista-barra .segmentado { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+    .vista-barra .segmentado .btn { flex-direction: column; gap: 2px; font-size: .82rem; min-height: 54px; padding: 6px 4px; }
+    .segmentado .largo { display: none; }
+    .segmentado .corto { display: inline; }
+    .boton-filtrar { display: inline-flex; }
+    .filtros input { flex: 1 1 0; }
+    #v-filtros > .filtros-mas { display: none; }
+    :global(.vf-a) { padding: 11px 40px 12px 14px; }
+    .v-lista :global(.v-dia h3) { font-size: .88rem; }
+    .calendario { max-width: none; padding: 10px 10px 12px; }
+    .cal-dias :global(.dia) { height: 38px; }
+    .cal-sem { margin: 6px 0 2px; }
+    .dlg-voto { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: 90dvh; border-radius: 20px 20px 0 0; border-bottom: 0; }
+    .dlg-voto[open] { animation: subir .22s ease-out; }
+    .d-cab { padding: 18px 8px 12px 16px; }
+    .d-cuerpo { padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
+  }
+  @media (min-width: 721px) { .dlg-filtros { display: none; } }
 </style>

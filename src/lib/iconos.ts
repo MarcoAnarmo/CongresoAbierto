@@ -20,6 +20,7 @@ export const TRAZOS = {
   tabla: '<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9.5h18M3 14.5h18M9 9.5v10"/>',
   grupos: '<path d="M4 20V11M10 20V5M16 20v-7M21.5 20h-19"/>',
   mapa: '<path d="m3 6.5 6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',
+  calendario: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   hemiciclo: '<circle cx="3.6" cy="18" r="1.4"/><circle cx="5.2" cy="12.4" r="1.4"/><circle cx="9.2" cy="8.2" r="1.4"/><circle cx="14.8" cy="8.2" r="1.4"/><circle cx="18.8" cy="12.4" r="1.4"/><circle cx="20.4" cy="18" r="1.4"/><circle cx="9" cy="17" r="1.4"/><circle cx="12" cy="13.6" r="1.4"/><circle cx="15" cy="17" r="1.4"/>',
   votaciones: '<path d="m4 7 1.6 1.6L9 5.2M4 15.5l1.6 1.6L9 13.7"/><path d="M12.5 7h7.5M12.5 15.5h7.5"/>',
   metodo: '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7.5h6"/>',
