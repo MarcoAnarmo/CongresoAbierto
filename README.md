@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://congresoabierto.pages.dev"><img src="docs/img/logo.svg" alt="Logo de Congreso Abierto: el hemiciclo dibujado con sus escaños" width="180"></a>
+  <a href="https://congresoabierto.org"><img src="docs/img/logo.svg" alt="Logo de Congreso Abierto: el hemiciclo dibujado con sus escaños" width="180"></a>
 </p>
 
 <h1 align="center">Congreso Abierto</h1>
@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://congresoabierto.pages.dev"><strong>congresoabierto.pages.dev</strong></a> ·
-  <a href="https://congresoabierto.pages.dev/colabora">Colabora</a> ·
+  <a href="https://congresoabierto.org"><strong>congresoabierto.org</strong></a> ·
+  <a href="https://congresoabierto.org/colabora">Colabora</a> ·
   <a href="#hoja-de-ruta">Hoja de ruta</a>
 </p>
 
@@ -128,7 +128,7 @@ congreso.es bloquea muchas descargas automáticas, así que la descarga se hace 
 
 ## Despliegue
 
-La web se publica en **Cloudflare Pages**, conectada a este repositorio: https://congresoabierto.pages.dev
+La web se publica en **Cloudflare Pages**, conectada a este repositorio, con el dominio propio https://congresoabierto.org (la dirección de Cloudflare, congresoabierto.pages.dev, sigue funcionando y debería redirigir al dominio propio).
 
 - Cada *merge* en `main` publica la web en producción.
 - Cada *pull request* desde una rama de este repositorio genera una vista previa con su propia URL. Los que llegan desde un *fork* no la tienen, pero GitHub Actions comprueba que la web compila en todos.
@@ -138,13 +138,13 @@ Es una web 100 % estática, así que también funciona en cualquier otro hosting
 
 ## Contacto
 
-Escribe a [congresoabierto.help@gmail.com](mailto:congresoabierto.help@gmail.com). Para errores en los datos o sugerencias, mejor abre una *issue* para que quede pública.
+Escribe a [ayuda@congresoabierto.org](mailto:ayuda@congresoabierto.org). Para errores en los datos o sugerencias, mejor abre una *issue* para que quede pública.
 
 Congreso Abierto es un proyecto independiente, sin relación con el Congreso de los Diputados ni con ningún partido. Si un dato no coincide con su documento oficial, prevalece el documento oficial.
 
 ## Cómo citar
 
-> Congreso Abierto (2026). *Datos de los diputados de la XV Legislatura*. https://congresoabierto.pages.dev (consultado el [fecha]).
+> Congreso Abierto (2026). *Datos de los diputados de la XV Legislatura*. https://congresoabierto.org (consultado el [fecha]).
 
 ## Licencia
 

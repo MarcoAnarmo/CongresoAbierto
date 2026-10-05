@@ -98,7 +98,7 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
     },
       h('div', { justifyContent: 'space-between', alignItems: 'center' },
         cabecera(0.78),
-        h('div', { fontSize: 22, fontWeight: 700, color: C.acento }, 'congresoabierto.pages.dev')),
+        h('div', { fontSize: 22, fontWeight: 700, color: C.acento }, 'congresoabierto.org')),
       h('div', { gap: 30, alignItems: 'stretch' },
         retrato(foto, nombre, 224, 292, color),
         h('div', { flexDirection: 'column', justifyContent: 'space-between', flex: 1, gap: 14 },
@@ -123,7 +123,7 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
     // Cabecera (zona alta: la tapan en parte el nombre y la barra de la historia)
     h('div', { justifyContent: 'space-between', alignItems: 'center' },
       cabecera(1.15),
-      h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.pages.dev')),
+      h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.org')),
     // Quién es
     h('div', { alignItems: 'center', gap: 40, marginTop: 48 },
       retrato(foto, nombre, 264, 352, color),
@@ -254,7 +254,7 @@ export async function tarjetaResumen(formato: Formato) {
     borderTop: `16px solid ${C.naranja}`, padding: '150px 72px 0',
   },
     // Cabecera (zona alta: la tapan en parte el nombre y la barra de la historia)
-    h('div', { ...fijo, justifyContent: 'space-between', alignItems: 'center' }, cabecera(1.15), h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.pages.dev')),
+    h('div', { ...fijo, justifyContent: 'space-between', alignItems: 'center' }, cabecera(1.15), h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.org')),
     h('div', { ...fijo, alignSelf: 'flex-start', alignItems: 'center', gap: 14, marginTop: 44, padding: '12px 28px', borderRadius: 999, background: C.naranja, color: '#fff', fontSize: 32, fontWeight: 800 },
       h('div', { width: 15, height: 15, borderRadius: 8, background: '#fff' }), elecciones ? 'Elecciones generales · 29 de noviembre' : 'Conoce a quien te representa'),
     h('div', { ...fijo, fontSize: elecciones ? 116 : 96, fontWeight: 800, letterSpacing: -4, lineHeight: 1.02, marginTop: 26 }, elecciones ? 'Prepárate para votar' : 'Conoce a quien te representa'),
@@ -334,7 +334,7 @@ export function tarjetaPagina(id: string) {
         h('div', { alignItems: 'center', gap: 12, padding: '12px 22px 12px 26px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 23, fontWeight: 800 }, p.llamada, img(FLECHA, 22, 22)))),
     h('div', { justifyContent: 'space-between', alignItems: 'center', fontSize: 20, color: C.apagado, borderTop: `2px solid ${C.borde}`, paddingTop: 16 },
       h('div', {}, 'Datos oficiales del Congreso y del BOE, sin interpretaciones'),
-      h('div', { color: C.acento, fontWeight: 800, fontSize: 22 }, 'congresoabierto.pages.dev')),
+      h('div', { color: C.acento, fontWeight: 800, fontSize: 22 }, 'congresoabierto.org')),
   ), 'horizontal');
 }
 

@@ -84,7 +84,7 @@ export const cabecera = (escala = 1) =>
 export const pie = (escala = 1) =>
   h('div', { flexDirection: escala > 1 ? 'column' : 'row', justifyContent: 'space-between', alignItems: escala > 1 ? 'flex-start' : 'center', gap: 6 * escala, fontSize: 24 * escala, color: C.apagado, borderTop: `${2 * escala}px solid ${C.borde}`, paddingTop: 22 * escala },
     h('div', {}, 'Datos oficiales del Congreso y del BOE, sin interpretaciones'),
-    h('div', { color: C.acento, fontWeight: 700 }, 'congresoabierto.pages.dev'));
+    h('div', { color: C.acento, fontWeight: 700 }, 'congresoabierto.org'));
 
 /** Lienzo con los márgenes de cada formato. En historias se respeta la zona segura de Instagram (arriba y abajo). */
 export const lienzo = (formato: Formato, ...hijos: Hijo[]) =>
