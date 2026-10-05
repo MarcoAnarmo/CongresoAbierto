@@ -6,13 +6,19 @@
  * las rutas de las imágenes y el enlace se montan en el navegador.
  */
 import type { Diputado } from '../lib/types';
-import { slug } from '../lib/data';
-import { compartir } from '../lib/tarjetas';
-interface Props { d: Diputado; class?: string }
-const { d, class: clase } = Astro.props;
-const etiqueta = `Compartir la ficha de ${d.nombreCompleto}`;
+import { slug, url } from '../lib/data';
+import { compartir, rutaTarjeta } from '../lib/tarjetas';
+/** Un diputado (`d`) o el resumen de todo el Congreso (`resumen`, para la portada). */
+interface Props { d?: Diputado; resumen?: boolean; class?: string }
+const { d, resumen = false, class: clase } = Astro.props;
+const etiqueta = d ? `Compartir la ficha de ${d.nombreCompleto}` : 'Compartir Congreso Abierto';
+// El resumen lleva sus datos completos (es un solo botón); el de un diputado, solo el slug
+const datosResumen = resumen ? {
+  'data-historia': url(rutaTarjeta.resumen('historia')), 'data-horizontal': url(rutaTarjeta.resumen('horizontal')),
+  'data-nombre': 'congreso-abierto', 'data-enlace': compartir.resumen().enlace, 'data-ct': compartir.resumen().texto, 'data-titulo': 'Comparte Congreso Abierto',
+} : {};
 ---
-<button class:list={['boton-compartir', clase]} type="button" data-compartir={slug(d)} data-cn={d.nombreCompleto} data-ct={compartir.diputado(d).texto} aria-label={etiqueta} title={etiqueta} aria-haspopup="dialog"><svg width="19" height="19" aria-hidden="true"><use href="#i-compartir" /></svg></button>
+<button class:list={['boton-compartir', clase]} type="button" data-compartir={d ? slug(d) : 'resumen'} data-cn={d?.nombreCompleto} data-ct={d ? compartir.diputado(d).texto : undefined} {...datosResumen} aria-label={etiqueta} title={etiqueta} aria-haspopup="dialog"><svg width="19" height="19" aria-hidden="true"><use href="#i-compartir" /></svg></button>
 
 <style>
   .boton-compartir {
