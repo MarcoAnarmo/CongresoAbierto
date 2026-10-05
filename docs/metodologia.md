@@ -9,7 +9,10 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 | Diputados | Buscador de diputados de congreso.es | `scripts/browser/descargar-datos.js` |
 | Cargos | Ficha de cada diputado | idem |
 | Patrimonio | Declaración de Bienes y Rentas (PDF escaneado) | Transcripción con `scripts/browser/visor-declaraciones.js` |
-| Votaciones | Datos abiertos de votaciones (JSON) | `window._votacion()` |
+| Votaciones | Datos abiertos de votaciones (JSON) | `scripts/browser/votaciones-pleno.js` + `npm run data:votaciones` (todas las del Pleno); `window._votacion()` (votaciones clave) |
+| Formación y trayectoria | Ficha personal de cada diputado | `scripts/browser/fichas-personales.js` |
+| Deudas | Declaración de Bienes y Rentas (pág. 4) | Transcripción según `data/raw/deudas/INSTRUCCIONES.md` |
+| Fotos | Foto oficial de cada ficha | `scripts/browser/fotos.js` + `scripts/fotos.ts` |
 | Textos votados | BOE (decretos-leyes), BOCG (proposiciones) y Diario de Sesiones | Enlaces y extractos literales en `data/manual/votaciones-clave.json` |
 | Retribuciones | https://www.congreso.es/es/cem/regecodip (2026) | `scripts/retribuciones.ts` |
 
@@ -18,17 +21,16 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 - Fuente: «Ficha personal» de cada diputado en congreso.es, descargada con `scripts/browser/fichas-personales.js` → `data/raw/fichas-personales.jsonl`. No se guardan datos familiares (estado civil, hijos).
 - `scripts/perfil.ts` copia las líneas literalmente y las separa en formación (títulos y estudios) y trayectoria. Una frase de empleo no cuenta como estudio aunque cite una universidad.
 - Tipo de universidad (pública/privada): solo si la línea nombra el centro, según el RUCT del Ministerio (`data/manual/universidades.json`, con alias en otras lenguas, siglas y centros adscritos). Los centros fuera del RUCT se marcan sin clasificar.
-- Línea de tiempo: legislaturas (fechas oficiales), cargos actuales con su fecha, líneas de trayectoria que citan un año y declaraciones de bienes e intereses económicos de la XV Legislatura.
+- Línea de tiempo: legislaturas (fechas oficiales), cargos en la fecha de consulta con su fecha de inicio, líneas de trayectoria que citan un año y declaraciones de bienes e intereses económicos de la XV Legislatura.
 
 ## Patrimonio
 
 - Se usa la última declaración publicada. Si es una **modificación parcial** (solo comunica un cambio), se combina con la última declaración completa anterior (`esModificacionParcial` en la transcripción).
 - Propiedad: cada fila de inmuebles urbanos o rústicos a nombre del diputado, en propiedad total o parcial. Una fila con varias unidades («5 PLAZAS DE GARAJE», «18 FINCAS») cuenta todas.
-- Vivienda: descripción con vivienda, piso, casa, chalet, apartamento, ático, dúplex, estudio, unifamiliar o residencial (también en suelo rústico). No cuentan garajes, trasteros, locales, solares, naves ni fincas.
-- Filas con varias unidades («2 PISOS», «3 VIVIENDAS») cuentan todas.
+- Vivienda: descripción con vivienda, piso, casa, chalet, apartamento, ático, dúplex, estudio, adosado, unifamiliar, bungaló o residencial (también en suelo rústico). No cuentan las que solo se describen como garaje, plaza de aparcamiento, cochera, trastero, local, oficina, almacén, nave, solar, parcela, terreno o finca rústica (`esVivienda` en `scripts/patrimonio.ts`).
 - Se cuenta cada vivienda declarada, se posea entera o en parte. El porcentaje y el derecho se muestran literalmente.
 - Inmuebles de sociedades: se listan aparte y no se suman.
-- Grupo y candidatura: el hemiciclo ordena por el grupo parlamentario actual; si la candidatura con la que fue elegido es distinta (p. ej. Grupo Mixto), se indica entre paréntesis.
+- Grupo y candidatura: el hemiciclo ordena por el grupo parlamentario en la fecha de consulta; si la candidatura con la que fue elegido es distinta (p. ej. Grupo Mixto), se indica entre paréntesis.
 
 ### Control de calidad
 
@@ -47,7 +49,7 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 
 ## Retribución
 
-Se muestran solo importes mensuales oficiales: asignación + complementos por cargo (el mayor de Mesa/Junta de Portavoces y el mayor de Comisiones, porque no son acumulables dentro de cada grupo) + indemnización. No se estiman pagas anuales. No incluye sueldos de miembros del Gobierno, transporte ni dietas de viajes oficiales.
+Se muestran solo importes mensuales oficiales: asignación + complementos por cargo (el mayor de Mesa/Junta de Portavoces y el mayor de Comisiones, porque no son acumulables dentro de cada bloque) + indemnización. No se estiman pagas anuales. No incluye sueldos de miembros del Gobierno, transporte ni dietas de viajes oficiales.
 
 ## Votaciones
 
