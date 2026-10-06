@@ -20,7 +20,7 @@ const t = textosCompartir[lang].ui;
 </dialog>
 
 <script>
-  import { rellenarCaja, textosCompartir } from '../scripts/compartir';
+  import { rellenarCaja, textosCompartir, type DatosCompartir } from '../scripts/compartir';
   import { deslizarParaCerrar } from '../scripts/hoja';
   import { f, prefijo } from '../i18n/cliente';
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -52,6 +52,12 @@ const t = textosCompartir[lang].ui;
       historia: `${pre}/tarjetas/historia/diputado/${s}.png`, horizontal: `${pre}/tarjetas/horizontal/diputado/${s}.png`,
       nombre: `congreso-abierto-${s}`, enlace: `${sitio}${pre}/diputado/${s}`, texto: boton.dataset.ct!, titulo: f(textosCompartir().fichaDe, { nombre: boton.dataset.cn! }),
     });
+    dlg.showModal();
+  });
+  // Tarjetas que se dibujan en el navegador (p. ej. la de cualquier votación): llegan hechas, con direcciones blob:
+  document.addEventListener('compartir:abrir', (e) => {
+    origen = document.activeElement as HTMLElement | null;
+    rellenarCaja(caja, (e as CustomEvent<DatosCompartir>).detail);
     dlg.showModal();
   });
   dlg.querySelector('.cerrar')!.addEventListener('click', () => dlg.close());
