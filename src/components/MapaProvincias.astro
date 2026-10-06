@@ -1,6 +1,7 @@
 ---
 import { diputados, colorGrupo, url, slug, etiquetaPartido, grupos } from '../lib/data';
 import { PROVINCIAS, COLUMNAS, FILAS, nombreLegible } from '../lib/provincias';
+import { slugTexto } from '../lib/texto';
 import { idiomaDeUrl, formatos, f, pl } from '../i18n';
 import comun from '../i18n/textos/comun';
 import textos from '../i18n/textos/mapa';
@@ -21,6 +22,8 @@ const porProvincia = PROVINCIAS.map((p) => {
   return {
     ...p,
     legible: nombreLegible(p.nombre),
+    /** Página de la provincia: /provincia/<id> */
+    id: slugTexto(nombreLegible(p.nombre)),
     escanos: ds.length,
     propiedades,
     viviendas,
@@ -85,7 +88,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   /** Singular o plural con la cifra tal cual (como en la lista de cada provincia). */
   const cuenta = (n: number | null, [uno, varios]: [string, string]) => f(n === 1 ? uno : varios, { n: String(n) });
   type Dip = { n: string; g: string; c: string; p: string; v: number | null; pr: number | null; f: string; s: string };
-  type Prov = { abrev: string; legible: string; cp: number; escanos: number; propiedades: number; viviendas: number; conDatos: number; dips: Dip[] };
+  type Prov = { id: string; abrev: string; legible: string; cp: number; escanos: number; propiedades: number; viviendas: number; conDatos: number; dips: Dip[] };
   const raw = JSON.parse(document.getElementById('mapa-datos')!.textContent!) as { base: string; provincias: Prov[] };
   const casillas = [...document.querySelectorAll<HTMLButtonElement>('.mapa .casilla')];
   const botones = [...document.querySelectorAll<HTMLButtonElement>('.mapa [data-mmodo]')];
@@ -127,7 +130,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
         <span class="cifra small">${d.pr === null ? '<strong>—</strong>' : `<span>${cuenta(d.pr, tx.propiedadesDip)}</span><span>${cuenta(d.v, tx.viviendasDip)}</span>`}</span>
       </a></li>`).join('');
     panel.innerHTML = `
-      <h3>${esc(p.legible)}</h3>
+      <h3><a href="${prefijo()}/provincia/${p.id}">${esc(p.legible)}<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a></h3>
       <p class="small muted">${pl(p.escanos, tx.elegidos)} ${p.conDatos ? ` · ${pl(p.propiedades, tx.declaradas)} ${pl(p.viviendas, tx.viviendasDip)}` : ''}</p>
       <ul class="lista">${filas}</ul>`;
     if (enfocar && matchMedia('(max-width: 860px)').matches) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -167,6 +170,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   .leyenda { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; color: var(--muted); }
   /* El panel se rellena desde el script: sus estilos van en :global() */
   .panel :global(h3) { margin: 0; font-size: 1.15rem; }
+  .panel :global(h3 a) { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
   .panel :global(> p) { margin: 2px 0 10px; }
   .panel :global(.lista) { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
   @media (min-width: 861px) { .panel :global(.lista) { max-height: 460px; overflow-y: auto; } }

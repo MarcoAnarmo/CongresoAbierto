@@ -9,6 +9,10 @@ import comun from './comun';
  */
 const es = {
   descripcion: '{nombre} ({partido}, {circ}): rentas, cuentas, acciones, propiedades y deudas declaradas, trabajos anteriores, actividades y cómo vota.',
+  /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
+  seo: { titulo: '{nombre} ({grupo}): patrimonio, propiedades y votos', descripcion: '{nombre} ({partido}, {circ}) declara {bienes}. Rentas, cuentas, deudas, trabajos anteriores y cómo vota en el Pleno.', bienes: '{propiedades} ({viviendas})', sinBienes: 'sin declaración de bienes publicada' },
+  /** Enlace a la página de su provincia. */
+  provincia: 'Diputados por {provincia}',
   cab: {
     fotoAlt: 'Foto oficial de {nombre}',
     /** «GP Socialista» → «Grupo Socialista» */
@@ -305,6 +309,10 @@ const es = {
 export default area(es, {
   ca: {
     descripcion: '{nombre} ({partido}, {circ}): rendes, comptes, accions, propietats i deutes declarats, feines anteriors, activitats i com vota.',
+    /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
+    seo: { titulo: '{nombre} ({grupo}): patrimoni, propietats i vots', descripcion: '{nombre} ({partido}, {circ}) declara {bienes}. Rendes, comptes, deutes, feines anteriors i com vota al Ple.', bienes: '{propiedades} ({viviendas})', sinBienes: 'sense declaració de béns publicada' },
+    /** Enlace a la página de su provincia. */
+    provincia: 'Diputats per {provincia}',
     cab: {
       fotoAlt: 'Foto oficial de {nombre}',
       grupo: 'Grup {nombre}',
@@ -579,6 +587,10 @@ export default area(es, {
   },
   eu: {
     descripcion: '{nombre} ({partido}, {circ}): aitortutako errentak, kontuak, akzioak, jabetzak eta zorrak, aurreko lanak, jarduerak eta nola bozkatzen duen.',
+    /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
+    seo: { titulo: '{nombre} ({grupo}): ondarea, jabetzak eta botoak', descripcion: '{nombre} ({partido}, {circ}): {bienes}. Errentak, kontuak, zorrak, aurreko lanak eta nola bozkatzen duen Osoko Bilkuran.', bienes: 'aitortutako {propiedades} ({viviendas})', sinBienes: 'ondasunen aitorpenik argitaratu gabe' },
+    /** Enlace a la página de su provincia. */
+    provincia: 'Diputatuak: {provincia}',
     cab: {
       fotoAlt: '{nombre}: argazki ofiziala',
       grupo: '{nombre} taldea',
@@ -853,6 +865,10 @@ export default area(es, {
   },
   gl: {
     descripcion: '{nombre} ({partido}, {circ}): rendas, contas, accións, propiedades e débedas declaradas, traballos anteriores, actividades e como vota.',
+    /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
+    seo: { titulo: '{nombre} ({grupo}): patrimonio, propiedades e votos', descripcion: '{nombre} ({partido}, {circ}) declara {bienes}. Rendas, contas, débedas, traballos anteriores e como vota no Pleno.', bienes: '{propiedades} ({viviendas})', sinBienes: 'sen declaración de bens publicada' },
+    /** Enlace a la página de su provincia. */
+    provincia: 'Deputados por {provincia}',
     cab: {
       fotoAlt: 'Foto oficial de {nombre}',
       grupo: 'Grupo {nombre}',
@@ -1127,6 +1143,10 @@ export default area(es, {
   },
   en: {
     descripcion: '{nombre} ({partido}, {circ}): declared income, accounts, shares, properties and debts, previous jobs, activities and how they vote.',
+    /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
+    seo: { titulo: '{nombre} ({grupo}): assets, properties and votes', descripcion: '{nombre} ({partido}, {circ}) declares {bienes}. Income, accounts, debts, previous jobs and how they vote in the Plenary.', bienes: '{propiedades} ({viviendas})', sinBienes: 'no asset declaration published' },
+    /** Enlace a la página de su provincia. */
+    provincia: 'Deputies for {provincia}',
     cab: {
       fotoAlt: 'Official photo of {nombre}',
       grupo: 'Grupo {nombre}',

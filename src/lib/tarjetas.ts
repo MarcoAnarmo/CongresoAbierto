@@ -1,5 +1,6 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
-import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, slug, candidaturaDistinta, antesDeElecciones } from './data';
+import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, slug, candidaturaDistinta, antesDeElecciones, circunscripciones } from './data';
+import { nombreLegible } from './provincias';
 import { fechaTexto } from '../i18n/fechas';
 import { disponerPorGrupos, TRAMOS, tramo } from './hemiciclo';
 import type { Diputado, VotacionClave, Voto } from './types';
@@ -252,11 +253,6 @@ export async function tarjetaVotacion(v: VotacionClave, formato: Formato, lang: 
 }
 
 /* ---------- Provincia ---------- */
-export const nombreLegible = (c: string) => (c === 'S/C Tenerife' ? 'Santa Cruz de Tenerife' : c.replace(/^(.+) \((.+)\)$/, '$2 $1'));
-export const slugTexto = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-export const circunscripciones = [...new Set(diputados.map((d) => d.circunscripcion))]
-  .map((c) => ({ id: slugTexto(nombreLegible(c)), nombre: c, legible: nombreLegible(c) }))
-  .sort((a, b) => a.legible.localeCompare(b.legible, 'es'));
 
 export async function tarjetaProvincia(id: string, formato: Formato, lang: Idioma = 'es') {
   const tp = textosTarjetas[lang].provincia;
@@ -552,7 +548,7 @@ export const compartir = {
   provincia: (id: string, lang: Idioma = 'es') => {
     const c = circunscripciones.find((x) => x.id === id)!;
     const k = diputados.filter((d) => d.circunscripcion === c.nombre).length;
-    return { enlace: pagina(`/diputados?provincia=${encodeURIComponent(c.nombre)}`, lang), texto: llamada(lang) + pl(k, textosCompartir[lang].mensaje.provincia, lang, { provincia: c.legible }) };
+    return { enlace: pagina(`/provincia/${c.id}`, lang), texto: llamada(lang) + pl(k, textosCompartir[lang].mensaje.provincia, lang, { provincia: c.legible }) };
   },
   resumen: (lang: Idioma = 'es') => ({
     enlace: pagina('/', lang),
