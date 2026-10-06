@@ -7,13 +7,14 @@ import DialogoCompartir from '../../components/DialogoCompartir.astro';
 import { rutasIdioma, idiomaDe } from '../../i18n';
 import comun from '../../i18n/textos/comun';
 import portada from '../../i18n/textos/portada';
+import { sitio } from '../../lib/seo';
 
 export const getStaticPaths = rutasIdioma;
 const lang = idiomaDe(Astro.params.lang);
 const c = comun[lang];
 const t = portada[lang];
 ---
-<Base title="Congreso Abierto">
+<Base title="Congreso Abierto" tituloSeo={`Congreso Abierto · ${c.marca.lema}`} jsonLd={sitio(lang, 'Congreso Abierto', c.marca.descripcion)}>
   <div class="portada-cab">
     {antesDeElecciones() && <p class="elecciones"><span class="e-punto" aria-hidden="true"></span><span class="e-largo">{c.elecciones.texto}</span><span class="e-corto">{c.elecciones.etiqueta}</span><span class="e-mini">{c.elecciones.mini}</span></p>}
     <BotonCompartir resumen class="compartir-portada" />

@@ -1,7 +1,8 @@
 ---
 import { fechaTexto } from '../../../i18n/fechas';
 import Base from '../../../layouts/Base.astro';
-import { diputados, votaciones, votacionesPleno, colorGrupo, slug, enlaceError, candidaturaDistinta } from '../../../lib/data';
+import { diputados, votaciones, votacionesPleno, colorGrupo, slug, enlaceError, candidaturaDistinta, circunscripcionDe } from '../../../lib/data';
+import { persona, migas } from '../../../lib/seo';
 import type { Diputado } from '../../../lib/types';
 import type { NombreIcono } from '../../../lib/iconos';
 import BotonCompartir from '../../../components/BotonCompartir.astro';
@@ -150,8 +151,22 @@ const teselas: Tesela[] = [
 ];
 const iconoDe = Object.fromEntries(teselas.map((x) => [x.id, x.icono])) as Record<string, NombreIcono>;
 const LINEA_CORTA = 6;
+
+// Buscadores: título con lo que la gente busca («patrimonio de …») y descripción con sus cifras
+const circ = circunscripcionDe(d);
+const rutaFicha = u(`/diputado/${slug(d)}`);
+const bienesSeo = sinDeclaracion || p.propiedades === null
+  ? t.seo.sinBienes
+  : f(t.seo.bienes, { propiedades: pl(p.propiedades, tc.palabras.propiedades, lang), viviendas: pl(p.viviendas ?? 0, tc.palabras.viviendas, lang) });
+const tituloSeo = `${f(t.seo.titulo, { nombre: d.nombreCompleto, grupo: d.grupoCorto })} · Congreso Abierto`;
+const descripcionSeo = f(t.seo.descripcion, { nombre: d.nombreCompleto, partido: d.partido, circ: d.circunscripcion, bienes: bienesSeo });
+const jsonLd = [
+  persona(d, rutaFicha, f(g(t.cab.diputadoPor), { circ: d.circunscripcion })),
+  migas([[tc.nav.diputados, u('/diputados')], [circ.legible, u(`/provincia/${circ.id}`)], [d.nombreCompleto, rutaFicha]]),
+];
+const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provincia, { provincia: circ.legible })}">${d.circunscripcion}</a>`;
 ---
-<Base title={d.nombreCompleto} imagen={rutaTarjeta.diputado(d, 'horizontal')} description={f(t.descripcion, { nombre: d.nombreCompleto, partido: d.partido, circ: d.circunscripcion })}>
+<Base title={d.nombreCompleto} tituloSeo={tituloSeo} imagen={rutaTarjeta.diputado(d, 'horizontal')} description={descripcionSeo} jsonLd={jsonLd}>
   <p class="volver-p"><a class="volver" href={u('/diputados')}>← {tc.nav.diputados}</a></p>
   <div class="cabecera">
     <BotonCompartir class="compartir-ficha" d={d} />
@@ -160,7 +175,7 @@ const LINEA_CORTA = 6;
       <h1>{d.nombreCompleto}</h1>
       <p class="cab-grupo">
         <span class="pill"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span>{d.grupo.startsWith('GP ') ? f(t.cab.grupo, { nombre: d.grupo.slice(3) }) : d.grupo}</span>
-        <span class="muted">{f(g(t.cab.diputadoPor), { circ: d.circunscripcion })}<span class="solo-escritorio">{f(t.cab.desde, { fecha: fmtFecha(d.fechaAlta) })}</span></span>
+        <span class="muted"><Fragment set:html={f(g(t.cab.diputadoPor), { circ: enlaceCirc })} /><span class="solo-escritorio">{f(t.cab.desde, { fecha: fmtFecha(d.fechaAlta) })}</span></span>
       </p>
       <p class="small muted cab-datos">
         {candidaturaDistinta(d) && <>{f(t.cab.candidatura, { partido: d.partido })}</>}

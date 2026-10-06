@@ -5,11 +5,21 @@ import type { NombreIcono } from '../lib/iconos';
 import Icono from '../components/Icono.astro';
 import { IDIOMAS, NOMBRE_IDIOMA, LOCALE, OG_LOCALE, DEFECTO, idiomaDeUrl, enlace, sinIdioma, prefijo, f } from '../i18n';
 import comun from '../i18n/textos/comun';
+import { serializar, type JsonLd } from '../lib/seo';
 
-interface Props { title: string; description?: string; /** Ruta de la tarjeta horizontal para la vista previa en redes (Open Graph), sin idioma. */ imagen?: string; }
+interface Props {
+  title: string;
+  description?: string;
+  /** Ruta de la tarjeta horizontal para la vista previa en redes (Open Graph), sin idioma. */
+  imagen?: string;
+  /** Datos estructurados para los buscadores (src/lib/seo.ts). */
+  jsonLd?: JsonLd | JsonLd[];
+  /** Título completo de la pestaña y de los buscadores, si no es «{title} · Congreso Abierto». */
+  tituloSeo?: string;
+}
 const lang = idiomaDeUrl(Astro.url.pathname);
 const t = comun[lang];
-const { title, description = t.marca.descripcion, imagen: imagenProp } = Astro.props;
+const { title, description = t.marca.descripcion, imagen: imagenProp, jsonLd, tituloSeo } = Astro.props;
 // Ruta de la página sin el idioma: /ca/diputados → /diputados
 const ruta = sinIdioma(Astro.url.pathname);
 const u = (p: string) => enlace(p, lang);
@@ -17,7 +27,7 @@ const u = (p: string) => enlace(p, lang);
 const seccion = ruta.split('/').filter(Boolean)[0] ?? '';
 const imagenRuta = imagenProp ?? (['diputados', 'votaciones', 'metodologia', 'colabora', 'tarjetas'].includes(seccion) ? `/tarjetas/horizontal/pagina/${seccion}.png` : '/tarjetas/horizontal/resumen.png');
 const imagen = enlace(imagenRuta, lang);
-const tituloCompleto = title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`;
+const tituloCompleto = tituloSeo ?? (title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`);
 const absoluta = (p: string) => new URL(p, Astro.site).href;
 const path = ruta.replace(/\/$/, '') || '/';
 const nav: { href: string; label: string; corto?: string; icono: NombreIcono }[] = [
@@ -98,6 +108,7 @@ const fuentes = f(t.pie.fuentes, {
     <link rel="icon" type="image/svg+xml" href={url('/favicon.svg?v=5')} />
     <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png?v=5')} />
     <link rel="apple-touch-icon" href={url('/apple-touch-icon.png?v=5')} />
+    {jsonLd && <script type="application/ld+json" set:html={serializar(jsonLd)} />}
   </head>
   <body>
     <a class="saltar" href="#contenido">{t.marca.saltar}</a>
