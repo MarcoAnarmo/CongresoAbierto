@@ -21,6 +21,7 @@ export const TRAZOS = {
   abajo: '<path d="m6 9 6 6 6-6"/>',
   derecha: '<path d="m9 6 6 6-6 6"/>',
   izquierda: '<path d="m15 6-6 6 6 6"/>',
+  sumar: '<path d="M12 5v14M5 12h14"/>',
   hecho: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
   buscar: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
   filtros: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',

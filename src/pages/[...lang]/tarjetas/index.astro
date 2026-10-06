@@ -1,19 +1,24 @@
 ---
 /**
- * Galería de tarjetas para compartir, por tipos (pestañas): resumen, votaciones, provincias y diputados.
+ * Galería de tarjetas para compartir, por tipos (pestañas): resumen, «Crea la tuya», votaciones, provincias y diputados.
  * Al tocar una tarjeta se abre la ventana de compartir (DialogoCompartir, una sola por página) con la tarjeta grande,
  * los botones de redes y las descargas vertical y horizontal. Las imágenes solo se cargan al ver su pestaña.
  * Las provincias se filtran con un buscador; los diputados se buscan en un JSON (diputados.json) que se descarga
- * solo al abrir su pestaña. Sin JavaScript se ven todas las tarjetas y cada una abre su imagen.
+ * solo al abrir su pestaña. «Crea la tuya» dibuja en el navegador la tarjeta de cualquier votación o la comparación de
+ * hasta 7 (src/scripts/tarjetas-votaciones.ts, como en Votaciones), con un atajo para las votaciones clave de vivienda;
+ * el índice de votaciones (/datos/votaciones.json) se descarga solo al abrir esa pestaña.
+ * Sin JavaScript se ven todas las tarjetas ya hechas y cada una abre su imagen.
  */
 import Base from '../../../layouts/Base.astro';
 import DialogoCompartir from '../../../components/DialogoCompartir.astro';
 import Icono from '../../../components/Icono.astro';
 import Pestanas from '../../../components/Pestanas.astro';
-import { votaciones, url, grupos, circunscripciones } from '../../../lib/data';
+import TarjetasVotacion from '../../../components/TarjetasVotacion.astro';
+import { votaciones, votacionesPleno, url, grupos, circunscripciones } from '../../../lib/data';
 import { rutaTarjeta, temaCorto, compartir, type ModoHemiciclo } from '../../../lib/tarjetas';
-import { favorable } from '../../../lib/votaciones';
-import { rutasIdioma, idiomaDe, enlace, formatos, f, prefijo } from '../../../i18n';
+import { favorable, aItem, MAX_COMPARAR, type TextosLista } from '../../../lib/votaciones';
+import { rutasIdioma, idiomaDe, enlace, formatos, f, prefijo, LOCALE } from '../../../i18n';
+import textosVotaciones from '../../../i18n/textos/votaciones';
 import textos from '../../../i18n/textos/tarjetas-pagina';
 import comun from '../../../i18n/textos/comun';
 import { sinTildes } from '../../../lib/texto';
@@ -34,13 +39,21 @@ const datos = (historia: string, horizontal: string, nombre: string, c: { enlace
   'data-nombre': nombre, 'data-enlace': c.enlace, 'data-ct': c.texto, 'data-titulo': titulo,
   'aria-label': f(t.abrir, { nombre: titulo }), 'aria-haspopup': 'dialog' as const,
 });
+// «Crea la tuya»: atajo con las votaciones clave de vivienda (con voto por grupo), de la más antigua a la más reciente
+const vivienda = vots.filter((v) => v.temas?.includes('vivienda') && v.porGrupo?.length).slice(0, MAX_COMPARAR).reverse();
+const idsVivienda = new Set(vivienda.map((v) => v.id));
+const tv = textosVotaciones[lang].cliente;
+const lista: TextosLista = { ...tv.lista, locale: LOCALE[lang], resultados: { ...comun[lang].resultado, ...tv.lista.resultados } };
 const config = {
   json: url(`${prefijo(lang)}/tarjetas/diputados.json`),
   colores: Object.fromEntries(grupos.map((g) => [g.corto, g.color])),
   abrir: t.abrir, sinResultados: t.sinResultados, mas: t.masResultados,
+  crea: t.crea, lista, compartirTexto: tv.compartirTexto, cuenta: tv.cuenta,
+  clave: votacionesPleno.filter((v) => idsVivienda.has(v.id)).map(aItem),
 };
 const PESTANAS = [
   { id: 'resumen', texto: t.categorias.resumen, icono: 'hemiciclo' as const },
+  { id: 'crea', texto: t.categorias.crea, icono: 'sumar' as const },
   { id: 'votaciones', texto: t.categorias.votaciones, icono: 'votaciones' as const },
   { id: 'provincias', texto: t.categorias.provincias, icono: 'mapa' as const },
   { id: 'diputados', texto: t.categorias.diputados, icono: 'fichas' as const },
@@ -50,7 +63,7 @@ const PESTANAS = [
   <h1>{t.titulo}</h1>
   <p class="lead">{t.lead}</p>
 
-  <a class="crear" href={enlace('/votaciones', lang)}>
+  <a class="crear" href={enlace('/votaciones', lang)} data-ir="crea">
     <span class="crear-ico" aria-hidden="true"><Icono n="imagen" tam={24} /></span>
     <span class="crear-txt"><strong>{t.crear.titulo}</strong><span>{t.crear.texto}</span></span>
     <span class="crear-ir"><span class="crear-boton">{t.crear.boton}</span><Icono n="derecha" tam={20} /></span>
@@ -70,6 +83,31 @@ const PESTANAS = [
         </li>
       ))}
     </ul>
+  </section>
+
+  <section class="panel-pestana" id="crea" role="tabpanel" aria-labelledby="tab-crea">
+    <h2 class="panel-tit">{t.categorias.crea}</h2>
+    <p class="crea-intro">{t.crea.intro}</p>
+    <div class="destacada">
+      <div class="dest-cab">
+        <span class="crear-ico" aria-hidden="true"><Icono n="vivienda" tam={24} /></span>
+        <div><h3>{f(t.crea.vivienda, { n: vivienda.length })}</h3><p>{t.crea.viviendaTexto}</p></div>
+      </div>
+      <ol class="dest-lista" role="list">
+        {vivienda.map((v) => <li><span class="dest-nombre">{temaCorto(v.tema)}</span><span class:list={['res', favorable(v.resultado)]}>{resultados[v.resultado] ?? v.resultado}</span></li>)}
+      </ol>
+      <button class="btn primario dest-boton" type="button" id="t-vivienda" data-ids={vivienda.map((v) => v.id).join(',')}><Icono n="imagen" tam={20} />{t.crea.viviendaBoton}</button>
+      <p class="small c-aviso" id="t-vivienda-aviso" role="status"></p>
+    </div>
+    <h3 class="sub" id="t-cv-tit">{t.crea.recientes}</h3>
+    <label class="buscador">
+      <Icono n="buscar" tam={20} />
+      <span class="sr-only">{t.crea.buscar}</span>
+      <input type="search" id="t-cv" placeholder={t.crea.buscar} autocomplete="off" enterkeyhint="search" />
+    </label>
+    <ul class="cvs" role="list" id="t-cv-lista" aria-live="polite" aria-busy="true"><li class="muted small">{t.crea.cargando}</li></ul>
+    <p class="vacio muted small" id="t-cv-mas" hidden></p>
+    <p class="small muted">{t.crea.nota}</p>
   </section>
 
   <section class="panel-pestana" id="votaciones" role="tabpanel" aria-labelledby="tab-votaciones">
@@ -121,13 +159,20 @@ const PESTANAS = [
   </section>
 
   <DialogoCompartir />
+  <TarjetasVotacion />
   <script type="application/json" id="tarjetas-cfg" set:html={JSON.stringify(config).replace(/</g, '\\u003c')} />
 </Base>
 
 <script>
   import { sinTildes } from '../../../lib/texto';
-  import { f, pl } from '../../../i18n/cliente';
-  const cfg = JSON.parse(document.getElementById('tarjetas-cfg')!.textContent!) as { json: string; colores: Record<string, string>; abrir: string; sinResultados: string; mas: [string, string] };
+  import { f, pl, fmtFecha, prefijo, base } from '../../../i18n/cliente';
+  import { normalizar, palabrasDe, coincide, totalesTexto, resultadoTexto, favorable, textoCompartirVotacion, type ItemVotacion, type TextosLista } from '../../../lib/votaciones';
+  import { iniciarTarjetasVotacion } from '../../../scripts/tarjetas-votaciones';
+  import type T from '../../../i18n/textos/tarjetas-pagina';
+  const cfg = JSON.parse(document.getElementById('tarjetas-cfg')!.textContent!) as {
+    json: string; colores: Record<string, string>; abrir: string; sinResultados: string; mas: [string, string];
+    crea: (typeof T)['es']['crea']; lista: TextosLista; compartirTexto: string; cuenta: [string, string]; clave: ItemVotacion[];
+  };
   const norm = (s: string) => sinTildes(s).toLowerCase().trim();
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
@@ -174,8 +219,65 @@ const PESTANAS = [
   const panelDip = document.getElementById('diputados')!;
   document.addEventListener('pestana', (e) => { if ((e as CustomEvent<string>).detail === 'diputados') cargar(); });
   if (panelDip.hasAttribute('data-activo')) cargar();
+
+  // ---------- Crea la tuya: tarjeta de cualquier votación o comparación de varias ----------
+  const porId = new Map(cfg.clave.map((i) => [i.id, i]));
+  const tarjetas = iniciarTarjetasVotacion({
+    buscar: (id) => porId.get(id), prefijo: prefijo(),
+    textoCompartir: (i) => textoCompartirVotacion(i, cfg.compartirTexto, cfg.lista, (iso) => fmtFecha(iso)),
+  });
+  const botonViv = document.getElementById('t-vivienda') as HTMLButtonElement;
+  botonViv.addEventListener('click', () => tarjetas.comparar(botonViv.dataset.ids!.split(','), botonViv, document.getElementById('t-vivienda-aviso')!));
+
+  // Sin buscar, solo las más recientes; buscando, más resultados
+  const CV_RECIENTES = 10, CV_MAX = 30;
+  const cvInput = document.getElementById('t-cv') as HTMLInputElement;
+  const cvLista = document.getElementById('t-cv-lista')!;
+  const cvMas = document.getElementById('t-cv-mas')!;
+  const cvTit = document.getElementById('t-cv-tit')!;
+  let votos: { i: ItemVotacion; q: string }[] | null = null;
+  let cargandoVotos: Promise<void> | null = null;
+  // Solo las que tienen el voto de cada grupo (las demás no tienen tarjeta), de la más reciente a la más antigua
+  const cargarVotaciones = () => (cargandoVotos ??= fetch(`${base()}/datos/votaciones.json`).then((r) => r.json()).then((xs: ItemVotacion[]) => {
+    votos = xs.filter((i) => i.g?.length && !i.pe && !i.nv).map((i) => ({ i, q: normalizar([i.c, i.t, i.d, i.tp].filter(Boolean).join(' ')) }));
+    votos.forEach(({ i }) => porId.set(i.id, i));
+    pintarVotaciones();
+    tarjetas.pintarBarra();
+  }).catch(() => {
+    cargandoVotos = null;
+    cvLista.innerHTML = `<li class="muted small">${esc(cfg.crea.error)}</li>`;
+  }));
+  function filaVotacion(i: ItemVotacion) {
+    return `<li class="cv"><p class="cv-meta"><time datetime="${i.f}">${esc(fmtFecha(i.f))}</time><span class="res ${favorable(i.r)}">${esc(resultadoTexto(i.r, cfg.lista))}</span></p>`
+      + `<p class="cv-tit">${esc(i.c ?? i.t)}</p>${i.d ? `<p class="cv-d">${esc(i.d)}</p>` : ''}`
+      + `<p class="cv-n">${esc(totalesTexto(i.to, cfg.lista))}</p>${tarjetas.botones(i)}</li>`;
+  }
+  function pintarVotaciones() {
+    if (!votos) return;
+    const palabras = palabrasDe(cvInput.value);
+    const hallados = palabras.length ? votos.filter((x) => coincide(x.q, palabras)) : votos;
+    cvTit.textContent = palabras.length ? pl(hallados.length, cfg.cuenta) : cfg.crea.recientes;
+    const max = palabras.length ? CV_MAX : CV_RECIENTES;
+    cvLista.innerHTML = hallados.slice(0, max).map((x) => filaVotacion(x.i)).join('');
+    cvLista.removeAttribute('aria-busy');
+    cvLista.querySelectorAll<HTMLElement>('li.cv').forEach((li) => tarjetas.conectar(li));
+    const resto = hallados.length - max;
+    cvMas.hidden = !(resto > 0 || !hallados.length);
+    cvMas.textContent = !hallados.length ? cfg.sinResultados : resto > 0 ? pl(resto, cfg.mas) : '';
+  }
+  let esperaCv = 0;
+  cvInput.addEventListener('input', () => { clearTimeout(esperaCv); esperaCv = window.setTimeout(pintarVotaciones, 150); });
+  cvInput.addEventListener('focus', cargarVotaciones, { once: true });
+  document.addEventListener('pestana', (e) => { if ((e as CustomEvent<string>).detail === 'crea') cargarVotaciones(); });
+  if (document.getElementById('crea')!.hasAttribute('data-activo')) cargarVotaciones();
+  // Un enlace con votaciones para comparar (?comparar=…) abre «Crea la tuya» con ellas ya elegidas
+  if (tarjetas.seleccion().length) {
+    cargarVotaciones();
+    if (!location.hash) { history.replaceState(history.state, '', `${location.pathname}${location.search}#crea`); dispatchEvent(new HashChangeEvent('hashchange')); }
+  }
+
   // El navegador puede recordar lo escrito al volver atrás
-  addEventListener('pageshow', () => { filtrarProv(); if (filas) pintar(); });
+  addEventListener('pageshow', () => { filtrarProv(); if (filas) pintar(); if (votos) pintarVotaciones(); });
 </script>
 
 <style>
@@ -246,5 +348,42 @@ const PESTANAS = [
   .lista :global(.fila:hover .f-ico) { background: var(--accent-soft); color: var(--accent-text); }
   .lista :global(.dot) { width: 10px; height: 10px; }
   .vacio { margin: 12px 0 0; }
+
+  /* Crea la tuya */
+  .crea-intro { margin: 0 0 16px; max-width: 70ch; color: var(--muted); }
+  .destacada { padding: 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 26px; }
+  .dest-cab { display: flex; gap: 14px; align-items: flex-start; }
+  .dest-cab .crear-ico { flex: none; background: var(--accent-soft); }
+  .dest-cab h3 { margin: 2px 0 2px; font-size: 1.05rem; }
+  .dest-cab p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.4; }
+  .dest-lista { list-style: none; margin: 14px 0; padding: 0; display: grid; gap: 0; counter-reset: v; }
+  .dest-lista li { counter-increment: v; display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: .9rem; }
+  .dest-lista li::before { content: counter(v); flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--chip); color: var(--muted); font-size: .75rem; font-weight: 700; }
+  .dest-nombre { flex: 1; min-width: 0; font-weight: 600; }
+  .dest-boton { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; border-radius: 14px; }
+  .dest-boton[aria-busy='true'] { opacity: .65; }
+  .c-aviso, :global(.cv .c-aviso) { margin: 6px 0 0; color: var(--muted); }
+  .c-aviso:empty, :global(.cv .c-aviso:empty) { display: none; }
+  @media (min-width: 900px) {
+    .destacada { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 8px 28px; padding: 22px 24px; align-items: start; }
+    .dest-cab, .dest-boton { grid-column: 1; }
+    .dest-lista { grid-column: 2; grid-row: 1 / span 3; margin: 0; }
+    .dest-boton { width: auto; justify-self: start; padding: 0 22px; margin-top: 8px; }
+  }
+  .sub { font-size: 1rem; margin: 0 0 10px; }
+  .cvs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  @media (min-width: 900px) { .cvs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .cvs :global(.cv) { display: flex; flex-direction: column; padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); min-width: 0; }
+  .cvs :global(.cv-meta) { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 0 4px; font-size: .8rem; color: var(--muted); }
+  .cvs :global(.cv-tit) { margin: 0; font-weight: 650; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .cvs :global(.cv-d) { margin: 2px 0 0; font-size: .82rem; color: var(--muted); }
+  .cvs :global(.cv-n) { margin: 4px 0 0; font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cvs :global(.d-tarjetas) { margin-top: auto; padding-top: 10px; }
+  .cvs :global(.res) { padding: 1px 8px; border-radius: 999px; font-weight: 650; font-size: .74rem; }
+  .cvs :global(.res.si) { background: color-mix(in srgb, var(--si) 16%, transparent); color: var(--si); }
+  .cvs :global(.res.no) { background: color-mix(in srgb, var(--no) 14%, transparent); color: var(--no); }
+  :global(:root[data-theme='dark']) .cvs :global(.res.si) { color: #7fd287; }
+  :global(:root[data-theme='dark']) .cvs :global(.res.no) { color: #ff8a80; }
+  :global(html:not(.js)) #crea { display: none; }
   .tambien { margin-top: 16px; }
 </style>

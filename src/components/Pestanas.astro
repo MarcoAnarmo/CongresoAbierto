@@ -11,7 +11,7 @@ export interface DefPestana { id: string; texto: string; icono?: NombreIcono }
 interface Props { etiqueta: string; pestanas: DefPestana[]; inicial?: string }
 const { etiqueta, pestanas, inicial = pestanas[0].id } = Astro.props;
 ---
-<div class="pestanas" role="tablist" aria-label={etiqueta} data-pestanas style={`--n:${pestanas.length}`}>
+<div class="pestanas" role="tablist" aria-label={etiqueta} data-pestanas data-desliza={pestanas.length > 3 ? '' : undefined} style={`--n:${pestanas.length}`}>
   {pestanas.map((p) => (
     <a role="tab" href={`#${p.id}`} id={`tab-${p.id}`} data-id={p.id} aria-controls={p.id} aria-selected={p.id === inicial ? 'true' : 'false'} tabindex={p.id === inicial ? 0 : -1}>
       {p.icono && <Icono n={p.icono} tam={19} />}<span>{p.texto}</span>
@@ -46,16 +46,16 @@ const { etiqueta, pestanas, inicial = pestanas[0].id } = Astro.props;
   .pestanas a:last-child { border-radius: 4px 12px 12px 4px; }
   .pestanas a:hover { color: var(--accent-text); }
   .pestanas a[aria-selected='true'] { background: var(--text); color: var(--surface); }
-  /* Móvil estrecho con cuatro pestañas: solo el texto y, si no caben, se deslizan en horizontal */
-  @media (max-width: 480px) {
-    .pestanas[style*='--n:4'] { display: flex; overflow-x: auto; scrollbar-width: none; }
-    .pestanas[style*='--n:4']::-webkit-scrollbar { display: none; }
-    .pestanas[style*='--n:4'] a { flex: 1 0 auto; padding-inline: 14px; }
-    .pestanas[style*='--n:4'] a :global(svg) { display: none; }
+  /* Más de tres pestañas: en el móvil, solo el texto y, si no caben, se deslizan en horizontal */
+  @media (max-width: 720px) {
+    .pestanas[data-desliza] { display: flex; overflow-x: auto; scrollbar-width: none; }
+    .pestanas[data-desliza]::-webkit-scrollbar { display: none; }
+    .pestanas[data-desliza] a { flex: 1 0 auto; padding-inline: 14px; }
+    .pestanas[data-desliza] a :global(svg) { display: none; }
   }
   @media (max-width: 380px) { .pestanas a :global(svg) { display: none; } }
   @media (min-width: 721px) {
-    .pestanas { display: inline-grid; grid-template-columns: repeat(var(--n), auto); margin: 0 0 18px; padding: 10px 0; background: var(--bg); }
+    .pestanas { display: inline-grid; grid-template-columns: repeat(var(--n), auto); max-width: 100%; overflow-x: auto; scrollbar-width: none; margin: 0 0 18px; padding: 10px 0; background: var(--bg); }
     .pestanas a { padding: 6px 20px; }
   }
 </style>

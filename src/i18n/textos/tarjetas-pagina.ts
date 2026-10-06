@@ -2,9 +2,10 @@ import { area } from '..';
 
 /** Página de la galería de tarjetas para compartir (/tarjetas). Los textos de las propias tarjetas están en otra área. */
 const es = {
-  "categorias": {"aria": "Tipos de tarjeta", "resumen": "Resumen", "votaciones": "Votaciones", "provincias": "Provincias", "diputados": "Diputados"},
+  "crea": {"intro": "Busca cualquier votación del Pleno y crea su tarjeta, o pulsa «Comparar» en varias (hasta 7) para ver en una sola tarjeta qué votó la mayoría de cada grupo.", "vivienda": "Las {n} votaciones clave de vivienda", "viviendaTexto": "Qué votó la mayoría de cada grupo en cada una, en una sola tarjeta.", "viviendaBoton": "Crear esta tarjeta", "buscar": "Busca por palabras del título: alquiler, pensiones…", "recientes": "Las más recientes", "cargando": "Cargando las votaciones…", "error": "No se han podido cargar las votaciones. Comprueba la conexión.", "nota": "Solo aparecen las votaciones con el voto de cada grupo."},
+  "categorias": {"aria": "Tipos de tarjeta", "resumen": "Resumen", "crea": "Crea la tuya", "votaciones": "Votaciones", "provincias": "Provincias", "diputados": "Diputados"},
   "modos": {"grupo": "Por grupo", "propiedades": "Propiedades declaradas", "viviendas": "Viviendas declaradas"},
-  "crear": {"titulo": "Crea la tarjeta de cualquier votación", "texto": "Abre una votación del Pleno y pulsa «Crear tarjeta», o compara hasta 7.", "boton": "Ir a Votaciones"},
+  "crear": {"titulo": "Crea tu propia tarjeta", "texto": "De cualquier votación del Pleno, o junta hasta 7 para comparar qué votó cada grupo.", "boton": "Crear"},
   "buscarProvincia": "Busca tu provincia",
   "buscarDiputado": "Nombre, grupo o provincia",
   "sinResultados": "Ningún resultado.",
@@ -29,9 +30,10 @@ const es = {
 
 export default area(es, {
   ca: {
-    "categorias": {"aria": "Tipus de targeta", "resumen": "Resum", "votaciones": "Votacions", "provincias": "Circumscripcions", "diputados": "Diputats"},
+    "crea": {"intro": "Cerca qualsevol votació del Ple i crea’n la targeta, o prem «Comparar» en diverses (fins a 7) per veure en una sola targeta què va votar la majoria de cada grup.", "vivienda": "Les {n} votacions clau d’habitatge", "viviendaTexto": "Què va votar la majoria de cada grup en cadascuna, en una sola targeta.", "viviendaBoton": "Crear aquesta targeta", "buscar": "Cerca per paraules del títol: lloguer, pensions…", "recientes": "Les més recents", "cargando": "Carregant les votacions…", "error": "No s’han pogut carregar les votacions. Comprova la connexió.", "nota": "Només hi apareixen les votacions amb el vot de cada grup."},
+    "categorias": {"aria": "Tipus de targeta", "resumen": "Resum", "crea": "Crea la teva", "votaciones": "Votacions", "provincias": "Circumscripcions", "diputados": "Diputats"},
     "modos": {"grupo": "Per grup", "propiedades": "Propietats declarades", "viviendas": "Habitatges declarats"},
-    "crear": {"titulo": "Crea la targeta de qualsevol votació", "texto": "Obre una votació del Ple i prem «Crear targeta», o compara’n fins a 7.", "boton": "Ves a Votacions"},
+    "crear": {"titulo": "Crea la teva pròpia targeta", "texto": "De qualsevol votació del Ple, o ajunta’n fins a 7 per comparar què va votar cada grup.", "boton": "Crear"},
     "buscarProvincia": "Cerca la teva circumscripció",
     "buscarDiputado": "Nom, grup o circumscripció",
     "sinResultados": "Cap resultat.",
@@ -52,9 +54,10 @@ export default area(es, {
     altDiputado: 'Targeta de {nombre}',
   },
   eu: {
-    "categorias": {"aria": "Txartel motak", "resumen": "Laburpena", "votaciones": "Bozketak", "provincias": "Probintziak", "diputados": "Diputatuak"},
+    "crea": {"intro": "Bilatu Osoko bilkurako edozein bozketa eta sortu haren txartela, edo sakatu «Alderatu» hainbatetan (7 arte) talde bakoitzaren gehiengoak zer bozkatu zuen txartel bakarrean ikusteko.", "vivienda": "Etxebizitzari buruzko {n} bozketa nagusiak", "viviendaTexto": "Talde bakoitzaren gehiengoak zer bozkatu zuen bakoitzean, txartel bakarrean.", "viviendaBoton": "Sortu txartel hau", "buscar": "Bilatu izenburuko hitzekin: alokairua, pentsioak…", "recientes": "Berrienak", "cargando": "Bozketak kargatzen…", "error": "Ezin izan dira bozketak kargatu. Egiaztatu konexioa.", "nota": "Talde bakoitzaren botoa duten bozketak baino ez dira agertzen."},
+    "categorias": {"aria": "Txartel motak", "resumen": "Laburpena", "crea": "Sortu zurea", "votaciones": "Bozketak", "provincias": "Probintziak", "diputados": "Diputatuak"},
     "modos": {"grupo": "Taldeka", "propiedades": "Aitortutako jabetzak", "viviendas": "Aitortutako etxebizitzak"},
-    "crear": {"titulo": "Sortu edozein bozketaren txartela", "texto": "Ireki Osoko bilkurako bozketa bat eta sakatu «Sortu txartela», edo alderatu 7 arte.", "boton": "Joan Bozketetara"},
+    "crear": {"titulo": "Sortu zure txartela", "texto": "Osoko bilkurako edozein bozketarena, edo bildu 7 arte talde bakoitzak zer bozkatu zuen alderatzeko.", "boton": "Sortu"},
     "buscarProvincia": "Bilatu zure probintzia",
     "buscarDiputado": "Izena, taldea edo probintzia",
     "sinResultados": "Emaitzarik ez.",
@@ -75,9 +78,10 @@ export default area(es, {
     altDiputado: 'Txartela: {nombre}',
   },
   gl: {
-    "categorias": {"aria": "Tipos de tarxeta", "resumen": "Resumo", "votaciones": "Votacións", "provincias": "Provincias", "diputados": "Deputados"},
+    "crea": {"intro": "Busca calquera votación do Pleno e crea a súa tarxeta, ou preme «Comparar» en varias (ata 7) para ver nunha soa tarxeta que votou a maioría de cada grupo.", "vivienda": "As {n} votacións clave de vivenda", "viviendaTexto": "Que votou a maioría de cada grupo en cada unha, nunha soa tarxeta.", "viviendaBoton": "Crear esta tarxeta", "buscar": "Busca por palabras do título: aluguer, pensións…", "recientes": "As máis recentes", "cargando": "Cargando as votacións…", "error": "Non se puideron cargar as votacións. Comproba a conexión.", "nota": "Só aparecen as votacións co voto de cada grupo."},
+    "categorias": {"aria": "Tipos de tarxeta", "resumen": "Resumo", "crea": "Crea a túa", "votaciones": "Votacións", "provincias": "Provincias", "diputados": "Deputados"},
     "modos": {"grupo": "Por grupo", "propiedades": "Propiedades declaradas", "viviendas": "Vivendas declaradas"},
-    "crear": {"titulo": "Crea a tarxeta de calquera votación", "texto": "Abre unha votación do Pleno e preme «Crear tarxeta», ou compara ata 7.", "boton": "Ir a Votacións"},
+    "crear": {"titulo": "Crea a túa propia tarxeta", "texto": "De calquera votación do Pleno, ou xunta ata 7 para comparar que votou cada grupo.", "boton": "Crear"},
     "buscarProvincia": "Busca a túa provincia",
     "buscarDiputado": "Nome, grupo ou provincia",
     "sinResultados": "Ningún resultado.",
@@ -98,9 +102,10 @@ export default area(es, {
     altDiputado: 'Tarxeta de {nombre}',
   },
   en: {
-    "categorias": {"aria": "Card types", "resumen": "Overview", "votaciones": "Votes", "provincias": "Provinces", "diputados": "MPs"},
+    "crea": {"intro": "Search any plenary vote and create its card, or press “Compare” on several (up to 7) to see on a single card how the majority of each group voted.", "vivienda": "The {n} key housing votes", "viviendaTexto": "How the majority of each group voted in each one, on a single card.", "viviendaBoton": "Create this card", "buscar": "Search by words in the title: rent, pensions…", "recientes": "Most recent", "cargando": "Loading votes…", "error": "The votes could not be loaded. Check your connection.", "nota": "Only votes with each group’s vote are shown."},
+    "categorias": {"aria": "Card types", "resumen": "Overview", "crea": "Make your own", "votaciones": "Votes", "provincias": "Provinces", "diputados": "MPs"},
     "modos": {"grupo": "By group", "propiedades": "Declared properties", "viviendas": "Declared homes"},
-    "crear": {"titulo": "Create a card for any vote", "texto": "Open any plenary vote and press “Create card”, or compare up to 7.", "boton": "Go to Votes"},
+    "crear": {"titulo": "Make your own card", "texto": "From any plenary vote, or put up to 7 together to compare how each group voted.", "boton": "Create"},
     "buscarProvincia": "Find your province",
     "buscarDiputado": "Name, group or province",
     "sinResultados": "No results.",
