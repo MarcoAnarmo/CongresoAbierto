@@ -1,5 +1,7 @@
 /**
- * Página Datos: elegir tabla, filtrar, elegir columnas y descargar CSV, todo en el navegador (la web es estática).
+ * Página Datos: asistente de cuatro pasos para elegir tabla, filtrar, elegir columnas y descargar CSV, todo en el
+ * navegador (la web es estática). Se ve un paso cada vez; el paso va en la dirección y en el historial, así que el
+ * botón «atrás» del navegador vuelve al paso anterior.
  *
  * Cada tabla se recorre fila a fila sin copiarla entera: así contar, ver las primeras filas o descargar
  * 700.000 votos no llena la memoria del móvil. Las tablas anuales (votos) solo descargan los años que pide el filtro.
@@ -7,6 +9,7 @@
  */
 import { TABLAS, SEP_LISTA, rutaTabla, type Celda, type DefTabla, type FicheroTabla } from '../lib/datos/tablas';
 import { celdaCsv, type FormatoCsv } from '../lib/datos/csv';
+import { pasoInicial, mover, filtrosAplicados, quitarFiltro, TOTAL_PASOS, type Paso, type Aplicado } from '../lib/datos/asistente';
 import { sinTildes } from '../lib/texto';
 import { f, pl, fmtNum } from '../i18n/cliente';
 
@@ -19,6 +22,8 @@ interface Config {
   temas: Record<string, string>;
   tx: Record<string, string>;
   plFilas: [string, string];
+  /** Nombre de cada paso del asistente. */
+  pasos: string[];
   nombresColumnas: Record<string, string>;
   nombresTablas: Record<string, string>;
   nombresFiltros: Record<string, string>;
@@ -43,8 +48,10 @@ function leerEstado(): Estado {
   };
 }
 let e = leerEstado();
-function guardarEstado() {
+let paso: Paso = pasoInicial(params);
+function direccion(p0: Paso = paso) {
   const p = new URLSearchParams();
+  p.set('paso', String(p0));
   p.set('tabla', e.tabla.id);
   for (const [k, v] of Object.entries(e.valores)) if (v.length) p.set(k, v.join(','));
   if (e.desde) p.set('desde', e.desde);
@@ -52,8 +59,9 @@ function guardarEstado() {
   if (e.texto) p.set('buscar', e.texto);
   if (e.columnas.join(',') !== defecto(e.tabla).join(',')) p.set('cols', e.columnas.join(','));
   if (e.formato === 'csv') p.set('formato', 'csv');
-  history.replaceState(history.state, '', `${location.pathname}?${p}${location.hash}`);
+  return `${location.pathname}?${p}${location.hash}`;
 }
+const guardarEstado = () => history.replaceState(history.state, '', direccion());
 
 // ---------- Datos: carga y recorrido ----------
 const cache = new Map<string, Promise<unknown>>();
@@ -163,12 +171,27 @@ async function pintarFiltros() {
     const ops = await opciones(t, fi.columna, fi.id);
     const sel = e.valores[fi.id] ?? [];
     const resumen = sel.length ? sel.map((v) => nombreValor(fi.id, v)).join(', ') : cfg.tx.todos;
-    return `<details class="f-valores" data-f="${esc(fi.id)}"><summary><span class="f-nombre">${esc(nombre)}</span><span class="f-resumen">${esc(resumen)}</span></summary>`
+    return `<details class="f-valores${sel.length ? ' con-valor' : ''}" data-f="${esc(fi.id)}"><summary><span class="f-nombre">${esc(nombre)}</span><span class="f-resumen">${esc(resumen)}</span></summary>`
       + `<div class="f-chips">${ops.map((v) => `<label class="chip"><input type="checkbox" value="${esc(v)}" ${sel.includes(v) ? 'checked' : ''} /><span>${esc(nombreValor(fi.id, v))}</span></label>`).join('')}</div></details>`;
   }));
   cajaFiltros.innerHTML = partes.join('');
-  $('d-quitar').hidden = !hayFiltros();
+  pintarAplicados();
 }
+/** Filtros aplicados, como chips que se quitan al pulsarlos (paso 2), y su resumen (panel «Tu descarga»). */
+let aplicados: Aplicado[] = [];
+function pintarAplicados() {
+  aplicados = filtrosAplicados(e, e.tabla.filtros, (id) => cfg.nombresFiltros[id] ?? id, nombreValor, { desde: cfg.tx.desde, hasta: cfg.tx.hasta });
+  $('d-aplicados').hidden = !aplicados.length;
+  $('d-aplicados').querySelector('ul')!.innerHTML = aplicados.map((a, i) => `<li><button type="button" data-quitar="${i}" aria-label="${esc(f(cfg.tx.quitarFiltro, { nombre: a.texto }))}">${esc(a.texto)}<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg></button></li>`).join('');
+  $('d-r-2').textContent = aplicados.length ? aplicados.map((a) => a.texto).join(' · ') : cfg.tx.sinFiltros;
+}
+$('d-aplicados').addEventListener('click', (ev) => {
+  const b = (ev.target as Element).closest<HTMLElement>('[data-quitar]');
+  if (!b) return;
+  e = quitarFiltro(e, aplicados[Number(b.dataset.quitar)]);
+  pintarFiltros();
+  cambio();
+});
 const hayFiltros = () => Object.values(e.valores).some((v) => v.length) || !!e.desde || !!e.hasta || !!e.texto;
 
 cajaFiltros.addEventListener('change', (ev) => {
@@ -178,9 +201,11 @@ cajaFiltros.addEventListener('change', (ev) => {
     e.valores[det.dataset.f!] = [...det.querySelectorAll<HTMLInputElement>('input:checked')].map((x) => x.value);
     const sel = e.valores[det.dataset.f!];
     det.querySelector('.f-resumen')!.textContent = sel.length ? sel.map((v) => nombreValor(det.dataset.f!, v)).join(', ') : cfg.tx.todos;
+    det.classList.toggle('con-valor', sel.length > 0);
   } else if (el.matches('[data-f-desde]')) e.desde = el.value;
   else if (el.matches('[data-f-hasta]')) e.hasta = el.value;
   else return;
+  pintarAplicados();
   cambio();
 });
 let esperaTexto = 0;
@@ -188,7 +213,7 @@ cajaFiltros.addEventListener('input', (ev) => {
   const el = ev.target as HTMLInputElement;
   if (!el.matches('[data-f-texto]')) return;
   clearTimeout(esperaTexto);
-  esperaTexto = window.setTimeout(() => { e.texto = el.value.trim(); cambio(); }, 250);
+  esperaTexto = window.setTimeout(() => { e.texto = el.value.trim(); pintarAplicados(); cambio(); }, 250);
 });
 $('d-quitar').addEventListener('click', () => { e.valores = {}; e.desde = ''; e.hasta = ''; e.texto = ''; pintarFiltros(); cambio(); });
 
@@ -199,7 +224,14 @@ function pintarColumnas() {
   cajaCols.innerHTML = t.columnas.map((c) => `<label class="chip"><input type="checkbox" value="${c.id}" ${e.columnas.includes(c.id) ? 'checked' : ''} /><span>${esc(cfg.nombresColumnas[c.id] ?? c.id)}</span></label>`).join('');
   resumenColumnas();
 }
-const resumenColumnas = () => { $('d-cols-n').textContent = f(cfg.tx.columnasN, { n: e.columnas.length, total: e.tabla.columnas.length }); };
+function resumenColumnas() {
+  const texto = f(cfg.tx.columnasN, { n: e.columnas.length, total: e.tabla.columnas.length });
+  $('d-cols-n').textContent = texto;
+  $('d-r-3').textContent = texto;
+  const ids = e.columnas.join(',');
+  $('d-cols-defecto').setAttribute('aria-pressed', String(ids === defecto(e.tabla).join(',')));
+  $('d-cols-todas').setAttribute('aria-pressed', String(ids === e.tabla.columnas.map((c) => c.id).join(',')));
+}
 cajaCols.addEventListener('change', () => {
   // Se respeta el orden de la tabla, no el de los clics
   const marcadas = new Set([...cajaCols.querySelectorAll<HTMLInputElement>('input:checked')].map((x) => x.value));
@@ -216,17 +248,21 @@ const GRANDE = 150000;
 let turno = 0;
 async function resultado() {
   const mio = ++turno;
-  const estado = $('d-estado'), previa = $('d-previa'), boton = $<HTMLButtonElement>('d-descargar');
-  estado.textContent = cfg.tx.cargando;
-  boton.disabled = true;
+  const estado = $('d-estado'), previa = $('d-previa');
+  const cifras = document.querySelectorAll<HTMLElement>('[data-filas]');
+  const botones = document.querySelectorAll<HTMLButtonElement>('[data-descargar]');
+  cifras.forEach((x) => { x.textContent = cfg.tx.cargando; });
+  estado.textContent = '';
+  botones.forEach((b) => { b.disabled = true; });
   try {
     const recorrer = await fuente(e.tabla);
     if (mio !== turno) return;
     let n = 0;
     const primeras: Fila[] = [];
     recorrer((fila) => { if (n < PREVIA) primeras.push(fila); n++; });
-    estado.innerHTML = `<strong>${esc(pl(n, cfg.plFilas))}</strong>${n > GRANDE ? ` · <span class="muted">${esc(cfg.tx.grande)}</span>` : ''}`;
-    boton.disabled = n === 0 || e.columnas.length === 0;
+    cifras.forEach((x) => { x.textContent = pl(n, cfg.plFilas); });
+    estado.textContent = !n ? cfg.tx.sinFilas : n > GRANDE ? cfg.tx.grande : '';
+    botones.forEach((b) => { b.disabled = n === 0 || e.columnas.length === 0; });
     if (!n) { previa.innerHTML = `<p class="muted">${esc(cfg.tx.sinFilas)}</p>`; return; }
     const cols = e.columnas;
     previa.innerHTML = `<p class="small muted">${esc(f(cfg.tx.vistaPrevia, { n: Math.min(PREVIA, n) }))}</p><div class="table-scroll"><table><thead><tr>${cols.map((c) => `<th>${esc(cfg.nombresColumnas[c] ?? c)}</th>`).join('')}</tr></thead><tbody>`
@@ -234,14 +270,15 @@ async function resultado() {
   } catch {
     if (mio !== turno) return;
     estado.textContent = cfg.tx.error;
+    cifras.forEach((x) => { x.textContent = '—'; });
     previa.innerHTML = '';
   }
 }
 const mostrar = (v: Celda | undefined) => (v === null || v === undefined ? '' : typeof v === 'boolean' ? (v ? cfg.tx.verdadero : cfg.tx.falso) : typeof v === 'number' ? fmtNum(v) : v.length > 80 ? `${v.slice(0, 78)}…` : v);
 
-async function descargar() {
-  const boton = $<HTMLButtonElement>('d-descargar');
+async function descargar(boton: HTMLButtonElement) {
   boton.disabled = true;
+  boton.setAttribute('aria-busy', 'true');
   try {
     const recorrer = await fuente(e.tabla);
     const cols = e.columnas.map((id) => e.tabla.columnas.find((c) => c.id === id)!);
@@ -270,9 +307,10 @@ async function descargar() {
     $('d-estado').textContent = cfg.tx.error;
   } finally {
     boton.disabled = false;
+    boton.removeAttribute('aria-busy');
   }
 }
-$('d-descargar').addEventListener('click', descargar);
+document.querySelectorAll<HTMLButtonElement>('[data-descargar]').forEach((b) => b.addEventListener('click', () => descargar(b)));
 
 // ---------- Tabla y formato ----------
 function elegirTabla(id: string) {
@@ -280,6 +318,7 @@ function elegirTabla(id: string) {
   if (t === e.tabla) return;
   e = { ...e, tabla: t, valores: {}, desde: '', hasta: '', texto: '', columnas: defecto(t) };
   document.querySelectorAll<HTMLElement>('[data-nota-tabla]').forEach((n) => { n.hidden = n.dataset.notaTabla !== t.id; });
+  resumenTabla();
   pintarFiltros();
   pintarColumnas();
   cambio();
@@ -290,18 +329,68 @@ document.querySelectorAll<HTMLInputElement>('input[name="d-tabla"]').forEach((r)
 });
 document.querySelectorAll<HTMLInputElement>('input[name="d-formato"]').forEach((r) => {
   r.checked = r.value === e.formato;
-  r.addEventListener('change', () => { if (r.checked) { e.formato = r.value as FormatoCsv; guardarEstado(); } });
+  r.addEventListener('change', () => { if (r.checked) { e.formato = r.value as FormatoCsv; resumenFormato(); guardarEstado(); } });
+});
+function resumenTabla() {
+  $('d-r-1').textContent = cfg.nombresTablas[e.tabla.id] ?? e.tabla.id;
+  $('d-dic').dataset.info = `dic-${e.tabla.id}`;
+}
+const resumenFormato = () => { $('d-r-4').textContent = e.formato === 'excel' ? cfg.tx.excel : cfg.tx.csv; };
+
+// ---------- Pasos del asistente ----------
+const asistente = $('descargas');
+const marcadores = [...document.querySelectorAll<HTMLButtonElement>('.pasos-barra [data-ir-paso]')];
+const atras = asistente.querySelector<HTMLButtonElement>('.b-atras')!;
+const siguiente = asistente.querySelector<HTMLButtonElement>('.b-sig')!;
+const bajar = asistente.querySelector<HTMLButtonElement>('.b-descargar')!;
+const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+/** Muestra el paso `p`. `empujar` lo guarda en el historial (el «atrás» del navegador vuelve al anterior). */
+function irA(p: Paso, { empujar = true, foco = true } = {}) {
+  const cambia = p !== paso;
+  paso = p;
+  asistente.dataset.paso = String(p);
+  asistente.querySelectorAll<HTMLElement>('.paso').forEach((x) => x.toggleAttribute('data-activo', Number(x.dataset.paso) === p));
+  marcadores.forEach((m) => {
+    const n = Number(m.dataset.irPaso);
+    if (n === p) m.setAttribute('aria-current', 'step'); else m.removeAttribute('aria-current');
+    m.toggleAttribute('data-hecho', n < p);
+  });
+  atras.disabled = p === 1;
+  siguiente.hidden = p === TOTAL_PASOS;
+  bajar.hidden = p !== TOTAL_PASOS;
+  $('d-sig').textContent = `${cfg.tx.siguiente}: ${cfg.pasos[p] ?? ''}`;
+  if (empujar && cambia) history.pushState({ paso: p }, '', direccion(p));
+  if (foco && cambia) {
+    // Al principio del asistente si se había bajado, y el foco en el título del paso (lectores de pantalla)
+    if (asistente.getBoundingClientRect().top < 0) asistente.scrollIntoView({ block: 'start', behavior: quieto() ? 'auto' : 'smooth' });
+    asistente.querySelector<HTMLElement>(`.paso[data-paso="${p}"] .paso-tit`)?.focus({ preventScroll: true });
+  }
+}
+asistente.addEventListener('click', (ev) => {
+  const b = (ev.target as Element).closest<HTMLElement>('[data-ir-paso], [data-mover]');
+  if (!b) return;
+  irA(b.dataset.irPaso ? (Number(b.dataset.irPaso) as Paso) : mover(paso, Number(b.dataset.mover)));
+});
+addEventListener('popstate', () => {
+  const p = pasoInicial(new URLSearchParams(location.search));
+  irA(p, { empujar: false, foco: true });
+  // La entrada del historial puede tener filtros antiguos: la dirección refleja siempre lo elegido
+  guardarEstado();
 });
 
 /** Algo cambió: se guarda en la dirección y se recalcula (en el siguiente fotograma, para que el toque responda ya). */
 function cambio(recalcular = true) {
-  $('d-quitar').hidden = !hayFiltros();
   guardarEstado();
   if (recalcular) requestAnimationFrame(() => resultado());
   else resultado();
 }
 
 document.querySelectorAll<HTMLElement>('[data-nota-tabla]').forEach((n) => { n.hidden = n.dataset.notaTabla !== e.tabla.id; });
+resumenTabla();
+resumenFormato();
+pintarAplicados();
 pintarFiltros().catch(() => { $('d-estado').textContent = cfg.tx.error; });
 pintarColumnas();
+irA(paso, { empujar: false, foco: false });
+guardarEstado();
 resultado();

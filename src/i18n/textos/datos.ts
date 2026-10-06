@@ -6,6 +6,17 @@ import { area } from '..';
  * Los valores oficiales (grupos, votos, resultados, textos) no se traducen.
  */
 const es = {
+  "formato": "Formato",
+  "siguiente": "Siguiente",
+  "atras": "Atrás",
+  "progreso": "Pasos de la descarga",
+  "pasoDe": "Paso {n} de {total}",
+  "tuDescarga": "Tu descarga",
+  "sinFiltros": "Sin filtros",
+  "quitarFiltro": "Quitar el filtro: {nombre}",
+  "verPrevia": "Ver las primeras filas",
+  "mas": "Más formas de usar los datos",
+  "listo": "Listo para descargar",
   "filas": [
     "{n} fila",
     "{n} filas"
@@ -17,7 +28,7 @@ const es = {
   "paso1": "Tabla",
   "paso2": "Filtros",
   "paso3": "Columnas",
-  "paso4": "Formato",
+  "paso4": "Descargar",
   "cargando": "Cargando datos…",
   "error": "No se han podido cargar los datos. Comprueba la conexión y vuelve a intentarlo.",
   "descargar": "Descargar",
@@ -331,6 +342,17 @@ const es = {
 
 export default area(es, {
   ca: {
+    "formato": "Format",
+    "siguiente": "Següent",
+    "atras": "Enrere",
+    "progreso": "Passos de la descàrrega",
+    "pasoDe": "Pas {n} de {total}",
+    "tuDescarga": "La teva descàrrega",
+    "sinFiltros": "Sense filtres",
+    "quitarFiltro": "Treu el filtre: {nombre}",
+    "verPrevia": "Veure les primeres files",
+    "mas": "Més maneres d’usar les dades",
+    "listo": "A punt per descarregar",
     "filas": [
       "{n} fila",
       "{n} files"
@@ -342,7 +364,7 @@ export default area(es, {
     "paso1": "Taula",
     "paso2": "Filtres",
     "paso3": "Columnes",
-    "paso4": "Format",
+    "paso4": "Descarregar",
     "cargando": "Carregant dades…",
     "error": "No s’han pogut carregar les dades. Comprova la connexió i torna-ho a provar.",
     "descargar": "Descarregar",
@@ -654,6 +676,17 @@ export default area(es, {
     }
   },
   eu: {
+    "formato": "Formatua",
+    "siguiente": "Hurrengoa",
+    "atras": "Atzera",
+    "progreso": "Deskargaren urratsak",
+    "pasoDe": "{n}. urratsa ({total}tik)",
+    "tuDescarga": "Zure deskarga",
+    "sinFiltros": "Iragazkirik gabe",
+    "quitarFiltro": "Kendu iragazkia: {nombre}",
+    "verPrevia": "Ikusi lehen errenkadak",
+    "mas": "Datuak erabiltzeko beste modu batzuk",
+    "listo": "Deskargatzeko prest",
     "filas": [
       "{n} errenkada",
       "{n} errenkada"
@@ -665,7 +698,7 @@ export default area(es, {
     "paso1": "Taula",
     "paso2": "Iragazkiak",
     "paso3": "Zutabeak",
-    "paso4": "Formatua",
+    "paso4": "Deskargatu",
     "cargando": "Datuak kargatzen…",
     "error": "Ezin izan dira datuak kargatu. Egiaztatu konexioa eta saiatu berriro.",
     "descargar": "Deskargatu",
@@ -977,6 +1010,17 @@ export default area(es, {
     }
   },
   gl: {
+    "formato": "Formato",
+    "siguiente": "Seguinte",
+    "atras": "Atrás",
+    "progreso": "Pasos da descarga",
+    "pasoDe": "Paso {n} de {total}",
+    "tuDescarga": "A túa descarga",
+    "sinFiltros": "Sen filtros",
+    "quitarFiltro": "Quitar o filtro: {nombre}",
+    "verPrevia": "Ver as primeiras filas",
+    "mas": "Máis formas de usar os datos",
+    "listo": "Listo para descargar",
     "filas": [
       "{n} fila",
       "{n} filas"
@@ -988,7 +1032,7 @@ export default area(es, {
     "paso1": "Táboa",
     "paso2": "Filtros",
     "paso3": "Columnas",
-    "paso4": "Formato",
+    "paso4": "Descargar",
     "cargando": "Cargando datos…",
     "error": "Non se puideron cargar os datos. Comproba a conexión e téntao de novo.",
     "descargar": "Descargar",
@@ -1300,6 +1344,17 @@ export default area(es, {
     }
   },
   en: {
+    "formato": "Format",
+    "siguiente": "Next",
+    "atras": "Back",
+    "progreso": "Download steps",
+    "pasoDe": "Step {n} of {total}",
+    "tuDescarga": "Your download",
+    "sinFiltros": "No filters",
+    "quitarFiltro": "Remove filter: {nombre}",
+    "verPrevia": "See the first rows",
+    "mas": "More ways to use the data",
+    "listo": "Ready to download",
     "filas": [
       "{n} row",
       "{n} rows"
@@ -1311,7 +1366,7 @@ export default area(es, {
     "paso1": "Table",
     "paso2": "Filters",
     "paso3": "Columns",
-    "paso4": "Format",
+    "paso4": "Download",
     "cargando": "Loading data…",
     "error": "The data could not be loaded. Check your connection and try again.",
     "descargar": "Download",
