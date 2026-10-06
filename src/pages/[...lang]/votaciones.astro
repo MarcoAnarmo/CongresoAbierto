@@ -1,14 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Icono from '../../components/Icono.astro';
-import { votacionesPleno, pendientes, grupos, url, TEMAS, antesDeElecciones } from '../../lib/data';
+import { votacionesPleno, pendientes, grupos, url, TEMAS } from '../../lib/data';
 import DialogoCompartir from '../../components/DialogoCompartir.astro';
+import TarjetasVotacion from '../../components/TarjetasVotacion.astro';
 import { aItem, itemPendiente, ordenar, listaHtml, filaHtml, TIPOS, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
 import { rutasIdioma, idiomaDe, enlace, formatos, f, pl, LOCALE } from '../../i18n';
 import comun from '../../i18n/textos/comun';
 import textos from '../../i18n/textos/votaciones';
-import textosTarjetas from '../../i18n/textos/tarjetas';
-import textosTarjetaVotacion from '../../i18n/textos/tarjeta-votacion';
 
 export const getStaticPaths = rutasIdioma;
 const lang = idiomaDe(Astro.params.lang);
@@ -39,13 +38,6 @@ const extra = Object.fromEntries([
   ...pendientes.map((p) => [p.id, { contenido: p.contenidos ?? [], documentos: p.fuentes, estado: t.pendientes[p.id] ?? p.estado }]),
 ]);
 const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class="etq clave">${tx.clave}</span>`, '').replace('<span class="vf-meta">', `<span class="vf-meta"><time datetime="${i.f}">${fmtFecha(i.f)}</time>`);
-// Tarjetas de cualquier votación y comparaciones, creadas en el navegador (src/scripts/tarjetas/)
-const tTarjetas = textosTarjetas[lang];
-const cfgTarjeta = {
-  tx: textosTarjetaVotacion[lang], base: url(''), pie: tTarjetas.pie, elecciones: antesDeElecciones() ? c.elecciones.tarjeta : null,
-  colores: Object.fromEntries(grupos.map((g) => [g.corto, g.color])), grupos: [...grupos].sort((a, b) => a.orden - b.orden).map((g) => g.corto),
-  resultados: c.resultado, rotulos: Object.fromEntries(Object.entries(tTarjetas.rotulos).map(([id, r]) => [id, { corto: r.corto, quien: r.quien }])),
-};
 ---
 <Base title={t.titulo} description={f(t.descripcion, { n: fmtNum(items.length) })}>
   <h1>{t.titulo}</h1>
@@ -153,14 +145,9 @@ const cfgTarjeta = {
     </div>
     <div class="d-cuerpo" id="dlg-voto-c" tabindex="-1" autofocus></div>
   </dialog>
-  <div class="barra-comparar" id="v-comparar" role="region" aria-label={textosTarjetaVotacion[lang].comparar} hidden>
-    <div class="vc-texto"><strong class="vc-n"></strong><span class="small vc-aviso" role="status"></span></div>
-    <button class="vc-vaciar" type="button" aria-label={textosTarjetaVotacion[lang].vaciar} title={textosTarjetaVotacion[lang].vaciar}><Icono n="cerrar" tam={20} /></button>
-    <button class="btn primario vc-crear" type="button">{textosTarjetaVotacion[lang].crearComparacion}</button>
-  </div>
+  <TarjetasVotacion />
   <DialogoCompartir />
 </Base>
-<script type="application/json" id="tarjeta-cfg" set:html={JSON.stringify(cfgTarjeta).replace(/</g, '\\u003c')} />
 
 <script type="application/json" data-textos="votaciones" set:html={JSON.stringify({ ...t.cliente, lista: tx })} />
 <script type="application/json" id="v-datos" set:html={JSON.stringify({
@@ -175,7 +162,7 @@ const cfgTarjeta = {
 
 <script>
   import { deslizarParaCerrar } from '../../scripts/hoja';
-  import { listaHtml, barraHtml, totalesTexto, nombreTipo, resultadoTexto, favorable, normalizar, palabrasDe, coincide, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
+  import { listaHtml, barraHtml, totalesTexto, nombreTipo, resultadoTexto, favorable, normalizar, palabrasDe, coincide, textoCompartirVotacion, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
   import { textos, f, pl, fmtNum, fmtFecha, locale, idioma, nombreMes as mesDe, koEko, prefijo, base as baseDatos } from '../../i18n/cliente';
   import type T from '../../i18n/textos/votaciones';
   import { iniciarTarjetasVotacion } from '../../scripts/tarjetas-votaciones';
@@ -399,11 +386,7 @@ const cfgTarjeta = {
       + (docs ? pliegue(esc(t.documentos), `<ul class="docs">${docs}</ul>`) : '')
       + `</div>`;
   }
-  function textoCompartir(i: ItemVotacion) {
-    const [si, no, ab] = i.to;
-    const tit = i.c ?? (i.t.length > 140 ? `${i.t.slice(0, 138).trimEnd()}…` : i.t);
-    return f(t.compartirTexto, { titulo: tit, fecha: fechaLarga(i.f), resultado: resultadoTexto(i.r, tx).toLocaleLowerCase(locale()), si, no, ab });
-  }
+  const textoCompartir = (i: ItemVotacion) => textoCompartirVotacion(i, t.compartirTexto, tx, fechaLarga);
   // Tarjeta de cualquier votación y comparación de varias (el dibujo se descarga solo al pulsar)
   const tarjetas = iniciarTarjetasVotacion({ buscar: (id) => porId.get(id), prefijo: base, textoCompartir });
   function abrir(id: string, empujar: boolean) {
@@ -598,21 +581,6 @@ const cfgTarjeta = {
   .d-cuerpo :global(.d-temas) { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 12px; }
   .d-cuerpo :global(.d-temas span) { font-size: .72rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
   .d-cuerpo :global(.d-res) { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 8px; }
-  /* Crear tarjeta y comparar (src/scripts/tarjetas-votaciones.ts) */
-  .d-cuerpo :global(.d-tarjetas) { display: flex; gap: 10px; margin: 10px 0 0; }
-  .d-cuerpo :global(.d-tarjetas .btn) { flex: 1 1 0; min-width: 0; justify-content: center; display: inline-flex; align-items: center; padding: 8px; white-space: nowrap; }
-  .d-cuerpo :global(.d-comparar[aria-pressed='true']) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
-  .d-cuerpo :global(.d-crear[aria-busy='true']) { opacity: .6; }
-  .barra-comparar { position: fixed; z-index: 25; left: 50%; transform: translateX(-50%); bottom: 16px; width: min(560px, calc(100% - 24px)); display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 8px 30px rgb(0 0 0 / .18); }
-  .barra-comparar[hidden] { display: none; }
-  .vc-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; font-size: .92rem; }
-  .vc-crear { flex: none; white-space: nowrap; padding: 8px 14px; }
-  :global(html.con-comparar) main { padding-bottom: 110px; }
-  .vc-aviso { color: var(--muted); }
-  .vc-vaciar { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; }
-  .vc-vaciar:hover { background: var(--chip); color: var(--text); }
-  .vc-crear:disabled { opacity: .55; cursor: default; }
-  @media (max-width: 720px) { .barra-comparar { bottom: calc(70px + env(safe-area-inset-bottom)); } }
   .d-cuerpo :global(.d-acciones) { display: flex; align-items: center; gap: 10px; margin: 16px 0 4px; }
   .d-cuerpo :global(.d-acciones .btn.primario) { flex: 1 1 auto; justify-content: center; }
   .d-cuerpo :global(.d-compartir) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: none; min-width: 44px; height: 44px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; cursor: pointer; transition: border-color .15s, color .15s, background .15s; }

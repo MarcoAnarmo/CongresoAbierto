@@ -1,14 +1,15 @@
 /**
- * Página Votaciones: «Crear tarjeta» de cualquier votación y comparación de hasta 7 votaciones en una tarjeta.
+ * Páginas Votaciones y Tarjetas («Crea la tuya»): «Crear tarjeta» de cualquier votación y comparación de hasta 7
+ * votaciones en una tarjeta. El HTML que necesita (configuración y barra de comparación) lo pinta TarjetasVotacion.astro.
  * Este fichero es pequeño; el que dibuja (fuentes incluidas) se descarga solo al pulsar «Crear tarjeta».
  * La selección para comparar va en la dirección (?comparar=id,id…), para poder compartir el enlace.
  */
-import type { ItemVotacion } from '../lib/votaciones';
+import { MAX_COMPARAR, type ItemVotacion } from '../lib/votaciones';
 import type { ConfigTarjeta, Tarjeta } from './tarjetas/votacion';
 import type { DatosCompartir } from './compartir';
 import { f, pl, fmtFecha, fmtFechaCorta } from '../i18n/cliente';
 
-export const MAX_COMPARAR = 7;
+export { MAX_COMPARAR };
 type Cfg = Omit<ConfigTarjeta, 'fecha' | 'fechaCorta'>;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
@@ -44,18 +45,19 @@ export function iniciarTarjetasVotacion(o: { buscar: (id: string) => ItemVotacio
     b.title = dentro ? tx.quitarComparar : tx.comparar;
   }
   barra.querySelector('.vc-vaciar')!.addEventListener('click', () => { seleccion = []; guardar(); pintarBarra(); });
-  crear.addEventListener('click', () => {
-    const items = seleccion.map(o.buscar).filter((x): x is ItemVotacion => !!x)
-      // De la más antigua a la más reciente, como se leen
+  /** Crea la tarjeta que compara `ids` (de la más antigua a la más reciente, como se leen) y abre la ventana de compartir. */
+  function comparar(ids: string[], boton: HTMLButtonElement, avisoEl: HTMLElement) {
+    const items = ids.map(o.buscar).filter((x): x is ItemVotacion => !!x)
       .sort((a, b) => a.f.localeCompare(b.f) || a.s - b.s || a.n - b.n);
-    if (items.length < 2) { aviso.textContent = tx.minimo; return; }
-    void generar(crear, aviso, async (m) => m.tarjetaComparacion(items, cfg), {
+    if (items.length < 2) { avisoEl.textContent = tx.minimo; return; }
+    void generar(boton, avisoEl, async (m) => m.tarjetaComparacion(items, cfg), {
       nombre: 'congreso-abierto-comparacion',
       enlace: `${sitio}${o.prefijo}/votaciones?comparar=${items.map((i) => i.id).join(',')}`,
       texto: f(tx.textoComparacion, { n: items.length }),
       titulo: tx.tituloDialogoComparacion,
     });
-  });
+  }
+  crear.addEventListener('click', () => comparar(seleccion, crear, aviso));
   // El detalle de una votación usa el historial (atrás lo cierra): la selección se vuelve a poner en la dirección
   addEventListener('popstate', () => guardar());
   pintarBarra();
@@ -81,6 +83,11 @@ export function iniciarTarjetasVotacion(o: { buscar: (id: string) => ItemVotacio
   }
 
   return {
+    comparar,
+    /** Votaciones elegidas para comparar (también las que llegan en la dirección). */
+    seleccion: () => [...seleccion],
+    /** Vuelve a pintar la barra (p. ej. cuando ya se han cargado las votaciones elegidas). */
+    pintarBarra,
     /** Botones para el detalle de una votación (solo si hay voto por grupo). */
     botones(i: ItemVotacion) {
       if (!i.g?.length || i.pe) return '';

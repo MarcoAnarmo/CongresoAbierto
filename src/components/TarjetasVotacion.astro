@@ -1,0 +1,51 @@
+---
+/**
+ * Lo que necesitan las tarjetas de votaciones creadas en el navegador (src/scripts/tarjetas-votaciones.ts):
+ * su configuración (#tarjeta-cfg) y la barra de comparación (#v-comparar), con los estilos de los botones
+ * «Crear tarjeta» y «Comparar». Va una vez en Votaciones y en Tarjetas («Crea la tuya»), junto a DialogoCompartir.
+ */
+import Icono from './Icono.astro';
+import { grupos, url, antesDeElecciones } from '../lib/data';
+import { idiomaDeUrl } from '../i18n';
+import comun from '../i18n/textos/comun';
+import textosTarjetas from '../i18n/textos/tarjetas';
+import textosTarjetaVotacion from '../i18n/textos/tarjeta-votacion';
+const lang = idiomaDeUrl(Astro.url.pathname);
+const c = comun[lang];
+const tt = textosTarjetas[lang];
+const tv = textosTarjetaVotacion[lang];
+const cfg = {
+  tx: tv, base: url(''), pie: tt.pie, elecciones: antesDeElecciones() ? c.elecciones.tarjeta : null,
+  colores: Object.fromEntries(grupos.map((g) => [g.corto, g.color])), grupos: [...grupos].sort((a, b) => a.orden - b.orden).map((g) => g.corto),
+  resultados: c.resultado, rotulos: Object.fromEntries(Object.entries(tt.rotulos).map(([id, r]) => [id, { corto: r.corto, quien: r.quien }])),
+};
+---
+<script type="application/json" id="tarjeta-cfg" set:html={JSON.stringify(cfg).replace(/</g, '\\u003c')} />
+<div class="barra-comparar" id="v-comparar" role="region" aria-label={tv.comparar} hidden>
+  <div class="vc-texto"><strong class="vc-n"></strong><span class="small vc-aviso" role="status"></span></div>
+  <button class="vc-vaciar" type="button" aria-label={tv.vaciar} title={tv.vaciar}><Icono n="cerrar" tam={20} /></button>
+  <button class="btn primario vc-crear" type="button">{tv.crearComparacion}</button>
+</div>
+
+<style>
+  /* Botones que pinta el script en cada votación */
+  :global(.d-tarjetas) { display: flex; gap: 10px; margin: 10px 0 0; }
+  :global(.d-tarjetas .btn) { flex: 1 1 0; min-width: 0; justify-content: center; display: inline-flex; align-items: center; padding: 8px; white-space: nowrap; }
+  :global(.d-comparar[aria-pressed='true']) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
+  :global(.d-crear[aria-busy='true']) { opacity: .6; }
+  /* Barra de comparación, fija abajo (en el móvil, encima del menú) */
+  .barra-comparar {
+    position: fixed; z-index: 25; left: 50%; transform: translateX(-50%); bottom: 16px; width: min(560px, calc(100% - 24px));
+    display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; border-radius: 16px;
+    background: var(--surface); border: 1px solid var(--border); box-shadow: 0 8px 30px rgb(0 0 0 / .18);
+  }
+  .barra-comparar[hidden] { display: none; }
+  .vc-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; font-size: .92rem; }
+  .vc-crear { flex: none; white-space: nowrap; padding: 8px 14px; }
+  :global(html.con-comparar) :global(main) { padding-bottom: 110px; }
+  .vc-aviso { color: var(--muted); }
+  .vc-vaciar { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; }
+  .vc-vaciar:hover { background: var(--chip); color: var(--text); }
+  .vc-crear:disabled { opacity: .55; cursor: default; }
+  @media (max-width: 720px) { .barra-comparar { bottom: calc(70px + env(safe-area-inset-bottom)); } }
+</style>

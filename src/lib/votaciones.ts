@@ -109,6 +109,16 @@ export function barraHtml(to: number[], fina = true) {
   const [si, no, ab, nv] = to; const tot = si + no + ab + nv;
   return `<span class="barra${fina ? ' fina' : ''}" aria-hidden="true"><span class="b-si" style="width:${pct(si, tot)}"></span><span class="b-no" style="width:${pct(no, tot)}"></span><span class="b-abs" style="width:${pct(ab, tot)}"></span><span class="b-nv" style="width:${pct(nv, tot)}"></span></span>`;
 }
+/** Votaciones que caben, como mucho, en una tarjeta de comparación. */
+export const MAX_COMPARAR = 7;
+
+/** Texto que acompaña al enlace al compartir una votación (página Votaciones y galería de tarjetas). {resultado} va en minúscula. */
+export function textoCompartirVotacion(i: ItemVotacion, plantilla: string, tx: TextosLista, fecha: (iso: string) => string) {
+  const [si, no, ab] = i.to;
+  const titulo = i.c ?? (i.t.length > 140 ? `${i.t.slice(0, 138).trimEnd()}…` : i.t);
+  const v: Record<string, string | number> = { titulo, fecha: fecha(i.f), resultado: resultadoTexto(i.r, tx).toLocaleLowerCase(tx.locale), si, no, ab };
+  return plantilla.replace(/\{([^{}\s]+)\}/g, (_, k) => (k in v ? String(v[k]) : `{${k}}`));
+}
 export const totalesTexto = (to: number[], tx: TextosLista) => [conN(tx.si, to[0]), conN(tx.no, to[1]), conN(tx.abst, to[2]), ...(to[3] ? [conN(tx.noVota, to[3])] : [])].join(' · ');
 
 /** Fila compacta de una votación (se abre en la ventana de detalle). `base` lleva ya el prefijo del idioma. */
