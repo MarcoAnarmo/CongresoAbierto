@@ -1,11 +1,47 @@
 ---
 import Base from '../layouts/Base.astro';
 import { url } from '../lib/data';
+import { IDIOMAS, enlace } from '../i18n';
+import comun from '../i18n/textos/comun';
+
+// Una sola página 404 (en la raíz). Sin JavaScript se ve en castellano; con JavaScript, el script de abajo la pone en el
+// idioma de la dirección (/ca/…, /eu/…), el elegido en el selector o el del navegador.
+const t = comun.es.noEncontrada;
+const textos = Object.fromEntries(IDIOMAS.map((l) => [l, { ...comun[l].noEncontrada, inicio: enlace('/', l) }]));
 ---
-<Base title="Página no encontrada" description="La página que buscas no existe.">
-  <h1>Página no encontrada</h1>
-  <p class="lead">La dirección no existe o ha cambiado.</p>
-  <p><a class="btn primario" href={url('/')}>Ir al hemiciclo</a></p>
+<Base title={t.titulo} description={t.descripcion}>
+  <h1 id="nf-titulo">{t.titulo}</h1>
+  <p class="lead" id="nf-texto">{t.texto}</p>
+  <p><a class="btn primario" id="nf-volver" href={url('/')}>{t.volver}</a></p>
+  <script is:inline define:vars={{ textos, base: url('') }}>
+    (function () {
+      var lang = null;
+      var ruta = location.pathname;
+      if (base && ruta.indexOf(base) === 0) ruta = ruta.slice(base.length);
+      var m = ruta.match(/^\/(ca|eu|gl|en)(\/|$)/);
+      if (m) lang = m[1];
+      if (!lang) { try { lang = localStorage.getItem('idioma'); } catch (e) {} }
+      if (!lang || !textos[lang]) {
+        lang = null;
+        var prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'es'];
+        for (var i = 0; i < prefs.length && !lang; i++) {
+          var c = String(prefs[i]).toLowerCase().split('-')[0];
+          if (c === 'va') c = 'ca';
+          if (textos[c]) lang = c;
+        }
+        lang = lang || 'en';
+      }
+      if (lang === 'es') return;
+      var t = textos[lang];
+      document.documentElement.lang = lang;
+      document.title = t.titulo + ' · Congreso Abierto';
+      document.getElementById('nf-titulo').textContent = t.titulo;
+      document.getElementById('nf-texto').textContent = t.texto;
+      var a = document.getElementById('nf-volver');
+      a.textContent = t.volver;
+      a.setAttribute('href', t.inicio);
+    })();
+  </script>
 </Base>
 
 <style>

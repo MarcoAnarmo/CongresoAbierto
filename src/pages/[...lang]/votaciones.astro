@@ -1,10 +1,26 @@
 ---
-import Base from '../layouts/Base.astro';
-import Icono from '../components/Icono.astro';
-import { votacionesPleno, pendientes, grupos, fmtFecha, fmtNum, url, TEMAS } from '../lib/data';
-import { aItem, itemPendiente, ordenar, listaHtml, filaHtml, TIPOS, type ItemVotacion } from '../lib/votaciones';
+import Base from '../../layouts/Base.astro';
+import Icono from '../../components/Icono.astro';
+import { votacionesPleno, pendientes, grupos, url, TEMAS } from '../../lib/data';
+import { aItem, itemPendiente, ordenar, listaHtml, filaHtml, TIPOS, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
+import { rutasIdioma, idiomaDe, enlace, formatos, f, pl, LOCALE } from '../../i18n';
+import comun from '../../i18n/textos/comun';
+import textos from '../../i18n/textos/votaciones';
 
+export const getStaticPaths = rutasIdioma;
+const lang = idiomaDe(Astro.params.lang);
+const t = textos[lang];
+const c = comun[lang];
+const { fecha: fmtFecha, num: fmtNum } = formatos(lang);
+
+// Datos comunes a todos los idiomas (/datos/…) y enlaces a páginas con el prefijo del idioma
 const base = url('');
+const pre = enlace('', lang);
+// Textos de las filas: resultados oficiales (comun) y propios de la web, tipos e idioma de las fechas
+const tx: TextosLista = { ...t.cliente.lista, locale: LOCALE[lang], resultados: { ...c.resultado, ...t.cliente.lista.resultados } };
+const nombreTema = (id: string, nombre: string) => c.temas[id] ?? nombre;
+// Iniciales de los días de la semana (de lunes a domingo), sin punto final
+const semana = Array.from({ length: 7 }, (_, d) => new Date(Date.UTC(2024, 0, 1 + d, 12)).toLocaleDateString(LOCALE[lang], { weekday: t.calendario.semana === 'short' ? 'short' : 'narrow', timeZone: 'UTC' }).replace(/\.$/, ''));
 const items = votacionesPleno.map(aItem);
 const todas = ordenar([...pendientes.map(itemPendiente), ...items]);
 const clave = todas.filter((i) => i.cl);
@@ -17,136 +33,144 @@ const cuentaTema = Object.fromEntries(TEMAS.map((t) => [t.id, todas.filter((i) =
 // Lo que solo tienen las votaciones clave y las pendientes: contenido literal, documentos y expediente
 const extra = Object.fromEntries([
   ...votacionesPleno.filter((v) => !v.automatica).map((v) => [v.id, { contenido: v.contenido ? [v.contenido] : [], documentos: v.documentos, expediente: v.expediente, expedienteUrl: v.expedienteUrl }]),
-  ...pendientes.map((p) => [p.id, { contenido: p.contenidos ?? [], documentos: p.fuentes, estado: p.estado }]),
+  ...pendientes.map((p) => [p.id, { contenido: p.contenidos ?? [], documentos: p.fuentes, estado: t.pendientes[p.id] ?? p.estado }]),
 ]);
-const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="etq clave">Votación clave</span>', '').replace('<span class="vf-meta">', `<span class="vf-meta"><time datetime="${i.f}">${fmtFecha(i.f)}</time>`);
+const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class="etq clave">${tx.clave}</span>`, '').replace('<span class="vf-meta">', `<span class="vf-meta"><time datetime="${i.f}">${fmtFecha(i.f)}</time>`);
 ---
-<Base title="Votaciones" description={`Las ${fmtNum(items.length)} votaciones del Pleno del Congreso de la XV Legislatura publicadas en datos abiertos, por tema y fecha, con el resultado y el voto de cada grupo.`}>
-  <h1>Votaciones</h1>
+<Base title={t.titulo} description={f(t.descripcion, { n: fmtNum(items.length) })}>
+  <h1>{t.titulo}</h1>
   <p class="lead">
-    <span class="largo">Todas las votaciones del Pleno de la XV Legislatura publicadas en los datos abiertos del Congreso, desde el {fmtFecha(primera)}: qué se votó, el resultado y cómo votó cada grupo. Toca una para ver el texto oficial y sus documentos.</span>
-    <span class="corto">Qué se votó en el Pleno desde {new Date(primera + 'T12:00:00').getFullYear()}, el resultado y cómo votó cada grupo.</span>
+    <span class="largo">{f(t.leadLargo, { fecha: fmtFecha(primera) })}</span>
+    <span class="corto">{f(t.leadCorto, { año: new Date(primera + 'T12:00:00').getFullYear() })}</span>
   </p>
 
   <div class="vista-barra">
-    <div class="segmentado" role="group" aria-label="Cómo ver las votaciones">
-      <button class="btn" type="button" data-vista="todas" aria-pressed="true"><Icono n="votaciones" tam={19} /><span>Todas</span></button>
-      <button class="btn" type="button" data-vista="clave" aria-pressed="false"><Icono n="vivienda" tam={19} /><span class="largo">Clave de vivienda</span><span class="corto">Vivienda</span></button>
-      <button class="btn" type="button" data-vista="calendario" aria-pressed="false"><Icono n="calendario" tam={19} /><span>Calendario</span></button>
+    <div class="segmentado" role="group" aria-label={t.vistas.grupo}>
+      <button class="btn" type="button" data-vista="todas" aria-pressed="true"><Icono n="votaciones" tam={19} /><span>{t.vistas.todas}</span></button>
+      <button class="btn" type="button" data-vista="clave" aria-pressed="false"><Icono n="vivienda" tam={19} /><span class="largo">{t.vistas.claveLargo}</span><span class="corto">{t.vistas.claveCorto}</span></button>
+      <button class="btn" type="button" data-vista="calendario" aria-pressed="false"><Icono n="calendario" tam={19} /><span>{t.vistas.calendario}</span></button>
     </div>
   </div>
 
-  <div class="filtros" id="v-filtros" role="search" aria-label="Buscar votaciones">
-    <label class="sr-only" for="v-texto">Buscar en las votaciones</label>
-    <input type="search" id="v-texto" placeholder="Buscar: alquiler, pensiones…" autocomplete="off" enterkeyhint="search" />
-    <button class="btn boton-filtrar" type="button" id="v-abrir-filtros" aria-haspopup="dialog" aria-controls="v-dlg-filtros"><Icono n="filtros" tam={19} /><span>Filtrar</span><span class="n-filtros" id="v-n-filtros" hidden></span></button>
+  <div class="filtros" id="v-filtros" role="search" aria-label={t.filtros.zona}>
+    <label class="sr-only" for="v-texto">{t.filtros.etiqueta}</label>
+    <input type="search" id="v-texto" placeholder={t.filtros.placeholder} autocomplete="off" enterkeyhint="search" />
+    <button class="btn boton-filtrar" type="button" id="v-abrir-filtros" aria-haspopup="dialog" aria-controls="v-dlg-filtros"><Icono n="filtros" tam={19} /><span>{t.filtros.filtrar}</span><span class="n-filtros" id="v-n-filtros" hidden></span></button>
     <div class="filtros-mas" id="v-filtros-mas">
-      <label class="sr-only" for="v-tema">Tema</label>
+      <label class="sr-only" for="v-tema">{t.filtros.tema}</label>
       <select id="v-tema" autocomplete="off">
-        <option value="">Todos los temas</option>
-        {TEMAS.filter((t) => cuentaTema[t.id] > 0).map((t) => <option value={t.id}>{t.nombre} ({fmtNum(cuentaTema[t.id])})</option>)}
+        <option value="">{t.filtros.todosTemas}</option>
+        {TEMAS.filter((x) => cuentaTema[x.id] > 0).map((x) => <option value={x.id}>{nombreTema(x.id, x.nombre)} ({fmtNum(cuentaTema[x.id])})</option>)}
       </select>
-      <label class="sr-only" for="v-tipo">Tipo de iniciativa</label>
+      <label class="sr-only" for="v-tipo">{t.filtros.tipo}</label>
       <select id="v-tipo" autocomplete="off">
-        <option value="">Todos los tipos</option>
-        {TIPOS.map((t) => <option value={t.id}>{t.plural}</option>)}
+        <option value="">{t.filtros.todosTipos}</option>
+        {TIPOS.map((x) => <option value={x.id}>{t.tiposPlural[x.id] ?? x.plural}</option>)}
       </select>
-      <label class="sr-only" for="v-res">Resultado</label>
+      <label class="sr-only" for="v-res">{t.filtros.resultado}</label>
       <select id="v-res" autocomplete="off">
-        <option value="">Cualquier resultado</option>
-        <option value="si">Aprobadas o convalidadas</option>
-        <option value="no">Rechazadas o derogadas</option>
+        <option value="">{t.filtros.cualquiera}</option>
+        <option value="si">{t.filtros.si}</option>
+        <option value="no">{t.filtros.no}</option>
       </select>
     </div>
-    <p class="small muted cuenta" id="v-cuenta" aria-live="polite">{fmtNum(todas.length)} votaciones</p>
+    <p class="small muted cuenta" id="v-cuenta" aria-live="polite">{pl(todas.length, t.cliente.cuenta, lang)}</p>
   </div>
   <dialog class="dlg-filtros" id="v-dlg-filtros" aria-labelledby="v-dlg-filtros-t">
     <div class="df-cab">
-      <h2 id="v-dlg-filtros-t">Filtrar votaciones</h2>
-      <button class="df-cerrar" type="button" aria-label="Cerrar"><Icono n="cerrar" /></button>
+      <h2 id="v-dlg-filtros-t">{t.filtros.titulo}</h2>
+      <button class="df-cerrar" type="button" aria-label={c.palabras.cerrar}><Icono n="cerrar" /></button>
     </div>
     <div class="df-cuerpo" id="v-df-cuerpo" tabindex="-1" autofocus></div>
     <div class="df-pie">
-      <button class="btn" type="button" id="v-quitar">Quitar filtros</button>
-      <button class="btn primario" type="button" id="v-ver">Ver resultados</button>
+      <button class="btn" type="button" id="v-quitar">{t.filtros.quitar}</button>
+      <button class="btn primario" type="button" id="v-ver">{t.filtros.ver}</button>
     </div>
   </dialog>
 
   <!-- Todas: más recientes primero, agrupadas por día -->
   <div id="vista-todas">
-    <div class="v-lista" id="v-lista" set:html={listaHtml(todas.slice(0, PRIMERAS), base, porDia)} />
-    <p class="mas"><button class="btn" type="button" id="v-mas">Ver más votaciones</button></p>
+    <div class="v-lista" id="v-lista" set:html={listaHtml(todas.slice(0, PRIMERAS), pre, tx, porDia)} />
+    <p class="mas"><button class="btn" type="button" id="v-mas">{t.verMas}</button></p>
   </div>
 
   <!-- Votaciones clave de vivienda (con contenido y documentos revisados a mano) -->
   <div id="vista-clave" hidden>
-    <p class="small muted nota-vista">Votaciones sobre vivienda con el contenido literal del texto votado y sus documentos oficiales (BOE, BOCG, Diario de Sesiones). Son las que aparecen en las fichas y en las tarjetas para compartir.</p>
+    <p class="small muted nota-vista">{t.notaClave}</p>
     <ul class="v-filas sueltas" set:html={clave.map(conFecha).join('')} />
   </div>
 
   <!-- Calendario: un mes (o un día) -->
   <div id="vista-calendario" hidden>
    <div class="cal-rejilla">
-    <section class="card calendario" aria-label="Calendario de votaciones">
+    <section class="card calendario" aria-label={t.calendario.zona}>
       <div class="cal-cab">
-        <button class="btn icono" type="button" id="cal-ant" aria-label="Mes anterior con votaciones">‹</button>
-        <label class="sr-only" for="cal-mes">Mes</label>
+        <button class="btn icono" type="button" id="cal-ant" aria-label={t.calendario.anterior}>‹</button>
+        <label class="sr-only" for="cal-mes">{t.calendario.mes}</label>
         <select id="cal-mes"></select>
-        <button class="btn icono" type="button" id="cal-sig" aria-label="Mes siguiente con votaciones">›</button>
+        <button class="btn icono" type="button" id="cal-sig" aria-label={t.calendario.siguiente}>›</button>
       </div>
-      <div class="cal-sem" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div class="cal-sem" aria-hidden="true">{semana.map((d) => <span>{d}</span>)}</div>
       <div class="cal-dias" id="cal-dias"></div>
-      <p class="small muted cal-ley"><span><i class="punto si"></i> aprobadas o convalidadas</span><span><i class="punto no"></i> rechazadas o derogadas</span><span><i class="punto pend"></i> voto pendiente</span></p>
+      <p class="small muted cal-ley"><span><i class="punto si"></i> {t.calendario.aprobadas}</span><span><i class="punto no"></i> {t.calendario.rechazadas}</span><span><i class="punto pend"></i> {t.calendario.pendiente}</span></p>
     </section>
     <div class="cal-derecha">
       <div class="cal-resumen" id="cal-resumen" aria-live="polite"></div>
-      <p class="small muted cal-cuenta"><span id="cal-cuenta"></span> <button type="button" class="enlace" id="cal-todo" hidden>Ver todo el mes</button></p>
+      <p class="small muted cal-cuenta"><span id="cal-cuenta"></span> <button type="button" class="enlace" id="cal-todo" hidden>{t.calendario.verMes}</button></p>
       <div class="v-lista" id="cal-lista"></div>
     </div>
    </div>
   </div>
 
-  <p class="vacio muted" id="v-vacio" hidden>Ninguna votación coincide con la búsqueda o los filtros.</p>
+  <p class="vacio muted" id="v-vacio" hidden>{t.vacio}</p>
 
   <details class="card glosario">
-    <summary>Glosario de procedimiento</summary>
+    <summary>{t.glosario.titulo}</summary>
     <ul class="small">
-      <li><strong>Convalidación o derogación de Reales Decretos-leyes:</strong> el Congreso decide si un decreto-ley del Gobierno sigue en vigor (convalidación) o queda derogado (art. 86 de la Constitución). Con las Cortes disueltas, lo decide la Diputación Permanente (art. 78).</li>
-      <li><strong>Toma en consideración de Proposiciones de Ley:</strong> el Pleno decide si una propuesta de ley presentada por grupos parlamentarios empieza a tramitarse (art. 126 del Reglamento del Congreso).</li>
-      <li><strong>Proposiciones no de Ley:</strong> propuestas sin rango de ley en las que la Cámara fija posición o insta al Gobierno (arts. 193 a 195 del Reglamento del Congreso).</li>
-      <li><strong>Votación por llamamiento:</strong> cada diputado dice su voto en voz alta (por ejemplo, en las investiduras). El voto de cada diputado en estas votaciones no aparece en los datos abiertos, o lo hace más tarde.</li>
+      {[t.glosario.rdl, t.glosario.pl, t.glosario.pnl, t.glosario.llamamiento].map((g) => <li><strong>{g.t}:</strong> {g.d}</li>)}
     </ul>
   </details>
-  <p class="small muted">Los votos son los publicados en los <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos del Congreso</a>; los textos, los oficiales del BOE y del BOCG. <a href={url('/metodologia#votaciones')}>Cómo se presentan</a>.</p>
+  <p class="small muted" set:html={f(t.nota, {
+    datos: `<a href="https://www.congreso.es/es/opendata/votaciones">${t.datosAbiertos}</a>`,
+    metodo: `<a href="${enlace('/metodologia', lang)}#votaciones">${t.comoSePresentan}</a>`,
+  })} />
 
   <dialog class="dlg-voto" id="dlg-voto" aria-labelledby="dlg-voto-t">
     <div class="d-cab">
       <span class="d-ico"><Icono n="votaciones" /></span>
-      <h2 id="dlg-voto-t">Votación</h2>
-      <button class="d-cerrar" type="button" aria-label="Cerrar"><Icono n="cerrar" /></button>
+      <h2 id="dlg-voto-t">{t.dialogo}</h2>
+      <button class="d-cerrar" type="button" aria-label={c.palabras.cerrar}><Icono n="cerrar" /></button>
     </div>
     <div class="d-cuerpo" id="dlg-voto-c" tabindex="-1" autofocus></div>
   </dialog>
 </Base>
 
+<script type="application/json" data-textos="votaciones" set:html={JSON.stringify({ ...t.cliente, lista: tx })} />
 <script type="application/json" id="v-datos" set:html={JSON.stringify({
   base, primeras: PRIMERAS, extra,
-  temas: Object.fromEntries(TEMAS.map((t) => [t.id, t.nombre])),
+  // Nombres de los temas: en castellano para buscar en los datos y en el idioma de la página para mostrarlos
+  temas: Object.fromEntries(TEMAS.map((x) => [x.id, x.nombre])),
+  temasT: Object.fromEntries(TEMAS.map((x) => [x.id, nombreTema(x.id, x.nombre)])),
   colores: Object.fromEntries(grupos.map((g) => [g.corto, g.color])),
   // Mientras llega el índice completo, la página funciona con las votaciones de la primera carga y las clave
   inicial: [...todas.slice(0, PRIMERAS), ...clave.filter((i) => todas.indexOf(i) >= PRIMERAS)],
 })} />
 
 <script>
-  import { deslizarParaCerrar } from '../scripts/hoja';
-  import { listaHtml, barraHtml, totalesTexto, nombreTipo, favorable, normalizar, palabrasDe, coincide, type ItemVotacion } from '../lib/votaciones';
+  import { deslizarParaCerrar } from '../../scripts/hoja';
+  import { listaHtml, barraHtml, totalesTexto, nombreTipo, resultadoTexto, favorable, normalizar, palabrasDe, coincide, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
+  import { textos, f, pl, fmtNum, fmtFecha, locale, idioma, nombreMes as mesDe, koEko, prefijo, base as baseDatos } from '../../i18n/cliente';
+  import type T from '../../i18n/textos/votaciones';
 
   interface Contenido { etiqueta: string; items: string[]; fuente: { titulo: string; url: string } }
   interface Extra { contenido: Contenido[]; documentos: { titulo: string; url: string; tipo?: string }[]; expediente?: string; expedienteUrl?: string; estado?: string }
   const cfg = JSON.parse(document.getElementById('v-datos')!.textContent!) as {
-    base: string; primeras: number; extra: Record<string, Extra>; temas: Record<string, string>; colores: Record<string, string>; inicial: ItemVotacion[];
+    base: string; primeras: number; extra: Record<string, Extra>; temas: Record<string, string>; temasT: Record<string, string>; colores: Record<string, string>; inicial: ItemVotacion[];
   };
-  const { base } = cfg;
+  const t = textos<(typeof T)['es']['cliente'] & { lista: TextosLista }>('votaciones');
+  const tx = t.lista;
+  // Páginas con el prefijo del idioma; datos comunes a todos los idiomas sin él
+  const base = prefijo();
   let todas: ItemVotacion[] = cfg.inicial;
   let completo = false;
   const porId = new Map<string, ItemVotacion>();
@@ -158,8 +182,8 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   const selTema = $<HTMLSelectElement>('v-tema'), selTipo = $<HTMLSelectElement>('v-tipo'), selRes = $<HTMLSelectElement>('v-res');
   const cuenta = $('v-cuenta'), vacio = $('v-vacio'), lista = $('v-lista'), mas = $<HTMLButtonElement>('v-mas');
   const norm = (x: string) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-  const fmt = (n: number) => n.toLocaleString('es-ES');
-  const fechaLarga = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  const fmt = fmtNum;
+  const fechaLarga = fmtFecha;
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
   // ---------- Vistas ----------
@@ -182,7 +206,8 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   botonesVista.forEach((b) => b.addEventListener('click', () => ponerVista(b.dataset.vista as Vista)));
 
   // ---------- Filtros ----------
-  const textoDe = (i: ItemVotacion) => normalizar([i.c, i.t, i.d, i.tp, i.r, ...i.te.map((t) => cfg.temas[t]), ...(cfg.extra[i.id]?.contenido.flatMap((c) => c.items) ?? [])].filter(Boolean).join(' '));
+  // Se busca en el texto de los datos (en castellano) y también en los temas y el resultado en el idioma de la página
+  const textoDe = (i: ItemVotacion) => normalizar([i.c, i.t, i.d, i.tp, i.r, ...i.te.map((t) => cfg.temas[t]), ...(cfg.extra[i.id]?.contenido.flatMap((c) => c.items) ?? []), ...i.te.map((t) => cfg.temasT[t]), resultadoTexto(i.r, tx)].filter(Boolean).join(' '));
   const cache = new Map<string, string>();
   const buscable = (i: ItemVotacion) => { let s = cache.get(i.id); if (s === undefined) { s = textoDe(i); cache.set(i.id, s); } return s; };
   /** Prepara el texto de búsqueda de todas las votaciones a ratos libres, para que buscar no trabe la página. */
@@ -219,10 +244,10 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
     const fs = filtradas();
     const porDia: Record<string, number> = {};
     fs.forEach((i) => { porDia[i.f] = (porDia[i.f] ?? 0) + 1; });
-    lista.innerHTML = listaHtml(fs.slice(0, mostradas), base, porDia);
+    lista.innerHTML = listaHtml(fs.slice(0, mostradas), base, tx, porDia);
     mas.hidden = !completo || fs.length <= mostradas;
-    mas.textContent = `Ver más votaciones (quedan ${fmt(fs.length - mostradas)})`;
-    if (completo) cuenta.textContent = `${fmt(fs.length)} ${fs.length === 1 ? 'votación' : 'votaciones'}`;
+    mas.textContent = f(t.verMas, { n: fmt(fs.length - mostradas) });
+    if (completo) cuenta.textContent = pl(fs.length, t.cuenta);
     vacio.hidden = fs.length > 0;
   }
   mas.addEventListener('click', () => { mostradas += PAGINA; pintarTodas(); });
@@ -236,7 +261,9 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   const ant = $<HTMLButtonElement>('cal-ant'), sig = $<HTMLButtonElement>('cal-sig');
   const calCuenta = $('cal-cuenta'), calTodo = $<HTMLButtonElement>('cal-todo');
   let meses: string[] = [], mes = '', dia = '';
-  const nombreMes = (m: string) => { const s = new Date(+m.slice(0, 4), +m.slice(5, 7) - 1, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }); return s.charAt(0).toUpperCase() + s.slice(1); };
+  /** «octubre de 2026» (para usar dentro de una frase) y «Octubre de 2026» (título y selector). */
+  const mesFrase = (m: string) => f(t.mesAño, { mes: mesDe(+m.slice(5, 7) - 1, idioma(), locale()), año: m.slice(0, 4), añoKo: m.slice(0, 4) + koEko(+m.slice(0, 4)) });
+  const nombreMes = (m: string) => { const s = mesFrase(m); return s.charAt(0).toUpperCase() + s.slice(1); };
   function prepararMeses() {
     meses = [...new Set(todas.map((i) => i.f.slice(0, 7)))].sort();
     if (!meses.includes(mes)) mes = meses.at(-1)!;
@@ -256,18 +283,18 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
       const k = (r: string) => delDia.filter((i) => favorable(i.r) === r).length;
       const puntos = delDia.length === 1 ? `<i class="punto ${favorable(delDia[0].r)}"></i>`
         : `<span class="mini">${['si', 'no', 'pend'].map((r) => k(r) ? `<i class="${r}" style="flex:${k(r)}"></i>` : '').join('')}</span><span class="cnt">${delDia.length}</span>`;
-      html += `<button type="button" class="dia con" data-dia="${iso}" aria-pressed="${dia === iso}" aria-label="${fechaLarga(iso)}: ${delDia.length} ${delDia.length === 1 ? 'votación' : 'votaciones'}">${d}<span class="puntos">${puntos}</span></button>`;
+      html += `<button type="button" class="dia con" data-dia="${iso}" aria-pressed="${dia === iso}" aria-label="${pl(delDia.length, t.diaAria, { fecha: fechaLarga(iso) })}">${d}<span class="puntos">${puntos}</span></button>`;
     }
     dias.innerHTML = html;
     const i = meses.indexOf(mes);
     ant.disabled = i <= 0; sig.disabled = i >= meses.length - 1;
     const vis = dia ? delMes.filter((x) => x.f === dia) : delMes;
-    calLista.innerHTML = listaHtml(vis, base);
+    calLista.innerHTML = listaHtml(vis, base, tx);
     const nDias = new Set(delMes.map((x) => x.f)).size;
     const nSi = delMes.filter((x) => favorable(x.r) === 'si').length, nNo = delMes.filter((x) => favorable(x.r) === 'no').length;
-    $('cal-resumen').innerHTML = `<p class="cr-t">${nombreMes(mes)}</p><div class="cr-cifras"><span><strong>${fmt(delMes.length)}</strong> ${delMes.length === 1 ? 'votación' : 'votaciones'}</span><span><strong>${nDias}</strong> ${nDias === 1 ? 'día de Pleno' : 'días de Pleno'}</span><span class="cr-si"><strong>${fmt(nSi)}</strong> aprobadas o convalidadas</span><span class="cr-no"><strong>${fmt(nNo)}</strong> rechazadas o derogadas</span></div>`;
-    const v = vis.length === 1 ? 'votación' : 'votaciones';
-    calCuenta.textContent = dia ? `${vis.length} ${v} el ${fechaLarga(dia)}` : `${vis.length} ${v} en ${nombreMes(mes).toLowerCase()}`;
+    const fuerte = (n: number) => `<strong>${fmt(n)}</strong>`;
+    $('cal-resumen').innerHTML = `<p class="cr-t">${nombreMes(mes)}</p><div class="cr-cifras"><span>${pl(delMes.length, t.resumen.votaciones, { n: fuerte(delMes.length) })}</span><span>${pl(nDias, t.resumen.dias, { n: fuerte(nDias) })}</span><span class="cr-si">${f(t.resumen.aprobadas, { n: fuerte(nSi) })}</span><span class="cr-no">${f(t.resumen.rechazadas, { n: fuerte(nNo) })}</span></div>`;
+    calCuenta.textContent = dia ? pl(vis.length, t.cuentaDia, { fecha: fechaLarga(dia) }) : pl(vis.length, t.cuentaMes, { mes: mesFrase(mes) });
     calTodo.hidden = !dia;
     vacio.hidden = true;
   }
@@ -315,64 +342,64 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   const dlg = $<HTMLDialogElement>('dlg-voto');
   const cuerpo = $('dlg-voto-c');
   let empujado = false, origen: HTMLElement | null = null;
-  const etDoc: Record<string, string> = { boe: 'BOE', bocg: 'BOCG', ds: 'Diario', votacion: 'Votación' };
+  const etDoc: Record<string, string> = { boe: 'BOE', bocg: 'BOCG', ds: t.docs.diario, votacion: t.docs.votacion };
   const iconoCompartir = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" /><path d="m8.3 10.8 7.4-4.4M8.3 13.2l7.4 4.4" /></svg>';
   const pliegue = (t: string, html: string, abierto = false) => `<details class="pl"${abierto ? ' open' : ''}><summary>${t}</summary><div class="pl-c">${html}</div></details>`;
   function detalleHtml(i: ItemVotacion) {
     const x = cfg.extra[i.id];
     const grupos = (i.g ?? []).map(([g, si, no, ab, nv]) => {
-      const txt = [si && `${si} sí`, no && `${no} no`, ab && `${ab} abst.`, nv && `${nv} no vota`].filter(Boolean).join(' · ');
+      const txt = [si && f(tx.si, { n: si }), no && f(tx.no, { n: no }), ab && f(tx.abst, { n: ab }), nv && f(tx.noVota, { n: nv })].filter(Boolean).join(' · ');
       return `<li><span class="g"><span class="dot" style="background:${cfg.colores[g] ?? 'var(--novota)'}"></span>${esc(g)}</span>${barraHtml([si, no, ab, nv])}<span class="n small">${txt}</span></li>`;
     }).join('');
     const docs = [
-      ...(x?.documentos ?? []).map((d) => `<li><span class="tipo t-${d.tipo ?? 'otro'}">${etDoc[d.tipo ?? ''] ?? 'Doc.'}</span><a href="${esc(d.url)}" rel="noopener">${esc(d.titulo)} ↗</a></li>`),
-      ...(i.pdf && !x?.documentos.some((d) => d.tipo === 'votacion') ? [`<li><span class="tipo t-votacion">Votación</span><a href="${esc(i.pdf)}" rel="noopener">Resultado de la votación (PDF oficial) ↗</a></li>`] : []),
-      ...(i.fu ? [`<li><span class="tipo t-json">Datos</span><a href="${esc(i.fu)}" rel="noopener">${i.nv ? 'Totales de la votación' : 'Voto de cada diputado'} (JSON, datos abiertos) ↗</a></li>`] : []),
+      ...(x?.documentos ?? []).map((d) => `<li><span class="tipo t-${d.tipo ?? 'otro'}">${esc(etDoc[d.tipo ?? ''] ?? t.docs.doc)}</span><a href="${esc(d.url)}" rel="noopener">${esc(d.titulo)} ↗</a></li>`),
+      ...(i.pdf && !x?.documentos.some((d) => d.tipo === 'votacion') ? [`<li><span class="tipo t-votacion">${esc(t.docs.votacion)}</span><a href="${esc(i.pdf)}" rel="noopener">${esc(t.docs.pdf)}</a></li>`] : []),
+      ...(i.fu ? [`<li><span class="tipo t-json">${esc(t.docs.datos)}</span><a href="${esc(i.fu)}" rel="noopener">${esc(i.nv ? t.docs.totales : t.docs.votos)}</a></li>`] : []),
     ].join('');
     const largo = i.t.length > 220;
     // Qué se votó: el texto oficial completo, el subgrupo, los temas, el contenido y el expediente
     const que = (i.c && largo ? `<p class="d-titulo">${esc(i.t)}</p>` : '')
       + (i.d ? `<p class="d-det small">${esc(i.d)}</p>` : '')
-      + `<p class="d-temas small">${i.te.map((t) => `<span>${esc(cfg.temas[t] ?? 'Otros')}</span>`).join('')}</p>`
-      + (x?.contenido ?? []).map((c) => `<p class="docs-t">${esc(c.etiqueta)}</p><ul class="contenido">${c.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul><p class="small muted">Fuente: <a href="${esc(c.fuente.url)}" rel="noopener">${esc(c.fuente.titulo)} ↗</a></p>`).join('')
-      + (x?.expediente ? `<p class="small muted">Expediente <a href="${esc(x.expedienteUrl ?? '')}" rel="noopener">${esc(x.expediente)} ↗</a></p>` : '')
-      + (i.s ? `<p class="small muted">${esc(i.tp)} Sesión ${i.s}, votación ${i.n}.</p>` : '');
-    const acciones = i.pe ? '' : `<div class="d-acciones">${i.nv ? '' : `<a class="btn primario" href="${base}/?votacion=${encodeURIComponent(i.id)}#hemiciclo"><span class="largo">Ver escaño a escaño en el hemiciclo</span><span class="corto">Ver en el hemiciclo</span></a>`}<button class="d-compartir" type="button" id="d-compartir" aria-label="Compartir esta votación" title="Compartir esta votación">${iconoCompartir}${i.nv ? '<span>Compartir</span>' : ''}</button></div><p class="small c-aviso" id="d-aviso" role="status"></p>`;
-    return `<p class="d-meta small"><span class="etq">${esc(nombreTipo(i.k, i.tp))}</span>${i.cl ? '<span class="etq clave">Votación clave</span>' : ''}</p>`
+      + `<p class="d-temas small">${i.te.map((t) => `<span>${esc(cfg.temasT[t] ?? cfg.temasT.otros ?? 'Otros')}</span>`).join('')}</p>`
+      + (x?.contenido ?? []).map((c) => `<p class="docs-t">${esc(c.etiqueta)}</p><ul class="contenido">${c.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul><p class="small muted">${esc(t.fuente)} <a href="${esc(c.fuente.url)}" rel="noopener">${esc(c.fuente.titulo)} ↗</a></p>`).join('')
+      + (x?.expediente ? `<p class="small muted">${esc(t.expediente)} <a href="${esc(x.expedienteUrl ?? '')}" rel="noopener">${esc(x.expediente)} ↗</a></p>` : '')
+      + (i.s ? `<p class="small muted">${esc(f(t.sesion, { tipo: i.tp, s: i.s, n: i.n }))}</p>` : '');
+    const acciones = i.pe ? '' : `<div class="d-acciones">${i.nv ? '' : `<a class="btn primario" href="${base}/?votacion=${encodeURIComponent(i.id)}#hemiciclo"><span class="largo">${esc(t.hemicicloLargo)}</span><span class="corto">${esc(t.hemicicloCorto)}</span></a>`}<button class="d-compartir" type="button" id="d-compartir" aria-label="${esc(t.compartirEsta)}" title="${esc(t.compartirEsta)}">${iconoCompartir}${i.nv ? `<span>${esc(t.compartir)}</span>` : ''}</button></div><p class="small c-aviso" id="d-aviso" role="status"></p>`;
+    return `<p class="d-meta small"><span class="etq">${esc(nombreTipo(i.k, i.tp, tx))}</span>${i.cl ? `<span class="etq clave">${esc(tx.clave)}</span>` : ''}</p>`
       + (i.c ? `<h3 class="d-corto">${esc(i.c)}</h3>` : `<p class="d-titulo${largo ? ' recorte' : ''}">${esc(i.t)}</p>`)
-      + `<div class="d-res"><span class="insignia ${favorable(i.r)}">${esc(i.r)}</span>${i.pe ? '' : `<span class="small"><strong>${totalesTexto(i.to)}</strong></span>`}</div>`
+      + `<div class="d-res"><span class="insignia ${favorable(i.r)}">${esc(resultadoTexto(i.r, tx))}</span>${i.pe ? '' : `<span class="small"><strong>${totalesTexto(i.to, tx)}</strong></span>`}</div>`
       + (i.pe ? `<p class="small">${esc(x?.estado ?? '')}</p>` : barraHtml(i.to, false))
-      + (i.nv ? `<p class="aviso-nv small"><strong>Solo hay totales.</strong> En esta votación el Congreso no publica el voto de cada diputado ni de cada grupo (por ejemplo, porque fue secreta), así que no se puede ver en el hemiciclo.</p>` : '')
+      + (i.nv ? `<p class="aviso-nv small"><strong>${esc(t.soloTotalesTitulo)}</strong> ${esc(t.soloTotalesTexto)}</p>` : '')
       + acciones
       + `<div class="pliegues">`
-      + pliegue(i.c || largo ? 'Qué se votó' : 'Más información', que)
-      + (grupos ? pliegue('Cómo votó cada grupo', `<ul class="grupos">${grupos}</ul><p class="small muted">Grupo de cada diputado en la fecha de la votación, según los datos abiertos del Congreso.</p>`, !mqMovil.matches) : '')
-      + (docs ? pliegue('Documentos oficiales', `<ul class="docs">${docs}</ul>`) : '')
+      + pliegue(esc(i.c || largo ? t.queSeVoto : t.masInformacion), que)
+      + (grupos ? pliegue(esc(t.comoVotoCadaGrupo), `<ul class="grupos">${grupos}</ul><p class="small muted">${esc(t.notaGrupos)}</p>`, !mqMovil.matches) : '')
+      + (docs ? pliegue(esc(t.documentos), `<ul class="docs">${docs}</ul>`) : '')
       + `</div>`;
   }
   function textoCompartir(i: ItemVotacion) {
     const [si, no, ab] = i.to;
     const tit = i.c ?? (i.t.length > 140 ? `${i.t.slice(0, 138).trimEnd()}…` : i.t);
-    return `${tit} (${fechaLarga(i.f)}): ${i.r.toLowerCase()} con ${si} sí, ${no} no y ${ab} abstenciones. Qué votó cada grupo:`;
+    return f(t.compartirTexto, { titulo: tit, fecha: fechaLarga(i.f), resultado: resultadoTexto(i.r, tx).toLocaleLowerCase(locale()), si, no, ab });
   }
   function abrir(id: string, empujar: boolean) {
     const i = porId.get(id);
     if (!i) return false;
-    $('dlg-voto-t').textContent = `Votación del ${fechaLarga(i.f)}`;
+    $('dlg-voto-t').textContent = f(t.tituloDialogo, { fecha: fechaLarga(i.f) });
     cuerpo.innerHTML = detalleHtml(i);
     cuerpo.scrollTop = 0;
     const rec = cuerpo.querySelector<HTMLElement>('.d-titulo.recorte');
     if (rec) {
-      const b = Object.assign(document.createElement('button'), { type: 'button', className: 'ver-texto', textContent: 'Ver el texto completo' });
+      const b = Object.assign(document.createElement('button'), { type: 'button', className: 'ver-texto', textContent: t.verTexto });
       b.addEventListener('click', () => { rec.classList.remove('recorte'); b.remove(); });
       rec.after(b);
     }
     document.getElementById('d-compartir')?.addEventListener('click', async () => {
       const enlace = new URL(`${base}/votaciones?v=${encodeURIComponent(i.id)}`, location.href).href;
-      const t = textoCompartir(i);
+      const mensaje = textoCompartir(i);
       const aviso = document.getElementById('d-aviso')!;
-      if (navigator.share && matchMedia('(pointer: coarse)').matches) { navigator.share({ text: t, url: enlace }).catch(() => {}); return; }
-      try { await navigator.clipboard.writeText(`${t} ${enlace}`); aviso.textContent = 'Texto y enlace copiados.'; } catch { aviso.textContent = enlace; }
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) { navigator.share({ text: mensaje, url: enlace }).catch(() => {}); return; }
+      try { await navigator.clipboard.writeText(`${mensaje} ${enlace}`); aviso.textContent = t.copiado; } catch { aviso.textContent = enlace; }
     });
     document.documentElement.classList.add('dlg-abierto');
     if (!dlg.open) dlg.showModal();
@@ -410,12 +437,12 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, base).replace('<span class="et
   prepararMeses();
   ponerVista(vista);
   if (pedida) abrir(pedida, false);
-  fetch(`${base}/datos/votaciones.json`).then((r) => r.json()).then((xs: ItemVotacion[]) => {
+  fetch(`${baseDatos()}/datos/votaciones.json`).then((r) => r.json()).then((xs: ItemVotacion[]) => {
     todas = xs; completo = true; indexar(); cache.clear(); ultimo.clave = ''; prepararBusqueda();
     prepararMeses();
     aplicar();
     if (pedida && !dlg.open) abrir(pedida, false);
-  }).catch(() => { cuenta.textContent = 'No se ha podido cargar el índice completo; se muestran las más recientes.'; });
+  }).catch(() => { cuenta.textContent = t.errorIndice; });
 </script>
 
 <style>

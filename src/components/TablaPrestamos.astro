@@ -1,18 +1,21 @@
 ---
 import type { Prestamo } from '../lib/types';
+import { idiomaDeUrl } from '../i18n';
+import textos from '../i18n/textos/ficha';
 interface Props { prestamos: Prestamo[] }
 const { prestamos } = Astro.props;
+const t = textos[idiomaDeUrl(Astro.url.pathname)].prestamos;
 ---
 <div class="card tabla-prestamos" style="padding:0">
   <table>
-    <thead><tr><th scope="col">Préstamo (descripción y acreedor)</th><th scope="col">Concesión</th><th scope="col" class="num">Importe concedido</th><th scope="col" class="num">Saldo pendiente</th></tr></thead>
+    <thead><tr><th scope="col">{t.prestamo}</th><th scope="col">{t.concesion}</th><th scope="col" class="num">{t.importe}</th><th scope="col" class="num">{t.saldo}</th></tr></thead>
     <tbody>
       {prestamos.map((x) => (
         <tr>
           <td class="desc">{x.descripcion || '—'}</td>
-          <td data-label="Concesión">{x.fechaConcesion ?? '—'}</td>
-          <td class="num" data-label="Concedido">{x.concedido ?? '—'}</td>
-          <td class="num" data-label="Pendiente"><strong>{x.pendiente ?? '—'}</strong></td>
+          <td data-label={t.concesion}>{x.fechaConcesion ?? '—'}</td>
+          <td class="num" data-label={t.concedido}>{x.concedido ?? '—'}</td>
+          <td class="num" data-label={t.pendiente}><strong>{x.pendiente ?? '—'}</strong></td>
         </tr>
       ))}
     </tbody>

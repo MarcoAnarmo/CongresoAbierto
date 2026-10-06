@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://congresoabierto.org/sitemap.xml

@@ -1,14 +1,25 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
-import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, fmtEur, fmtNum, slug, candidaturaDistinta, ELECCIONES, antesDeElecciones } from './data';
+import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, slug, candidaturaDistinta, antesDeElecciones } from './data';
+import { fechaTexto } from '../i18n/fechas';
 import { disponerPorGrupos } from './hemiciclo';
 import type { Diputado, VotacionClave, Voto } from './types';
 import { C, h, img, lienzo, cabecera, pie, cifra, retrato, barraVotos, fotoDataUri, aPng, type Formato } from './og';
+import { LOCALE, formatos, f, pl, prefijo, type Idioma } from '../i18n';
+import comun from '../i18n/textos/comun';
+import textosTarjetas from '../i18n/textos/tarjetas';
+import textosCompartir from '../i18n/textos/compartir';
 
-const fechaCorta = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-const fechaLarga = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+/*
+ * Cada tarjeta tiene una versión por idioma (`lang`, castellano por defecto). Se traducen las etiquetas y textos propios
+ * de la web; los datos oficiales (nombres, partidos, títulos de votaciones, formación, cargos) van tal cual, en castellano.
+ */
+const fechaCorta = (iso: string, lang: Idioma) => fechaTexto(iso, lang, LOCALE[lang], { mes: 'short' });
 /** «RDL 8/2026 · alquiler (28/04/2026)» → «RDL 8/2026 · alquiler». */
 export const temaCorto = (tema: string) => tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '');
-const n = (x: number | null) => (x === null ? '—' : fmtNum(x));
+/** Elige la forma de un par [uno, varios] sin poner el número. */
+const forma = (k: number | null, [uno, varios]: readonly string[] | string[]) => (k === 1 ? uno : varios);
+/** Resultado oficial de una votación, traducido (si no está en la lista, tal cual). */
+const resultadoTexto = (r: string, lang: Idioma) => (comun[lang].resultado as Record<string, string>)[r] ?? r;
 const colorVoto: Record<Voto, string> = { 'Sí': C.si, 'No': C.no, 'Abstención': C.abs, 'No vota': C.novota };
 const ordenGrupo = new Map(grupos.map((g) => [g.corto, g.orden]));
 const puntoGrupo = (color: string, tam: number) => h('div', { width: tam, height: tam, borderRadius: tam / 2, background: color, flexShrink: 0 });
@@ -18,28 +29,27 @@ const resultadoColor = (r: string) => (/Aprobada|Convalidado/.test(r) ? C.si : C
 
 /* ---------- Diputado ---------- */
 /**
- * Rótulos cortos de las votaciones clave para las tarjetas, con palabras de su título oficial.
- * «mini» es el rótulo de la tira de votos de la tarjeta horizontal. Si falta una votación, se usa su tema.
+ * Rótulos cortos de las votaciones clave para las tarjetas, con palabras de su título oficial (src/i18n/textos/tarjetas.ts).
+ * «mini» es el rótulo de la tira de votos de la tarjeta horizontal. Si falta una votación, se usan su tema y su tipo oficiales.
  */
-const ROTULOS: Record<string, { corto: string; mini: string; quien: string }> = {
-  'pl-ley-vivienda-sumar-2026': { corto: 'Modificar la Ley de vivienda', mini: 'Ley de vivienda', quien: 'Propuesta de SUMAR' },
-  'pnl-especulacion-2026': { corto: 'Frenar la especulación inmobiliaria', mini: 'Especulación', quien: 'Propuesta (no de ley) de SUMAR' },
-  'pl-okupacion-pp-2026': { corto: 'Contra la ocupación ilegal', mini: 'Ocupación ilegal', quien: 'Propuesta del PP' },
-  'rdl-8-2026': { corto: 'Medidas en el alquiler', mini: 'Decreto alquiler', quien: 'Decreto ley del Gobierno' },
-  'pl-suelo-vivienda-pp-2026': { corto: 'Ordenación urbanística y vivienda', mini: 'Urbanismo', quien: 'Propuesta del PP' },
-  'pl-pisos-turisticos-2025': { corto: 'Regular los pisos turísticos', mini: 'Pisos turísticos', quien: 'Propuesta de EH Bildu' },
-  'pl-alquiler-temporada-2024-12': { corto: 'Alquiler temporal y de habitaciones', mini: 'Alquiler temporal', quien: 'Propuesta de SUMAR, ERC, Bildu y Mixto' },
-};
-export const rotulo = (v: VotacionClave) => ROTULOS[v.id] ?? { corto: temaCorto(v.tema), mini: temaCorto(v.tema), quien: v.tipo.replace(/\.$/, '') };
+export const rotulo = (v: VotacionClave, lang: Idioma = 'es'): { corto: string; mini: string; quien: string } =>
+  (textosTarjetas[lang].rotulos as Record<string, { corto: string; mini: string; quien: string }>)[v.id]
+  ?? { corto: temaCorto(v.tema), mini: temaCorto(v.tema), quien: v.tipo.replace(/\.$/, '') };
 
 /** Etiqueta de un voto; sin voto registrado es porque aún no era diputado o diputada. */
-const textoVoto = (voto: Voto | undefined, d: Diputado) => voto ?? (d.genero === 'F' ? 'No era diputada' : 'No era diputado');
-function chipVoto(voto: Voto | undefined, d: Diputado, ancho: number, alto: number, tam: number) {
+const textoVoto = (voto: Voto | undefined, d: Diputado, lang: Idioma) =>
+  voto ? comun[lang].voto[voto] : textosTarjetas[lang].diputado.noEra[d.genero === 'F' ? 1 : 0];
+function chipVoto(voto: Voto | undefined, d: Diputado, ancho: number, alto: number, tam: number, lang: Idioma) {
   const color = voto ? colorVoto[voto] : C.chip;
+  const texto = textoVoto(voto, d, lang);
+  let fontSize = voto ? Math.round(voto === 'Abstención' ? tam * 0.86 : tam) : Math.round(tam * 0.68);
+  // En otros idiomas la etiqueta puede ser más larga («Ez du bozkatzen», «Did not vote»): se achica hasta que quepa
+  // (Inter ExtraBold mide de media ~0,55 em por letra; se deja algo de margen).
+  if (lang !== 'es') fontSize = Math.min(fontSize, Math.floor((ancho - 22) / (texto.length * 0.58)));
   return h('div', {
     width: ancho, height: alto, borderRadius: alto / 2, background: color, color: voto ? (voto === 'Abstención' ? C.texto : '#fff') : C.apagado,
-    alignItems: 'center', justifyContent: 'center', fontSize: voto ? Math.round(voto === 'Abstención' ? tam * 0.86 : tam) : Math.round(tam * 0.68), fontWeight: 800, flexShrink: 0,
-  }, textoVoto(voto, d));
+    alignItems: 'center', justifyContent: 'center', fontSize, fontWeight: 800, flexShrink: 0,
+  }, texto);
 }
 
 /* Iconos sencillos (trazo) para las cifras: edificio, casa y euro. */
@@ -68,9 +78,9 @@ function panelCifras(cifras: Cifra[], e: number) {
 }
 
 /** Formación (texto literal de su ficha) y cargos en la Cámara, para la tarjeta vertical. */
-const TIPO_FORMACION: Record<string, string> = { publica: 'Universidad pública', privada: 'Universidad privada', ambas: 'Universidad pública y privada', 'sin-centro': 'No indica el centro de estudios' };
 const recortar = (t: string, max: number) => (t.length <= max ? t : `${t.slice(0, max).replace(/\s+\S*$/, '')}…`);
-function perfilTarjeta(d: Diputado) {
+function perfilTarjeta(d: Diputado, lang: Idioma) {
+  const TIPO_FORMACION = textosTarjetas[lang].diputado.tipo;
   const lineas = d.perfil?.formacion ?? [];
   // La línea que nombra un centro (universidad) es la más informativa; si no hay, la primera
   const principal = lineas.find((f) => f.centros?.length) ?? lineas[0];
@@ -80,8 +90,8 @@ function perfilTarjeta(d: Diputado) {
     : tipos.has('pública') && tipos.has('privada') ? TIPO_FORMACION.ambas
     : tipos.has('pública') ? TIPO_FORMACION.publica
     : tipos.has('privada') ? TIPO_FORMACION.privada
-    : principal.otroCentro ? 'Centro no incluido en el registro de universidades (RUCT)'
-    : TIPO_FORMACION['sin-centro'];
+    : principal.otroCentro ? TIPO_FORMACION.otroCentro
+    : TIPO_FORMACION.sinCentro;
   return {
     formacion: principal ? recortar(principal.texto.replace(/\.$/, ''), 92) : null,
     otras: Math.max(0, lineas.length - 1),
@@ -91,22 +101,26 @@ function perfilTarjeta(d: Diputado) {
   };
 }
 
-export async function tarjetaDiputado(d: Diputado, formato: Formato) {
+export async function tarjetaDiputado(d: Diputado, formato: Formato, lang: Idioma = 'es') {
+  const t = textosTarjetas[lang];
+  const td = t.diputado;
+  const fmt = formatos(lang);
+  const n = (x: number | null) => (x === null ? '—' : fmt.num(x));
   const p = d.patrimonio;
   const foto = await fotoDataUri(d.fotoUrl);
   const color = colorGrupo(d.grupoCorto);
-  const cargo = `${d.genero === 'F' ? 'Diputada' : 'Diputado'} por ${nombreLegible(d.circunscripcion)}`;
+  const cargo = f(td.cargo[d.genero === 'F' ? 1 : 0], { provincia: nombreLegible(d.circunscripcion) });
   const sinDecl = p.propiedades === null;
   const prop = sinDecl ? '—' : n(p.propiedades);
-  const etProp = sinDecl ? 'sin declaración de bienes publicada' : p.propiedades === 1 ? 'propiedad declarada' : 'propiedades declaradas';
+  const etProp = sinDecl ? td.sinDeclaracion : forma(p.propiedades, td.propiedades);
   const viv = sinDecl ? '—' : n(p.viviendas);
-  const etViv = sinDecl || !p.propiedades ? 'viviendas' : p.viviendas === 1 ? 'de ellas, vivienda' : 'de ellas, viviendas';
-  const sueldo = fmtEur(d.retribucion.totalMensual);
-  const etSueldo = 'al mes del Congreso';
+  const etViv = sinDecl || !p.propiedades ? td.viviendas : forma(p.viviendas, td.deEllas);
+  const sueldo = fmt.eur(d.retribucion.totalMensual);
+  const etSueldo = td.sueldo;
   const votos = [...votaciones].sort((a, b) => b.fecha.localeCompare(a.fecha))
-    .map((v) => ({ v, r: rotulo(v), voto: v.votos[String(d.codParlamentario)] as Voto | undefined }));
-  const veh = p.vehiculos ? `${n(p.vehiculos)} ${p.vehiculos === 1 ? 'vehículo' : 'vehículos'}` : null;
-  const notaBienes = sinDecl ? null : [p.declaracionFecha && `Declaración de bienes del ${fechaCorta(p.declaracionFecha)}`, veh && `también declara ${veh}`].filter(Boolean).join(' · ');
+    .map((v) => ({ v, r: rotulo(v, lang), voto: v.votos[String(d.codParlamentario)] as Voto | undefined }));
+  const veh = p.vehiculos ? pl(p.vehiculos, td.vehiculos, lang) : null;
+  const notaBienes = sinDecl ? null : [p.declaracionFecha && f(td.declaracion, { fecha: fechaCorta(p.declaracionFecha, lang) }), veh].filter(Boolean).join(' · ');
   const nombre = d.nombreCompleto;
   const cifras = (ancha: boolean): Cifra[] => [
     { valor: prop, etiqueta: etProp, icono: 'propiedades', tam: 96 },
@@ -131,10 +145,10 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
             h('div', { alignItems: 'center', gap: 10, fontSize: 24, color: C.apagado }, puntoGrupo(color, 18), h('div', { fontWeight: 700, color: C.texto }, d.grupoCorto), candidaturaDistinta(d) ? `(${d.partido}) · ${cargo}` : `· ${cargo}`)),
           panelCifras(cifras(true), 0.7))),
       h('div', { flexDirection: 'column', gap: 10 },
-        h('div', { fontSize: 19, fontWeight: 700, color: C.apagado, letterSpacing: 0.3 }, 'CÓMO VOTÓ SOBRE VIVIENDA'),
+        h('div', { fontSize: 19, fontWeight: 700, color: C.apagado, letterSpacing: 0.3 }, td.comoVoto),
         h('div', { gap: 10 },
           ...votos.map(({ r, voto }) => h('div', { flexDirection: 'column', alignItems: 'center', gap: 6, width: 146 },
-            chipVoto(voto, d, 146, 40, 22),
+            chipVoto(voto, d, 146, 40, 22, lang),
             h('div', { fontSize: 17, color: C.apagado, textAlign: 'center', lineHeight: 1.15 }, r.mini))))),
     ), 'horizontal');
   }
@@ -159,41 +173,41 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato) {
     h('div', { flexDirection: 'column', gap: 12, marginTop: 30 },
       panelCifras(cifras(false), 1),
       notaBienes && h('div', { fontSize: 24, color: C.apagado, paddingLeft: 6 }, notaBienes),
-      p.revisar && h('div', { alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 700, color: C.acento, paddingLeft: 6 }, h('div', { width: 30, height: 30, borderRadius: 15, background: C.acento, color: '#fff', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800 }, '!'), 'Lectura no confirmada: compruébala en el PDF oficial')),
+      p.revisar && h('div', { alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 700, color: C.acento, paddingLeft: 6 }, h('div', { width: 30, height: 30, borderRadius: 15, background: C.acento, color: '#fff', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, flexShrink: 0 }, '!'), td.revisar)),
     // Formación y cargos en el Congreso (texto de su ficha oficial)
     (() => {
-      const pf = perfilTarjeta(d);
+      const pf = perfilTarjeta(d, lang);
       const etq = (t: string) => h('div', { fontSize: 22, fontWeight: 800, color: C.apagado, letterSpacing: 0.5 }, t);
       const pastillaTipo = (t: string, aviso = false) => h('div', { alignSelf: 'flex-start', padding: '4px 14px', borderRadius: 999, fontSize: 21, fontWeight: 700, background: aviso ? C.chip : C.acentoSuave, color: aviso ? C.apagado : C.acento }, t);
       return h('div', { flexDirection: 'column', gap: 16, marginTop: 24, background: C.blanco, border: `2px solid ${C.borde}`, borderRadius: 28, padding: '22px 30px' },
         h('div', { flexDirection: 'column', gap: 6 },
-          etq('FORMACIÓN'),
+          etq(td.formacion),
           pf.formacion
             ? h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25 }, pf.formacion)
-            : h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25, color: C.apagado }, 'No consta formación en su ficha oficial'),
+            : h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25, color: C.apagado }, td.sinFormacion),
           (pf.tipo || pf.otras > 0) && h('div', { gap: 10, alignItems: 'center', flexWrap: 'wrap' },
             pf.tipo && pastillaTipo(pf.tipo, pf.tipoAviso),
-            pf.otras > 0 && h('div', { fontSize: 21, color: C.apagado }, `y ${pf.otras} ${pf.otras === 1 ? 'línea más' : 'líneas más'} en su ficha`))),
+            pf.otras > 0 && h('div', { fontSize: 21, color: C.apagado }, pl(pf.otras, td.masLineas, lang)))),
         h('div', { height: 2, background: C.chip }),
         h('div', { flexDirection: 'column', gap: 6 },
-          etq('EN EL CONGRESO'),
+          etq(td.enElCongreso),
           ...(pf.cargos.length
             ? pf.cargos.map((c) => h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25 }, c))
-            : [h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25, color: C.apagado }, 'Sin cargos en la Cámara según su ficha oficial')]),
-          pf.masCargos > 0 && h('div', { fontSize: 21, color: C.apagado }, `y ${pf.masCargos} ${pf.masCargos === 1 ? 'cargo más' : 'cargos más'}`)));
+            : [h('div', { fontSize: 27, fontWeight: 700, lineHeight: 1.25, color: C.apagado }, td.sinCargos)]),
+          pf.masCargos > 0 && h('div', { fontSize: 21, color: C.apagado }, pl(pf.masCargos, td.masCargos, lang))));
     })(),
     // Cómo votó
     h('div', { flexDirection: 'column', marginTop: 24, background: C.blanco, border: `2px solid ${C.borde}`, borderRadius: 28, padding: '20px 30px 8px' },
-      h('div', { fontSize: 22, fontWeight: 800, color: C.apagado, letterSpacing: 0.5, marginBottom: 2 }, 'CÓMO VOTÓ SOBRE VIVIENDA'),
+      h('div', { fontSize: 22, fontWeight: 800, color: C.apagado, letterSpacing: 0.5, marginBottom: 2 }, td.comoVoto),
       ...votos.map(({ v, r, voto }, i) => h('div', { alignItems: 'center', justifyContent: 'space-between', gap: 18, padding: '5px 0', borderTop: i ? `2px solid ${C.chip}` : 'none' },
         h('div', { flexDirection: 'column', flex: 1, gap: 2 },
           h('div', { fontSize: 27, fontWeight: 800, lineHeight: 1.15, letterSpacing: -0.5 }, r.corto),
           h('div', { flexWrap: 'wrap', gap: 8, fontSize: 19, color: C.apagado, lineHeight: 1.25 },
-            `${r.quien} · ${fechaCorta(v.fecha)} ·`, h('div', { color: resultadoColor(v.resultado), fontWeight: 700 }, v.resultado))),
-        chipVoto(voto, d, 170, 48, 26)))),
+            `${r.quien} · ${fechaCorta(v.fecha, lang)} ·`, h('div', { color: resultadoColor(v.resultado), fontWeight: 700 }, resultadoTexto(v.resultado, lang)))),
+        chipVoto(voto, d, 170, 48, 26, lang)))),
     // Pie (justo encima de la zona de respuesta de la historia)
     h('div', { marginTop: 18, fontSize: 23, color: C.apagado, paddingLeft: 6 },
-      antesDeElecciones() ? 'Elecciones generales del 29-N · Datos oficiales, sin interpretaciones' : 'Conoce a quien te representa · Datos oficiales, sin interpretaciones'),
+      antesDeElecciones() ? t.pieElecciones : t.pieLema),
   ), 'historia');
 }
 
@@ -209,17 +223,18 @@ function votoPorGrupo(v: VotacionClave) {
   }).filter((x) => x.total > 0);
 }
 
-export async function tarjetaVotacion(v: VotacionClave, formato: Formato) {
+export async function tarjetaVotacion(v: VotacionClave, formato: Formato, lang: Idioma = 'es') {
+  const tv = textosTarjetas[lang].votacion;
   const t = v.totales;
   const e = formato === 'historia' ? 1.45 : 1;
   const numeros = h('div', { gap: 16 * e },
-    cifra(String(t.si), 'sí', false, e), cifra(String(t.no), 'no', false, e), cifra(String(t.abstencion), 'abstención', false, e), cifra(String(t.noVota), 'no vota', false, e));
+    cifra(String(t.si), tv.si, false, e), cifra(String(t.no), tv.no, false, e), cifra(String(t.abstencion), tv.abstencion, false, e), cifra(String(t.noVota), tv.noVota, false, e));
   const titulo = (tam: number) => h('div', { flexDirection: 'column', gap: 14 * e },
-    h('div', { fontSize: 26 * e, color: C.apagado }, `${fechaLarga(v.fecha)} · Pleno del Congreso`),
+    h('div', { fontSize: 26 * e, color: C.apagado }, f(tv.pleno, { fecha: formatos(lang).fecha(v.fecha) })),
     h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2, lineHeight: 1.08 }, temaCorto(v.tema)),
-    h('div', {}, pastilla(v.resultado, resultadoColor(v.resultado), e)));
+    h('div', {}, pastilla(resultadoTexto(v.resultado, lang), resultadoColor(v.resultado), e)));
   if (formato === 'horizontal') {
-    return aPng(lienzo('horizontal', cabecera(), titulo(62), h('div', { flexDirection: 'column', gap: 16 }, numeros, barraVotos(t, 16, 1072)), pie()), 'horizontal');
+    return aPng(lienzo('horizontal', cabecera(), titulo(62), h('div', { flexDirection: 'column', gap: 16 }, numeros, barraVotos(t, 16, 1072)), pie(1, lang)), 'horizontal');
   }
   const filas = votoPorGrupo(v);
   return aPng(lienzo('historia',
@@ -227,11 +242,11 @@ export async function tarjetaVotacion(v: VotacionClave, formato: Formato) {
     titulo(76),
     h('div', { flexDirection: 'column', gap: 22 }, numeros, barraVotos(t, 24, 920)),
     h('div', { flexDirection: 'column', gap: 16, background: C.blanco, border: `3px solid ${C.borde}`, borderRadius: 26, padding: '28px 32px' },
-      h('div', { fontSize: 28, fontWeight: 700, color: C.apagado }, 'Voto por grupo'),
+      h('div', { fontSize: 28, fontWeight: 700, color: C.apagado }, tv.porGrupo),
       ...filas.map(({ g, t: tg }) => h('div', { alignItems: 'center', gap: 18 },
         h('div', { alignItems: 'center', gap: 12, width: 190, fontSize: 28, fontWeight: 700 }, puntoGrupo(g.color, 20), g.corto),
         barraVotos(tg, 20, 600)))),
-    pie(1.4),
+    pie(1.4, lang),
   ), 'historia');
 }
 
@@ -242,7 +257,9 @@ export const circunscripciones = [...new Set(diputados.map((d) => d.circunscripc
   .map((c) => ({ id: slugTexto(nombreLegible(c)), nombre: c, legible: nombreLegible(c) }))
   .sort((a, b) => a.legible.localeCompare(b.legible, 'es'));
 
-export async function tarjetaProvincia(id: string, formato: Formato) {
+export async function tarjetaProvincia(id: string, formato: Formato, lang: Idioma = 'es') {
+  const tp = textosTarjetas[lang].provincia;
+  const fmtNum = formatos(lang).num;
   const c = circunscripciones.find((x) => x.id === id)!;
   const ds = diputados.filter((d) => d.circunscripcion === c.nombre)
     .sort((a, b) => (ordenGrupo.get(a.grupoCorto)! - ordenGrupo.get(b.grupoCorto)!) || a.apellidos.localeCompare(b.apellidos, 'es'));
@@ -254,13 +271,13 @@ export async function tarjetaProvincia(id: string, formato: Formato) {
   const composicion = h('div', { flexWrap: 'wrap', gap: 12 * e },
     ...porGrupo.map(({ g, n: k }) => h('div', { alignItems: 'center', gap: 10 * e, padding: `${8 * e}px ${16 * e}px`, borderRadius: 999, background: C.blanco, border: `${2 * e}px solid ${C.borde}`, fontSize: 24 * e, fontWeight: 700 }, puntoGrupo(colorGrupo(g), 16 * e), `${g} ${k}`)));
   const cifras = h('div', { gap: 18 * e },
-    cifra(String(ds.length), ds.length === 1 ? 'diputado elegido' : 'diputados elegidos', true, e),
-    cifra(conDatos.length ? fmtNum(prop) : '—', prop === 1 ? 'propiedad declarada' : 'propiedades declaradas', false, e),
-    cifra(conDatos.length ? fmtNum(viv) : '—', viv === 1 ? 'es vivienda' : 'son viviendas', false, e));
+    cifra(String(ds.length), forma(ds.length, tp.elegidos), true, e),
+    cifra(conDatos.length ? fmtNum(prop) : '—', forma(prop, tp.propiedades), false, e),
+    cifra(conDatos.length ? fmtNum(viv) : '—', forma(viv, tp.viviendas), false, e));
   const titulo = (tam: number) => h('div', { flexDirection: 'column', gap: 8 * e },
-    h('div', { fontSize: 28 * e, color: C.apagado }, 'Tus diputados por'),
+    h('div', { fontSize: 28 * e, color: C.apagado }, tp.titulo),
     h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 }, c.legible));
-  if (formato === 'horizontal') return aPng(lienzo('horizontal', cabecera(), titulo(72), composicion, cifras, pie()), 'horizontal');
+  if (formato === 'horizontal') return aPng(lienzo('horizontal', cabecera(), titulo(72), composicion, cifras, pie(1, lang)), 'horizontal');
 
   const fotos = await Promise.all(ds.map((d) => fotoDataUri(d.fotoUrl)));
   const k = ds.length;
@@ -272,16 +289,19 @@ export async function tarjetaProvincia(id: string, formato: Formato) {
       ...ds.map((d, i) => retrato(fotos[i], d.nombreCompleto, w, Math.round(w * 1.27), colorGrupo(d.grupoCorto)))),
     composicion,
     h('div', { flexDirection: 'column', gap: 18 },
-      h('div', { gap: 18 }, cifra(String(ds.length), ds.length === 1 ? 'diputado' : 'diputados', true, 1.3), cifra(conDatos.length ? fmtNum(prop) : '—', prop === 1 ? 'propiedad declarada' : 'propiedades declaradas', false, 1.3)),
-      h('div', { fontSize: 30, color: C.apagado }, conDatos.length ? `De ellas, ${fmtNum(viv)} ${viv === 1 ? 'es vivienda' : 'son viviendas'}` : '')),
-    pie(1.4),
+      h('div', { gap: 18 }, cifra(String(ds.length), forma(ds.length, tp.diputados), true, 1.3), cifra(conDatos.length ? fmtNum(prop) : '—', forma(prop, tp.propiedades), false, 1.3)),
+      h('div', { fontSize: 30, color: C.apagado }, conDatos.length ? pl(viv, tp.deEllas, lang) : '')),
+    pie(1.4, lang),
   ), 'historia');
 }
 
 /* ---------- Resumen del Congreso ---------- */
-export async function tarjetaResumen(formato: Formato) {
+export async function tarjetaResumen(formato: Formato, lang: Idioma = 'es') {
   // Horizontal: la vista previa de la portada. Historia: enfocada en las elecciones, con las cifras y el hemiciclo
-  if (formato === 'horizontal') return tarjetaPagina('inicio');
+  if (formato === 'horizontal') return tarjetaPagina('inicio', lang);
+  const tt = textosTarjetas[lang];
+  const tc = comun[lang];
+  const fmtNum = formatos(lang).num;
   const con = diputados.filter((d) => d.patrimonio.viviendas !== null);
   const prop = con.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
   const viv = con.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
@@ -301,20 +321,20 @@ export async function tarjetaResumen(formato: Formato) {
     // Cabecera (zona alta: la tapan en parte el nombre y la barra de la historia)
     h('div', { ...fijo, justifyContent: 'space-between', alignItems: 'center' }, cabecera(1.15), h('div', { fontSize: 27, fontWeight: 800, color: C.acento }, 'congresoabierto.org')),
     h('div', { ...fijo, alignSelf: 'flex-start', alignItems: 'center', gap: 14, marginTop: 44, padding: '12px 28px', borderRadius: 999, background: C.naranja, color: '#fff', fontSize: 32, fontWeight: 800 },
-      h('div', { width: 15, height: 15, borderRadius: 8, background: '#fff' }), elecciones ? 'Elecciones generales · 29 de noviembre' : 'Conoce a quien te representa'),
-    h('div', { ...fijo, fontSize: elecciones ? 116 : 96, fontWeight: 800, letterSpacing: -4, lineHeight: 1.02, marginTop: 26 }, elecciones ? 'Prepárate para votar' : 'Conoce a quien te representa'),
-    h('div', { ...fijo, fontSize: 36, color: C.apagado, lineHeight: 1.3, marginTop: 18 }, 'Qué declaran tener, cuánto cobran y cómo votan los 350 diputados del Congreso'),
+      h('div', { width: 15, height: 15, borderRadius: 8, background: '#fff', flexShrink: 0 }), elecciones ? tc.elecciones.tarjeta : tc.marca.lema),
+    h('div', { ...fijo, fontSize: elecciones ? 116 : 96, fontWeight: 800, letterSpacing: -4, lineHeight: 1.02, marginTop: 26 }, elecciones ? tt.resumen.titulo : tc.marca.lema),
+    h('div', { ...fijo, fontSize: 36, color: C.apagado, lineHeight: 1.3, marginTop: 18 }, tt.resumen.subtitulo),
     // Hemiciclo con los 350 escaños por grupo
     h('div', { ...fijo, flexDirection: 'column', alignItems: 'center', marginTop: 32, background: C.blanco, border: `3px solid ${C.borde}`, borderRadius: 30, padding: '26px 24px 24px' },
       img(hemicicloUri(), 780, 412),
       h('div', { flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px', marginTop: 12, fontSize: 22, fontWeight: 700, color: C.apagado },
         ...orden.map((g) => h('div', { alignItems: 'center', gap: 7 }, puntoGrupo(g.color, 14), g.corto))),
-      h('div', { alignItems: 'center', gap: 14, marginTop: 20, padding: '14px 32px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 32, fontWeight: 800 }, 'Míralo escaño a escaño', img(FLECHA, 30, 30))),
+      h('div', { alignItems: 'center', gap: 14, marginTop: 20, padding: '14px 32px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 32, fontWeight: 800 }, tt.resumen.llamada, img(FLECHA, 30, 30))),
     // Cifras del Congreso
     h('div', { ...fijo, flexDirection: 'column', gap: 16, marginTop: 26 },
-      h('div', { gap: 16 }, caja(fmtNum(prop), 'propiedades declaradas', true), caja(fmtNum(viv), 'de ellas, viviendas')),
-      h('div', { gap: 16 }, caja(fmtNum(votacionesPleno.length), 'votaciones del Pleno'), caja(String(diputados.length), 'diputados, uno a uno'))),
-    h('div', { ...fijo, marginTop: 18, fontSize: 24, color: C.apagado, paddingLeft: 6 }, 'Datos oficiales del Congreso y del BOE, sin interpretaciones'),
+      h('div', { gap: 16 }, caja(fmtNum(prop), tt.cifras.propiedades, true), caja(fmtNum(viv), tt.cifras.viviendas)),
+      h('div', { gap: 16 }, caja(fmtNum(votacionesPleno.length), tt.cifras.votaciones), caja(String(diputados.length), tt.cifras.unoAUno))),
+    h('div', { ...fijo, marginTop: 18, fontSize: 24, color: C.apagado, paddingLeft: 6 }, tt.pie),
   ), 'historia');
 }
 
@@ -334,30 +354,40 @@ function hemicicloUri() {
 const conDeclaracion = () => diputados.filter((d) => d.patrimonio.viviendas !== null);
 const totalPropiedades = () => conDeclaracion().reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
 const totalViviendas = () => conDeclaracion().reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
-const cifrasCongreso = (): [string, string][] => [[fmtNum(totalPropiedades()), 'propiedades declaradas'], [fmtNum(totalViviendas()), 'de ellas, viviendas'], [String(diputados.length), 'diputados']];
-const cifrasVotaciones = (): [string, string][] => [
-  [fmtNum(votacionesPleno.length), 'votaciones del Pleno'],
-  [fmtNum(votacionesPleno.filter((v) => temasDe(v).includes('vivienda')).length), 'sobre vivienda'],
-  [String(diputados.length), 'diputados, uno a uno'],
-];
+const cifrasCongreso = (lang: Idioma): [string, string][] => {
+  const { num } = formatos(lang), t = textosTarjetas[lang].cifras;
+  return [[num(totalPropiedades()), t.propiedades], [num(totalViviendas()), t.viviendas], [String(diputados.length), t.diputados]];
+};
+const cifrasVotaciones = (lang: Idioma): [string, string][] => {
+  const { num } = formatos(lang), t = textosTarjetas[lang].cifras;
+  return [
+    [num(votacionesPleno.length), t.votaciones],
+    [num(votacionesPleno.filter((v) => temasDe(v).includes('vivienda')).length), t.sobreVivienda],
+    [String(diputados.length), t.unoAUno],
+  ];
+};
 
-export const PAGINAS: Record<string, { titulo: string; subtitulo: string; cifras: () => [string, string][]; llamada: string }> = {
-  inicio: { titulo: 'Prepárate para votar', subtitulo: 'Qué declaran tener, cuánto cobran y cómo votan los 350 diputados del Congreso', cifras: cifrasCongreso, llamada: 'Míralo escaño a escaño' },
-  diputados: { titulo: 'Los 350 diputados', subtitulo: 'Quiénes son, qué declaran tener y cuánto cobran, con sus documentos oficiales', cifras: cifrasCongreso, llamada: 'Busca a los de tu provincia' },
-  votaciones: { titulo: 'Cómo votó cada diputado', subtitulo: 'Todas las votaciones del Pleno de la XV Legislatura, por tema y fecha', cifras: cifrasVotaciones, llamada: 'Míralo escaño a escaño' },
-  metodologia: { titulo: 'De dónde sale cada dato', subtitulo: 'Solo documentos oficiales del Congreso y del BOE, copiados y revisados uno a uno', cifras: cifrasCongreso, llamada: 'Compruébalo en el original' },
-  colabora: { titulo: 'Ayuda a mantenerlo al día', subtitulo: 'Proyecto independiente y de código abierto: avisa de un error o propón una mejora', cifras: cifrasCongreso, llamada: 'Míralo escaño a escaño' },
-  tarjetas: { titulo: 'Compártelo en tus redes', subtitulo: 'Tarjetas con los datos de cada diputado, provincia y votación, listas para historias', cifras: cifrasCongreso, llamada: 'Busca a tu diputado' },
+/** Páginas con vista previa propia y sus cifras. Título, subtítulo y llamada de cada idioma: textos/tarjetas.ts (paginas). */
+type IdPagina = keyof (typeof textosTarjetas)['es']['paginas'];
+export const PAGINAS: Record<IdPagina, { cifras: (lang: Idioma) => [string, string][] }> = {
+  inicio: { cifras: cifrasCongreso },
+  diputados: { cifras: cifrasCongreso },
+  votaciones: { cifras: cifrasVotaciones },
+  metodologia: { cifras: cifrasCongreso },
+  colabora: { cifras: cifrasCongreso },
+  tarjetas: { cifras: cifrasCongreso },
 };
 
 const FLECHA = `data:image/svg+xml;base64,${Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>').toString('base64')}`;
 /** Vista previa de enlaces (1200×630): elecciones, titular, cifras en cajitas y el hemiciclo. */
-export function tarjetaPagina(id: string) {
-  const p = PAGINAS[id];
+export function tarjetaPagina(id: string, lang: Idioma = 'es') {
+  const tt = textosTarjetas[lang];
+  const tc = comun[lang];
+  const p = { ...tt.paginas[id as IdPagina], cifras: () => PAGINAS[id as IdPagina].cifras(lang) };
   const elecciones = antesDeElecciones();
   const etiqueta = h('div', { alignItems: 'center', gap: 10, padding: '9px 20px', borderRadius: 999, background: C.naranja, color: '#fff', fontSize: 22, fontWeight: 800 },
-    h('div', { width: 12, height: 12, borderRadius: 6, background: '#fff' }),
-    elecciones ? 'Elecciones generales · 29 de noviembre' : 'Conoce a quien te representa');
+    h('div', { width: 12, height: 12, borderRadius: 6, background: '#fff', flexShrink: 0 }),
+    elecciones ? tc.elecciones.tarjeta : tc.marca.lema);
   const caja = ([v, t]: [string, string], i: number) => h('div', {
     flexDirection: 'column', flex: 1, gap: 2, padding: '14px 18px', borderRadius: 16,
     background: i === 0 ? C.acentoSuave : C.blanco, border: `2px solid ${i === 0 ? '#f7c9a6' : C.borde}`,
@@ -371,49 +401,64 @@ export function tarjetaPagina(id: string) {
     h('div', { justifyContent: 'space-between', alignItems: 'center' }, cabecera(0.9), etiqueta),
     h('div', { gap: 36, alignItems: 'center' },
       h('div', { flexDirection: 'column', gap: 18, width: 620 },
-        h('div', { fontSize: id === 'inicio' && elecciones ? 70 : 62, fontWeight: 800, letterSpacing: -2.5, lineHeight: 1.02 }, id === 'inicio' && !elecciones ? 'Conoce a quien te representa' : p.titulo),
+        h('div', { fontSize: id === 'inicio' && elecciones ? 70 : 62, fontWeight: 800, letterSpacing: -2.5, lineHeight: 1.02 }, id === 'inicio' && !elecciones ? tc.marca.lema : p.titulo),
         h('div', { fontSize: 26, color: C.apagado, lineHeight: 1.3 }, p.subtitulo),
         h('div', { gap: 12, marginTop: 6 }, ...p.cifras().map(caja))),
       h('div', { flexDirection: 'column', alignItems: 'center', gap: 16, flex: 1 },
         img(hemicicloUri(), 420, 222),
         h('div', { alignItems: 'center', gap: 12, padding: '12px 22px 12px 26px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 23, fontWeight: 800 }, p.llamada, img(FLECHA, 22, 22)))),
     h('div', { justifyContent: 'space-between', alignItems: 'center', fontSize: 20, color: C.apagado, borderTop: `2px solid ${C.borde}`, paddingTop: 16 },
-      h('div', {}, 'Datos oficiales del Congreso y del BOE, sin interpretaciones'),
+      h('div', {}, tt.pie),
       h('div', { color: C.acento, fontWeight: 800, fontSize: 22 }, 'congresoabierto.org')),
   ), 'horizontal');
 }
 
-/** Rutas de las imágenes (relativas a la raíz de la web). */
+/**
+ * Rutas de las imágenes, sin la base de la web y con el prefijo del idioma ('/ca/tarjetas/…'; en castellano, '/tarjetas/…').
+ * Cada idioma tiene sus tarjetas.
+ */
 export const rutaTarjeta = {
-  diputado: (d: Diputado, f: Formato) => `/tarjetas/${f}/diputado/${slug(d)}.png`,
-  votacion: (v: VotacionClave, f: Formato) => `/tarjetas/${f}/votacion/${v.id}.png`,
-  provincia: (id: string, f: Formato) => `/tarjetas/${f}/provincia/${id}.png`,
-  resumen: (f: Formato) => `/tarjetas/${f}/resumen.png`,
-  pagina: (id: string) => `/tarjetas/horizontal/pagina/${id}.png`,
+  diputado: (d: Diputado, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/diputado/${slug(d)}.png`,
+  votacion: (v: VotacionClave, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/votacion/${v.id}.png`,
+  provincia: (id: string, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/provincia/${id}.png`,
+  resumen: (f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/resumen.png`,
+  pagina: (id: string, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/horizontal/pagina/${id}.png`,
 };
 
 /* ---------- Texto y enlace para compartir ---------- */
-const cuenta = (k: number, uno: string, varios: string) => `${fmtNum(k)} ${k === 1 ? uno : varios}`;
-/** Enlace (ruta de la web) y texto que acompaña a cada tarjeta al compartirla. Solo datos oficiales, sin valoraciones. */
+/** Ruta de una página en un idioma, sin la base de la web: '/diputado/x' → '/ca/diputado/x'; '/' → '/ca/'. */
+const pagina = (p: string, lang: Idioma) => `${prefijo(lang)}${p}`;
+/** Llamada a votar que va delante de los textos mientras no se hayan celebrado las elecciones. */
+const llamada = (lang: Idioma) => (antesDeElecciones() ? comun[lang].elecciones.llamada : '');
+/**
+ * Enlace (ruta de la web, sin la base y con el prefijo del idioma) y texto que acompaña a cada tarjeta al compartirla.
+ * Solo datos oficiales, sin valoraciones.
+ */
 export const compartir = {
-  diputado: (d: Diputado) => {
+  diputado: (d: Diputado, lang: Idioma = 'es') => {
+    const t = textosCompartir[lang].mensaje;
     const p = d.patrimonio;
-    const bienes = p.propiedades === null ? 'no tiene publicada su declaración de bienes'
-      : `declara ${cuenta(p.propiedades, 'propiedad', 'propiedades')}${p.propiedades && p.viviendas !== null ? ` (${cuenta(p.viviendas, 'vivienda', 'viviendas')})` : ''}`;
+    const bienes = p.propiedades === null ? t.sinDeclaracion
+      : `${pl(p.propiedades, t.declara, lang)}${p.propiedades && p.viviendas !== null ? pl(p.viviendas, t.viviendas, lang) : ''}`;
     return {
-      enlace: `/diputado/${slug(d)}`,
-      texto: `${antesDeElecciones() ? ELECCIONES.llamada : ''}${d.nombreCompleto} (${d.grupoCorto}, ${nombreLegible(d.circunscripcion)}) ${bienes} y cobra ${fmtEur(d.retribucion.totalMensual)} al mes del Congreso. Así votó sobre vivienda:`,
+      enlace: pagina(`/diputado/${slug(d)}`, lang),
+      texto: llamada(lang) + f(t.diputado, { nombre: d.nombreCompleto, grupo: d.grupoCorto, provincia: nombreLegible(d.circunscripcion), bienes, sueldo: formatos(lang).eur(d.retribucion.totalMensual) }),
     };
   },
-  votacion: (v: VotacionClave) => ({
-    enlace: `/?votacion=${encodeURIComponent(v.id)}#hemiciclo`,
-    texto: `${rotulo(v).corto} (${fechaLarga(v.fecha)}): ${v.resultado.toLowerCase()} con ${v.totales.si} sí, ${v.totales.no} no y ${v.totales.abstencion} abstenciones. Qué votó cada diputado:`,
+  votacion: (v: VotacionClave, lang: Idioma = 'es') => ({
+    enlace: pagina(`/?votacion=${encodeURIComponent(v.id)}#hemiciclo`, lang),
+    texto: f(textosCompartir[lang].mensaje.votacion, {
+      titulo: rotulo(v, lang).corto, fecha: formatos(lang).fecha(v.fecha), resultado: resultadoTexto(v.resultado, lang).toLowerCase(),
+      si: v.totales.si, no: v.totales.no, abs: v.totales.abstencion,
+    }),
   }),
-  provincia: (id: string) => {
+  provincia: (id: string, lang: Idioma = 'es') => {
     const c = circunscripciones.find((x) => x.id === id)!;
     const k = diputados.filter((d) => d.circunscripcion === c.nombre).length;
-    return { enlace: `/diputados?provincia=${encodeURIComponent(c.nombre)}`, texto: `${antesDeElecciones() ? ELECCIONES.llamada : ''}${k === 1 ? 'El diputado elegido' : `Los ${k} diputados elegidos`} por ${c.legible}: qué declaran, cuánto cobran y cómo votan.` };
+    return { enlace: pagina(`/diputados?provincia=${encodeURIComponent(c.nombre)}`, lang), texto: llamada(lang) + pl(k, textosCompartir[lang].mensaje.provincia, lang, { provincia: c.legible }) };
   },
-  resumen: () => ({ enlace: '/', texto: `${antesDeElecciones() ? `${ELECCIONES.texto}. ` : ''}Los 350 diputados de la XV Legislatura: qué declaran, cuánto cobran y cómo votan, con sus datos oficiales.` }),
+  resumen: (lang: Idioma = 'es') => ({
+    enlace: pagina('/', lang),
+    texto: `${antesDeElecciones() ? `${comun[lang].elecciones.texto}. ` : ''}${textosCompartir[lang].mensaje.resumen}`,
+  }),
 };
-

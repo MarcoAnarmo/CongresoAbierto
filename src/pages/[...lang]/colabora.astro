@@ -1,0 +1,73 @@
+---
+import Base from '../../layouts/Base.astro';
+import { REPO, enlaceSugerencia, enlaceError, enlaceGuia, enlacePrimerasTareas, enlaceIncidencias, enlaceHojaDeRuta } from '../../lib/data';
+import { rutasIdioma, idiomaDe, enlace, f } from '../../i18n';
+import textos from '../../i18n/textos/colabora';
+
+export const getStaticPaths = rutasIdioma;
+const lang = idiomaDe(Astro.params.lang);
+const t = textos[lang];
+const v = {
+  enlace: enlaceHojaDeRuta,
+  incidencias: enlaceIncidencias,
+  primeras: enlacePrimerasTareas,
+  guia: enlaceGuia,
+  metodologia: enlace('/metodologia', lang),
+  conducta: `${REPO}/blob/main/CODE_OF_CONDUCT.md`,
+};
+---
+<Base title={t.titulo} description={t.descripcion}>
+  <h1>{t.h1}</h1>
+  <p class="lead">{t.lead}</p>
+
+  <div class="vias">
+    <section class="card via">
+      <p class="etiqueta">{t.sinProgramar}</p>
+      <h2>{t.error.titulo}</h2>
+      <p>{t.error.texto}</p>
+      <a class="btn primario" href={enlaceError()} rel="noopener">{t.error.boton}</a>
+    </section>
+    <section class="card via">
+      <p class="etiqueta">{t.sinProgramar}</p>
+      <h2>{t.mejora.titulo}</h2>
+      <p>{t.mejora.texto}</p>
+      <a class="btn" href={enlaceSugerencia} rel="noopener">{t.mejora.boton}</a>
+    </section>
+    <section class="card via">
+      <p class="etiqueta">{t.conCodigo}</p>
+      <h2>{t.contribuye.titulo}</h2>
+      <p set:html={t.contribuye.texto} />
+      <a class="btn" href={enlaceGuia} rel="noopener">{t.contribuye.boton}</a>
+    </section>
+  </div>
+
+  <h2>{t.hojaDeRuta}</h2>
+  <p set:html={t.rutaIntro} />
+  <ul class="ruta">
+    {t.ruta.map((r) => <li set:html={r} />)}
+  </ul>
+  <p set:html={f(t.rutaPie, v)} />
+
+  <h2>{t.comoFunciona}</h2>
+  <ol class="pasos">
+    {t.pasos.map((p) => <li set:html={f(p, v)} />)}
+  </ol>
+
+  <h2>{t.queSeAcepta}</h2>
+  <ul>
+    {t.acepta.map((a) => <li set:html={f(a, v)} />)}
+  </ul>
+  <p set:html={t.correo} />
+  <p class="small muted" set:html={f(t.conducta, v)} />
+</Base>
+
+<style>
+  .vias { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 1.4rem 0; }
+  @media (max-width: 860px) { .vias { grid-template-columns: 1fr; } }
+  .via { display: flex; flex-direction: column; gap: 4px; }
+  .via h2 { margin: 0; font-size: 1.15rem; }
+  .via p { margin: .2rem 0 .6rem; }
+  .via .btn { margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; text-decoration: none; }
+  .etiqueta { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: var(--accent-text); margin: 0; }
+  .pasos li, ul li { margin: .4rem 0; max-width: 75ch; }
+</style>

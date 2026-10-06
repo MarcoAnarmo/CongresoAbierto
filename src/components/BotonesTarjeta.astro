@@ -5,7 +5,8 @@
  * en el ordenador WhatsApp y X mandan el enlace con su vista previa. Solo descargan los enlaces de descarga y la miniatura.
  */
 import { url } from '../lib/data';
-import { enlacesRedes } from '../scripts/compartir';
+import { idiomaDeUrl } from '../i18n';
+import textosCompartir from '../i18n/textos/compartir';
 interface Props {
   historia: string; horizontal: string; nombre: string;
   /** Ruta de la página que se comparte (su vista previa es la tarjeta horizontal). */
@@ -16,13 +17,22 @@ interface Props {
   vista?: boolean;
   titulo?: string;
 }
-const { historia, horizontal, nombre, enlace, texto, vista = false, titulo = 'Compártelo' } = Astro.props;
+const lang = idiomaDeUrl(Astro.url.pathname);
+const t = textosCompartir[lang];
+const { historia, horizontal, nombre, enlace, texto, vista = false, titulo = t.ui.titulo } = Astro.props;
 const absoluta = new URL(url(enlace), Astro.site).href;
-const { whatsapp, x } = enlacesRedes(texto, absoluta);
+// Los mismos enlaces que monta enlacesRedes() en scripts/compartir.ts (que solo puede cargarse en el navegador)
+const whatsapp = `https://wa.me/?text=${encodeURIComponent(`${texto} ${absoluta}`)}`;
+const x = `https://x.com/intent/post?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(absoluta)}`;
+// Avisos del navegador en el idioma de la página: una sola vez por página, aunque haya cientos de cajas (página de tarjetas)
+const locals = Astro.locals as Record<string, unknown>;
+const pintarTextos = !locals.textosCompartir;
+locals.textosCompartir = true;
 ---
+{pintarTextos && <script type="application/json" data-textos="compartir" set:html={JSON.stringify(t.cliente)} />}
 <div class:list={['compartir', { 'con-vista': vista }]} data-historia={url(historia)} data-nombre={`${nombre}.png`} data-enlace={absoluta} data-texto={texto}>
   {vista && (
-    <a class="miniatura" href={url(historia)} target="_blank" rel="noopener" aria-label="Ver la tarjeta vertical a tamaño completo">
+    <a class="miniatura" href={url(historia)} target="_blank" rel="noopener" aria-label={t.ui.verVertical}>
       <img src={url(historia)} alt="" width="135" height="240" loading="lazy" />
     </a>
   )}
@@ -31,7 +41,7 @@ const { whatsapp, x } = enlacesRedes(texto, absoluta);
     <div class="fila">
       <button class="btn primario c-historia" type="button">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="4 2.6" /><path d="M12 8v8M8 12h8" /></svg>
-        <span class="largo">Historia de Instagram</span><span class="corto">Historia</span>
+        <span class="largo">{t.ui.historia}</span><span class="corto">{t.ui.historiaCorto}</span>
       </button>
       <a class="btn c-red c-whatsapp" href={whatsapp} target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.6 19z" /></svg>
@@ -39,21 +49,21 @@ const { whatsapp, x } = enlacesRedes(texto, absoluta);
       </a>
       <a class="btn c-red c-x" href={x} target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14v10H9l-4 4z" /></svg>
-        <span class="largo">Publicar en X</span><span class="corto">X</span>
+        <span class="largo">{t.ui.publicarX}</span><span class="corto">X</span>
       </a>
       <button class="btn c-copiar" type="button">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" /></svg>
-        <span class="largo">Copiar enlace</span><span class="corto">Enlace</span>
+        <span class="largo">{t.ui.copiar}</span><span class="corto">{t.ui.copiarCorto}</span>
       </button>
       <button class="btn c-mas" type="button" hidden>
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M5 13v6h14v-6" /></svg>
-        Más
+        {t.ui.mas}
       </button>
     </div>
     <p class="small muted c-descargas">
-      Descargar imagen:{' '}
-      <a href={url(historia)} download={`${nombre}.png`}>vertical (historias)</a>{' · '}
-      <a href={url(horizontal)} download={`${nombre}-horizontal.png`}>horizontal</a>
+      {t.ui.descargar}{' '}
+      <a href={url(historia)} download={`${nombre}.png`}>{t.ui.vertical}</a>{' · '}
+      <a href={url(horizontal)} download={`${nombre}-horizontal.png`}>{t.ui.horizontal}</a>
     </p>
     <p class="small c-aviso" role="status" aria-live="polite"></p>
   </div>

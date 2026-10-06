@@ -1,23 +1,31 @@
 ---
 /** Ventana emergente de compartir: una por página, la abren los BotonCompartir con sus datos. */
 import BotonesTarjeta from './BotonesTarjeta.astro';
+import { idiomaDeUrl } from '../i18n';
+import comun from '../i18n/textos/comun';
+import textosCompartir from '../i18n/textos/compartir';
+const lang = idiomaDeUrl(Astro.url.pathname);
+const t = textosCompartir[lang].ui;
 ---
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-compartir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" /><path d="m8.3 10.8 7.4-4.4M8.3 13.2l7.4 4.4" />
   </symbol>
 </svg>
-<dialog class="dlg-compartir" id="dlg-compartir" aria-label="Compartir">
-  <button class="cerrar" type="button" aria-label="Cerrar">
+<dialog class="dlg-compartir" id="dlg-compartir" aria-label={t.dialogo}>
+  <button class="cerrar" type="button" aria-label={comun[lang].palabras.cerrar}>
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
   </button>
-  <BotonesTarjeta historia="" horizontal="" nombre="" enlace="/" texto="" vista titulo="Compartir" />
+  <BotonesTarjeta historia="" horizontal="" nombre="" enlace="/" texto="" vista titulo={t.dialogo} />
 </dialog>
 
 <script>
-  import { rellenarCaja } from '../scripts/compartir';
+  import { rellenarCaja, textosCompartir } from '../scripts/compartir';
   import { deslizarParaCerrar } from '../scripts/hoja';
+  import { f, prefijo } from '../i18n/cliente';
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  // Base de la web con el idioma de la página ('' o '/ca', '/eu'…): imágenes y enlaces en ese idioma
+  const pre = prefijo();
   const sitio = import.meta.env.SITE.replace(/\/$/, '');
   const dlg = document.getElementById('dlg-compartir') as HTMLDialogElement;
   const caja = dlg.querySelector<HTMLElement>('.compartir')!;
@@ -30,14 +38,14 @@ import BotonesTarjeta from './BotonesTarjeta.astro';
     const s = boton.dataset.compartir!;
     const b = boton.dataset;
     if (b.historia) {
-      // Botón con sus propios datos (p. ej. la portada: resumen de todo el Congreso)
+      // Botón con sus propios datos (p. ej. la portada: resumen de todo el Congreso); su enlace ya lleva el idioma
       rellenarCaja(caja, { historia: b.historia, horizontal: b.horizontal!, nombre: b.nombre!, enlace: `${sitio}${base}${b.enlace}`, texto: b.ct!, titulo: b.titulo! });
       dlg.showModal();
       return;
     }
     rellenarCaja(caja, {
-      historia: `${base}/tarjetas/historia/diputado/${s}.png`, horizontal: `${base}/tarjetas/horizontal/diputado/${s}.png`,
-      nombre: `congreso-abierto-${s}`, enlace: `${sitio}${base}/diputado/${s}`, texto: boton.dataset.ct!, titulo: `Comparte la ficha de ${boton.dataset.cn}`,
+      historia: `${pre}/tarjetas/historia/diputado/${s}.png`, horizontal: `${pre}/tarjetas/horizontal/diputado/${s}.png`,
+      nombre: `congreso-abierto-${s}`, enlace: `${sitio}${pre}/diputado/${s}`, texto: boton.dataset.ct!, titulo: f(textosCompartir().fichaDe, { nombre: boton.dataset.cn! }),
     });
     dlg.showModal();
   });
