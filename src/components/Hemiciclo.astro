@@ -1,10 +1,18 @@
 ---
 import { diputados, votaciones, votacionesPleno, TEMAS, temasDe, grupos, colorGrupo, url, slug, etiquetaPartido } from '../lib/data';
 import { disponerPorGrupos } from '../lib/hemiciclo';
+import { idiomaDeUrl, enlace, formatos, f } from '../i18n';
+import comun from '../i18n/textos/comun';
+import textos from '../i18n/textos/hemiciclo';
+
+const lang = idiomaDeUrl(Astro.url.pathname);
+const c = comun[lang];
+const t = textos[lang];
+const fmt = formatos(lang);
 
 const orden = new Map(grupos.map((g) => [g.corto, g.orden]));
 const ordenados = [...diputados].sort((a, b) =>
-  (orden.get(a.grupoCorto)! - orden.get(b.grupoCorto)!) || a.apellidos.localeCompare(b.apellidos, 'es'));
+  (orden.get(a.grupoCorto)! - orden.get(b.grupoCorto)!) || fmt.comparar(a.apellidos, b.apellidos));
 const gruposOrden = [...grupos].sort((a, b) => a.orden - b.orden).filter((g) => ordenados.some((d) => d.grupoCorto === g.corto));
 const { escanos, sectores, rPunto } = disponerPorGrupos(gruposOrden.map((g) => ordenados.filter((d) => d.grupoCorto === g.corto).length));
 const W = 1000, H = 590, S = 440, CX = W / 2, CY = 560;
@@ -29,48 +37,48 @@ const etiquetas = sectores.map((s, i) => {
 // Selector de votaciones: las votaciones clave y, por tema, las más recientes del Pleno (el resto se busca en Votaciones).
 // Una votación con varios temas aparece en cada uno. Las que no son clave se descargan al elegirlas.
 const POR_TEMA = 12;
-const fechaCorta = (iso: string) => iso.split('-').reverse().join('/');
+const fechaCorta = fmt.fechaCorta;
 const recorta = (t: string, n = 95) => (t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t);
 /** El final del detalle es lo que distingue votaciones del mismo asunto («Enmienda 14», «Punto 2»). */
 const finDe = (t: string, n: number) => (t.length > n ? `…${t.slice(-(n - 1)).replace(/^\S*\s/, '')}` : t);
 const etiquetaVoto = (v: (typeof votacionesPleno)[number]) =>
   v.automatica
-    ? `${fechaCorta(v.fecha)} · nº ${v.numeroVotacion} · ${recorta(v.titulo, 70)}${v.detalle ? ` · ${finDe(v.detalle.replace(/\.$/, ''), 50)}` : ''}`
-    : `${fechaCorta(v.fecha)} · ${v.tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '')} (votación clave)`;
+    ? `${fechaCorta(v.fecha)} · ${f(t.numero, { n: v.numeroVotacion })} · ${recorta(v.titulo, 70)}${v.detalle ? ` · ${finDe(v.detalle.replace(/\.$/, ''), 50)}` : ''}`
+    : f(t.votacionClave, { texto: `${fechaCorta(v.fecha)} · ${v.tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '')}` });
 const recientes = (xs: typeof votacionesPleno) => [...xs].sort((a, b) => b.fecha.localeCompare(a.fecha) || b.sesion - a.sesion || b.numeroVotacion - a.numeroVotacion);
 const gruposVoto = [
-  { nombre: 'Votaciones clave de vivienda', votaciones: recientes(votacionesPleno.filter((v) => !v.automatica)) },
-  ...TEMAS.map((t) => ({ nombre: `${t.nombre}: las más recientes`, votaciones: recientes(votacionesPleno.filter((v) => v.automatica && temasDe(v).includes(t.id))).slice(0, POR_TEMA) })),
+  { nombre: t.claveVivienda, votaciones: recientes(votacionesPleno.filter((v) => !v.automatica)) },
+  ...TEMAS.map((tema) => ({ nombre: f(t.recientesTema, { tema: c.temas[tema.id] ?? tema.nombre }), votaciones: recientes(votacionesPleno.filter((v) => v.automatica && temasDe(v).includes(tema.id))).slice(0, POR_TEMA) })),
 ].filter((g) => g.votaciones.length > 0);
 
 const votosCliente = Object.fromEntries(votaciones.map((v) => [v.id, Object.fromEntries(Object.entries(v.votos).map(([c, x]) => [c, x === 'Sí' ? 'S' : x === 'No' ? 'N' : x === 'Abstención' ? 'A' : 'X']))]));
 const datos = Object.fromEntries(ordenados.map((d) => [d.codParlamentario, {
-  n: d.nombreCompleto, g: d.grupoCorto, p: etiquetaPartido(d), ci: d.circunscripcion,
+  n: d.nombreCompleto, g: d.grupoCorto, p: etiquetaPartido(d, lang), ci: d.circunscripcion,
   pr: d.patrimonio.propiedades, v: d.patrimonio.viviendas, co: d.patrimonio.vehiculos,
   r: d.retribucion.totalMensual, s: slug(d), rv: d.patrimonio.revisar,
 }]));
 const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
 ---
 <section class="hemi" id="hemiciclo" aria-labelledby="hemi-h">
-  <h2 id="hemi-h" class="sr-only">Hemiciclo</h2>
+  <h2 id="hemi-h" class="sr-only">{c.nav.hemiciclo}</h2>
   <div class="controles">
-    <div class="modos segmentado" role="group" aria-label="Qué mostrar en el hemiciclo">
-      <button class="btn" data-modo="grupo" aria-pressed="false">Grupo</button>
-      <button class="btn" data-modo="propiedades" aria-pressed="false">Propiedades</button>
-      <button class="btn" data-modo="viviendas" aria-pressed="false">Viviendas</button>
+    <div class="modos segmentado" role="group" aria-label={t.modosAria}>
+      <button class="btn" data-modo="grupo" aria-pressed="false">{t.modos.grupo}</button>
+      <button class="btn" data-modo="propiedades" aria-pressed="false">{t.modos.propiedades}</button>
+      <button class="btn" data-modo="viviendas" aria-pressed="false">{t.modos.viviendas}</button>
     </div>
     {votaciones.length > 0 && (
       <div class="selector">
-        <label for="hemi-voto" class="sr-only">Ver una votación</label>
+        <label for="hemi-voto" class="sr-only">{t.verVotacion}</label>
         <select id="hemi-voto">
-          <option value="">Ver una votación…</option>
+          <option value="">{t.verVotacionOpcion}</option>
           {gruposVoto.map((g) => (
             <optgroup label={g.nombre}>
               {g.votaciones.map((v) => <option value={`voto:${v.id}`}>{etiquetaVoto(v)}</option>)}
             </optgroup>
           ))}
-          <optgroup label="Más votaciones">
-            <option value="ir:votaciones">{`Buscar entre las ${votacionesPleno.length.toLocaleString('es-ES')} votaciones del Pleno…`}</option>
+          <optgroup label={t.masVotaciones}>
+            <option value="ir:votaciones">{f(t.buscarEntre, { n: fmt.num(votacionesPleno.length) })}</option>
           </optgroup>
         </select>
       </div>
@@ -80,7 +88,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
 
   <div class="lienzo">
     <svg viewBox={`-130 0 ${W + 260} ${H}`} data-hueco={HUECO} data-vb-movil={`12 ${(CY - RB * S - 10).toFixed(0)} ${W - 24} ${(RB * S + 26).toFixed(0)}`} role="img" aria-labelledby="hemi-titulo">
-      <title id="hemi-titulo">Hemiciclo del Congreso: 350 escaños agrupados por grupo parlamentario</title>
+      <title id="hemi-titulo">{t.svgTitulo}</title>
       <g class="franjas" aria-hidden="true">
         {franjas.map((f) => <path d={f.d} stroke={f.color} />)}
       </g>
@@ -90,32 +98,44 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
       {ordenados.map((d, i) => {
         const e = escanos[i];
         return (
-          <a href={url(`/diputado/${slug(d)}`)} aria-label={`${d.nombreCompleto}, ${etiquetaPartido(d)}`}>
+          <a href={enlace(`/diputado/${slug(d)}`, lang)} aria-label={`${d.nombreCompleto}, ${etiquetaPartido(d, lang)}`}>
             <circle cx={(CX + e.x * S).toFixed(1)} cy={(CY - e.y * S).toFixed(1)} r={(e.r * S).toFixed(1)}
               data-cod={d.codParlamentario} data-color={colorGrupo(d.grupoCorto)} style={`fill:${colorGrupo(d.grupoCorto)}`} />
           </a>
         );
       })}
       <text x={CX} y={CY - 52} text-anchor="middle" class="centro" id="hemi-centro">350</text>
-      <text x={CX} y={CY - 16} text-anchor="middle" class="centro-sub" id="hemi-centro-sub">diputados</text>
+      <text x={CX} y={CY - 16} text-anchor="middle" class="centro-sub" id="hemi-centro-sub">{t.cliente.diputados[1]}</text>
     </svg>
     <div class="tip" id="hemi-tip" hidden>
-      <button class="cerrar" type="button" aria-label="Cerrar">×</button>
+      <button class="cerrar" type="button" aria-label={c.palabras.cerrar}>×</button>
       <div class="tip-cuerpo"></div>
-      <a class="btn primario ver" href="#">Ver ficha completa →</a>
+      <a class="btn primario ver" href="#">{t.verFicha}</a>
     </div>
   </div>
-  <div class="leyenda small" id="hemi-leyenda" role="group" aria-label="Leyenda: pulsa un color para resaltar esos escaños"></div>
-  <p class="grupos-movil small" aria-label="Grupos de izquierda a derecha en el gráfico">
+  <div class="leyenda small" id="hemi-leyenda" role="group" aria-label={t.leyendaAria}></div>
+  <p class="grupos-movil small" aria-label={t.gruposMovilAria}>
     {gruposOrden.map((g) => <span><i style={`background:${g.color}`}></i>{g.corto}</span>)}
   </p>
-  <p class="small muted nota">Pulsa un escaño para ver quién es, o un color de la leyenda para resaltar solo esos escaños. Gráfico ordenado por grupos parlamentarios; no reproduce el plano real de asientos.</p>
+  <p class="small muted nota">{t.nota}</p>
 </section>
 
+<script type="application/json" data-textos="hemiciclo" set:html={JSON.stringify({ ...t.cliente, votos: c.voto, resultados: c.resultado, sinDatos: c.palabras.sinDatos })} />
 <script type="application/json" id="hemi-datos" set:html={JSON.stringify({ datos, votos: votosCliente, colores, base: url(''), votaciones: votaciones.map((v) => ({ id: v.id, titulo: v.titulo, tipo: v.tipo, fecha: v.fecha, resultado: v.resultado, totales: v.totales })) })} />
 
 <script>
   import { deslizarParaCerrar } from '../scripts/hoja';
+  import { textos, f, locale, localeNum, fmtFechaCorta, prefijo } from '../i18n/cliente';
+  type Tx = {
+    diputados: [string, string]; viviendas: string; propiedades: string; tramoViviendas: string; tramoPropiedades: string; sinDatosAria: string; sd: string;
+    descGrupo: string; descViviendas: string; descPropiedades: string; noEraDiputado: string; resultado: string; centroVoto: string; sinEscano: string;
+    voto: string; noEraEnVotacion: string; patrimonio: string; vehiculos: string; errorCarga: string;
+    /** De comun.ts: voto y resultado oficiales (en castellano) → texto en el idioma de la página; «sin datos». */
+    votos: Record<string, string>; resultados: Record<string, string>; sinDatos: string;
+  };
+  const tx = textos<Tx>('hemiciclo');
+  /** Resultado oficial traducido (si no está en la lista, tal cual). */
+  const resultadoTx = (r: string) => tx.resultados[r] ?? r;
   type Info = { n: string; g: string; p: string; ci: string; pr: number | null; v: number | null; co: number | null; r: number; s: string; rv: boolean };
   type Voto = 'S' | 'N' | 'A' | 'X';
   const raw = JSON.parse(document.getElementById('hemi-datos')!.textContent!) as {
@@ -124,11 +144,11 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   };
   // Variables CSS: así los colores cambian solos al pasar de modo claro a oscuro
   const cVoto: Record<Voto, string> = { S: 'var(--si)', N: 'var(--no)', A: 'var(--abs)', X: 'var(--novota)' };
-  const etVoto: Record<Voto, string> = { S: 'Sí', N: 'No', A: 'Abstención', X: 'No vota' };
+  const etVoto: Record<Voto, string> = { S: tx.votos['Sí'], N: tx.votos['No'], A: tx.votos['Abstención'], X: tx.votos['No vota'] };
   const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
   const tramos = {
-    viviendas: { cortes: [0, 1, 2, 4, 7], etiquetas: ['0', '1', '2', '3–4', '5–7', '8+'], unidad: ['vivienda', 'viviendas'] },
-    propiedades: { cortes: [0, 1, 3, 6, 10], etiquetas: ['0', '1', '2–3', '4–6', '7–10', '11+'], unidad: ['propiedad', 'propiedades'] },
+    viviendas: { cortes: [0, 1, 2, 4, 7], etiquetas: ['0', '1', '2', '3–4', '5–7', '8+'], aria: tx.tramoViviendas },
+    propiedades: { cortes: [0, 1, 3, 6, 10], etiquetas: ['0', '1', '2–3', '4–6', '7–10', '11+'], aria: tx.tramoPropiedades },
   };
   const tramo = (v: number | null, cortes: number[]) => (v === null ? -1 : cortes.findIndex((c) => v <= c) === -1 ? cortes.length : cortes.findIndex((c) => v <= c));
 
@@ -143,8 +163,8 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   const seccion = document.querySelector('.hemi') as HTMLElement;
   const botones = [...document.querySelectorAll<HTMLButtonElement>('.hemi [data-modo]')];
   const selVoto = document.getElementById('hemi-voto') as HTMLSelectElement | null;
-  const eur = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
-  const num = new Intl.NumberFormat('es-ES');
+  const eur = new Intl.NumberFormat(localeNum(), { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+  const num = new Intl.NumberFormat(localeNum());
   const tactil = () => matchMedia('(hover: none), (max-width: 640px)').matches;
   let modo = 'grupo';
 
@@ -152,9 +172,9 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   const item = (color: string, texto: string, clave: string, borde = false) =>
     `<button type="button" class="pill filtro" data-f="${clave}" aria-pressed="false"><span class="dot${borde ? ' vacio' : ''}" style="background:${color}"></span>${texto}</button>`;
   /** Escala ordenada de menos a más: una barra de tramos con su número debajo */
-  const escalaHtml = (etiquetas: string[], unidad: string, cuenta: number[], sinDatos: number) =>
-    `<div class="escala">${escala.map((c, i) => `<button type="button" class="tramo filtro" data-f="${i}" aria-pressed="false" aria-label="${etiquetas[i]} ${unidad}: ${cuenta[i]} diputados"><i style="background:${c}"></i><span>${etiquetas[i]}</span></button>`).join('')}` +
-    (sinDatos ? `<button type="button" class="tramo filtro sd" data-f="-1" aria-pressed="false" aria-label="Sin datos: ${sinDatos} diputados"><i></i><span>s/d</span></button>` : '') + '</div>';
+  const escalaHtml = (etiquetas: string[], aria: string, cuenta: number[], sinDatos: number) =>
+    `<div class="escala">${escala.map((c, i) => `<button type="button" class="tramo filtro" data-f="${i}" aria-pressed="false" aria-label="${f(aria, { tramo: etiquetas[i], n: cuenta[i] })}"><i style="background:${c}"></i><span>${etiquetas[i]}</span></button>`).join('')}` +
+    (sinDatos ? `<button type="button" class="tramo filtro sd" data-f="-1" aria-pressed="false" aria-label="${f(tx.sinDatosAria, { n: sinDatos })}"><i></i><span>${tx.sd}</span></button>` : '') + '</div>';
   const rellenar = (c: SVGCircleElement, color: string | null) => { c.style.fill = color ?? 'transparent'; c.classList.toggle('vacio', color === null); };
 
   function pintar(m: string) {
@@ -172,8 +192,8 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
       const cuenta: Record<string, number> = {};
       Object.values(raw.datos).forEach((d) => (cuenta[d.g] = (cuenta[d.g] ?? 0) + 1));
       leyenda.innerHTML = Object.entries(raw.colores).map(([g, c]) => item(c, `${g} · ${cuenta[g] ?? 0}`, g)).join(' ');
-      desc.textContent = 'Composición del Congreso por grupo parlamentario.';
-      centro.textContent = '350'; centroSub.textContent = 'diputados';
+      desc.textContent = tx.descGrupo;
+      centro.textContent = '350'; centroSub.textContent = tx.diputados[1];
     } else if (m === 'viviendas' || m === 'propiedades') {
       const t = tramos[m]; const campo = m === 'viviendas' ? 'v' : 'pr';
       const cuenta = escala.map(() => 0); let sinDatos = 0;
@@ -182,19 +202,19 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
         rellenar(c, i < 0 ? null : escala[i]); c.dataset.k = String(i);
         if (i < 0) sinDatos++; else cuenta[i]++;
       });
-      leyenda.innerHTML = escalaHtml(t.etiquetas, t.unidad[1], cuenta, sinDatos);
+      leyenda.innerHTML = escalaHtml(t.etiquetas, t.aria, cuenta, sinDatos);
       const total = Object.values(raw.datos).reduce((a, d) => a + (d[campo] ?? 0), 0);
       desc.textContent = m === 'viviendas'
-        ? 'Viviendas que cada diputado declara, en propiedad total o parcial, en su declaración de bienes oficial más reciente.'
-        : 'Propiedades (inmuebles urbanos y rústicos a su nombre: viviendas, garajes, locales, fincas…) según su declaración de bienes oficial más reciente.';
-      centro.textContent = num.format(total); centroSub.textContent = m === 'viviendas' ? 'viviendas' : 'propiedades';
+        ? tx.descViviendas
+        : tx.descPropiedades;
+      centro.textContent = num.format(total); centroSub.textContent = m === 'viviendas' ? tx.viviendas : tx.propiedades;
     } else {
       const id = m.slice(5); const vot = raw.votos[id]; const info = raw.votaciones.find((v) => v.id === id)!;
       circulos.forEach((c) => { const x = vot[c.dataset.cod!]; rellenar(c, x ? cVoto[x] : null); c.dataset.k = x ?? '-'; });
       const t = info.totales;
-      leyenda.innerHTML = [item(cVoto.S, `Sí · ${t.si}`, 'S'), item(cVoto.N, `No · ${t.no}`, 'N'), item(cVoto.A, `Abstención · ${t.abstencion}`, 'A'), item(cVoto.X, `No vota · ${t.noVota}`, 'X'), item('transparent', 'Aún no era diputado', '-', true)].join(' ');
-      desc.innerHTML = `<span>${info.tipo} ${new Date(info.fecha + 'T12:00:00').toLocaleDateString('es-ES')}</span><br><strong class="texto">${info.titulo}</strong> Resultado: <strong>${info.resultado}</strong>.`;
-      centro.textContent = `${t.si}–${t.no}`; centroSub.textContent = `sí – no · ${info.resultado.toLowerCase()}`;
+      leyenda.innerHTML = [item(cVoto.S, `${etVoto.S} · ${t.si}`, 'S'), item(cVoto.N, `${etVoto.N} · ${t.no}`, 'N'), item(cVoto.A, `${etVoto.A} · ${t.abstencion}`, 'A'), item(cVoto.X, `${etVoto.X} · ${t.noVota}`, 'X'), item('transparent', tx.noEraDiputado, '-', true)].join(' ');
+      desc.innerHTML = `<span>${info.tipo} ${fmtFechaCorta(info.fecha)}</span><br><strong class="texto">${info.titulo}</strong> ${f(tx.resultado, { r: resultadoTx(info.resultado) })}`;
+      centro.textContent = `${t.si}–${t.no}`; centroSub.textContent = f(tx.centroVoto, { r: resultadoTx(info.resultado).toLowerCase() });
     }
     centroBase = [centro.textContent!, centroSub.textContent!];
     filtrar(null);
@@ -213,7 +233,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     if (f === null) { centro.textContent = centroBase[0]; centroSub.textContent = centroBase[1]; }
     else {
       centro.textContent = num.format(n);
-      centroSub.textContent = seccion.dataset.modo === 'grupo' ? f : seccion.dataset.modo === 'voto' ? (f === '-' ? 'sin escaño' : etVoto[f as Voto].toLowerCase()) : n === 1 ? 'diputado' : 'diputados';
+      centroSub.textContent = seccion.dataset.modo === 'grupo' ? f : seccion.dataset.modo === 'voto' ? (f === '-' ? tx.sinEscano : etVoto[f as Voto].toLowerCase()) : n === 1 ? tx.diputados[0] : tx.diputados[1];
     }
     ajustarCentro();
   }
@@ -247,11 +267,11 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
       `<strong class="nombre">${d.n}</strong>`,
       `<span class="muted"><span class="dot" style="background:${raw.colores[d.g]}"></span> ${d.p} · ${d.ci}</span>`,
     ];
-    if (modo.startsWith('voto:')) { const v = raw.votos[modo.slice(5)][c.dataset.cod!]; lineas.push(v ? `Votó: <strong style="color:${cVoto[v]}">${etVoto[v]}</strong>` : '<span class="muted">Aún no era diputado/a en esa votación</span>'); }
-    lineas.push(`Propiedades: <strong>${d.pr ?? 'sin datos'}</strong> · Viviendas: <strong>${d.v ?? 'sin datos'}</strong>`);
-    lineas.push(`Vehículos: ${d.co ?? '—'} · Congreso: ${eur.format(d.r)}/mes`);
+    if (modo.startsWith('voto:')) { const v = raw.votos[modo.slice(5)][c.dataset.cod!]; lineas.push(v ? f(tx.voto, { voto: `<strong style="color:${cVoto[v]}">${etVoto[v]}</strong>` }) : `<span class="muted">${tx.noEraEnVotacion}</span>`); }
+    lineas.push(f(tx.patrimonio, { pr: d.pr ?? tx.sinDatos, v: d.v ?? tx.sinDatos }));
+    lineas.push(f(tx.vehiculos, { co: d.co ?? '—', r: eur.format(d.r) }));
     tipCuerpo.innerHTML = lineas.join('<br>');
-    tipVer.href = `${raw.base}/diputado/${d.s}`;
+    tipVer.href = `${prefijo()}/diputado/${d.s}`;
     tip.hidden = false;
     circulos.forEach((o) => o.classList.toggle('activo', o === c));
     if (tactil()) { tip.classList.add('hoja'); tip.style.left = ''; tip.style.top = ''; return; }
@@ -299,12 +319,12 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
       seccion.setAttribute('aria-busy', 'true');
       const ok = await cargarVotacion(id);
       seccion.removeAttribute('aria-busy');
-      if (!ok) { desc.textContent = 'No se ha podido cargar esta votación. Inténtalo de nuevo.'; return; }
+      if (!ok) { desc.textContent = tx.errorCarga; return; }
     }
     pintar(m);
   }
   selVoto?.addEventListener('change', () => {
-    if (selVoto.value === 'ir:votaciones') { location.href = `${raw.base}/votaciones`; return; }
+    if (selVoto.value === 'ir:votaciones') { location.href = `${prefijo()}/votaciones`; return; }
     if (selVoto.value) verVotacion(selVoto.value);
   });
   const validos = [...botones.map((b) => b.dataset.modo!), ...(selVoto ? [...selVoto.options].map((o) => o.value).filter((x) => x.startsWith('voto:')) : [])];
@@ -321,7 +341,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
       raw.votaciones.push(v);
       if (selVoto && ![...selVoto.options].some((o) => o.value === `voto:${id}`)) {
         const corto = v.titulo.length > 70 ? `${v.titulo.slice(0, 68).trimEnd()}…` : v.titulo;
-        selVoto.add(new Option(`${new Date(v.fecha + 'T12:00:00').toLocaleDateString('es-ES')} · ${corto}`, `voto:${id}`), 1);
+        selVoto.add(new Option(`${fmtFechaCorta(v.fecha)} · ${corto}`, `voto:${id}`), 1);
       }
       return true;
     } catch { return false; }

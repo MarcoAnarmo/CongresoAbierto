@@ -1,12 +1,20 @@
 ---
 import { diputados, colorGrupo, url, slug, etiquetaPartido, grupos } from '../lib/data';
 import { PROVINCIAS, COLUMNAS, FILAS, nombreLegible } from '../lib/provincias';
+import { idiomaDeUrl, formatos, f, pl } from '../i18n';
+import comun from '../i18n/textos/comun';
+import textos from '../i18n/textos/mapa';
+
+const lang = idiomaDeUrl(Astro.url.pathname);
+const c = comun[lang];
+const t = textos[lang];
+const fmt = formatos(lang);
 
 const orden = new Map(grupos.map((g) => [g.corto, g.orden]));
 const porProvincia = PROVINCIAS.map((p) => {
   const ds = diputados
     .filter((d) => d.circunscripcion === p.nombre)
-    .sort((a, b) => (orden.get(a.grupoCorto)! - orden.get(b.grupoCorto)!) || a.apellidos.localeCompare(b.apellidos, 'es'));
+    .sort((a, b) => (orden.get(a.grupoCorto)! - orden.get(b.grupoCorto)!) || fmt.comparar(a.apellidos, b.apellidos));
   const conDatos = ds.filter((d) => d.patrimonio.viviendas !== null);
   const viviendas = conDatos.reduce((a, d) => a + (d.patrimonio.viviendas ?? 0), 0);
   const propiedades = conDatos.reduce((a, d) => a + (d.patrimonio.propiedades ?? 0), 0);
@@ -17,7 +25,7 @@ const porProvincia = PROVINCIAS.map((p) => {
     propiedades,
     viviendas,
     conDatos: conDatos.length,
-    dips: ds.map((d) => ({ n: d.nombreCompleto, g: d.grupoCorto, c: colorGrupo(d.grupoCorto), p: etiquetaPartido(d), v: d.patrimonio.viviendas, pr: d.patrimonio.propiedades, f: d.fotoUrl, s: slug(d) })),
+    dips: ds.map((d) => ({ n: d.nombreCompleto, g: d.grupoCorto, c: colorGrupo(d.grupoCorto), p: etiquetaPartido(d, lang), v: d.patrimonio.viviendas, pr: d.patrimonio.propiedades, f: d.fotoUrl, s: slug(d) })),
   };
 });
 const sinCasilla = diputados.filter((d) => !PROVINCIAS.some((p) => p.nombre === d.circunscripcion));
@@ -31,19 +39,19 @@ const celdas: ((typeof porProvincia)[number] | null)[] = [];
 for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(porProvincia.find((p) => p.col === c && p.fila === f) ?? null);
 ---
 <section class:list={['mapa', { 'en-vista': enVista }]} aria-labelledby="mapa-h" id="mapa">
-  <h2 id="mapa-h" class:list={{ 'sr-only': enVista }}>Tus diputados por provincia</h2>
-  <p class="muted small intro">Cada casilla es una circunscripción, colocada de forma aproximada (no es un mapa a escala). Pulsa la tuya o escribe tu código postal.</p>
+  <h2 id="mapa-h" class:list={{ 'sr-only': enVista }}>{t.titulo}</h2>
+  <p class="muted small intro">{t.intro}</p>
 
   <div class="controles">
-    <div class="segmentado" role="group" aria-label="Qué mostrar en el mapa">
-      <button class="btn" type="button" data-mmodo="escanos" aria-pressed="true">Diputados</button>
-      <button class="btn" type="button" data-mmodo="propiedades" aria-pressed="false">Propiedades</button>
-      <button class="btn" type="button" data-mmodo="viviendas" aria-pressed="false">Viviendas</button>
+    <div class="segmentado" role="group" aria-label={t.modosAria}>
+      <button class="btn" type="button" data-mmodo="escanos" aria-pressed="true">{c.nav.diputados}</button>
+      <button class="btn" type="button" data-mmodo="propiedades" aria-pressed="false">{t.modos.propiedades}</button>
+      <button class="btn" type="button" data-mmodo="viviendas" aria-pressed="false">{t.modos.viviendas}</button>
     </div>
     <form class="buscar-cp" id="mapa-cp-form" novalidate>
-      <label for="mapa-cp" class="sr-only">Tu código postal</label>
-      <input type="search" id="mapa-cp" inputmode="numeric" maxlength="5" placeholder="Tu código postal: 41001" autocomplete="postal-code" aria-describedby="mapa-cp-error" />
-      <button class="btn" type="submit">Buscar</button>
+      <label for="mapa-cp" class="sr-only">{t.cpLabel}</label>
+      <input type="search" id="mapa-cp" inputmode="numeric" maxlength="5" placeholder={t.cpPlaceholder} autocomplete="postal-code" aria-describedby="mapa-cp-error" />
+      <button class="btn" type="submit">{t.buscar}</button>
     </form>
   </div>
   <p class="error small" id="mapa-cp-error" aria-live="polite"></p>
@@ -52,21 +60,30 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
     <div>
       <div class="rejilla" style={`--cols:${COLUMNAS}`}>
         {celdas.map((p) => p
-          ? <button type="button" class="casilla" data-ab={p.abrev} data-escanos={p.escanos} data-propiedades={p.conDatos ? p.propiedades : ''} data-viviendas={p.conDatos ? p.viviendas : ''} aria-label={`${p.legible}: ${p.escanos} ${p.escanos === 1 ? 'diputado' : 'diputados'}`} title={p.legible}>{p.abrev}</button>
+          ? <button type="button" class="casilla" data-ab={p.abrev} data-escanos={p.escanos} data-propiedades={p.conDatos ? p.propiedades : ''} data-viviendas={p.conDatos ? p.viviendas : ''} aria-label={f(t.casillaAria, { provincia: p.legible, diputados: pl(p.escanos, c.palabras.diputados, lang) })} title={p.legible}>{p.abrev}</button>
           : <span class="hueco" aria-hidden="true"></span>)}
       </div>
       <div class="leyenda small" id="mapa-leyenda" aria-hidden="true"></div>
     </div>
 
     <div class="panel card" id="mapa-panel" aria-live="polite">
-      <p class="small muted">Elige una provincia en el mapa.</p>
+      <p class="small muted">{t.elige}</p>
     </div>
   </div>
 </section>
 
+<script type="application/json" data-textos="mapa" set:html={JSON.stringify(t.cliente)} />
 <script type="application/json" id="mapa-datos" set:html={JSON.stringify({ base: url(''), provincias: porProvincia.map(({ col, fila, nombre, ...r }) => r) })} />
 
 <script>
+  import { textos, f, pl, prefijo } from '../i18n/cliente';
+  type Tx = {
+    escanosMas: string; masDe: string; leyendaEscanos: string; leyendaPropiedades: string; leyendaViviendas: string;
+    propiedadesDip: [string, string]; viviendasDip: [string, string]; elegidos: [string, string]; declaradas: [string, string]; errorCp: string; cpSinProvincia: string;
+  };
+  const tx = textos<Tx>('mapa');
+  /** Singular o plural con la cifra tal cual (como en la lista de cada provincia). */
+  const cuenta = (n: number | null, [uno, varios]: [string, string]) => f(n === 1 ? uno : varios, { n: String(n) });
   type Dip = { n: string; g: string; c: string; p: string; v: number | null; pr: number | null; f: string; s: string };
   type Prov = { abrev: string; legible: string; cp: number; escanos: number; propiedades: number; viviendas: number; conDatos: number; dips: Dip[] };
   const raw = JSON.parse(document.getElementById('mapa-datos')!.textContent!) as { base: string; provincias: Prov[] };
@@ -77,12 +94,11 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   const form = document.getElementById('mapa-cp-form') as HTMLFormElement;
   const cp = document.getElementById('mapa-cp') as HTMLInputElement;
   const error = document.getElementById('mapa-cp-error')!;
-  const num = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
-  const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
+    const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
   const modos = {
-    escanos: { cortes: [1, 3, 5, 8, 16], etiquetas: ['1', '2–3', '4–5', '6–8', '9–16', '30 o más'], valor: (c: HTMLElement) => Number(c.dataset.escanos) },
-    propiedades: { cortes: [5, 10, 15, 25, 40], etiquetas: ['1–5', '6–10', '11–15', '16–25', '26–40', 'más de 40'], valor: (c: HTMLElement) => (c.dataset.propiedades ? Number(c.dataset.propiedades) : null) },
-    viviendas: { cortes: [3, 6, 10, 15, 25], etiquetas: ['1–3', '4–6', '7–10', '11–15', '16–25', 'más de 25'], valor: (c: HTMLElement) => (c.dataset.viviendas ? Number(c.dataset.viviendas) : null) },
+    escanos: { cortes: [1, 3, 5, 8, 16], etiquetas: ['1', '2–3', '4–5', '6–8', '9–16', f(tx.escanosMas, { n: 30 })], valor: (c: HTMLElement) => Number(c.dataset.escanos) },
+    propiedades: { cortes: [5, 10, 15, 25, 40], etiquetas: ['1–5', '6–10', '11–15', '16–25', '26–40', f(tx.masDe, { n: 40 })], valor: (c: HTMLElement) => (c.dataset.propiedades ? Number(c.dataset.propiedades) : null) },
+    viviendas: { cortes: [3, 6, 10, 15, 25], etiquetas: ['1–3', '4–6', '7–10', '11–15', '16–25', f(tx.masDe, { n: 25 })], valor: (c: HTMLElement) => (c.dataset.viviendas ? Number(c.dataset.viviendas) : null) },
   };
   let actual: Prov | null = null;
   const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]!);
@@ -96,7 +112,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
       c.style.background = i < 0 ? 'transparent' : escala[i];
       c.classList.toggle('oscura', i >= 3);
     });
-    leyenda.innerHTML = ({ escanos: 'Diputados elegidos: ', propiedades: 'Propiedades declaradas por sus diputados: ', viviendas: 'Viviendas declaradas por sus diputados: ' })[m]
+    leyenda.innerHTML = ({ escanos: tx.leyendaEscanos, propiedades: tx.leyendaPropiedades, viviendas: tx.leyendaViviendas })[m]
       + escala.map((c, i) => `<span class="pill"><span class="dot" style="background:${c}"></span>${t.etiquetas[i]}</span>`).join(' ');
     if (actual) mostrar(actual, false);
   }
@@ -105,14 +121,14 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
     actual = p;
     casillas.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.ab === p.abrev)));
     const filas = p.dips.map((d) => `
-      <li><a href="${raw.base}/diputado/${d.s}">
+      <li><a href="${prefijo()}/diputado/${d.s}">
         <img src="${esc(d.f)}" alt="" width="40" height="50" loading="lazy" referrerpolicy="no-referrer" />
         <span class="quien"><strong>${esc(d.n)}</strong><span class="muted small"><span class="dot" style="background:${d.c}"></span> ${esc(d.p)}</span></span>
-        <span class="cifra small">${d.pr === null ? '<strong>—</strong>' : `<span><strong>${d.pr}</strong> ${d.pr === 1 ? 'propiedad' : 'propiedades'}</span><span>(${d.v} ${d.v === 1 ? 'vivienda' : 'viviendas'})</span>`}</span>
+        <span class="cifra small">${d.pr === null ? '<strong>—</strong>' : `<span>${cuenta(d.pr, tx.propiedadesDip)}</span><span>${cuenta(d.v, tx.viviendasDip)}</span>`}</span>
       </a></li>`).join('');
     panel.innerHTML = `
       <h3>${esc(p.legible)}</h3>
-      <p class="small muted">${p.escanos} ${p.escanos === 1 ? 'diputado elegido' : 'diputados elegidos'} ${p.conDatos ? ` · ${num.format(p.propiedades)} ${p.propiedades === 1 ? 'propiedad declarada' : 'propiedades declaradas'} (${num.format(p.viviendas)} ${p.viviendas === 1 ? 'vivienda' : 'viviendas'})` : ''}</p>
+      <p class="small muted">${pl(p.escanos, tx.elegidos)} ${p.conDatos ? ` · ${pl(p.propiedades, tx.declaradas)} ${pl(p.viviendas, tx.viviendasDip)}` : ''}</p>
       <ul class="lista">${filas}</ul>`;
     if (enfocar && matchMedia('(max-width: 860px)').matches) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -123,9 +139,9 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const v = cp.value.trim();
-    if (!/^\d{5}$/.test(v)) { error.textContent = 'Escribe un código postal de 5 cifras.'; return; }
+    if (!/^\d{5}$/.test(v)) { error.textContent = tx.errorCp; return; }
     const p = raw.provincias.find((x) => x.cp === Number(v.slice(0, 2)));
-    if (!p) { error.textContent = 'Ese código postal no corresponde a ninguna provincia. Prueba otro.'; return; }
+    if (!p) { error.textContent = tx.cpSinProvincia; return; }
     mostrar(p);
   });
   pintar('escanos');

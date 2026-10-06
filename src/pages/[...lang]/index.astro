@@ -1,17 +1,25 @@
 ---
-import Base from '../layouts/Base.astro';
-import Hemiciclo from '../components/Hemiciclo.astro';
-import { ELECCIONES, antesDeElecciones } from '../lib/data';
-import BotonCompartir from '../components/BotonCompartir.astro';
-import DialogoCompartir from '../components/DialogoCompartir.astro';
+import Base from '../../layouts/Base.astro';
+import Hemiciclo from '../../components/Hemiciclo.astro';
+import { antesDeElecciones } from '../../lib/data';
+import BotonCompartir from '../../components/BotonCompartir.astro';
+import DialogoCompartir from '../../components/DialogoCompartir.astro';
+import { rutasIdioma, idiomaDe } from '../../i18n';
+import comun from '../../i18n/textos/comun';
+import portada from '../../i18n/textos/portada';
+
+export const getStaticPaths = rutasIdioma;
+const lang = idiomaDe(Astro.params.lang);
+const c = comun[lang];
+const t = portada[lang];
 ---
 <Base title="Congreso Abierto">
   <div class="portada-cab">
-    {antesDeElecciones() && <p class="elecciones"><span class="e-punto" aria-hidden="true"></span><span class="e-largo">{ELECCIONES.texto}</span><span class="e-corto">Elecciones generales: 29 de noviembre</span><span class="e-mini">Elecciones: 29 de noviembre</span></p>}
+    {antesDeElecciones() && <p class="elecciones"><span class="e-punto" aria-hidden="true"></span><span class="e-largo">{c.elecciones.texto}</span><span class="e-corto">{c.elecciones.etiqueta}</span><span class="e-mini">{c.elecciones.mini}</span></p>}
     <BotonCompartir resumen class="compartir-portada" />
   </div>
-  <h1>Conoce a quien te representa</h1>
-  <p class="lema">Transparencia y acceso fácil a datos oficiales del Congreso</p>
+  <h1>{c.marca.lema}</h1>
+  <p class="lema">{c.marca.subtitulo}</p>
   <script is:inline>
     // Móvil: lema y subtítulo en una sola línea cada uno; el tamaño de letra se ajusta al ancho real de la pantalla
     // (depende de la fuente del sistema). Si haría falta una letra demasiado pequeña, se parte en dos líneas equilibradas.
@@ -42,21 +50,18 @@ import DialogoCompartir from '../components/DialogoCompartir.astro';
       if (document.fonts) { document.fonts.ready.then(ajustar); document.fonts.addEventListener('loadingdone', ajustar); }
     })();
   </script>
-  <p class="lead largo">
-    Si trabajan para la ciudadanía, la ciudadanía tiene derecho a conocerlos bien. Aquí están los 350 diputados de la XV Legislatura: quiénes son, qué han estudiado,
-    a qué se han dedicado, lo que cobran, lo que ellos mismos declaran tener y cómo votan. Solo datos oficiales, sin interpretaciones,
-    cada uno con un enlace a su documento original. Para que juzgues con criterio.
-  </p>
+  <p class="lead largo">{t.leadLargo}</p>
   <!-- Móvil: texto corto para que el hemiciclo se vea entero nada más entrar -->
-  <p class="lead corto">Quiénes son los 350 diputados, qué cobran, qué declaran tener y cómo votan. Solo datos oficiales.</p>
+  <p class="lead corto">{t.leadCorto}</p>
 
   <Hemiciclo />
   <DialogoCompartir />
 </Base>
 
 <script>
+  import { prefijo } from '../../i18n/cliente';
   // El mapa por provincias está ahora en Diputados: los enlaces antiguos a /#mapa siguen funcionando
-  if (location.hash === '#mapa') location.replace(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/diputados?vista=mapa`);
+  if (location.hash === '#mapa') location.replace(`${prefijo()}/diputados?vista=mapa`);
 </script>
 
 <style>

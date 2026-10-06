@@ -10,11 +10,18 @@ import { Resvg } from '@resvg/resvg-js';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
+import type { Idioma } from '../i18n';
+import textos from '../i18n/textos/tarjetas';
 
 const require = createRequire(import.meta.url);
-const fuente = (peso: number) => readFileSync(require.resolve(`@fontsource/inter/files/inter-latin-${peso}-normal.woff`));
+const fuente = (subconjunto: string, peso: number) => readFileSync(require.resolve(`@fontsource/inter/files/inter-${subconjunto}-${peso}-normal.woff`));
 let fuentes: { name: string; data: Buffer; weight: 400 | 700 | 800; style: 'normal' }[] | null = null;
-const cargarFuentes = () => (fuentes ??= ([400, 700, 800] as const).map((w) => ({ name: 'Inter', data: fuente(w), weight: w, style: 'normal' as const })));
+/**
+ * Inter en latín básico y, detrás, latín extendido: este solo se usa para los caracteres que no estén en el primero
+ * (por ejemplo, la ŀ catalana o letras de nombres propios); el resto de glifos salen del latín básico.
+ */
+const cargarFuentes = () => (fuentes ??= (['latin', 'latin-ext'] as const).flatMap((sub) =>
+  ([400, 700, 800] as const).map((w) => ({ name: 'Inter', data: fuente(sub, w), weight: w, style: 'normal' as const }))));
 
 export const FORMATOS = { historia: { ancho: 1080, alto: 1920 }, horizontal: { ancho: 1200, alto: 630 } } as const;
 export type Formato = keyof typeof FORMATOS;
@@ -81,9 +88,9 @@ export const cabecera = (escala = 1) =>
     img(LOGO_URI, 103 * escala, 50 * escala),
     h('div', { fontSize: 32 * escala, fontWeight: 800, letterSpacing: -0.5 }, 'Congreso Abierto'));
 
-export const pie = (escala = 1) =>
+export const pie = (escala = 1, lang: Idioma = 'es') =>
   h('div', { flexDirection: escala > 1 ? 'column' : 'row', justifyContent: 'space-between', alignItems: escala > 1 ? 'flex-start' : 'center', gap: 6 * escala, fontSize: 24 * escala, color: C.apagado, borderTop: `${2 * escala}px solid ${C.borde}`, paddingTop: 22 * escala },
-    h('div', {}, 'Datos oficiales del Congreso y del BOE, sin interpretaciones'),
+    h('div', {}, textos[lang].pie),
     h('div', { color: C.acento, fontWeight: 700 }, 'congresoabierto.org'));
 
 /** Lienzo con los márgenes de cada formato. En historias se respeta la zona segura de Instagram (arriba y abajo). */
@@ -113,7 +120,8 @@ export function barraVotos(t: { si: number; no: number; abstencion: number; noVo
 export async function aPng(nodo: Nodo, formato: Formato) {
   const { ancho, alto } = FORMATOS[formato];
   const svg = await satori(nodo as any, { width: ancho, height: alto, fonts: cargarFuentes() });
-  return new Uint8Array(new Resvg(svg, { fitTo: { mode: 'width', value: ancho } }).render().asPng());
+  // satori ya convierte el texto en trazos: resvg no necesita fuentes. Sin cargar las del sistema, cada tarjeta tarda ~5 veces menos.
+  return new Uint8Array(new Resvg(svg, { fitTo: { mode: 'width', value: ancho }, font: { loadSystemFonts: false } }).render().asPng());
 }
 
 export const respuestaPng = (png: Uint8Array) => new Response(png as unknown as BodyInit, { headers: { 'Content-Type': 'image/png' } });

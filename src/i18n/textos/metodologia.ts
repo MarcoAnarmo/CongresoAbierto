@@ -1,0 +1,478 @@
+import { area } from '..';
+
+/**
+ * Página de metodología. Cada sección es HTML con marcadores que se sustituyen con f():
+ * {fecha} fecha de consulta · {pdfs} {conDecl} {ultima} declaraciones · {fuenteRetribuciones} {asignacion} {indemOtras}
+ * {indemMadrid} {cargos} (lista <li>) retribuciones · {votaciones} {error} {colabora} enlaces.
+ * Los nombres oficiales de documentos, registros y normas se dejan en castellano (con una glosa si ayuda).
+ * Los identificadores de las secciones (#propiedades, #retribuciones…) son los mismos en todos los idiomas.
+ */
+const es = {
+  titulo: 'Metodología',
+  descripcion: 'De dónde salen los datos de Congreso Abierto y cómo se presentan, sin interpretaciones.',
+  h1: 'Fuentes y método',
+  indice: 'Índice de la página',
+  enPagina: 'En esta página',
+  /** Aviso en los idiomas distintos del castellano. En castellano queda vacío. */
+  nota: '',
+  secciones: {
+    principio: 'Principio',
+    fuentes: 'Fuentes oficiales',
+    perfil: 'Formación y trayectoria',
+    propiedades: 'Propiedades y viviendas',
+    vehiculos: 'Vehículos',
+    deudas: 'Deudas y préstamos',
+    rentas: 'Rentas, cuentas y acciones',
+    actividades: 'Cargos y actividades',
+    intereses: 'Trabajos anteriores e intereses',
+    revision: 'Cómo se han copiado los datos',
+    retribuciones: 'Retribuciones',
+    votaciones: 'Votaciones',
+    participacion: 'Sus votos en el Pleno',
+    temas: 'Temas de las votaciones',
+    errores: '¿Has visto un error?',
+  },
+  html: {
+    principio: `<p>Aquí solo hay información oficial del Estado, presentada tal y como la publica la institución que la produce. No hacemos interpretaciones ni valoraciones: ordenamos y simplificamos para que cualquiera pueda consultarla y sacar sus propias conclusiones. Si algo no coincide con el documento oficial, prevalece el documento oficial.</p>`,
+    fuentes: `<ul>
+<li><strong>Diputados, grupos y cargos:</strong> buscador y fichas oficiales de <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> (XV Legislatura). Consultados el {fecha}.</li>
+<li><strong>Propiedades y vehículos:</strong> las <em>Declaraciones de Bienes y Rentas</em> que cada diputado presenta ante el Congreso y que este publica en su ficha: {pdfs} documentos de {conDecl} diputados; el más reciente es del {ultima}.</li>
+<li><strong>Rentas, cuentas, acciones y sociedades:</strong> páginas 1 a 3 de esas mismas declaraciones de bienes.</li>
+<li><strong>Cargos, actividades, trabajos anteriores y donaciones:</strong> el <em>Registro de Intereses - Actividades</em> y las <em>Declaraciones de Intereses Económicos</em> que el Congreso publica en la ficha de cada diputado.</li>
+<li><strong>Votaciones:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos de votaciones</a> del Congreso, con el texto oficial de cada expediente.</li>
+<li><strong>Normas:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decretos-leyes y acuerdos de convalidación o derogación).</li>
+<li><strong>Retribuciones:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a>, importes de 2026.</li>
+</ul>
+<p><strong>Grupo y candidatura.</strong> El Congreso registra dos datos distintos: la candidatura con la que cada diputado fue elegido en las elecciones y el grupo parlamentario al que pertenece en la fecha de consulta. Pueden no coincidir: quien deja su grupo pasa al Grupo Mixto aunque fuera elegido en otra lista. El hemiciclo ordena por ese grupo parlamentario; cuando la candidatura es distinta, se indica entre paréntesis.</p>`,
+    perfil: `<p>Salen de la <em>Ficha personal</em> de cada diputado en <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, un texto que redacta el propio diputado. Se copia literalmente, línea a línea, y solo se separa en dos bloques:</p>
+<ul>
+<li><strong>Formación:</strong> las líneas que hablan de títulos o estudios (licenciado, grado, máster, doctor, diplomado, ingeniero, curso, programa…). El resto es <strong>trayectoria</strong>. Una frase de empleo (profesor, investigador, director…) no cuenta como estudio aunque nombre una universidad.</li>
+<li><strong>Universidad pública o privada:</strong> solo cuando la línea nombra el centro. El tipo es el que figura en el <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades">Registro de Universidades, Centros y Títulos (RUCT)</a> del Ministerio. Se reconocen también otras formas de nombrarla (en otras lenguas oficiales, siglas como UCM o UNED, y centros que forman parte de una universidad, como ICADE, ESADE o IESE). La lista está en <code>data/manual/universidades.json</code>.</li>
+<li>Si nombra un centro que no está en el RUCT (por ejemplo, una universidad extranjera), se indica así, sin clasificarlo. Si no nombra el centro, se dice que la ficha no lo indica: no se deduce nada.</li>
+<li>No se recogen datos familiares (estado civil, hijos) aunque aparezcan en la ficha.</li>
+<li><strong>Línea de tiempo:</strong> las legislaturas en las que ha sido diputado (con sus fechas oficiales), sus cargos en la Cámara en la fecha de consulta, con la fecha de inicio, las líneas de su trayectoria que citan un año y sus declaraciones de bienes y de intereses económicos de esta legislatura, cada una con su PDF.</li>
+</ul>`,
+    propiedades: `<p>Se usan las tablas de «Bienes inmuebles» de cada declaración, copiadas literalmente. Cada ficha enlaza a sus PDF originales.</p>
+<ul>
+<li><strong>Propiedades:</strong> todos los inmuebles urbanos y rústicos que el diputado declara a su nombre, en propiedad total o parcial: viviendas, garajes, trasteros, locales, naves, solares, fincas… Cada línea de la tabla oficial cuenta como una propiedad; si la línea indica un número de unidades («16 viviendas», «8 fincas rústicas», «piso y dos plazas de garaje»), se cuentan esas unidades.</li>
+<li><strong>Viviendas:</strong> de esas propiedades, las que el propio diputado describe como vivienda, piso, casa, chalet, apartamento, ático, dúplex, estudio, adosado, unifamiliar, bungaló o residencial, también en suelo rústico. No cuentan como vivienda los que solo se describen como garaje, plaza de aparcamiento, cochera, trastero, local, oficina, almacén, nave, solar, parcela, terreno o finca rústica.</li>
+<li>Se muestran el porcentaje y el tipo de derecho (pleno dominio, nuda propiedad, ganancial…) tal y como los escribe el diputado.</li>
+<li>Los inmuebles de sociedades en las que participa el diputado se listan aparte en su ficha y no se suman.</li>
+<li>Si la última declaración solo comunica un cambio (por ejemplo, una compra), se muestra junto a la declaración completa anterior. Un bien solo deja de contarse cuando una declaración oficial posterior comunica su venta o baja; la ficha indica cuál.</li>
+<li>Las declaraciones reflejan el patrimonio en la fecha en que se presentaron.</li>
+</ul>`,
+    vehiculos: `<p>Se copian de la tabla «Vehículos, embarcaciones y aeronaves». No se publican matrículas, porque el propio formulario oficial pide no indicarlas.</p>`,
+    deudas: `<p>Se copian del apartado «Deudas y obligaciones patrimoniales» (página 4) de las mismas declaraciones de bienes que se usan para las propiedades.</p>
+<ul>
+<li>Cada préstamo se publica con su descripción y acreedor, fecha de concesión, importe concedido y saldo pendiente, <strong>tal y como los escribe el diputado</strong> (formato, erratas y todo).</li>
+<li>El saldo pendiente total es la suma de la tabla de préstamos de su declaración más reciente que rellena el apartado. Si algún importe no se puede leer como número sin interpretarlo (un dígito ilegible en el escaneo, un formato imposible), no se suma y se indica «al menos».</li>
+<li>No se suman préstamos de declaraciones distintas, porque el mismo préstamo puede repetirse. Las anteriores que siguen vigentes se muestran aparte.</li>
+<li>«Otras deudas y obligaciones» (pensiones, avales, financiaciones…) y las observaciones del diputado sobre sus deudas se copian literalmente y no se suman.</li>
+<li>El nombre de personas particulares que no son el diputado (por ejemplo, hijos) se sustituye por «[nombre omitido]».</li>
+<li>Si una lectura no se ha podido confirmar al 100 % (una cifra tapada o cortada en el escaneo, un separador casi invisible) o el original trae un dato incoherente (una fecha imposible o posterior a la declaración), la ficha lo indica con un aviso de <strong>lectura no confirmada</strong>, un enlace al PDF y otro para avisarnos si alguien puede confirmarlo.</li>
+<li>El saldo es el de la fecha que indica el formulario oficial: a 31 de diciembre del año anterior a la declaración o en el mes anterior a presentarla.</li>
+</ul>`,
+    rentas: `<p>Se copian de las páginas 1 a 3 de las declaraciones de bienes, con el texto y el importe <strong>tal y como los escribe el diputado</strong>:</p>
+<ul>
+<li><strong>Rentas:</strong> las que percibió en el año anterior a la declaración (sueldos, honorarios, dividendos, intereses, alquileres, ventas y otras), y la cuota de IRPF que pagó ese año. El sueldo del Congreso no se declara aquí porque ya lo publica la Cámara (ver <a href="#retribuciones">Retribuciones</a>); por eso muchas tablas aparecen vacías aunque el diputado declare el IRPF.</li>
+<li><strong>Cuentas y depósitos:</strong> el saldo de todos sus depósitos en la fecha que indica el formulario. Los números de cuenta no se publican.</li>
+<li><strong>Acciones, fondos y sociedades:</strong> deuda pública, acciones y participaciones, sociedades participadas en más de un 5 % por sus sociedades, y otros bienes o derechos (seguros de vida, planes de pensiones…), con el valor que declara.</li>
+<li>Cada tabla se toma de la declaración más reciente que la rellena, y la ficha indica su fecha. Las modificaciones que solo comunican otros cambios (por ejemplo, un vehículo) no la sustituyen.</li>
+<li>Las cifras grandes de la ficha son la suma de cada tabla. Si un importe no se puede leer como número sin interpretarlo (formatos como «47.268.27» o un texto en lugar de una cifra), no se suma y se indica «al menos». No se calculan medias.</li>
+<li>El nombre de personas particulares que no son el diputado se sustituye por «[nombre omitido]».</li>
+</ul>`,
+    actividades: `<p>Del <em>Registro de Intereses - Actividades</em>: cargos públicos, actividades públicas a las que ha renunciado, pensiones, docencia, cargos en partidos, colaboraciones, actividades privadas autorizadas y otras. Es lo que cada diputado declara y el Pleno del Congreso considera compatible con el escaño. El texto se extrae automáticamente del PDF oficial (tiene capa de texto) y se publica literalmente, con la fecha del acuerdo del Pleno. Si el Pleno aún no se ha pronunciado, el Congreso no publica el contenido y la ficha lo indica.</p>`,
+    intereses: `<p>De las <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales): actividades de los cinco años anteriores al escaño que le dieron ingresos o pueden condicionar su actividad política (período, empleador, sector y descripción), donaciones y obsequios recibidos, fundaciones y asociaciones a las que contribuye y otros intereses. Se toma cada apartado de la declaración más reciente que lo rellena. El nombre de un particular (por ejemplo, un familiar como benefactor) se sustituye por «[nombre omitido]».</p>`,
+    revision: `<p>Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila (las deudas, con dos transcripciones independientes cuyas diferencias se resuelven mirando el PDF), incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura no confirmada llevan un aviso (*) y un enlace al PDF para comprobarlo. Las rentas, cuentas, acciones y declaraciones de intereses se han transcrito del PDF y comparado con una lectura automática (OCR) independiente: cada importe o palabra que no coincide se ha vuelto a mirar en el original ampliado.</p>`,
+    retribuciones: `<p>Se muestran los importes mensuales oficiales de 2026 que corresponden a cada diputado durante su mandato, según su circunscripción y sus cargos:</p>
+<ul>
+<li>Asignación constitucional, igual para todos: {asignacion}.</li>
+<li>Indemnización por gastos, exenta de IRPF: {indemOtras} (fuera de Madrid) o {indemMadrid} (electos por Madrid).</li>
+<li>Complementos por cargo, no acumulables dentro de cada bloque (Mesa y Junta de Portavoces; Comisiones):<ul>{cargos}</ul></li>
+</ul>
+<p>Los cargos salen de la ficha oficial de cada diputado. No se incluyen el transporte (lo paga el Congreso directamente) ni los sueldos de quienes además son miembros del Gobierno, que se rigen por los Presupuestos Generales del Estado.</p>`,
+    votaciones: `<p>Cada votación muestra el texto oficial del expediente, el tipo de votación, el resultado, el voto de cada grupo (con el grupo de cada diputado en la fecha de la votación) y el voto de cada diputado según los datos abiertos del Congreso. El hemiciclo es un gráfico ordenado por grupos parlamentarios; no reproduce el plano real de asientos. Las votaciones por llamamiento (en voz alta) tardan más en publicarse en datos abiertos; se añaden cuando aparecen. Con las Cortes disueltas, los decretos-leyes los convalida o deroga la Diputación Permanente (art. 78 de la Constitución). Cuando el Congreso solo publica los totales de una votación, sin el voto de cada diputado (por ejemplo, en una votación secreta), la web muestra solo esos totales y lo indica. <a href="{votaciones}">Ver votaciones</a>.</p>`,
+    participacion: `<p>Para cada diputado se cuentan todas las votaciones del Pleno de la XV Legislatura con voto nominal publicado en las que tenía escaño: cuántas veces votó sí, no o abstención y cuántas no votó (por ausencia o porque no emitió voto). No se incluyen las votaciones secretas, porque no hay voto de cada diputado.</p>
+<p><strong>Voto distinto de su grupo:</strong> se cuenta cuando votó sí, no o abstención y la mayoría de su grupo en esa votación (con el grupo que publica el Congreso para esa fecha) votó otra cosa. No cuenta «no vota», ni las votaciones en las que su grupo empató, ni el Grupo Mixto, donde conviven varios partidos.</p>`,
+    temas: `<p>La página de votaciones recoge todas las votaciones del Pleno de la XV Legislatura publicadas en datos abiertos (desde septiembre de 2023). Las votaciones por llamamiento, como las investiduras, no tienen el voto de cada diputado en datos abiertos y no aparecen. Las <strong>votaciones clave</strong> llevan además documentos oficiales (BOE, BOCG, Diario de Sesiones) y extractos literales del texto, revisados a mano; las demás muestran el título oficial, los totales, el voto por grupo y el JSON y el PDF oficiales.</p>
+<p>El Congreso no clasifica sus votaciones por temas. Para poder filtrarlas, cada votación recibe uno o varios temas según las palabras que aparecen en su título oficial (por ejemplo, «alquiler» o «vivienda» → Vivienda). Es una ayuda para buscar, no una valoración: la lista completa de palabras está en <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> y cualquiera puede proponer cambios. Si una votación no encaja en ningún tema, aparece en «Otros».</p>
+<p>El resultado se calcula con los totales oficiales: mayoría simple (más síes que noes), salvo en la votación de conjunto de una ley orgánica, que necesita 176 votos a favor (art. 81 de la Constitución). En los decretos-leyes, «convalidado» o «derogado».</p>`,
+    errores: `<p><a href="{error}" rel="noopener">Avisa del error en GitHub</a> con el diputado, el dato y el enlace al documento oficial (con la página). Solo se aceptan correcciones respaldadas por un documento oficial.</p>
+<p>El proyecto es público y cualquiera puede proponer cambios, sepa o no programar. En <a href="{colabora}">Colabora</a> se explica cómo.</p>`,
+  },
+};
+
+export default area(es, {
+  ca: {
+    titulo: 'Metodologia',
+    descripcion: 'D’on surten les dades de Congreso Abierto i com es presenten, sense interpretacions.',
+    h1: 'Fonts i mètode',
+    indice: 'Índex de la pàgina',
+    enPagina: 'En aquesta pàgina',
+    nota: 'Els documents i les dades oficials els publica el Congrés en castellà, i aquí es mostren tal com es publiquen.',
+    secciones: {
+      principio: 'Principi',
+      fuentes: 'Fonts oficials',
+      perfil: 'Formació i trajectòria',
+      propiedades: 'Propietats i habitatges',
+      vehiculos: 'Vehicles',
+      deudas: 'Deutes i préstecs',
+      rentas: 'Rendes, comptes i accions',
+      actividades: 'Càrrecs i activitats',
+      intereses: 'Feines anteriors i interessos',
+      revision: 'Com s’han copiat les dades',
+      retribuciones: 'Retribucions',
+      votaciones: 'Votacions',
+      participacion: 'Els seus vots al Ple',
+      temas: 'Temes de les votacions',
+      errores: 'Has vist un error?',
+    },
+    html: {
+      principio: `<p>Aquí només hi ha informació oficial de l’Estat, presentada tal com la publica la institució que la produeix. No fem interpretacions ni valoracions: ordenem i simplifiquem perquè qualsevol persona la pugui consultar i en pugui treure les seves pròpies conclusions. Si alguna cosa no coincideix amb el document oficial, preval el document oficial.</p>`,
+      fuentes: `<ul>
+<li><strong>Diputats, grups i càrrecs:</strong> cercador i fitxes oficials de <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> (XV legislatura). Data de consulta: {fecha}.</li>
+<li><strong>Propietats i vehicles:</strong> les <em>Declaraciones de Bienes y Rentas</em> (declaracions de béns i rendes) que cada diputat presenta davant el Congrés i que aquest publica a la seva fitxa: {pdfs} documents de {conDecl} diputats; el més recent és de data {ultima}.</li>
+<li><strong>Rendes, comptes, accions i societats:</strong> pàgines 1 a 3 d’aquestes mateixes declaracions de béns.</li>
+<li><strong>Càrrecs, activitats, feines anteriors i donacions:</strong> el <em>Registro de Intereses - Actividades</em> (registre d’interessos – activitats) i les <em>Declaraciones de Intereses Económicos</em> (declaracions d’interessos econòmics) que el Congrés publica a la fitxa de cada diputat.</li>
+<li><strong>Votacions:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">dades obertes de votacions</a> del Congrés, amb el text oficial de cada expedient.</li>
+<li><strong>Normes:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decrets llei i acords de convalidació o derogació).</li>
+<li><strong>Retribucions:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a>, imports del 2026.</li>
+</ul>
+<p><strong>Grup i candidatura.</strong> El Congrés registra dues dades diferents: la candidatura amb què cada diputat va ser elegit a les eleccions i el grup parlamentari al qual pertany en la data de consulta. Poden no coincidir: qui deixa el seu grup passa al Grupo Mixto encara que hagués estat elegit en una altra llista. L’hemicicle ordena per aquest grup parlamentari; quan la candidatura és diferent, s’indica entre parèntesis.</p>`,
+      perfil: `<p>Surten de la <em>Ficha personal</em> (fitxa personal) de cada diputat a <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, un text que redacta el mateix diputat. Es copia literalment, línia a línia, i només se separa en dos blocs:</p>
+<ul>
+<li><strong>Formació:</strong> les línies que parlen de títols o estudis (llicenciat, grau, màster, doctor, diplomat, enginyer, curs, programa…). La resta és <strong>trajectòria</strong>. Una frase de feina (professor, investigador, director…) no compta com a estudi encara que esmenti una universitat.</li>
+<li><strong>Universitat pública o privada:</strong> només quan la línia esmenta el centre. El tipus és el que consta al <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades">Registro de Universidades, Centros y Títulos (RUCT)</a> del Ministeri. També es reconeixen altres maneres d’anomenar-la (en altres llengües oficials, sigles com UCM o UNED, i centres que formen part d’una universitat, com ICADE, ESADE o IESE). La llista és a <code>data/manual/universidades.json</code>.</li>
+<li>Si esmenta un centre que no és al RUCT (per exemple, una universitat estrangera), s’indica així, sense classificar-lo. Si no esmenta el centre, es diu que la fitxa no ho indica: no se’n dedueix res.</li>
+<li>No es recullen dades familiars (estat civil, fills) encara que apareguin a la fitxa.</li>
+<li><strong>Línia de temps:</strong> les legislatures en què ha estat diputat (amb les dates oficials), els seus càrrecs a la Cambra en la data de consulta, amb la data d’inici, les línies de la seva trajectòria que citen un any i les seves declaracions de béns i d’interessos econòmics d’aquesta legislatura, cadascuna amb el seu PDF.</li>
+</ul>`,
+      propiedades: `<p>S’utilitzen les taules de «Bienes inmuebles» (béns immobles) de cada declaració, copiades literalment. Cada fitxa enllaça als seus PDF originals.</p>
+<ul>
+<li><strong>Propietats:</strong> tots els immobles urbans i rústics que el diputat declara al seu nom, en propietat total o parcial: habitatges, garatges, trasters, locals, naus, solars, finques… Cada línia de la taula oficial compta com una propietat; si la línia indica un nombre d’unitats («16 viviendas», «8 fincas rústicas», «piso y dos plazas de garaje»), es compten aquestes unitats.</li>
+<li><strong>Habitatges:</strong> d’aquestes propietats, les que el mateix diputat descriu com a habitatge, pis, casa, xalet, apartament, àtic, dúplex, estudi, adossat, unifamiliar, bungalou o residencial, també en sòl rústic. No compten com a habitatge les que només es descriuen com a garatge, plaça d’aparcament, cotxera, traster, local, oficina, magatzem, nau, solar, parcel·la, terreny o finca rústica.</li>
+<li>Es mostren el percentatge i el tipus de dret (pleno dominio, nuda propiedad, ganancial…) tal com els escriu el diputat.</li>
+<li>Els immobles de societats en què participa el diputat es llisten a part a la seva fitxa i no se sumen.</li>
+<li>Si l’última declaració només comunica un canvi (per exemple, una compra), es mostra al costat de la declaració completa anterior. Un bé només deixa de comptar-se quan una declaració oficial posterior en comunica la venda o la baixa; la fitxa indica quina.</li>
+<li>Les declaracions reflecteixen el patrimoni en la data en què es van presentar.</li>
+</ul>`,
+      vehiculos: `<p>Es copien de la taula «Vehículos, embarcaciones y aeronaves» (vehicles, embarcacions i aeronaus). No es publiquen matrícules, perquè el mateix formulari oficial demana que no s’indiquin.</p>`,
+      deudas: `<p>Es copien de l’apartat «Deudas y obligaciones patrimoniales» (deutes i obligacions patrimonials, pàgina 4) de les mateixes declaracions de béns que s’utilitzen per a les propietats.</p>
+<ul>
+<li>Cada préstec es publica amb la descripció i el creditor, la data de concessió, l’import concedit i el saldo pendent, <strong>tal com els escriu el diputat</strong> (format, errates i tot).</li>
+<li>El saldo pendent total és la suma de la taula de préstecs de la seva declaració més recent que emplena l’apartat. Si algun import no es pot llegir com a número sense interpretar-lo (un dígit il·legible a l’escaneig, un format impossible), no se suma i s’indica «almenys».</li>
+<li>No se sumen préstecs de declaracions diferents, perquè el mateix préstec es pot repetir. Els anteriors que continuen vigents es mostren a part.</li>
+<li>«Otras deudas y obligaciones» (altres deutes i obligacions: pensions, avals, finançaments…) i les observacions del diputat sobre els seus deutes es copien literalment i no se sumen.</li>
+<li>El nom de persones particulars que no són el diputat (per exemple, fills) se substitueix per «[nombre omitido]» (nom omès).</li>
+<li>Si una lectura no s’ha pogut confirmar al 100 % (una xifra tapada o tallada a l’escaneig, un separador gairebé invisible) o l’original conté una dada incoherent (una data impossible o posterior a la declaració), la fitxa ho indica amb un avís de <strong>lectura no confirmada</strong>, un enllaç al PDF i un altre perquè ens avisis si algú ho pot confirmar.</li>
+<li>El saldo és el de la data que indica el formulari oficial: a 31 de desembre de l’any anterior a la declaració o el mes anterior a presentar-la.</li>
+</ul>`,
+      rentas: `<p>Es copien de les pàgines 1 a 3 de les declaracions de béns, amb el text i l’import <strong>tal com els escriu el diputat</strong>:</p>
+<ul>
+<li><strong>Rendes:</strong> les que va percebre l’any anterior a la declaració (sous, honoraris, dividends, interessos, lloguers, vendes i altres) i la quota d’IRPF que va pagar aquell any. El sou del Congrés no es declara aquí perquè ja el publica la Cambra (consulta <a href="#retribuciones">Retribucions</a>); per això moltes taules apareixen buides encara que el diputat declari l’IRPF.</li>
+<li><strong>Comptes i dipòsits:</strong> el saldo de tots els seus dipòsits en la data que indica el formulari. Els números de compte no es publiquen.</li>
+<li><strong>Accions, fons i societats:</strong> deute públic, accions i participacions, societats participades en més d’un 5 % per les seves societats, i altres béns o drets (assegurances de vida, plans de pensions…), amb el valor que declara.</li>
+<li>Cada taula es pren de la declaració més recent que l’emplena, i la fitxa n’indica la data. Les modificacions que només comuniquen altres canvis (per exemple, un vehicle) no la substitueixen.</li>
+<li>Les xifres grans de la fitxa són la suma de cada taula. Si un import no es pot llegir com a número sense interpretar-lo (formats com «47.268.27» o un text en lloc d’una xifra), no se suma i s’indica «almenys». No es calculen mitjanes.</li>
+<li>El nom de persones particulars que no són el diputat se substitueix per «[nombre omitido]».</li>
+</ul>`,
+      actividades: `<p>Del <em>Registro de Intereses - Actividades</em>: càrrecs públics, activitats públiques a què ha renunciat, pensions, docència, càrrecs en partits, col·laboracions, activitats privades autoritzades i altres. És el que cada diputat declara i el Ple del Congrés considera compatible amb l’escó. El text s’extreu automàticament del PDF oficial (té capa de text) i es publica literalment, amb la data de l’acord del Ple. Si el Ple encara no s’hi ha pronunciat, el Congrés no en publica el contingut i la fitxa ho indica.</p>`,
+      intereses: `<p>De les <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales): activitats dels cinc anys anteriors a l’escó que li van donar ingressos o que poden condicionar la seva activitat política (període, ocupador, sector i descripció), donacions i obsequis rebuts, fundacions i associacions a què contribueix i altres interessos. Cada apartat es pren de la declaració més recent que l’emplena. El nom d’un particular (per exemple, un familiar com a benefactor) se substitueix per «[nombre omitido]».</p>`,
+      revision: `<p>Les declaracions es publiquen com a PDF escanejats, sense dades estructurades. Cadascuna s’ha copiat a mà a partir del PDF i després s’ha revisat una segona vegada, fila a fila (els deutes, amb dues transcripcions independents les diferències de les quals es resolen mirant el PDF), incloses les observacions de la pàgina 4 i la seva possible continuació. Les fitxes amb alguna lectura no confirmada porten un avís (*) i un enllaç al PDF per comprovar-ho. Les rendes, comptes, accions i declaracions d’interessos s’han transcrit del PDF i s’han comparat amb una lectura automàtica (OCR) independent: cada import o paraula que no coincideix s’ha tornat a mirar a l’original ampliat.</p>`,
+      retribuciones: `<p>Es mostren els imports mensuals oficials del 2026 que corresponen a cada diputat durant el seu mandat, segons la seva circumscripció i els seus càrrecs:</p>
+<ul>
+<li>Assignació constitucional, igual per a tothom: {asignacion}.</li>
+<li>Indemnització per despeses, exempta d’IRPF: {indemOtras} (fora de Madrid) o {indemMadrid} (elegits per Madrid).</li>
+<li>Complements per càrrec, no acumulables dins de cada bloc (Mesa i Junta de Portaveus; comissions):<ul>{cargos}</ul></li>
+</ul>
+<p>Els càrrecs surten de la fitxa oficial de cada diputat. No s’hi inclouen el transport (el paga directament el Congrés) ni els sous dels qui, a més, són membres del Govern, que es regeixen pels Presupuestos Generales del Estado.</p>`,
+      votaciones: `<p>Cada votació mostra el text oficial de l’expedient, el tipus de votació, el resultat, el vot de cada grup (amb el grup de cada diputat en la data de la votació) i el vot de cada diputat segons les dades obertes del Congrés. L’hemicicle és un gràfic ordenat per grups parlamentaris; no reprodueix el plànol real dels escons. Les votacions per crida (en veu alta) triguen més a publicar-se en dades obertes; s’afegeixen quan apareixen. Amb les Corts dissoltes, els decrets llei els convalida o els deroga la Diputació Permanent (art. 78 de la Constitució). Quan el Congrés només publica els totals d’una votació, sense el vot de cada diputat (per exemple, en una votació secreta), el web mostra només aquests totals i ho indica. <a href="{votaciones}">Mostra les votacions</a>.</p>`,
+      participacion: `<p>Per a cada diputat es compten totes les votacions del Ple de la XV legislatura amb vot nominal publicat en què tenia escó: quantes vegades va votar sí, no o abstenció i quantes no va votar (per absència o perquè no va emetre el vot). No s’hi inclouen les votacions secretes, perquè no hi consta el vot de cada diputat.</p>
+<p><strong>Vot diferent del seu grup:</strong> es compta quan va votar sí, no o abstenció i la majoria del seu grup en aquella votació (amb el grup que publica el Congrés per a aquella data) va votar una altra cosa. No compta «no vota», ni les votacions en què el seu grup va empatar, ni el Grupo Mixto, on conviuen diversos partits.</p>`,
+      temas: `<p>La pàgina de votacions recull totes les votacions del Ple de la XV legislatura publicades en dades obertes (des del setembre del 2023). Les votacions per crida, com les investidures, no tenen el vot de cada diputat en dades obertes i no hi apareixen. Les <strong>votacions clau</strong> inclouen, a més, documents oficials (BOE, BOCG, Diario de Sesiones) i extractes literals del text, revisats a mà; les altres mostren el títol oficial, els totals, el vot per grup i el JSON i el PDF oficials.</p>
+<p>El Congrés no classifica les seves votacions per temes. Per poder-les filtrar, cada votació rep un o diversos temes segons les paraules que apareixen en el seu títol oficial (per exemple, «alquiler» o «vivienda» → Habitatge). És una ajuda per cercar, no una valoració: la llista completa de paraules és a <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> i qualsevol persona hi pot proposar canvis. Si una votació no encaixa en cap tema, apareix a «Altres».</p>
+<p>El resultat es calcula amb els totals oficials: majoria simple (més sís que nos), excepte en la votació de conjunt d’una llei orgànica, que necessita 176 vots a favor (art. 81 de la Constitució). En els decrets llei, «convalidat» o «derogat».</p>`,
+      errores: `<p><a href="{error}" rel="noopener">Avisa de l’error a GitHub</a> amb el diputat, la dada i l’enllaç al document oficial (amb la pàgina). Només s’accepten correccions avalades per un document oficial.</p>
+<p>El projecte és públic i qualsevol persona hi pot proposar canvis, en sàpiga o no de programar. A <a href="{colabora}">Col·labora</a> s’explica com.</p>`,
+    },
+  },
+  eu: {
+    titulo: 'Metodologia',
+    descripcion: 'Nondik datozen Congreso Abiertoko datuak eta nola aurkezten diren, interpretaziorik gabe.',
+    h1: 'Iturriak eta metodoa',
+    indice: 'Orriaren aurkibidea',
+    enPagina: 'Orri honetan',
+    nota: 'Dokumentu eta datu ofizialak Kongresuak gaztelaniaz argitaratzen ditu, eta hemen argitaratzen diren bezala erakusten dira.',
+    secciones: {
+      principio: 'Printzipioa',
+      fuentes: 'Iturri ofizialak',
+      perfil: 'Prestakuntza eta ibilbidea',
+      propiedades: 'Jabetzak eta etxebizitzak',
+      vehiculos: 'Ibilgailuak',
+      deudas: 'Zorrak eta maileguak',
+      rentas: 'Errentak, kontuak eta akzioak',
+      actividades: 'Karguak eta jarduerak',
+      intereses: 'Aurreko lanak eta interesak',
+      revision: 'Nola kopiatu diren datuak',
+      retribuciones: 'Ordainsariak',
+      votaciones: 'Bozketak',
+      participacion: 'Haren botoak Osoko Bilkuran',
+      temas: 'Bozketen gaiak',
+      errores: 'Akatsen bat ikusi duzu?',
+    },
+    html: {
+      principio: `<p>Hemen Estatuaren informazio ofiziala baino ez dago, hura sortzen duen erakundeak argitaratzen duen bezala aurkeztua. Ez dugu interpretaziorik ez baloraziorik egiten: ordenatu eta sinplifikatu egiten dugu, edonork kontsulta dezan eta bere ondorioak atera ditzan. Zerbait dokumentu ofizialarekin bat ez badator, dokumentu ofizialak du lehentasuna.</p>`,
+      fuentes: `<ul>
+<li><strong>Diputatuak, taldeak eta karguak:</strong> <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> webguneko bilatzailea eta fitxa ofizialak (XV. legegintzaldia). Kontsulta-data: {fecha}.</li>
+<li><strong>Jabetzak eta ibilgailuak:</strong> diputatu bakoitzak Kongresuan aurkezten dituen eta Kongresuak haren fitxan argitaratzen dituen <em>Declaraciones de Bienes y Rentas</em> (ondasun- eta errenta-aitorpenak): {conDecl} diputaturen {pdfs} dokumentu; berrienaren data: {ultima}.</li>
+<li><strong>Errentak, kontuak, akzioak eta sozietateak:</strong> ondasun-aitorpen horien 1. orritik 3.era bitartekoak.</li>
+<li><strong>Karguak, jarduerak, aurreko lanak eta dohaintzak:</strong> Kongresuak diputatu bakoitzaren fitxan argitaratzen dituen <em>Registro de Intereses - Actividades</em> (interesen erregistroa – jarduerak) eta <em>Declaraciones de Intereses Económicos</em> (interes ekonomikoen aitorpenak).</li>
+<li><strong>Bozketak:</strong> Kongresuaren <a href="https://www.congreso.es/es/opendata/votaciones">bozketen datu irekiak</a>, espediente bakoitzaren testu ofizialarekin.</li>
+<li><strong>Arauak:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (lege-dekretuak eta baliozkotze- edo indargabetze-erabakiak).</li>
+<li><strong>Ordainsariak:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a>, 2026ko zenbatekoak.</li>
+</ul>
+<p><strong>Taldea eta hautagaitza.</strong> Kongresuak bi datu desberdin erregistratzen ditu: diputatu bakoitza hauteskundeetan zein hautagaitzarekin hautatu zuten, eta kontsulta-datan zein talde parlamentariotakoa den. Baliteke bat ez etortzea: bere taldea uzten duena Grupo Mixtora pasatzen da, beste zerrenda batean hautatua izan bazen ere. Hemizikloak talde parlamentario horren arabera ordenatzen ditu diputatuak; hautagaitza desberdina denean, parentesi artean adierazten da.</p>`,
+      perfil: `<p>Diputatu bakoitzak <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> webgunean duen <em>Ficha personal</em> delakotik (fitxa pertsonala) ateratzen dira; diputatuak berak idazten duen testua da. Hitzez hitz kopiatzen da, lerroz lerro, eta bi multzotan bereizten da soilik:</p>
+<ul>
+<li><strong>Prestakuntza:</strong> tituluez edo ikasketez ari diren lerroak (lizentziatua, gradua, masterra, doktorea, diplomatua, ingeniaria, ikastaroa, programa…). Gainerakoa <strong>ibilbidea</strong> da. Lan bati buruzko esaldi bat (irakaslea, ikertzailea, zuzendaria…) ez da ikasketatzat hartzen, unibertsitate bat aipatu arren.</li>
+<li><strong>Unibertsitate publikoa edo pribatua:</strong> lerroak zentroa aipatzen duenean bakarrik. Mota Ministerioaren <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades">Registro de Universidades, Centros y Títulos (RUCT)</a> erregistroan agertzen dena da. Unibertsitatea izendatzeko beste modu batzuk ere ezagutzen dira (beste hizkuntza ofizial batzuetan, UCM edo UNED bezalako siglak, eta unibertsitate baten parte diren zentroak, hala nola ICADE, ESADE edo IESE). Zerrenda <code>data/manual/universidades.json</code> fitxategian dago.</li>
+<li>RUCTen ez dagoen zentro bat aipatzen badu (adibidez, atzerriko unibertsitate bat), hala adierazten da, sailkatu gabe. Zentroa aipatzen ez badu, fitxak ez duela adierazten esaten da: ez da ezer ondorioztatzen.</li>
+<li>Ez dira familia-datuak jasotzen (egoera zibila, seme-alabak), fitxan agertu arren.</li>
+<li><strong>Denbora-lerroa:</strong> diputatu izan den legegintzaldiak (beren data ofizialekin), Ganberan kontsulta-datan dituen karguak, hasiera-datarekin, urte bat aipatzen duten ibilbideko lerroak, eta legegintzaldi honetako ondasun-aitorpenak eta interes ekonomikoen aitorpenak, bakoitza bere PDFarekin.</li>
+</ul>`,
+      propiedades: `<p>Aitorpen bakoitzeko «Bienes inmuebles» (ondasun higiezinak) taulak erabiltzen dira, hitzez hitz kopiatuta. Fitxa bakoitzak jatorrizko PDFetarako estekak ditu.</p>
+<ul>
+<li><strong>Jabetzak:</strong> diputatuak bere izenean aitortzen dituen hiriko eta landako higiezin guztiak, jabetza osoan edo partzialean: etxebizitzak, garajeak, trastelekuak, lokalak, pabiloiak, orubeak, finkak… Taula ofizialeko lerro bakoitza jabetza bat da; lerroak unitate kopuru bat adierazten badu («16 viviendas», «8 fincas rústicas», «piso y dos plazas de garaje»), unitate horiek zenbatzen dira.</li>
+<li><strong>Etxebizitzak:</strong> jabetza horietatik, diputatuak berak etxebizitza, pisu, etxe, txalet, apartamentu, attiko, duplex, estudio, etxe atxiki, familia bakarreko etxe, bungalow edo bizitegi gisa deskribatzen dituenak, baita landa-lurzoruan daudenak ere. Ez dira etxebizitzatzat hartzen garaje, aparkaleku, kotxetegi, trasteleku, lokal, bulego, biltegi, pabiloi, orube, partzela, lursail edo landa-finka gisa soilik deskribatzen direnak.</li>
+<li>Ehunekoa eta eskubide mota (pleno dominio, nuda propiedad, ganancial…) diputatuak idazten dituen bezala erakusten dira.</li>
+<li>Diputatuak parte hartzen duen sozietateen higiezinak aparte zerrendatzen dira haren fitxan, eta ez dira batzen.</li>
+<li>Azken aitorpenak aldaketa bat baino ez badu jakinarazten (adibidez, erosketa bat), aurreko aitorpen osoarekin batera erakusten da. Ondasun bat ez da zenbatzeari uzten ondorengo aitorpen ofizial batek haren salmenta edo baja jakinarazten duen arte; fitxak zein den adierazten du.</li>
+<li>Aitorpenek aurkeztu ziren egunean zegoen ondarea islatzen dute.</li>
+</ul>`,
+      vehiculos: `<p>«Vehículos, embarcaciones y aeronaves» (ibilgailuak, ontziak eta aireontziak) taulatik kopiatzen dira. Ez dira matrikulak argitaratzen, inprimaki ofizialak berak ez adierazteko eskatzen duelako.</p>`,
+      deudas: `<p>Jabetzetarako erabiltzen diren ondasun-aitorpen horietako «Deudas y obligaciones patrimoniales» (zorrak eta ondare-betebeharrak) ataletik kopiatzen dira (4. orria).</p>
+<ul>
+<li>Mailegu bakoitza bere deskribapenarekin eta hartzekodunarekin, emate-datarekin, emandako zenbatekoarekin eta ordaintzeko dagoen saldoarekin argitaratzen da, <strong>diputatuak idazten dituen bezala</strong> (formatua, akatsak eta guzti).</li>
+<li>Ordaintzeko dagoen saldo osoa atala betetzen duen aitorpen berrienaren mailegu-taularen batura da. Zenbatekoren bat ezin bada zenbaki gisa irakurri interpretatu gabe (eskaneatzean irakurtezina den digitu bat, formatu ezinezko bat), ez da batzen eta «gutxienez» adierazten da.</li>
+<li>Ez dira aitorpen desberdinetako maileguak batzen, mailegu bera errepika daitekeelako. Indarrean jarraitzen duten aurrekoak aparte erakusten dira.</li>
+<li>«Otras deudas y obligaciones» (beste zor eta betebehar batzuk: pentsioak, abalak, finantzaketak…) eta diputatuak bere zorrei buruz egindako oharrak hitzez hitz kopiatzen dira, eta ez dira batzen.</li>
+<li>Diputatua ez diren partikularren izena (adibidez, seme-alabena) «[nombre omitido]» (izena ezabatuta) testuarekin ordezten da.</li>
+<li>Irakurketa bat % 100ean berretsi ezin izan bada (eskaneatzean estalita edo moztuta dagoen zifra bat, ia ikusezina den bereizle bat) edo jatorrizkoak datu inkoherente bat badakar (data ezinezko bat edo aitorpena baino geroagokoa), fitxak <strong>irakurketa berretsi gabea</strong> abisuarekin adierazten du, PDFrako esteka batekin eta, norbaitek berretsi badezake, guri jakinarazteko beste esteka batekin.</li>
+<li>Saldoa inprimaki ofizialak adierazten duen datakoa da: aitorpenaren aurreko urteko abenduaren 31koa edo aitorpena aurkeztu aurreko hilabetekoa.</li>
+</ul>`,
+      rentas: `<p>Ondasun-aitorpenen 1. orritik 3.era bitartekoetatik kopiatzen dira, testua eta zenbatekoa <strong>diputatuak idazten dituen bezala</strong>:</p>
+<ul>
+<li><strong>Errentak:</strong> aitorpenaren aurreko urtean jaso zituenak (soldatak, ordainsari profesionalak, dibidenduak, interesak, alokairuak, salmentak eta bestelakoak), eta urte hartan ordaindu zuen PFEZaren (IRPF) kuota. Kongresuko soldata ez da hemen aitortzen, Ganberak dagoeneko argitaratzen duelako (ikus <a href="#retribuciones">Ordainsariak</a>); horregatik, taula asko hutsik agertzen dira, diputatuak PFEZa aitortu arren.</li>
+<li><strong>Kontuak eta gordailuak:</strong> bere gordailu guztien saldoa, inprimakiak adierazten duen datan. Kontu-zenbakiak ez dira argitaratzen.</li>
+<li><strong>Akzioak, funtsak eta sozietateak:</strong> zor publikoa, akzioak eta partaidetzak, bere sozietateek % 5etik gora partaidetzen dituzten sozietateak, eta beste ondasun edo eskubide batzuk (bizitza-aseguruak, pentsio-planak…), aitortzen duen balioarekin.</li>
+<li>Taula bakoitza hura betetzen duen aitorpen berrienetik hartzen da, eta fitxak haren data adierazten du. Beste aldaketa batzuk baino jakinarazten ez dituzten aldaketek (adibidez, ibilgailu bat) ez dute ordezten.</li>
+<li>Fitxako zifra handiak taula bakoitzaren batura dira. Zenbateko bat ezin bada zenbaki gisa irakurri interpretatu gabe («47.268.27» bezalako formatuak edo zifra baten ordez testu bat), ez da batzen eta «gutxienez» adierazten da. Ez da batez bestekorik kalkulatzen.</li>
+<li>Diputatua ez diren partikularren izena «[nombre omitido]» testuarekin ordezten da.</li>
+</ul>`,
+      actividades: `<p><em>Registro de Intereses - Actividades</em> delakotik: kargu publikoak, uko egin dien jarduera publikoak, pentsioak, irakaskuntza, alderdietako karguak, lankidetzak, baimendutako jarduera pribatuak eta bestelakoak. Diputatu bakoitzak aitortzen duena da, eta Kongresuko Osoko Bilkurak eserlekuarekin bateragarritzat jotzen duena. Testua PDF ofizialetik automatikoki ateratzen da (testu-geruza du) eta hitzez hitz argitaratzen da, Osoko Bilkuraren erabakiaren datarekin. Osoko Bilkurak oraindik erabakirik hartu ez badu, Kongresuak ez du edukia argitaratzen, eta fitxak hala adierazten du.</p>`,
+      intereses: `<p><em>Declaraciones de Intereses Económicos</em> delakoetatik (Código de Conducta de las Cortes Generales): eserlekua lortu aurreko bost urteetako jarduerak, diru-sarrerak eman zizkiotenak edo haren jarduera politikoa baldintza dezaketenak (aldia, enplegatzailea, sektorea eta deskribapena), jasotako dohaintzak eta opariak, ekarpenak egiten dizkien fundazioak eta elkarteak, eta beste interes batzuk. Atal bakoitza hura betetzen duen aitorpen berrienetik hartzen da. Partikular baten izena (adibidez, onuragile gisa ageri den senide batena) «[nombre omitido]» testuarekin ordezten da.</p>`,
+      revision: `<p>Aitorpenak PDF eskaneatu gisa argitaratzen dira, datu egituraturik gabe. Bakoitza eskuz kopiatu da PDFtik abiatuta, eta gero bigarren aldiz berrikusi da, errenkadaz errenkada (zorrak, bi transkripzio independenterekin, eta haien arteko aldeak PDFa begiratuta ebazten dira), 4. orriko oharrak eta haien balizko jarraipena barne. Irakurketa berretsi gaberen bat duten fitxek abisu bat (*) eta PDFrako esteka bat dute, egiaztatu ahal izateko. Errentak, kontuak, akzioak eta interesen aitorpenak PDFtik transkribatu dira, eta irakurketa automatiko (OCR) independente batekin alderatu: bat ez datorren zenbateko edo hitz bakoitza berriro begiratu da jatorrizkoan, handituta.</p>`,
+      retribuciones: `<p>Diputatu bakoitzari bere agintaldian dagozkion 2026ko hileko zenbateko ofizialak erakusten dira, haren barrutiaren eta karguen arabera:</p>
+<ul>
+<li>Konstituzio-esleipena (asignación constitucional), guztientzat berdina: {asignacion}.</li>
+<li>Gastuengatiko kalte-ordaina, PFEZetik (IRPF) salbuetsia: {indemOtras} (Madriletik kanpo) edo {indemMadrid} (Madrilen hautatuak).</li>
+<li>Karguagatiko osagarriak, bloke bakoitzaren barruan metagarriak ez direnak (Mahaia eta Bozeramaileen Batzordea; batzordeak):<ul>{cargos}</ul></li>
+</ul>
+<p>Karguak diputatu bakoitzaren fitxa ofizialetik ateratzen dira. Ez dira sartzen garraioa (Kongresuak zuzenean ordaintzen du) ezta Gobernuko kide ere badirenen soldatak ere; horiek Presupuestos Generales del Estado (Estatuko Aurrekontu Orokorrak) delakoaren arabera arautzen dira.</p>`,
+      votaciones: `<p>Bozketa bakoitzak espedientearen testu ofiziala, bozketa mota, emaitza, talde bakoitzaren botoa (diputatu bakoitzak bozketaren egunean zuen taldearekin) eta diputatu bakoitzaren botoa erakusten ditu, Kongresuaren datu irekien arabera. Hemizikloa talde parlamentarioen arabera ordenatutako grafiko bat da; ez du eserlekuen benetako planoa erreproduzitzen. Deiketa bidezko bozketak (ozenki egiten direnak) beranduago argitaratzen dira datu irekietan; agertzen direnean gehitzen dira. Gorteak desegin direnean, lege-dekretuak Diputazio Iraunkorrak baliozkotzen edo indargabetzen ditu (Konstituzioaren 78. art.). Kongresuak bozketa baten guztizkoak soilik argitaratzen dituenean, diputatu bakoitzaren botorik gabe (adibidez, bozketa sekretu batean), webguneak guztizko horiek baino ez ditu erakusten, eta hala adierazten du. <a href="{votaciones}">Ikusi bozketak</a>.</p>`,
+      participacion: `<p>Diputatu bakoitzeko, XV. legegintzaldiko Osoko Bilkuraren bozketa guztiak zenbatzen dira, boto izenduna argitaratuta dutenak eta haietan eserlekua zuenean: zenbat aldiz bozkatu zuen baietz, ezetz edo abstentzioa, eta zenbat aldiz ez zuen bozkatu (ez zegoelako edo botorik eman ez zuelako). Bozketa sekretuak ez dira sartzen, ez baitago diputatu bakoitzaren botorik.</p>
+<p><strong>Bere taldeaz bestelako botoa:</strong> baietz, ezetz edo abstentzioa bozkatu zuenean eta bozketa horretan bere taldearen gehiengoak (Kongresuak data horretarako argitaratzen duen taldearekin) beste zerbait bozkatu zuenean zenbatzen da. Ez dira kontuan hartzen «Ez du bozkatzen», bere taldea berdinduta geratu zen bozketak, ezta Grupo Mixtoa ere, alderdi batzuk elkarrekin baitaude bertan.</p>`,
+      temas: `<p>Bozketen orriak datu irekietan argitaratutako XV. legegintzaldiko Osoko Bilkuraren bozketa guztiak biltzen ditu (2023ko irailetik aurrera). Deiketa bidezko bozketek, inbestidurek adibidez, ez dute diputatu bakoitzaren botoa datu irekietan, eta ez dira agertzen. <strong>Funtsezko bozketek</strong> dokumentu ofizialak (BOE, BOCG, Diario de Sesiones) eta testuaren pasarte literalak ere badituzte, eskuz berrikusiak; gainerakoek titulu ofiziala, guztizkoak, taldekako botoa eta JSON eta PDF ofizialak erakusten dituzte.</p>
+<p>Kongresuak ez ditu bere bozketak gaika sailkatzen. Iragazi ahal izateko, bozketa bakoitzari gai bat edo gehiago esleitzen zaizkio, bere titulu ofizialean agertzen diren hitzen arabera (adibidez, «alquiler» (alokairua) edo «vivienda» (etxebizitza) → Etxebizitza). Bilatzeko laguntza bat da, ez balorazio bat: hitzen zerrenda osoa <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> fitxategian dago, eta edonork proposa ditzake aldaketak. Bozketa bat inongo gaitan sartzen ez bada, «Besteak» atalean agertzen da.</p>
+<p>Emaitza guztizko ofizialekin kalkulatzen da: gehiengo soila (baiezko gehiago ezezkoak baino), lege organiko baten osotasunaren gaineko bozketan izan ezik, horrek 176 aldeko boto behar baititu (Konstituzioaren 81. art.). Lege-dekretuetan, «baliozkotua» edo «indargabetua».</p>`,
+      errores: `<p><a href="{error}" rel="noopener">Jakinarazi akatsa GitHub-en</a>, diputatua, datua eta dokumentu ofizialerako esteka (orrialdearekin) adierazita. Dokumentu ofizial batek babestutako zuzenketak baino ez dira onartzen.</p>
+<p>Proiektua publikoa da, eta edonork proposa ditzake aldaketak, programatzen jakin ala ez. <a href="{colabora}">Lagundu</a> atalean azaltzen da nola.</p>`,
+    },
+  },
+  gl: {
+    titulo: 'Metodoloxía',
+    descripcion: 'De onde saen os datos de Congreso Abierto e como se presentan, sen interpretacións.',
+    h1: 'Fontes e método',
+    indice: 'Índice da páxina',
+    enPagina: 'Nesta páxina',
+    nota: 'Os documentos e os datos oficiais publícaos o Congreso en castelán, e aquí móstranse tal como se publican.',
+    secciones: {
+      principio: 'Principio',
+      fuentes: 'Fontes oficiais',
+      perfil: 'Formación e traxectoria',
+      propiedades: 'Propiedades e vivendas',
+      vehiculos: 'Vehículos',
+      deudas: 'Débedas e préstamos',
+      rentas: 'Rendas, contas e accións',
+      actividades: 'Cargos e actividades',
+      intereses: 'Traballos anteriores e intereses',
+      revision: 'Como se copiaron os datos',
+      retribuciones: 'Retribucións',
+      votaciones: 'Votacións',
+      participacion: 'Os seus votos no Pleno',
+      temas: 'Temas das votacións',
+      errores: 'Viches un erro?',
+    },
+    html: {
+      principio: `<p>Aquí só hai información oficial do Estado, presentada tal e como a publica a institución que a produce. Non facemos interpretacións nin valoracións: ordenamos e simplificamos para que calquera poida consultala e tirar as súas propias conclusións. Se algo non coincide co documento oficial, prevalece o documento oficial.</p>`,
+      fuentes: `<ul>
+<li><strong>Deputados, grupos e cargos:</strong> buscador e fichas oficiais de <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> (XV Lexislatura). Consultados o {fecha}.</li>
+<li><strong>Propiedades e vehículos:</strong> as <em>Declaraciones de Bienes y Rentas</em> (declaracións de bens e rendas) que cada deputado presenta ante o Congreso e que este publica na súa ficha: {pdfs} documentos de {conDecl} deputados; o máis recente é do {ultima}.</li>
+<li><strong>Rendas, contas, accións e sociedades:</strong> páxinas 1 a 3 desas mesmas declaracións de bens.</li>
+<li><strong>Cargos, actividades, traballos anteriores e doazóns:</strong> o <em>Registro de Intereses - Actividades</em> (rexistro de intereses – actividades) e as <em>Declaraciones de Intereses Económicos</em> (declaracións de intereses económicos) que o Congreso publica na ficha de cada deputado.</li>
+<li><strong>Votacións:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">datos abertos de votacións</a> do Congreso, co texto oficial de cada expediente.</li>
+<li><strong>Normas:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decretos leis e acordos de convalidación ou derrogación).</li>
+<li><strong>Retribucións:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a>, importes de 2026.</li>
+</ul>
+<p><strong>Grupo e candidatura.</strong> O Congreso rexistra dous datos distintos: a candidatura coa que cada deputado foi elixido nas eleccións e o grupo parlamentario ao que pertence na data de consulta. Poden non coincidir: quen deixa o seu grupo pasa ao Grupo Mixto aínda que fose elixido noutra lista. O hemiciclo ordena por ese grupo parlamentario; cando a candidatura é distinta, indícase entre parénteses.</p>`,
+      perfil: `<p>Saen da <em>Ficha personal</em> de cada deputado en <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, un texto que redacta o propio deputado. Cópiase literalmente, liña a liña, e só se separa en dous bloques:</p>
+<ul>
+<li><strong>Formación:</strong> as liñas que falan de títulos ou estudos (licenciado, grao, máster, doutor, diplomado, enxeñeiro, curso, programa…). O resto é <strong>traxectoria</strong>. Unha frase de emprego (profesor, investigador, director…) non conta como estudo aínda que nomee unha universidade.</li>
+<li><strong>Universidade pública ou privada:</strong> só cando a liña nomea o centro. O tipo é o que figura no <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades">Registro de Universidades, Centros y Títulos (RUCT)</a> do Ministerio. Recoñécense tamén outras formas de nomeala (noutras linguas oficiais, siglas como UCM ou UNED, e centros que forman parte dunha universidade, como ICADE, ESADE ou IESE). A lista está en <code>data/manual/universidades.json</code>.</li>
+<li>Se nomea un centro que non está no RUCT (por exemplo, unha universidade estranxeira), indícase así, sen clasificalo. Se non nomea o centro, dise que a ficha non o indica: non se deduce nada.</li>
+<li>Non se recollen datos familiares (estado civil, fillos) aínda que aparezan na ficha.</li>
+<li><strong>Liña do tempo:</strong> as lexislaturas nas que foi deputado (coas súas datas oficiais), os seus cargos na Cámara na data de consulta, coa data de inicio, as liñas da súa traxectoria que citan un ano e as súas declaracións de bens e de intereses económicos desta lexislatura, cada unha co seu PDF.</li>
+</ul>`,
+      propiedades: `<p>Úsanse as táboas de «Bienes inmuebles» (bens inmobles) de cada declaración, copiadas literalmente. Cada ficha enlaza cos seus PDF orixinais.</p>
+<ul>
+<li><strong>Propiedades:</strong> todos os inmobles urbanos e rústicos que o deputado declara ao seu nome, en propiedade total ou parcial: vivendas, garaxes, rochos, locais, naves, soares, fincas… Cada liña da táboa oficial conta como unha propiedade; se a liña indica un número de unidades («16 viviendas», «8 fincas rústicas», «piso y dos plazas de garaje»), cóntanse esas unidades.</li>
+<li><strong>Vivendas:</strong> desas propiedades, as que o propio deputado describe como vivenda, piso, casa, chalé, apartamento, ático, dúplex, estudio, casa adosada, unifamiliar, bungaló ou residencial, tamén en solo rústico. Non contan como vivenda as que só se describen como garaxe, praza de aparcamento, cocheira, rocho, local, oficina, almacén, nave, soar, parcela, terreo ou finca rústica.</li>
+<li>Móstranse a porcentaxe e o tipo de dereito (pleno dominio, nuda propiedad, ganancial…) tal e como os escribe o deputado.</li>
+<li>Os inmobles de sociedades nas que participa o deputado lístanse á parte na súa ficha e non se suman.</li>
+<li>Se a última declaración só comunica un cambio (por exemplo, unha compra), móstrase xunto á declaración completa anterior. Un ben só deixa de contarse cando unha declaración oficial posterior comunica a súa venda ou baixa; a ficha indica cal.</li>
+<li>As declaracións reflicten o patrimonio na data en que se presentaron.</li>
+</ul>`,
+      vehiculos: `<p>Cópianse da táboa «Vehículos, embarcaciones y aeronaves» (vehículos, embarcacións e aeronaves). Non se publican matrículas, porque o propio formulario oficial pide non indicalas.</p>`,
+      deudas: `<p>Cópianse do apartado «Deudas y obligaciones patrimoniales» (débedas e obrigas patrimoniais, páxina 4) das mesmas declaracións de bens que se usan para as propiedades.</p>
+<ul>
+<li>Cada préstamo publícase coa súa descrición e acredor, data de concesión, importe concedido e saldo pendente, <strong>tal e como os escribe o deputado</strong> (formato, erratas e todo).</li>
+<li>O saldo pendente total é a suma da táboa de préstamos da súa declaración máis recente que enche o apartado. Se algún importe non se pode ler como número sen interpretalo (un díxito ilexible na dixitalización, un formato imposible), non se suma e indícase «polo menos».</li>
+<li>Non se suman préstamos de declaracións distintas, porque o mesmo préstamo pode repetirse. Os anteriores que seguen vixentes móstranse á parte.</li>
+<li>«Otras deudas y obligaciones» (outras débedas e obrigas: pensións, avais, financiamentos…) e as observacións do deputado sobre as súas débedas cópianse literalmente e non se suman.</li>
+<li>O nome de persoas particulares que non son o deputado (por exemplo, fillos) substitúese por «[nombre omitido]» (nome omitido).</li>
+<li>Se unha lectura non se puido confirmar ao 100 % (unha cifra tapada ou cortada na dixitalización, un separador case invisible) ou o orixinal trae un dato incoherente (unha data imposible ou posterior á declaración), a ficha indícao cun aviso de <strong>lectura non confirmada</strong>, unha ligazón ao PDF e outra para avisarnos se alguén pode confirmalo.</li>
+<li>O saldo é o da data que indica o formulario oficial: a 31 de decembro do ano anterior á declaración ou no mes anterior a presentala.</li>
+</ul>`,
+      rentas: `<p>Cópianse das páxinas 1 a 3 das declaracións de bens, co texto e o importe <strong>tal e como os escribe o deputado</strong>:</p>
+<ul>
+<li><strong>Rendas:</strong> as que percibiu no ano anterior á declaración (soldos, honorarios, dividendos, xuros, alugueiros, vendas e outras), e a cota do IRPF que pagou ese ano. O soldo do Congreso non se declara aquí porque xa o publica a Cámara (consulta <a href="#retribuciones">Retribucións</a>); por iso moitas táboas aparecen baleiras aínda que o deputado declare o IRPF.</li>
+<li><strong>Contas e depósitos:</strong> o saldo de todos os seus depósitos na data que indica o formulario. Os números de conta non se publican.</li>
+<li><strong>Accións, fondos e sociedades:</strong> débeda pública, accións e participacións, sociedades participadas en máis dun 5 % polas súas sociedades, e outros bens ou dereitos (seguros de vida, plans de pensións…), co valor que declara.</li>
+<li>Cada táboa tómase da declaración máis recente que a enche, e a ficha indica a súa data. As modificacións que só comunican outros cambios (por exemplo, un vehículo) non a substitúen.</li>
+<li>As cifras grandes da ficha son a suma de cada táboa. Se un importe non se pode ler como número sen interpretalo (formatos como «47.268.27» ou un texto no canto dunha cifra), non se suma e indícase «polo menos». Non se calculan medias.</li>
+<li>O nome de persoas particulares que non son o deputado substitúese por «[nombre omitido]».</li>
+</ul>`,
+      actividades: `<p>Do <em>Registro de Intereses - Actividades</em>: cargos públicos, actividades públicas ás que renunciou, pensións, docencia, cargos en partidos, colaboracións, actividades privadas autorizadas e outras. É o que cada deputado declara e o Pleno do Congreso considera compatible co escano. O texto extráese automaticamente do PDF oficial (ten capa de texto) e publícase literalmente, coa data do acordo do Pleno. Se o Pleno aínda non se pronunciou, o Congreso non publica o contido e a ficha indícao.</p>`,
+      intereses: `<p>Das <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales): actividades dos cinco anos anteriores ao escano que lle deron ingresos ou poden condicionar a súa actividade política (período, empregador, sector e descrición), doazóns e agasallos recibidos, fundacións e asociacións ás que contribúe e outros intereses. Tómase cada apartado da declaración máis recente que o enche. O nome dun particular (por exemplo, un familiar como benfeitor) substitúese por «[nombre omitido]».</p>`,
+      revision: `<p>As declaracións publícanse como PDF escaneados, sen datos estruturados. Cada unha copiouse a man a partir do PDF e despois revisouse unha segunda vez, fila a fila (as débedas, con dúas transcricións independentes cuxas diferenzas se resolven mirando o PDF), incluídas as observacións da páxina 4 e a súa posible continuación. As fichas con algunha lectura non confirmada levan un aviso (*) e unha ligazón ao PDF para comprobalo. As rendas, contas, accións e declaracións de intereses transcribíronse do PDF e comparáronse cunha lectura automática (OCR) independente: cada importe ou palabra que non coincide volveuse mirar no orixinal ampliado.</p>`,
+      retribuciones: `<p>Móstranse os importes mensuais oficiais de 2026 que lle corresponden a cada deputado durante o seu mandato, segundo a súa circunscrición e os seus cargos:</p>
+<ul>
+<li>Asignación constitucional, igual para todos: {asignacion}.</li>
+<li>Indemnización por gastos, exenta de IRPF: {indemOtras} (fóra de Madrid) ou {indemMadrid} (electos por Madrid).</li>
+<li>Complementos por cargo, non acumulables dentro de cada bloque (Mesa e Xunta de Portavoces; comisións):<ul>{cargos}</ul></li>
+</ul>
+<p>Os cargos saen da ficha oficial de cada deputado. Non se inclúen o transporte (págao o Congreso directamente) nin os soldos de quen ademais son membros do Goberno, que se rexen polos Presupuestos Generales del Estado.</p>`,
+      votaciones: `<p>Cada votación mostra o texto oficial do expediente, o tipo de votación, o resultado, o voto de cada grupo (co grupo de cada deputado na data da votación) e o voto de cada deputado segundo os datos abertos do Congreso. O hemiciclo é un gráfico ordenado por grupos parlamentarios; non reproduce o plano real dos asentos. As votacións por chamamento (en voz alta) tardan máis en publicarse en datos abertos; engádense cando aparecen. Coas Cortes disoltas, os decretos leis convalídaos ou derrógaos a Deputación Permanente (art. 78 da Constitución). Cando o Congreso só publica os totais dunha votación, sen o voto de cada deputado (por exemplo, nunha votación secreta), a web mostra só eses totais e indícao. <a href="{votaciones}">Ver votacións</a>.</p>`,
+      participacion: `<p>Para cada deputado cóntanse todas as votacións do Pleno da XV Lexislatura con voto nominal publicado nas que tiña escano: cantas veces votou si, non ou abstención e cantas non votou (por ausencia ou porque non emitiu voto). Non se inclúen as votacións secretas, porque non hai voto de cada deputado.</p>
+<p><strong>Voto distinto do seu grupo:</strong> cóntase cando votou si, non ou abstención e a maioría do seu grupo nesa votación (co grupo que publica o Congreso para esa data) votou outra cousa. Non conta «non vota», nin as votacións nas que o seu grupo empatou, nin o Grupo Mixto, onde conviven varios partidos.</p>`,
+      temas: `<p>A páxina de votacións recolle todas as votacións do Pleno da XV Lexislatura publicadas en datos abertos (desde setembro de 2023). As votacións por chamamento, como as investiduras, non teñen o voto de cada deputado en datos abertos e non aparecen. As <strong>votacións clave</strong> levan ademais documentos oficiais (BOE, BOCG, Diario de Sesiones) e extractos literais do texto, revisados a man; as demais mostran o título oficial, os totais, o voto por grupo e o JSON e o PDF oficiais.</p>
+<p>O Congreso non clasifica as súas votacións por temas. Para poder filtralas, cada votación recibe un ou varios temas segundo as palabras que aparecen no seu título oficial (por exemplo, «alquiler» ou «vivienda» → Vivenda). É unha axuda para buscar, non unha valoración: a lista completa de palabras está en <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> e calquera pode propoñer cambios. Se unha votación non encaixa en ningún tema, aparece en «Outros».</p>
+<p>O resultado calcúlase cos totais oficiais: maioría simple (máis votos a favor ca en contra), agás na votación de conxunto dunha lei orgánica, que precisa 176 votos a favor (art. 81 da Constitución). Nos decretos leis, «convalidado» ou «derrogado».</p>`,
+      errores: `<p><a href="{error}" rel="noopener">Avisa do erro en GitHub</a> co deputado, o dato e a ligazón ao documento oficial (coa páxina). Só se aceptan correccións respaldadas por un documento oficial.</p>
+<p>O proxecto é público e calquera pode propoñer cambios, saiba ou non programar. En <a href="{colabora}">Colabora</a> explícase como.</p>`,
+    },
+  },
+  en: {
+    titulo: 'Methodology',
+    descripcion: 'Where the data on Congreso Abierto come from and how they are presented, without interpretation.',
+    h1: 'Sources and method',
+    indice: 'Page contents',
+    enPagina: 'On this page',
+    nota: 'The official documents and data are published by the Congress in Spanish and are shown here as published.',
+    secciones: {
+      principio: 'Principle',
+      fuentes: 'Official sources',
+      perfil: 'Education and career',
+      propiedades: 'Property and homes',
+      vehiculos: 'Vehicles',
+      deudas: 'Debts and loans',
+      rentas: 'Income, accounts and shares',
+      actividades: 'Positions and activities',
+      intereses: 'Previous jobs and interests',
+      revision: 'How the data were copied',
+      retribuciones: 'Pay',
+      votaciones: 'Votes',
+      participacion: 'Their votes in plenary',
+      temas: 'Vote topics',
+      errores: 'Spotted a mistake?',
+    },
+    html: {
+      principio: `<p>This site contains only official information from the Spanish state, presented exactly as the institution that produces it publishes it. We make no interpretations or judgements: we organise and simplify it so that anyone can look it up and draw their own conclusions. If anything differs from the official document, the official document prevails.</p>`,
+      fuentes: `<ul>
+<li><strong>Deputies, groups and positions:</strong> the official search tool and profiles on <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> (15th term, XV Legislatura). Consulted on {fecha}.</li>
+<li><strong>Property and vehicles:</strong> the <em>Declaraciones de Bienes y Rentas</em> (asset and income declarations) that each deputy files with the Congress and that the Congress publishes on their profile: {pdfs} documents from {conDecl} deputies; the most recent is dated {ultima}.</li>
+<li><strong>Income, accounts, shares and companies:</strong> pages 1 to 3 of those same asset declarations.</li>
+<li><strong>Positions, activities, previous jobs and donations:</strong> the <em>Registro de Intereses - Actividades</em> (register of interests – activities) and the <em>Declaraciones de Intereses Económicos</em> (declarations of economic interests) that the Congress publishes on each deputy’s profile.</li>
+<li><strong>Votes:</strong> the Congress’s <a href="https://www.congreso.es/es/opendata/votaciones">open voting data</a>, with the official text of each item.</li>
+<li><strong>Legislation:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (Spain’s official gazette: decree-laws and decisions to ratify or repeal them).</li>
+<li><strong>Pay:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a> (pay and allowances of members of the Chamber), 2026 amounts.</li>
+</ul>
+<p><strong>Group and electoral list.</strong> The Congress records two different things: the electoral list (candidatura) on which each deputy was elected and the parliamentary group they belong to on the date of consultation. They may differ: anyone who leaves their group moves to the Grupo Mixto (mixed group), even if they were elected on another list. The chamber chart is ordered by parliamentary group; where the electoral list is different, it is shown in brackets.</p>`,
+      perfil: `<p>These come from each deputy’s <em>Ficha personal</em> (personal profile) on <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, a text written by the deputy themselves. It is copied word for word, line by line, and only split into two blocks:</p>
+<ul>
+<li><strong>Education:</strong> lines about degrees or studies (bachelor’s degree, master’s, doctorate, diploma, engineering, course, programme…). Everything else is <strong>career</strong>. A sentence about a job (lecturer, researcher, director…) does not count as education even if it names a university.</li>
+<li><strong>Public or private university:</strong> only when the line names the institution. The type is the one listed in the Ministry’s <a href="https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades">Registro de Universidades, Centros y Títulos (RUCT)</a> (register of universities, centres and degrees). Other ways of naming it are also recognised (in Spain’s other official languages, abbreviations such as UCM or UNED, and schools that are part of a university, such as ICADE, ESADE or IESE). The list is in <code>data/manual/universidades.json</code>.</li>
+<li>If it names an institution that is not in the RUCT (for example, a foreign university), this is stated, without classifying it. If it does not name the institution, the page says that the profile does not specify it: nothing is inferred.</li>
+<li>Family details (marital status, children) are not collected, even if they appear in the profile.</li>
+<li><strong>Timeline:</strong> the terms in which they have been a deputy (with their official dates), their positions in the Chamber on the date of consultation, with their start date, the lines of their career that mention a year, and their asset declarations and declarations of economic interests for this term, each with its PDF.</li>
+</ul>`,
+      propiedades: `<p>The “Bienes inmuebles” (real estate) tables in each declaration are used, copied word for word. Each profile links to its original PDFs.</p>
+<ul>
+<li><strong>Properties:</strong> all urban and rural real estate that the deputy declares in their own name, in full or partial ownership: homes, garages, storage rooms, commercial premises, industrial buildings, building plots, rural estates… Each line of the official table counts as one property; if the line gives a number of units (“16 viviendas”, “8 fincas rústicas”, “piso y dos plazas de garaje”), those units are counted.</li>
+<li><strong>Homes:</strong> of those properties, the ones the deputy describes as a home, flat, house, chalet, apartment, penthouse, duplex, studio, terraced house, single-family house, bungalow or residential, including on rural land. Properties described only as a garage, parking space, carport, storage room, commercial premises, office, warehouse, industrial building, building plot, parcel, land or rural estate do not count as homes.</li>
+<li>The percentage and the type of right (pleno dominio, nuda propiedad, ganancial…) are shown as the deputy writes them.</li>
+<li>Real estate owned by companies in which the deputy has a stake is listed separately on their profile and is not added in.</li>
+<li>If the latest declaration only reports a change (for example, a purchase), it is shown alongside the previous full declaration. An asset only stops being counted when a later official declaration reports its sale or removal; the profile shows which one.</li>
+<li>Declarations reflect the deputy’s assets on the date they were filed.</li>
+</ul>`,
+      vehiculos: `<p>Copied from the “Vehículos, embarcaciones y aeronaves” (vehicles, boats and aircraft) table. Number plates are not published, because the official form itself asks for them not to be given.</p>`,
+      deudas: `<p>Copied from the “Deudas y obligaciones patrimoniales” (debts and financial obligations) section (page 4) of the same asset declarations used for property.</p>
+<ul>
+<li>Each loan is published with its description and lender, the date it was granted, the amount granted and the outstanding balance, <strong>exactly as the deputy writes them</strong> (format, typos and all).</li>
+<li>The total outstanding balance is the sum of the loans table in their most recent declaration that fills in this section. If an amount cannot be read as a number without interpreting it (a digit that is illegible in the scan, an impossible format), it is not added and “at least” is shown.</li>
+<li>Loans from different declarations are not added together, because the same loan may be repeated. Earlier ones that are still in force are shown separately.</li>
+<li>“Otras deudas y obligaciones” (other debts and obligations: pensions, guarantees, financing…) and the deputy’s remarks about their debts are copied word for word and are not added up.</li>
+<li>The names of private individuals other than the deputy (for example, children) are replaced with “[nombre omitido]” (name omitted).</li>
+<li>If a reading could not be fully confirmed (a figure covered or cut off in the scan, an almost invisible separator) or the original contains inconsistent data (an impossible date, or one later than the declaration), the profile flags it with an <strong>unconfirmed reading</strong> notice, a link to the PDF and another link to let us know if anyone can confirm it.</li>
+<li>The balance is as of the date set by the official form: 31 December of the year before the declaration, or the month before it was filed.</li>
+</ul>`,
+      rentas: `<p>Copied from pages 1 to 3 of the asset declarations, with the text and amount <strong>exactly as the deputy writes them</strong>:</p>
+<ul>
+<li><strong>Income:</strong> what they received in the year before the declaration (salaries, fees, dividends, interest, rents, sales and other income), and the personal income tax (IRPF) they paid that year. Their salary from the Congress is not declared here because the Chamber already publishes it (see <a href="#retribuciones">Pay</a>); that is why many tables appear empty even though the deputy declares their IRPF.</li>
+<li><strong>Accounts and deposits:</strong> the balance of all their deposits on the date set by the form. Account numbers are not published.</li>
+<li><strong>Shares, funds and companies:</strong> government debt, shares and holdings, companies in which their companies hold more than 5%, and other assets or rights (life insurance, pension plans…), at the value they declare.</li>
+<li>Each table is taken from the most recent declaration that fills it in, and the profile shows its date. Amendments that only report other changes (for example, a vehicle) do not replace it.</li>
+<li>The large figures on the profile are the total of each table. If an amount cannot be read as a number without interpreting it (formats such as “47.268.27”, or text instead of a figure), it is not added and “at least” is shown. No averages are calculated.</li>
+<li>The names of private individuals other than the deputy are replaced with “[nombre omitido]”.</li>
+</ul>`,
+      actividades: `<p>From the <em>Registro de Intereses - Actividades</em>: public offices, public activities they have given up, pensions, teaching, party positions, collaborations, authorised private activities and others. This is what each deputy declares and what the plenary of the Congress considers compatible with their seat. The text is extracted automatically from the official PDF (it has a text layer) and published word for word, with the date of the plenary decision. If the plenary has not yet ruled, the Congress does not publish the content and the profile says so.</p>`,
+      intereses: `<p>From the <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales, the code of conduct of the Spanish Parliament): activities in the five years before taking their seat that gave them income or could influence their political activity (period, employer, sector and description), donations and gifts received, foundations and associations they contribute to, and other interests. Each section is taken from the most recent declaration that fills it in. The name of a private individual (for example, a relative named as a benefactor) is replaced with “[nombre omitido]”.</p>`,
+      revision: `<p>The declarations are published as scanned PDFs, with no structured data. Each one has been copied by hand from the PDF and then checked a second time, row by row (debts with two independent transcriptions, whose differences are resolved by looking at the PDF), including the remarks on page 4 and any continuation. Profiles with an unconfirmed reading carry a notice (*) and a link to the PDF so it can be checked. Income, accounts, shares and declarations of interests have been transcribed from the PDF and compared with an independent automatic reading (OCR): every amount or word that did not match has been checked again in the enlarged original.</p>`,
+      retribuciones: `<p>This shows the official 2026 monthly amounts that correspond to each deputy during their term of office, according to their constituency and positions:</p>
+<ul>
+<li>Constitutional allowance (asignación constitucional), the same for everyone: {asignacion}.</li>
+<li>Expenses allowance, exempt from IRPF: {indemOtras} (outside Madrid) or {indemMadrid} (deputies elected for Madrid).</li>
+<li>Supplements for positions, not cumulative within each block (Bureau and Board of Spokespersons; committees):<ul>{cargos}</ul></li>
+</ul>
+<p>Positions are taken from each deputy’s official profile. This does not include transport (paid directly by the Congress) or the salaries of those who are also members of the Government, which are governed by the Presupuestos Generales del Estado (state budget).</p>`,
+      votaciones: `<p>Each vote shows the official text of the item, the type of vote, the result, how each group voted (with each deputy’s group on the date of the vote) and how each deputy voted, according to the Congress’s open data. The chamber chart is a graphic ordered by parliamentary group; it does not reproduce the real seating plan. Roll-call votes (cast aloud) take longer to appear in the open data; they are added when they appear. When the Cortes are dissolved, decree-laws are ratified or repealed by the Diputación Permanente, the standing committee (art. 78 of the Constitution). When the Congress publishes only the totals of a vote, without each deputy’s vote (for example, in a secret ballot), the site shows only those totals and says so. <a href="{votaciones}">See votes</a>.</p>`,
+      participacion: `<p>For each deputy, we count all plenary votes in the 15th term (XV Legislatura) with published individual votes in which they held a seat: how many times they voted yes, no or abstain, and how many times they did not vote (because they were absent or did not cast a vote). Secret ballots are not included, because there is no individual vote for each deputy.</p>
+<p><strong>Voted differently from their group:</strong> counted when they voted yes, no or abstain and the majority of their group in that vote (using the group the Congress publishes for that date) voted otherwise. “Did not vote” does not count, nor do votes in which their group was tied, nor does the Grupo Mixto, which brings together several parties.</p>`,
+      temas: `<p>The votes page includes all plenary votes in the 15th term published in the open data (since September 2023). Roll-call votes, such as investiture votes, do not have each deputy’s vote in the open data and do not appear. <strong>Key votes</strong> also include official documents (BOE, BOCG, Diario de Sesiones) and verbatim extracts of the text, checked by hand; the others show the official title, the totals, the vote by group and the official JSON and PDF.</p>
+<p>The Congress does not classify its votes by topic. To make them filterable, each vote is given one or more topics based on the words in its official title (for example, “alquiler” [rent] or “vivienda” [housing] → Housing). It is a search aid, not a judgement: the full list of words is in <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> and anyone can suggest changes. If a vote does not fit any topic, it appears under “Other”.</p>
+<p>The result is calculated from the official totals: simple majority (more yes than no votes), except in the vote on an organic law as a whole, which needs 176 votes in favour (art. 81 of the Constitution). For decree-laws, “ratified” or “repealed”.</p>`,
+      errores: `<p><a href="{error}" rel="noopener">Report the mistake on GitHub</a> with the deputy, the data point and the link to the official document (with the page number). Only corrections backed by an official document are accepted.</p>
+<p>The project is public and anyone can suggest changes, whether or not they can code. <a href="{colabora}">Contribute</a> explains how.</p>`,
+    },
+  },
+});

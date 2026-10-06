@@ -1,0 +1,120 @@
+---
+import Base from '../../layouts/Base.astro';
+import { CARGOS_CAMARA, CARGOS_COMISION, ASIGNACION, INDEMNIZACION_MADRID, INDEMNIZACION_OTRAS, FUENTE_RETRIBUCIONES } from '../../../scripts/retribuciones';
+import { diputados, meta, enlaceError } from '../../lib/data';
+import { rutasIdioma, idiomaDe, enlace, formatos, f } from '../../i18n';
+import textos from '../../i18n/textos/metodologia';
+
+export const getStaticPaths = rutasIdioma;
+const lang = idiomaDe(Astro.params.lang);
+const t = textos[lang];
+const { fecha: fmtFecha, eur2: fmtEur2, num: fmtNum } = formatos(lang);
+const conDecl = diputados.filter((d) => d.patrimonio.estado !== 'sin-declaracion').length;
+const ultimaDecl = diputados.map((d) => d.patrimonio.declaracionFecha ?? '').sort().at(-1) ?? null;
+const pdfs = diputados.reduce((a, d) => a + d.patrimonio.fuentes.length, 0);
+// Los identificadores (#propiedades, #retribuciones…) son los mismos en todos los idiomas: otras páginas enlazan a ellos
+const secciones = (Object.keys(t.secciones) as (keyof typeof t.secciones)[]).map((id) => ({ id, t: t.secciones[id] }));
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// Los cargos son denominaciones oficiales: se muestran en castellano
+const cargos = [
+  ...Object.values(CARGOS_CAMARA).map((c) => `<li>${esc(c.etiqueta)}: ${fmtEur2(c.complementoMesa + c.gastosRepresentacion + c.gastosLibreDisposicion)}</li>`),
+  ...Object.values(CARGOS_COMISION).map((c) => `<li>${esc(c.etiqueta)}: ${fmtEur2(c.gastosRepresentacion)}</li>`),
+].join('');
+const valores = {
+  fecha: fmtFecha(meta.generado.slice(0, 10)),
+  pdfs: fmtNum(pdfs),
+  conDecl: fmtNum(conDecl),
+  ultima: fmtFecha(ultimaDecl),
+  fuenteRetribuciones: esc(FUENTE_RETRIBUCIONES),
+  asignacion: fmtEur2(ASIGNACION),
+  indemOtras: fmtEur2(INDEMNIZACION_OTRAS),
+  indemMadrid: fmtEur2(INDEMNIZACION_MADRID),
+  cargos,
+  votaciones: enlace('/votaciones', lang),
+  error: esc(enlaceError()),
+  colabora: enlace('/colabora', lang),
+};
+---
+<Base title={t.titulo} description={t.descripcion}>
+  <div class="disposicion">
+    <aside class="lateral">
+      <h1>{t.h1}</h1>
+      <nav class="indice" aria-label={t.indice}>
+        <p class="indice-t">{t.enPagina}</p>
+        <ol>
+          {secciones.map((s) => <li><a class="subraya" href={`#${s.id}`}>{s.t}</a></li>)}
+        </ol>
+      </nav>
+    </aside>
+
+    <article class="prosa">
+      {secciones.map((s) => (
+        <section id={s.id}>
+          <h2>{s.t}</h2>
+          <Fragment set:html={f(t.html[s.id], valores)} />
+          {s.id === 'principio' && t.nota && <p><em>{t.nota}</em></p>}
+        </section>
+      ))}
+    </article>
+  </div>
+</Base>
+
+<script>
+  const enlaces = [...document.querySelectorAll<HTMLAnchorElement>('.indice a')];
+  const secciones = enlaces.map((a) => document.getElementById(a.hash.slice(1))!);
+  const indice = document.querySelector('.lateral') as HTMLElement;
+  let actualPrev = -1;
+  function marcar() {
+    const cabecera = (document.querySelector('header.site') as HTMLElement).offsetHeight;
+    const movil = matchMedia('(max-width: 900px)').matches;
+    const corte = cabecera + (movil ? indice.offsetHeight : 0) + Math.min(140, innerHeight * 0.2);
+    let actual = 0;
+    secciones.forEach((s, i) => { if (s.getBoundingClientRect().top <= corte) actual = i; });
+    const sc = document.getElementById('desplazable')!;
+    const alFinal = sc.scrollHeight > sc.clientHeight + 1 ? sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 4 : innerHeight + scrollY >= document.documentElement.scrollHeight - 4;
+    if (alFinal) actual = secciones.length - 1;
+    indice.classList.toggle('pegado', movil && scrollY > 8);
+    document.documentElement.style.setProperty('--alto-indice', indice.offsetHeight + 'px');
+    if (actual === actualPrev) return;
+    actualPrev = actual;
+    enlaces.forEach((a, i) => (i === actual ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
+    if (movil) { const a = enlaces[actual]; indice.querySelector('ol')!.scrollTo({ left: a.offsetLeft - 16, behavior: 'smooth' }); }
+  }
+  addEventListener('scroll', marcar, { passive: true });
+  document.getElementById('desplazable')!.addEventListener('scroll', marcar, { passive: true });
+  addEventListener('resize', marcar);
+  marcar();
+</script>
+
+<style>
+  /* El texto de cada sección llega con set:html: sus etiquetas no llevan el atributo de ámbito de Astro */
+  .prosa :global(code) { overflow-wrap: anywhere; }
+  .disposicion { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: start; }
+  .lateral { position: sticky; top: calc(var(--tope) + 20px); }
+  .lateral h1 { font-size: 1.6rem; margin: .2rem 0 1.2rem; }
+  .indice { font-size: .92rem; border-left: 2px solid var(--border); }
+  .indice-t { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; margin: 0 0 6px 14px; }
+  .indice ol { list-style: none; margin: 0; padding: 0; }
+  .indice a { display: block; padding: 7px 12px; color: var(--muted); margin-left: -2px; border-left: 2px solid transparent; transition: color .15s, border-color .15s; }
+  .indice a::after { display: none; }
+  .indice a:hover { color: var(--text); border-left-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+  .indice a[aria-current] { color: var(--text); font-weight: 650; border-left-color: var(--accent); }
+  .prosa { max-width: 70ch; }
+  .prosa section { scroll-margin-top: calc(var(--tope) + 20px); }
+  .prosa section:first-child h2 { margin-top: .4rem; }
+  .prosa :global(li) { margin: .35rem 0; }
+  @media (max-width: 900px) {
+    .disposicion { display: block; }
+    .lateral { top: var(--tope); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--border); margin: 0 -16px 8px; padding: 0 16px; }
+    .lateral h1 { font-size: clamp(1.65rem, 5vw, 2.2rem); margin: .3rem 0 .2rem; transition: font-size .15s, margin .15s; }
+    .lateral.pegado h1 { font-size: 1.1rem; margin: .5rem 0 0; }
+    .indice { border-left: 0; margin: 0 -12px; }
+    .indice-t { display: none; }
+    .indice ol { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+    .indice ol::-webkit-scrollbar { display: none; }
+    .indice a { white-space: nowrap; margin: 0; border-left: 0; padding: 10px 12px; --sub-y: 0px; }
+    .indice a::after { display: block; }
+    .indice a:hover { border-left-color: transparent; }
+    .prosa section { scroll-margin-top: calc(var(--tope) + var(--alto-indice, 90px) + 12px); }
+  }
+</style>

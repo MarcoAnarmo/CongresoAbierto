@@ -3,6 +3,7 @@
  * y plantillas HTML de cada fila, que comparten el servidor (primera carga) y el cliente (filtros y paginación).
  * Este fichero no importa los datos: lo usan también los scripts de cliente.
  */
+import { fechaTexto } from '../i18n/fechas';
 import type { VotacionClave } from './types';
 
 /** Votación en el índice del cliente. */
@@ -41,7 +42,28 @@ export const TIPOS: { id: string; nombre: string; plural: string }[] = [
   { id: 'int', nombre: 'Convenio internacional', plural: 'Convenios internacionales' },
   { id: 'otro', nombre: 'Otros', plural: 'Otros' },
 ];
-export const nombreTipo = (k: string, tp = '') => TIPOS.find((x) => x.id === k && k !== 'otro')?.nombre ?? (tp.replace(/\.$/, '') || 'Votación');
+/**
+ * Textos de las filas y la lista, en el idioma de la página (solo cadenas: los usa también el script del navegador).
+ * Los datos del índice (resultado, tipo oficial…) siguen en castellano; aquí solo se traducen al mostrarlos.
+ */
+export interface TextosLista {
+  /** Locale para Intl (fechas de la lista). */
+  locale: string;
+  /** «Votación clave», «· solo totales». */
+  clave: string; soloTotales: string;
+  /** Piezas de los totales: «{n} sí», «{n} no», «{n} abst.», «{n} no vota». */
+  si: string; no: string; abst: string; noVota: string;
+  /** Cabecera de cada día: ['{n} votación', '{n} votaciones']. */
+  votaciones: string[];
+  /** Nombre de cada tipo propio (TIPOS) y «Votación» cuando no hay tipo. */
+  tipos: Record<string, string>; votacion: string;
+  /** Resultado oficial (en castellano) → texto en el idioma de la página. */
+  resultados: Record<string, string>;
+}
+const conN = (s: string, n: number | string) => s.replace('{n}', String(n));
+export const nombreTipo = (k: string, tp: string, tx: TextosLista) => (TIPOS.some((x) => x.id === k && k !== 'otro') ? tx.tipos[k] : undefined) ?? (tp.replace(/\.$/, '') || tx.votacion);
+/** Resultado oficial en el idioma de la página. */
+export const resultadoTexto = (r: string, tx: TextosLista) => tx.resultados[r] ?? r;
 export const favorable = (r: string) => (/Aprobada|Convalidado/.test(r) ? 'si' : /pendiente/i.test(r) ? 'pend' : 'no');
 /** Etiqueta corta oficial sin la fecha final: «RDL 8/2026 · alquiler (28/04/2026)» → «RDL 8/2026 · alquiler». */
 export const sinFecha = (tema: string) => tema.replace(/\s*\(\d{2}\/\d{2}\/\d{4}\)\s*$/, '');
@@ -87,37 +109,37 @@ export function barraHtml(to: number[], fina = true) {
   const [si, no, ab, nv] = to; const tot = si + no + ab + nv;
   return `<span class="barra${fina ? ' fina' : ''}" aria-hidden="true"><span class="b-si" style="width:${pct(si, tot)}"></span><span class="b-no" style="width:${pct(no, tot)}"></span><span class="b-abs" style="width:${pct(ab, tot)}"></span><span class="b-nv" style="width:${pct(nv, tot)}"></span></span>`;
 }
-export const totalesTexto = (to: number[]) => `${to[0]} sí · ${to[1]} no · ${to[2]} abst.${to[3] ? ` · ${to[3]} no vota` : ''}`;
+export const totalesTexto = (to: number[], tx: TextosLista) => [conN(tx.si, to[0]), conN(tx.no, to[1]), conN(tx.abst, to[2]), ...(to[3] ? [conN(tx.noVota, to[3])] : [])].join(' · ');
 
-/** Fila compacta de una votación (se abre en la ventana de detalle). */
-export function filaHtml(i: ItemVotacion, base: string) {
+/** Fila compacta de una votación (se abre en la ventana de detalle). `base` lleva ya el prefijo del idioma. */
+export function filaHtml(i: ItemVotacion, base: string, tx: TextosLista) {
   const fav = favorable(i.r);
   const tit = i.c ?? i.t;
   return `<li class="vf${i.pe ? ' pend' : ''}"><a class="vf-a" href="${base}/votaciones?v=${encodeURIComponent(i.id)}" data-v="${esc(i.id)}">`
-    + `<span class="vf-meta"><span class="etq">${esc(nombreTipo(i.k, i.tp))}</span>${i.cl ? '<span class="etq clave">Votación clave</span>' : ''}</span>`
+    + `<span class="vf-meta"><span class="etq">${esc(nombreTipo(i.k, i.tp, tx))}</span>${i.cl ? `<span class="etq clave">${esc(tx.clave)}</span>` : ''}</span>`
     + `<span class="vf-tit">${esc(tit)}</span>`
     + (i.d && !i.c ? `<span class="vf-det">${esc(finDe(i.d))}</span>` : '')
-    + `<span class="vf-res"><span class="insignia ${fav}">${esc(i.r)}</span>${i.pe ? '' : `<span class="vf-n">${totalesTexto(i.to)}</span>`}${i.nv ? '<span class="vf-n">· solo totales</span>' : ''}</span>`
+    + `<span class="vf-res"><span class="insignia ${fav}">${esc(resultadoTexto(i.r, tx))}</span>${i.pe ? '' : `<span class="vf-n">${totalesTexto(i.to, tx)}</span>`}${i.nv ? `<span class="vf-n">${esc(tx.soloTotales)}</span>` : ''}</span>`
     + (i.pe ? '' : barraHtml(i.to))
     + `<svg class="vf-ir" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6" /></svg>`
     + `</a></li>`;
 }
 
-const fechaDia = (iso: string) => {
-  const s = new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const fechaDia = (iso: string, locale: string) => {
+  const s = fechaTexto(iso, locale.slice(0, 2), locale, { semana: true });
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 /** Lista agrupada por día (las votaciones ya vienen ordenadas). `total` cuenta las de cada día aunque solo se muestren algunas. */
-export function listaHtml(items: ItemVotacion[], base: string, total?: Record<string, number>) {
+export function listaHtml(items: ItemVotacion[], base: string, tx: TextosLista, total?: Record<string, number>) {
   let html = '', dia = '';
   for (const i of items) {
     if (i.f !== dia) {
       if (dia) html += '</ul></section>';
       dia = i.f;
       const n = total?.[dia] ?? items.filter((x) => x.f === dia).length;
-      html += `<section class="v-dia"><h3><time datetime="${dia}">${fechaDia(dia)}</time><span>${n} ${n === 1 ? 'votación' : 'votaciones'}</span></h3><ul class="v-filas">`;
+      html += `<section class="v-dia"><h3><time datetime="${dia}">${fechaDia(dia, tx.locale)}</time><span>${conN(n === 1 ? tx.votaciones[0] : tx.votaciones[1], n)}</span></h3><ul class="v-filas">`;
     }
-    html += filaHtml(i, base);
+    html += filaHtml(i, base, tx);
   }
   return html + (dia ? '</ul></section>' : '');
 }

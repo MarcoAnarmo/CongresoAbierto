@@ -1,0 +1,934 @@
+---
+import { fechaTexto } from '../../../i18n/fechas';
+import Base from '../../../layouts/Base.astro';
+import { diputados, votaciones, votacionesPleno, colorGrupo, slug, enlaceError, candidaturaDistinta } from '../../../lib/data';
+import type { Diputado } from '../../../lib/types';
+import type { NombreIcono } from '../../../lib/iconos';
+import BotonCompartir from '../../../components/BotonCompartir.astro';
+import DialogoCompartir from '../../../components/DialogoCompartir.astro';
+import { rutaTarjeta, rotulo } from '../../../lib/tarjetas';
+import TablaPrestamos from '../../../components/TablaPrestamos.astro';
+import AvisoDudoso from '../../../components/AvisoDudoso.astro';
+import Icono from '../../../components/Icono.astro';
+import { conIdiomas, enlace, formatos, f, pl, LOCALE, type Idioma } from '../../../i18n';
+import comun from '../../../i18n/textos/comun';
+import textos, { textoEvento, detalleEvento } from '../../../i18n/textos/ficha';
+
+export function getStaticPaths() {
+  return conIdiomas(diputados.map((d) => ({ params: { slug: slug(d) }, props: { d } })));
+}
+const { d, lang } = Astro.props as { d: Diputado; lang: Idioma };
+const t = textos[lang];
+const tc = comun[lang];
+const { eur: fmtEur, eur2: fmtEur2, num: fmtNum, fecha: fmtFecha } = formatos(lang);
+const u = (p: string) => enlace(p, lang);
+const p = d.patrimonio;
+const m = d.retribucion.mensual;
+const totalMensual = m.asignacion + m.complementoMesa + m.gastosRepresentacion + m.gastosLibreDisposicion + m.indemnizacion;
+const pctTxt = (n: number | null) => (n === null ? '—' : f(t.comun.pct, { n: fmtNum(n) }));
+const fem = d.genero === 'F';
+/** Forma masculina o femenina ([diputado, diputada]); en euskera e inglés son iguales. */
+const g = (x: string[]) => x[fem ? 1 : 0];
+/** Voto y resultado oficiales (en castellano en los datos) en el idioma de la página. */
+const vt = (x: string) => (tc.voto as Record<string, string>)[x] ?? x;
+const vr = (x: string) => (tc.resultado as Record<string, string>)[x] ?? x;
+const votosDip = votaciones.map((v) => ({ v, voto: v.votos[String(d.codParlamentario)] ?? null }));
+const colorVoto: Record<string, string> = { 'Sí': 'var(--si)', 'No': 'var(--no)', 'Abstención': 'var(--abs)', 'No vota': 'var(--novota)' };
+const sinEscano = g(t.sinEscano);
+const pf = d.perfil;
+const dd = d.deudas;
+const fechaEvento = (fe: string) => (fe.length === 4 ? fe : fechaTexto(fe, lang, LOCALE[lang], { mes: 'short' }));
+const etEvento = t.tray.etiqueta;
+const RUCT = 'https://www.educacion.gob.es/ruct/consultauniversidades?actual=universidades';
+const sinDeclaracion = p.estado === 'sin-declaracion';
+
+// Votos sobre vivienda: cuántos de cada tipo (texto para la cajita y para lectores de pantalla)
+const tiposVoto = [
+  { k: 'Sí', t: t.votos.si }, { k: 'No', t: t.votos.no }, { k: 'Abstención', t: t.votos.abs }, { k: 'No vota', t: t.votos.nv }, { k: null, t: g(t.votos.sinEscano) },
+];
+const cuentaVotos = tiposVoto.map((x) => ({ ...x, n: votosDip.filter((y) => y.voto === x.k).length })).filter((x) => x.n > 0).map((x) => ({ ...x, texto: f(x.t, { n: x.n }) }));
+const resumenVotos = cuentaVotos.map((x) => x.texto).join(' · ');
+
+const avisoDeudas = !!(dd?.principal?.aviso || dd?.anteriores.some((a) => a.aviso));
+const nLeg = pf?.legislaturas.length ?? 0;
+const etTipo = t.tes.tipoFormacion;
+const viviendas = p.inmuebles.filter((i) => i.esVivienda).length;
+const otras = p.inmuebles.length - viviendas;
+
+// Documentos oficiales de la ficha
+const documentos = [
+  ...p.fuentes.map((fu) => ({ t: fu.parcial ? t.docs.modificacion : t.docs.bienes, fecha: fu.fecha, url: fu.url })),
+  ...(pf?.declaracionesIntereses ?? []).map((x) => ({ t: t.docs.intereses, fecha: x.fecha, url: x.url })),
+  ...(pf?.declaracionActividades ? [{ t: t.docs.actividades, fecha: null, url: pf.declaracionActividades }] : []),
+];
+
+// Deudas: lo que se resume en su cajita
+const prestamos = dd?.principal?.prestamos ?? [];
+const deuda = !dd
+  ? { valor: '—', sub: t.tes.sinDatosDeudas }
+  : dd.sinDeudas || !dd.principal
+    ? { valor: t.tes.ninguna, sub: t.tes.noDeudas }
+    : prestamos.length
+      ? { valor: fmtEur(dd.principal.totalPendiente), sub: pl(prestamos.length, dd.principal.totalIncompleto ? t.tes.pendientesMin : t.tes.pendientes, lang) }
+      : { valor: t.tes.si, sub: t.tes.otrasDeudas };
+
+// Rentas, cuentas, acciones y sociedades (páginas 1 a 3 de la declaración de bienes)
+const fz = d.finanzas;
+const TIPO_RENTA = t.rentas.tipos;
+const tiposRenta = fz?.rentas ? Object.keys(TIPO_RENTA).filter((k) => fz.rentas!.filas.some((fi) => fi.tipo === k)) : [];
+const inversiones = [fz?.valores, fz?.sociedades, fz?.otrosBienes].filter((x) => !!x);
+const totalInversiones = inversiones.reduce((a, x) => a + x!.total, 0);
+const filasInversiones = inversiones.reduce((a, x) => a + x!.filas.length, 0);
+const fechaDecl = (x: { fecha: string | null; parcial: boolean }) => t.comun.decl(x.parcial, fmtFecha(x.fecha));
+const rentas = fz?.rentas;
+const tRentas = !fz ? { valor: '—', sub: t.tes.sinDeclaracion }
+  : !rentas ? { valor: t.tes.ninguna, sub: t.tes.noRentas }
+  : rentas.filas.some((fi) => fi.euros !== null) ? { valor: fmtEur(rentas.total), sub: rentas.totalIncompleto ? t.tes.rentasAnioMin : t.tes.rentasAnio }
+  : { valor: rentas.irpf ? t.tes.irpf : '—', sub: rentas.irpf ? f(t.tes.irpfPagado, { irpf: rentas.irpfEuros !== null ? fmtEur(rentas.irpfEuros) : rentas.irpf }) : t.tes.noImportes };
+const tCuentas = !fz ? { valor: '—', sub: t.tes.sinDeclaracion }
+  : !fz.depositos ? { valor: '0', sub: t.tes.noCuentas }
+  : { valor: fmtEur(fz.depositos.total), sub: fz.depositos.totalIncompleto ? t.tes.enCuentasMin : t.tes.enCuentas };
+const tInv = !fz ? { valor: '—', sub: t.tes.sinDeclaracion }
+  : !filasInversiones ? { valor: t.tes.ninguno, sub: t.tes.noInversiones }
+  : { valor: fmtEur(totalInversiones), sub: inversiones.some((x) => x!.totalIncompleto) ? t.tes.enInversionesMin : t.tes.enInversiones };
+
+// Registro de actividades y declaraciones de intereses económicos
+const act = d.actividades;
+const inter = d.intereses;
+const nTrab = inter?.trabajos.length ?? 0;
+// Sus votos en todas las votaciones del Pleno
+const pa = d.participacion;
+const votoEmitido = pa ? pa.si + pa.no + pa.abstencion : 0;
+const pctDe = (n: number, tot: number) => (tot ? f(t.comun.pct, { n: fmtNum(Math.round((1000 * n) / tot) / 10) }) : '—');
+/** Ancho de cada tramo de la barra (CSS, igual en todos los idiomas). */
+const anchoDe = (n: number, tot: number) => (tot ? `${Math.round((1000 * n) / tot) / 10}%` : '—');
+const porId = new Map(votacionesPleno.map((v) => [v.id, v]));
+const distintas = (pa?.distintoGrupoIds ?? []).map((id) => porId.get(id)).filter((v) => !!v).slice(0, 12);
+
+/** Cada cajita del resumen abre su sección (en el móvil, como hoja desde abajo; en el ordenador, en una ventana). */
+type Tesela = { grupo?: string; id: string; icono: NombreIcono; titulo: string; corto?: string; prefijo?: string; valor: string; sub: string; acento?: string; texto?: boolean; aviso?: boolean; destacada?: boolean; votos?: boolean };
+const teselas: Tesela[] = [
+  {
+    grupo: t.grupos.dinero, id: 'propiedades', icono: 'propiedades', titulo: t.tes.propiedades, destacada: true, aviso: p.revisar,
+    valor: sinDeclaracion ? '—' : String(p.propiedades ?? '—'),
+    sub: sinDeclaracion || p.viviendas === null ? t.tes.sinDeclaracion : t.tes.deEllas,
+    acento: sinDeclaracion || p.viviendas === null ? undefined : pl(p.viviendas, tc.palabras.viviendas, lang),
+  },
+  { id: 'rentas', icono: 'rentas', titulo: t.tes.rentas, corto: t.tes.rentasCorto, valor: tRentas.valor, sub: tRentas.sub, aviso: fz?.avisos.includes('rentas') },
+  { id: 'cuentas', icono: 'cuenta', titulo: t.tes.cuentas, valor: tCuentas.valor, sub: tCuentas.sub, aviso: fz?.avisos.includes('depositos') },
+  { id: 'inversiones', icono: 'acciones', titulo: t.tes.inversiones, corto: t.tes.inversionesCorto, valor: tInv.valor, sub: tInv.sub, aviso: fz?.avisos.some((a) => a !== 'rentas' && a !== 'depositos') },
+  { id: 'deudas', icono: 'deuda', titulo: t.tes.deudas, valor: deuda.valor, sub: deuda.sub, aviso: avisoDeudas },
+  {
+    id: 'vehiculos', icono: 'vehiculo', titulo: t.tes.vehiculos,
+    valor: sinDeclaracion ? '—' : String(p.vehiculos ?? '—'),
+    sub: sinDeclaracion ? t.tes.sinDeclaracion : p.vehiculos === 0 ? t.tes.noVehiculos : t.tes.vehiculosDeclarados[p.vehiculos === 1 ? 0 : 1],
+  },
+  { id: 'retribucion', icono: 'sueldo', titulo: t.tes.retribucion, valor: fmtEur(d.retribucion.totalMensual), sub: t.tes.alMes },
+  ...(pa ? [{
+    grupo: t.grupos.congreso, id: 'participacion', icono: 'votaciones' as const, titulo: t.tes.participacion, corto: t.tes.participacionCorto,
+    valor: fmtNum(votoEmitido), sub: f(t.tes.conEscano, { n: fmtNum(pa.enEscano) }),
+    acento: pa.distintoGrupo ? f(t.tes.distinto, { n: fmtNum(pa.distintoGrupo) }) : t.tes.siempre,
+  }] : []),
+  ...(votosDip.length ? [{ id: 'votaciones', icono: 'voto' as const, titulo: t.tes.votaciones, corto: t.tes.votacionesCorto, prefijo: t.tes.sobreVivienda, valor: '', sub: resumenVotos, votos: true }] : []),
+  {
+    id: 'actividades', icono: 'actividades', titulo: t.tes.actividades, corto: t.tes.actividadesCorto,
+    valor: !act ? '—' : act.pendiente ? '…' : String(act.total),
+    sub: !act ? t.tes.sinRegistro : act.pendiente ? t.tes.pendiente : t.tes.compatibles[act.total === 1 ? 0 : 1],
+  },
+  {
+    id: 'trabajos', icono: 'trabajos', titulo: t.tes.trabajos, corto: t.tes.trabajosCorto,
+    valor: !inter ? '—' : String(nTrab), sub: !inter ? t.tes.sinDeclaracion : nTrab ? t.tes.trabajosAntes[nTrab === 1 ? 0 : 1] : t.tes.noTrabajos,
+    aviso: !!inter?.avisos.length,
+  },
+  {
+    grupo: t.grupos.perfil, id: 'formacion', icono: 'formacion', titulo: t.tes.formacion, texto: !!pf?.formacion.length,
+    valor: pf?.formacion[0]?.texto ?? '—',
+    sub: pf?.formacion.length ? (etTipo[pf.tipoFormacion] ?? t.tes.formacionFicha) : t.tes.sinEstudios,
+  },
+  { id: 'trayectoria', icono: 'trayectoria', titulo: t.tes.trayectoria, valor: String(nLeg || '—'), sub: nLeg === 1 ? t.tes.legislaturas[0] : nLeg ? t.tes.legislaturas[1] : t.tes.sinDatosFicha },
+  { id: 'documentos', icono: 'documento', titulo: t.tes.documentos, valor: String(documentos.length), sub: t.tes.documentosOficiales[documentos.length === 1 ? 0 : 1] },
+];
+const iconoDe = Object.fromEntries(teselas.map((x) => [x.id, x.icono])) as Record<string, NombreIcono>;
+const LINEA_CORTA = 6;
+---
+<Base title={d.nombreCompleto} imagen={rutaTarjeta.diputado(d, 'horizontal')} description={f(t.descripcion, { nombre: d.nombreCompleto, partido: d.partido, circ: d.circunscripcion })}>
+  <p class="volver-p"><a class="volver" href={u('/diputados')}>← {tc.nav.diputados}</a></p>
+  <div class="cabecera">
+    <BotonCompartir class="compartir-ficha" d={d} />
+    <div class="foto" style={`--g:${colorGrupo(d.grupoCorto)}`}><img src={d.fotoUrl} alt={f(t.cab.fotoAlt, { nombre: d.nombreCompleto })} width="132" height="168" loading="lazy" referrerpolicy="no-referrer" /></div>
+    <div class="cab-texto">
+      <h1>{d.nombreCompleto}</h1>
+      <p class="cab-grupo">
+        <span class="pill"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span>{d.grupo.startsWith('GP ') ? f(t.cab.grupo, { nombre: d.grupo.slice(3) }) : d.grupo}</span>
+        <span class="muted">{f(g(t.cab.diputadoPor), { circ: d.circunscripcion })}<span class="solo-escritorio">{f(t.cab.desde, { fecha: fmtFecha(d.fechaAlta) })}</span></span>
+      </p>
+      <p class="small muted cab-datos">
+        {candidaturaDistinta(d) && <>{f(t.cab.candidatura, { partido: d.partido })}</>}
+        {pf?.anioNacimiento && <>{f(g(t.cab.nacido), { anio: pf.anioNacimiento })}</>}
+        {pf?.legislaturasTexto || g(t.cab.legislatura)}
+      </p>
+      {d.cargos.length > 0 && <p class="small solo-escritorio">{d.cargos.join(' · ')}</p>}
+      <p class="small solo-escritorio"><a href={d.fichaUrl} rel="noopener">{t.cab.fichaOficial}</a> · <a href={enlaceError(d.nombreCompleto)} rel="noopener">{t.cab.avisarError}</a></p>
+    </div>
+  </div>
+
+  {p.revisar && <p class="warn aviso-general">{t.cab.avisoGeneral[0]}<a href={u('/metodologia#errores')}>{t.cab.avisoGeneral[1]}</a>{t.cab.avisoGeneral[2]}</p>}
+
+  <nav class="mosaico" aria-label={f(t.cab.resumenAria, { nombre: d.nombreCompleto })}>
+    {teselas.map((ts) => (<>
+      {ts.grupo && <h2 class="m-grupo">{ts.grupo}</h2>}
+      <a class:list={['tesela', { destacada: ts.destacada }]} href={`#${ts.id}`} data-detalle={ts.id} aria-haspopup="dialog">
+        <span class="t-cab"><span class="t-ico"><Icono n={ts.icono} /></span><span class="t-tit">{ts.corto ? <><span class="tt-largo">{ts.titulo}</span><span class="tt-corto">{ts.corto}</span></> : ts.titulo}</span><Icono n="derecha" tam={18} class="t-ir" /></span>
+        {ts.votos
+          ? <span class="t-v t-puntos" role="img" aria-label={resumenVotos}>{votosDip.map(({ v, voto }) => <span class="pv" style={`background:${voto ? colorVoto[voto] : 'transparent'}`} data-vacio={voto ? undefined : ''} title={`${rotulo(v, lang).mini}: ${voto ? vt(voto) : sinEscano}`}></span>)}</span>
+          : <span class:list={['t-v', { texto: ts.texto }]}>{ts.valor}</span>}
+        <span class="t-sub" aria-hidden={ts.votos ? 'true' : undefined}>{ts.prefijo && <span class="tt-corto">{ts.prefijo}</span>}{ts.sub}{ts.acento && <span class="t-acento">{ts.acento}</span>}</span>
+        {ts.aviso && <span class="t-aviso"><Icono n="aviso" tam={14} />{tc.palabras.lecturaNoConfirmada}</span>}
+      </a>
+    </>))}
+  </nav>
+  <p class="ver-todo-p"><button class="ver-todo" type="button" id="ver-todo" aria-controls="secciones" aria-expanded="false">{t.verTodo}</button></p>
+
+  <div class="secciones" id="secciones">
+
+  <section class="seccion" id="propiedades" aria-labelledby="h-propiedades">
+    <h2 id="h-propiedades"><span class="s-ico"><Icono n="propiedades" /></span>{t.prop.titulo}</h2>
+    <div class="s-cuerpo">
+      {sinDeclaracion ? <p class="muted">{t.comun.sinDeclaracion}</p> : (
+        <>
+          {p.estado === 'verificado' && <p class="small muted">{t.prop.verificado}</p>}
+          {p.estado === 'transcrito' && !p.revisar && <p class="small muted">{t.prop.transcrito}</p>}
+          {p.revisar && <AvisoDudoso texto={t.prop.aviso} url={p.fuentes[0]?.url} nombre={d.nombreCompleto} />}
+          <p class="small muted">
+            {p.combinada
+              ? <>{f(t.prop.combinada, { fecha: fmtFecha(p.declaracionFecha) })}</>
+              : <>{f(t.prop.segun, { fecha: fmtFecha(p.declaracionFecha) })}</>}
+          </p>
+          {p.inmuebles.length === 0 ? <p>{t.prop.sinInmuebles}</p> : (
+            <>
+              {viviendas > 0 && otras > 0 && (
+                <div class="segmentado filtro-bienes" role="group" aria-label={t.prop.filtroAria}>
+                  <button class="btn" type="button" data-b="" aria-pressed="true">{f(t.prop.todas, { n: p.inmuebles.length })}</button>
+                  <button class="btn" type="button" data-b="viv" aria-pressed="false">{f(t.prop.viviendas, { n: viviendas })}</button>
+                  <button class="btn" type="button" data-b="otra" aria-pressed="false">{f(t.prop.otras, { n: otras })}</button>
+                </div>
+              )}
+              <ul class="bienes">
+                {p.inmuebles.map((i) => (
+                  <li class:list={['bien', { viv: i.esVivienda }]} data-b={i.esVivienda ? 'viv' : 'otra'}>
+                    <span class="b-l1">
+                      <span class="b-nombre">{i.descripcion}{i.esVivienda && <span class="pill tag">{t.prop.vivienda}</span>}</span>
+                      <span class="b-pct" title={t.prop.porcentaje}><span class="sr-only">{t.prop.porcentaje}: </span>{pctTxt(i.porcentaje)}</span>
+                    </span>
+                    <span class="b-l2">{[i.provincia ?? t.prop.sinSituacion, i.naturaleza === 'urbana' ? t.prop.urbano : t.prop.rustico, i.anioAdquisicion && f(t.comun.adquirido, { anio: i.anioAdquisicion }), [i.derecho, i.titulo].filter(Boolean).join(' · ')].filter(Boolean).join(' · ')}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {p.inmueblesSociedad.length > 0 && (
+            <>
+              <h3>{t.prop.deSociedades}</h3>
+              <ul class="lineas">{p.inmueblesSociedad.map((i) => <li>{i.descripcion}{i.provincia && ` · ${i.provincia}`}{i.derecho && ` · ${i.derecho}`}</li>)}</ul>
+              <p class="small muted">{t.prop.noSeSuman}</p>
+            </>
+          )}
+          {p.notas.length > 0 && (
+            <details>
+              <summary class="small">{f(t.prop.notas, { n: p.notas.length })}</summary>
+              <ul class="small muted">{p.notas.map((n) => <li>{n}</li>)}</ul>
+            </details>
+          )}
+          <p class="fuente">
+            <Icono n="info" tam={16} />
+            <span>{p.fuentes.map((fu, i) => <>{i > 0 && ' · '}<a href={fu.url} rel="noopener">{t.comun.docPdf(fu.parcial, fmtFecha(fu.fecha))}</a></>)} · <a href={u('/metodologia#propiedades')}>{t.prop.comoSeCuentan}</a></span>
+          </p>
+        </>
+      )}
+    </div>
+  </section>
+
+  <section class="seccion" id="rentas" aria-labelledby="h-rentas">
+    <h2 id="h-rentas"><span class="s-ico"><Icono n="rentas" /></span>{t.rentas.titulo}</h2>
+    <div class="s-cuerpo">
+      {!fz ? <p class="muted">{t.comun.sinDeclaracion}</p> : !rentas ? <p>{t.rentas.ninguna}</p> : (
+        <>
+          <p class="small muted">{f(t.rentas.intro[0], { decl: fechaDecl(rentas) })}<a href="#retribucion">{t.rentas.intro[1]}</a>{t.rentas.intro[2]}</p>
+          {fz.avisos.includes('rentas') && <AvisoDudoso texto={t.rentas.aviso} url={rentas.url} nombre={d.nombreCompleto} />}
+          {rentas.filas.some((fi) => fi.euros !== null) && (
+            <p class="s-cifra"><strong>{rentas.totalIncompleto && <span class="small">{t.comun.alMenos}</span>}{fmtEur(rentas.total)}</strong><span>{t.rentas.suma}</span></p>
+          )}
+          {tiposRenta.map((k) => (
+            <>
+              <h3>{TIPO_RENTA[k]}</h3>
+              <ul class="importes">{rentas.filas.filter((fi) => fi.tipo === k).map((fi) => <li><span>{fi.texto || <span class="muted">{t.rentas.sinConcepto}</span>}</span><span class="imp">{fi.importe || <span class="muted">{t.rentas.sinImporte}</span>}</span></li>)}</ul>
+            </>
+          ))}
+          {rentas.filas.length === 0 && <p>{t.rentas.sinTabla}</p>}
+          {rentas.irpf && <p class="irpf"><span>{t.rentas.irpf}</span><strong>{rentas.irpf}{rentas.irpfEuros !== null && !/€/.test(rentas.irpf) && ' €'}</strong></p>}
+          {rentas.totalIncompleto && <p class="small muted">{t.rentas.incompleto}</p>}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{rentas && <><a href={rentas.url} rel="noopener">{f(t.rentas.pagina, { decl: fechaDecl(rentas) })}</a> · </>}<a href={u('/metodologia#rentas')}>{t.comun.comoSeObtiene}</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="cuentas" aria-labelledby="h-cuentas">
+    <h2 id="h-cuentas"><span class="s-ico"><Icono n="cuenta" /></span>{t.cuentas.titulo}</h2>
+    <div class="s-cuerpo">
+      {!fz ? <p class="muted">{t.comun.sinDeclaracion}</p> : !fz.depositos ? <p>{t.cuentas.ninguna}</p> : (
+        <>
+          <p class="small muted">{f(t.cuentas.intro, { decl: fechaDecl(fz.depositos) })}</p>
+          <p class="s-cifra"><strong>{fz.depositos.totalIncompleto && <span class="small">{t.comun.alMenos}</span>}{fmtEur(fz.depositos.total)}</strong><span>{t.cuentas.cifra}</span></p>
+          <ul class="importes">{fz.depositos.filas.map((fi) => <li><span>{fi.texto || <span class="muted">{t.comun.sinDescripcion}</span>}</span><span class="imp">{fi.importe || <span class="muted">{t.cuentas.sinSaldo}</span>}</span></li>)}</ul>
+          {fz.depositos.totalIncompleto && <p class="small muted">{t.cuentas.incompleto}</p>}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{fz?.depositos && <><a href={fz.depositos.url} rel="noopener">{f(t.cuentas.pagina, { decl: fechaDecl(fz.depositos) })}</a> · </>}<a href={u('/metodologia#rentas')}>{t.comun.comoSeObtiene}</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="inversiones" aria-labelledby="h-inversiones">
+    <h2 id="h-inversiones"><span class="s-ico"><Icono n="acciones" /></span>{t.inv.titulo}</h2>
+    <div class="s-cuerpo">
+      {!fz ? <p class="muted">{t.comun.sinDeclaracion}</p> : !filasInversiones ? <p>{t.inv.ninguna}</p> : (
+        <>
+          <p class="s-cifra"><strong>{inversiones.some((x) => x!.totalIncompleto) && <span class="small">{t.comun.alMenos}</span>}{fmtEur(totalInversiones)}</strong><span>{t.inv.cifra}</span></p>
+          {fz.valores && (
+            <>
+              <h3>{t.inv.valores}</h3>
+              <p class="small muted">{f(t.comun.segun, { decl: fechaDecl(fz.valores) })}</p>
+              <ul class="importes">{fz.valores.filas.map((fi) => <li><span>{fi.texto || <span class="muted">{t.comun.sinDescripcion}</span>}</span><span class="imp">{fi.importe || <span class="muted">{t.comun.sinValor}</span>}</span></li>)}</ul>
+            </>
+          )}
+          {fz.sociedades && (
+            <>
+              <h3>{t.inv.sociedades}</h3>
+              <p class="small muted">{f(t.comun.segun, { decl: fechaDecl(fz.sociedades) })}</p>
+              <ul class="importes">{fz.sociedades.filas.map((fi) => <li><span>{fi.texto || <span class="muted">{t.comun.sinDescripcion}</span>}</span><span class="imp">{fi.importe || <span class="muted">{t.comun.sinValor}</span>}</span></li>)}</ul>
+            </>
+          )}
+          {fz.otrosBienes && (
+            <>
+              <h3>{t.inv.otros}</h3>
+              <p class="small muted">{f(t.comun.segun, { decl: fechaDecl(fz.otrosBienes) })}</p>
+              <ul class="importes">{fz.otrosBienes.filas.map((fi) => <li><span>{fi.texto || <span class="muted">{t.comun.sinDescripcion}</span>}</span><span class="imp">{fi.importe || <span class="muted">{t.comun.sinValor}</span>}</span></li>)}</ul>
+            </>
+          )}
+          {p.inmueblesSociedad.length > 0 && <p class="small muted">{t.inv.inmuebles[0]}<a href="#propiedades">{t.inv.inmuebles[1]}</a>{t.inv.inmuebles[2]}</p>}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{t.inv.fuente}<a href={u('/metodologia#rentas')}>{t.comun.comoSeObtiene}</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="vehiculos" aria-labelledby="h-vehiculos">
+    <h2 id="h-vehiculos"><span class="s-ico"><Icono n="vehiculo" /></span>{t.veh.titulo}</h2>
+    <div class="s-cuerpo">
+      {sinDeclaracion ? <p class="muted">{t.comun.sinDeclaracion}</p>
+        : p.listaVehiculos.length === 0 ? <p>{t.veh.ninguno}</p>
+        : <ul class="lista-simple">{p.listaVehiculos.map((v) => <li><span>{v.descripcion}</span>{v.anioAdquisicion && <span class="muted small">{f(t.comun.adquirido, { anio: v.anioAdquisicion })}</span>}</li>)}</ul>}
+      {!sinDeclaracion && <p class="fuente"><Icono n="info" tam={16} /><span>{f(t.veh.fuente, { fecha: fmtFecha(p.declaracionFecha) })}</span></p>}
+    </div>
+  </section>
+
+  <section class="seccion" id="deudas" aria-labelledby="h-deudas">
+    <h2 id="h-deudas"><span class="s-ico"><Icono n="deuda" /></span>{t.deudas.titulo}</h2>
+    <div class="s-cuerpo">
+      {!dd ? <p class="muted">{t.deudas.sinDatos}</p> : dd.sinDeudas || !dd.principal ? (
+        <p>{p.declaracionFecha ? f(t.deudas.ningunaFecha, { fecha: fmtFecha(p.declaracionFecha) }) : t.deudas.ninguna}</p>
+      ) : (
+        <>
+          <p class="small muted">
+            {t.deudas.segun(dd.principal.parcial, fmtFecha(dd.principal.fecha))}{' '}{t.deudas.literal}
+          </p>
+          {dd.principal.aviso && <AvisoDudoso texto={dd.principal.aviso} url={dd.principal.url} nombre={d.nombreCompleto} />}
+          {dd.principal.prestamos.length > 0 && (
+            <>
+              <p class="s-cifra">
+                <strong>{dd.principal.totalIncompleto && <span class="small">{t.comun.alMenos}</span>}{fmtEur(dd.principal.totalPendiente)}</strong>
+                <span>{pl(dd.principal.prestamos.length, t.deudas.cifra, lang)}</span>
+              </p>
+              {dd.principal.totalIncompleto && <p class="small muted">{t.deudas.incompleto}</p>}
+              <TablaPrestamos prestamos={dd.principal.prestamos} />
+            </>
+          )}
+          {dd.principal.otras && <p><strong>{t.deudas.otras}</strong> {dd.principal.otras}</p>}
+          {dd.principal.nota && <p class="small muted">{f(t.deudas.observacionDip, { nota: dd.principal.nota })}</p>}
+          {dd.anteriores.length > 0 && (
+            <details>
+              <summary class="small">{f(t.deudas.anteriores, { n: dd.anteriores.length })}</summary>
+              <p class="small muted">{t.deudas.repetir}</p>
+              {dd.anteriores.map((a) => (
+                <div class="anterior">
+                  <p class="small"><a href={a.url} rel="noopener">{t.comun.docPdf(a.parcial, fmtFecha(a.fecha))}</a></p>
+                  {a.aviso && <AvisoDudoso texto={a.aviso} url={a.url} nombre={d.nombreCompleto} />}
+                  {a.prestamos.length > 0 && <TablaPrestamos prestamos={a.prestamos} />}
+                  {a.otras && <p class="small"><strong>{t.deudas.otras}</strong> {a.otras}</p>}
+                  {a.nota && <p class="small muted">{f(t.deudas.observacion, { nota: a.nota })}</p>}
+                </div>
+              ))}
+            </details>
+          )}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{t.deudas.fuente}<a href={u('/metodologia#deudas')}>{t.comun.comoSeObtiene}</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="retribucion" aria-labelledby="h-retribucion">
+    <h2 id="h-retribucion"><span class="s-ico"><Icono n="sueldo" /></span>{t.ret.titulo}</h2>
+    <div class="s-cuerpo">
+      <p class="s-cifra"><strong>{fmtEur2(totalMensual)}</strong><span>{t.ret.cifra}</span></p>
+      <div class="table-scroll card" style="padding:0">
+        <table>
+          <caption class="sr-only">{t.ret.caption}</caption>
+          <tbody>
+            <tr><td>{t.ret.asignacion}</td><td class="num">{fmtEur2(m.asignacion)}</td></tr>
+            {m.complementoMesa > 0 && <tr><td>{t.ret.mesa}</td><td class="num">{fmtEur2(m.complementoMesa)}</td></tr>}
+            {m.gastosRepresentacion > 0 && <tr><td>{t.ret.representacion}</td><td class="num">{fmtEur2(m.gastosRepresentacion)}</td></tr>}
+            {m.gastosLibreDisposicion > 0 && <tr><td>{t.ret.libre}</td><td class="num">{fmtEur2(m.gastosLibreDisposicion)}</td></tr>}
+            <tr><td>{t.ret.indemnizacion}{d.circunscripcion === 'Madrid' && t.ret.madrid}</td><td class="num">{fmtEur2(m.indemnizacion)}</td></tr>
+            <tr><th>{t.ret.total}</th><th class="num">{fmtEur2(totalMensual)}</th></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">
+        {d.retribucion.cargosRetribuidos.length ? f(t.ret.incluye, { cargos: d.retribucion.cargosRetribuidos.join(', ') }) : t.ret.sinComplementos}
+        {t.ret.noIncluye}
+      </p>
+      <p class="fuente"><Icono n="info" tam={16} /><span><a href={u('/metodologia#retribuciones')}>{t.comun.comoSeCalcula}</a></span></p>
+    </div>
+  </section>
+
+  {pa && (
+    <section class="seccion" id="participacion" aria-labelledby="h-participacion">
+      <h2 id="h-participacion"><span class="s-ico"><Icono n="votaciones" /></span>{t.part.titulo}</h2>
+      <div class="s-cuerpo">
+        <p class="small muted">{f(g(t.part.intro), { desde: fmtFecha(pa.desde), hasta: fmtFecha(pa.hasta) })}</p>
+        <p class="s-cifra"><strong>{fmtNum(votoEmitido)}</strong><span>{f(t.part.cifra, { total: fmtNum(pa.enEscano), pct: pctDe(votoEmitido, pa.enEscano) })}</span></p>
+        <span class="barra" aria-hidden="true"><span class="b-si" style={`width:${anchoDe(pa.si, pa.enEscano)}`}></span><span class="b-no" style={`width:${anchoDe(pa.no, pa.enEscano)}`}></span><span class="b-abs" style={`width:${anchoDe(pa.abstencion, pa.enEscano)}`}></span><span class="b-nv" style={`width:${anchoDe(pa.noVota, pa.enEscano)}`}></span></span>
+        <p class="leyenda-votos small">
+          <span class="pill"><span class="dot" style="background:var(--si)"></span>{f(t.votos.si, { n: fmtNum(pa.si) })}</span>
+          <span class="pill"><span class="dot" style="background:var(--no)"></span>{f(t.votos.no, { n: fmtNum(pa.no) })}</span>
+          <span class="pill"><span class="dot" style="background:var(--abs)"></span>{f(t.votos.abs, { n: fmtNum(pa.abstencion) })}</span>
+          <span class="pill"><span class="dot" style="background:var(--novota)"></span>{f(t.votos.nv, { n: fmtNum(pa.noVota) })}</span>
+        </p>
+        <h3>{t.part.distintos}</h3>
+        {d.grupoCorto === 'Mixto'
+          ? <p class="small">{t.part.mixto}</p>
+          : pa.distintoGrupo === 0
+            ? <p>{t.part.siempre}</p>
+            : (
+              <>
+                <p><strong>{fmtNum(pa.distintoGrupo)}</strong> {t.part.veces[pa.distintoGrupo === 1 ? 0 : 1]}{distintas.length < pa.distintoGrupo ? f(t.part.recientes, { n: distintas.length }) : t.part.dosPuntos}</p>
+                <ul class="votos">
+                  {distintas.map((v) => (
+                    <li><a class="v-fila" href={u(`/votaciones?v=${encodeURIComponent(v!.id)}`)}>
+                      <span class="pill voto" style={`border-color:${colorVoto[v!.votos[String(d.codParlamentario)]] ?? 'var(--border)'}`}><span class="dot" style={`background:${colorVoto[v!.votos[String(d.codParlamentario)]] ?? 'transparent'}`}></span>{vt(v!.votos[String(d.codParlamentario)])}</span>
+                      <span class="v-texto"><strong class="v-oficial-t">{v!.titulo}</strong><span class="muted small">{fmtFecha(v!.fecha)} · {vr(v!.resultado)}{v!.detalle && ` · ${v!.detalle}`}</span></span>
+                      <span class="v-ir" aria-hidden="true"><Icono n="derecha" tam={18} /></span>
+                    </a></li>
+                  ))}
+                </ul>
+              </>
+            )}
+        <p class="fuente"><Icono n="info" tam={16} /><span>{t.part.fuente}<a href={u('/metodologia#participacion')}>{t.comun.comoSeCalcula}</a> · <a href={u('/votaciones')}>{t.comun.todasVotaciones}</a></span></p>
+      </div>
+    </section>
+  )}
+
+  {votosDip.length > 0 && (
+    <section class="seccion" id="votaciones" aria-labelledby="h-votaciones">
+      <h2 id="h-votaciones"><span class="s-ico"><Icono n="voto" /></span>{t.viv.titulo}</h2>
+      <div class="s-cuerpo">
+        <p class="leyenda-votos small">
+          {cuentaVotos.map((x) => <span class="pill"><span class="dot" style={x.k ? `background:${colorVoto[x.k]}` : 'border:2px solid var(--novota)'}></span>{x.texto}</span>)}
+        </p>
+        <ul class="votos">
+          {votosDip.map(({ v, voto }) => (
+            <li><a class="v-fila" href={u(`/votaciones?v=${encodeURIComponent(v.id)}`)} aria-label={f(t.viv.aria, { rotulo: rotulo(v, lang).corto, voto: voto ? vt(voto) : sinEscano })}>
+              <span class="pill voto" style={`border-color:${voto ? colorVoto[voto] : 'var(--border)'}`}><span class="dot" style={voto ? `background:${colorVoto[voto]}` : 'border:2px solid var(--novota)'}></span>{voto ? vt(voto) : sinEscano}</span>
+              <span class="v-texto">
+                <strong>{rotulo(v, lang).corto}</strong>
+                <span class="muted small">{rotulo(v, lang).quien} · {fmtFecha(v.fecha)} · {vr(v.resultado)}</span>
+                <span class="small v-oficial">{v.titulo}</span>
+              </span>
+              <span class="v-ir" aria-hidden="true"><Icono n="derecha" tam={18} /></span>
+            </a></li>
+          ))}
+        </ul>
+        <p class="fuente"><Icono n="info" tam={16} /><span>{t.viv.fuente}<a href={u('/votaciones')}>{t.comun.todasVotaciones}</a></span></p>
+      </div>
+    </section>
+  )}
+
+  <section class="seccion" id="actividades" aria-labelledby="h-actividades">
+    <h2 id="h-actividades"><span class="s-ico"><Icono n="actividades" /></span>{t.act.titulo}</h2>
+    <div class="s-cuerpo">
+      {!act ? <p class="muted">{t.act.sinRegistro}</p> : act.pendiente ? (
+        <p>{t.act.pendiente}</p>
+      ) : act.total === 0 ? <p>{t.act.ninguna}</p> : (
+        <>
+          <p class="small muted">{g(t.act.intro)}</p>
+          {act.secciones.map((sc) => (
+            <>
+              <h3>{sc.titulo}</h3>
+              <ul class="lineas">{sc.items.map((i) => <li>{i.texto}{i.fechaAcuerdo && <span class="muted small">{f(t.act.acuerdo, { fecha: fmtFecha(i.fechaAcuerdo) })}</span>}</li>)}</ul>
+            </>
+          ))}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{act && <><a href={act.url} rel="noopener">{t.act.pdf}</a> · </>}<a href={u('/metodologia#actividades')}>{t.comun.comoSeObtiene}</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="trabajos" aria-labelledby="h-trabajos">
+    <h2 id="h-trabajos"><span class="s-ico"><Icono n="trabajos" /></span>{t.trab.titulo}</h2>
+    <div class="s-cuerpo">
+      {!inter ? <p class="muted">{t.trab.sinDeclaracion}</p> : (
+        <>
+          {inter.avisos.map((a) => <AvisoDudoso texto={a} url={inter.declaraciones[0]?.url} nombre={d.nombreCompleto} />)}
+          <h3>{t.trab.cincoAnios}</h3>
+          {nTrab === 0 ? <p>{t.trab.ninguno}</p> : (
+            <>
+              <p class="small muted">{f(t.trab.segun, { fecha: fmtFecha(inter.trabajosFuente!.fecha) })}</p>
+              <ul class="trabajos">{inter.trabajos.map((tr) => (
+                <li>
+                  <span class="tr-l1"><strong>{tr.empleador || tr.descripcion}</strong>{tr.sector && <span class="pill tag">{tr.sector}</span>}</span>
+                  <span class="tr-l2">{[tr.periodo, tr.empleador && tr.descripcion].filter(Boolean).join(' · ')}</span>
+                </li>
+              ))}</ul>
+            </>
+          )}
+          <h3>{t.trab.donaciones}</h3>
+          {inter.donaciones.length === 0 ? <p class="small">{t.trab.noDonaciones}</p>
+            : <ul class="lineas">{inter.donaciones.map((x) => <li>{x.benefactor && <strong>{x.benefactor}: </strong>}{x.descripcion}</li>)}</ul>}
+          <h3>{t.trab.contribuciones}</h3>
+          {inter.contribuciones.length === 0 ? <p class="small">{t.trab.noContribuciones}</p>
+            : <ul class="lineas">{inter.contribuciones.map((x) => <li>{x.destinatario && <strong>{x.destinatario}: </strong>}{x.descripcion}</li>)}</ul>}
+          {inter.otros.length > 0 && (
+            <>
+              <h3>{t.trab.otros}</h3>
+              <ul class="lineas">{inter.otros.map((o) => <li>{o}</li>)}</ul>
+            </>
+          )}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{inter && inter.declaraciones.map((x, i) => <>{i > 0 && ' · '}<a href={x.url} rel="noopener">{t.comun.docPdf(x.tipo === 'modificacion', fmtFecha(x.fecha))}</a></>)}{inter && ' · '}<a href={u('/metodologia#intereses')}>{t.comun.comoSeObtiene}</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="formacion" aria-labelledby="h-formacion">
+    <h2 id="h-formacion"><span class="s-ico"><Icono n="formacion" /></span>{t.form.titulo}</h2>
+    <div class="s-cuerpo">
+      {!pf || pf.formacion.length === 0 ? <p class="muted">{t.form.sinEstudios}</p> : (
+        <ul class="lineas">
+          {pf.formacion.map((fo) => (
+            <li>
+              {fo.texto}
+              {fo.centros.map((c) => <a class={`pill tipo ${c.tipo === 'pública' ? 'publica' : 'privada'}`} href={RUCT} rel="noopener" title={f(t.form.tituloCentro, { nombre: c.nombre, tipo: t.form.tipo[c.tipo] ?? c.tipo })}>{c.nombre} · {t.form.tipo[c.tipo] ?? c.tipo}</a>)}
+              {fo.otroCentro && <span class="pill tipo otro" title={t.form.tituloOtro}>{t.form.otro}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+      {pf && pf.formacion.length > 0 && pf.tipoFormacion === 'sin-centro' && <p class="small muted">{t.form.sinCentro}</p>}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{t.form.fuente[0]}<a href={d.fichaUrl} rel="noopener">{t.form.fuente[1]}</a>{t.form.fuente[2]}<a href={RUCT} rel="noopener">{t.form.fuente[3]}</a>{t.form.fuente[4]} · <a href={u('/metodologia#perfil')}>{t.comun.comoSeObtiene}</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="trayectoria" aria-labelledby="h-trayectoria">
+    <h2 id="h-trayectoria"><span class="s-ico"><Icono n="trayectoria" /></span>{t.tray.titulo}</h2>
+    <div class="s-cuerpo">
+      <p class="small muted">{f(g(t.tray.desde), { circ: d.circunscripcion, fecha: fmtFecha(d.fechaAlta) })}{pf?.legislaturasTexto && ` · ${pf.legislaturasTexto}`}.</p>
+      {d.cargos.length > 0 && (
+        <>
+          <h3>{t.tray.cargos}</h3>
+          <ul class="lineas">{d.cargos.map((c) => <li>{c}</li>)}</ul>
+        </>
+      )}
+      <h3>{t.tray.antes}</h3>
+      {!pf || pf.trayectoria.length === 0 ? <p class="muted small">{t.tray.sinTrayectoria}</p> : <ul class="lineas">{pf.trayectoria.map((tr) => <li>{tr}</li>)}</ul>}
+      {pf && pf.eventos.length > 0 && (
+        <>
+          <h3>{t.tray.linea}</h3>
+          <div class="segmentado filtros-tiempo" role="group" aria-label={t.tray.filtroAria}>
+            <button class="btn" type="button" data-t="" aria-pressed="true">{t.tray.todo}</button>
+            <button class="btn" type="button" data-t="congreso" aria-pressed="false">{t.tray.congreso}</button>
+            <button class="btn" type="button" data-t="trayectoria" aria-pressed="false">{t.tray.trayectoria}</button>
+            <button class="btn" type="button" data-t="declaraciones" aria-pressed="false">{t.tray.declaraciones}</button>
+          </div>
+          <ol class="linea" data-corta={LINEA_CORTA}>
+            {pf.eventos.map((e) => (
+              <li class={`ev ev-${e.tipo}`} data-grupo={e.tipo === 'legislatura' || e.tipo === 'cargo' ? 'congreso' : e.tipo === 'trayectoria' ? 'trayectoria' : 'declaraciones'}>
+                <time datetime={e.fecha}>{fechaEvento(e.fecha)}</time>
+                <span class="riel" aria-hidden="true"></span>
+                <div class="cuerpo">
+                  <span class="etq">{etEvento[e.tipo]}</span>
+                  {e.url ? <a href={e.url} rel="noopener">{textoEvento(e.texto, lang, t)} (PDF) ↗</a> : <span>{textoEvento(e.texto, lang, t)}</span>}
+                  {e.detalle && <p class="small muted">{detalleEvento(e.detalle, lang, t)}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+          <button class="btn mas-linea" type="button" hidden>{t.tray.verTodas}</button>
+          <p class="fuente"><Icono n="info" tam={16} /><span>{t.tray.fuente}</span></p>
+        </>
+      )}
+    </div>
+  </section>
+
+  <section class="seccion" id="documentos" aria-labelledby="h-documentos">
+    <h2 id="h-documentos"><span class="s-ico"><Icono n="documento" /></span>{t.docs.titulo}</h2>
+    <div class="s-cuerpo">
+      <ul class="lista-docs">
+        <li><a href={d.fichaUrl} rel="noopener"><Icono n="documento" tam={18} /><span>{t.docs.ficha}</span></a></li>
+        {documentos.map((x) => <li><a href={x.url} rel="noopener"><Icono n="documento" tam={18} /><span>{x.t}{x.fecha && <span class="muted"> · {fmtFecha(x.fecha)}</span>} (PDF) ↗</span></a></li>)}
+      </ul>
+      <p class="fuente"><Icono n="aviso" tam={16} /><span>{t.docs.noCoincide}<a href={enlaceError(d.nombreCompleto)} rel="noopener">{t.cab.avisarError}</a></span></p>
+    </div>
+  </section>
+
+  </div>
+
+  <dialog class="dlg-detalle" id="dlg-detalle" aria-labelledby="dlg-detalle-t">
+    <div class="d-cab">
+      {Object.entries(iconoDe).map(([id, n]) => <span class="d-ico" data-para={id} hidden><Icono n={n} /></span>)}
+      <h2 id="dlg-detalle-t"></h2>
+      <button class="d-cerrar" type="button" aria-label={tc.palabras.cerrar}><Icono n="cerrar" /></button>
+    </div>
+    <div class="d-cuerpo" tabindex="-1" autofocus></div>
+  </dialog>
+  <DialogoCompartir />
+  <script type="application/json" data-textos="ficha" set:html={JSON.stringify(t.cliente)} />
+</Base>
+
+<style>
+  .volver-p { margin: 0 0 .4rem; }
+  /* Cabecera: la foto lleva un marco del color de su grupo, como en las tarjetas para compartir */
+  .cabecera { display: flex; gap: 20px; align-items: stretch; position: relative; }
+  .cabecera :global(.compartir-ficha) { position: absolute; top: 0; right: 0; }
+  .cab-texto h1 { padding-right: 48px; }
+  .foto { flex: none; width: 140px; position: relative; border-radius: 14px; padding: 4px; background: var(--surface); box-shadow: inset 0 0 0 3px var(--g); }
+  .foto img { display: block; width: 100%; height: 100%; min-height: 160px; object-fit: cover; object-position: center top; border-radius: 10px; background: var(--chip); }
+  .cab-texto { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+  .cab-texto > * { margin: 0; }
+  .cab-texto h1 { line-height: 1.05; }
+  .cab-grupo { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+  .aviso-general { margin: 16px 0 0; }
+
+  /* Resumen en cajitas (mosaico) */
+  .mosaico { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 22px 0 6px; }
+  .tesela {
+    position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 156px; padding: 16px 16px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+  }
+  .tesela:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); color: var(--text); }
+  .tesela:active { transform: scale(.98); }
+  .tesela.destacada { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+  .t-cab { display: flex; align-items: center; gap: 10px; font-size: .9rem; font-weight: 650; color: var(--muted); }
+  .t-ico, .s-ico, .d-ico { display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-text); }
+  .t-tit { flex: 1; min-width: 0; line-height: 1.25; }
+  .tt-corto { display: none; }
+  .tesela :global(.t-ir) { flex: none; color: var(--muted); transition: transform .15s, color .15s; }
+  .tesela:hover :global(.t-ir) { color: var(--accent-text); transform: translateX(2px); }
+  .t-v { padding-top: 10px; font-size: clamp(1.45rem, 2.6vw, 2rem); font-weight: 750; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .t-v.texto { font-size: 1rem; font-weight: 650; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: normal; }
+  .destacada .t-v { color: var(--accent-text); }
+  .t-puntos { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 14px; padding-bottom: 6px; }
+  .pv { width: 18px; height: 18px; border-radius: 50%; }
+  .pv[data-vacio] { box-shadow: inset 0 0 0 2px var(--novota); }
+  .t-sub { font-size: .875rem; color: var(--muted); line-height: 1.35; }
+  .t-acento { color: var(--accent-text); font-weight: 650; }
+  .t-aviso { align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; margin-top: auto; position: relative; top: 4px; padding: 2px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; line-height: 1.5; background: color-mix(in srgb, var(--abs) 20%, transparent); color: var(--text); }
+  .ver-todo-p { display: none; margin: 4px 0 0; text-align: right; }
+  :global(.js) .ver-todo-p { display: block; }
+  .ver-todo { border: 0; background: none; padding: 10px 4px; min-height: 44px; color: var(--muted); font-size: .9rem; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 60%, transparent); text-underline-offset: 3px; cursor: pointer; }
+  .ver-todo:hover { color: var(--accent-text); }
+
+  /* Secciones: sin JavaScript (o con «Ver toda la ficha») se leen seguidas; si no, cada una se abre desde su cajita */
+  :global(.js:not(.ficha-completa)) .secciones { display: none; }
+  .seccion { scroll-margin-top: calc(var(--tope) + 16px); }
+  .seccion > h2 { display: flex; align-items: center; gap: 12px; margin: 2.4rem 0 1rem; padding-top: 1.6rem; border-top: 1px solid var(--border); }
+  .seccion:first-child > h2 { margin-top: 1.2rem; }
+  .s-cuerpo > :first-child { margin-top: 0; }
+  .s-cuerpo h3 { margin: 1.4rem 0 .6rem; font-size: 1.05rem; }
+  .s-cifra { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 6px 0 14px; }
+  .s-cifra strong { font-size: 1.8rem; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .s-cifra span { color: var(--muted); font-size: .9rem; }
+  .fuente { display: flex; gap: 8px; align-items: flex-start; margin: 16px 0 0; padding-top: 12px; border-top: 1px dashed var(--border); font-size: .85rem; line-height: 1.5; color: var(--muted); }
+  .fuente :global(.icono) { flex: none; margin-top: 2px; color: var(--accent-text); }
+
+  .m-grupo { grid-column: 1 / -1; margin: 10px 0 -2px; padding: 0; border: 0; font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .m-grupo:first-child { margin-top: 0; }
+  /* Importes: texto literal a la izquierda, importe literal a la derecha */
+  .importes { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .importes li { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; padding: 11px 16px; border-bottom: 1px solid var(--border); line-height: 1.45; }
+  .importes li:last-child { border-bottom: 0; }
+  .importes li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  .imp { flex: none; max-width: 45%; text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .irpf { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; margin: 16px 0 0; padding: 12px 16px; border-radius: var(--radius); background: var(--accent-soft); }
+  .irpf strong { font-variant-numeric: tabular-nums; }
+  .barra { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--chip); margin: 0 0 10px; }
+  .barra > span { display: block; height: 100%; }
+  .b-si { background: var(--si); } .b-no { background: var(--no); } .b-abs { background: var(--abs); } .b-nv { background: var(--novota); }
+  .trabajos { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .trabajos li { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .trabajos li:last-child { border-bottom: 0; }
+  .tr-l1 { overflow-wrap: anywhere; }
+  .tr-l2 { font-size: .875rem; color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
+  .v-oficial-t { font-weight: 600; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Propiedades: una fila por bien (descripción literal arriba, resto de datos debajo) */
+  .filtro-bienes { margin: 4px 0 12px; max-width: 100%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .filtro-bienes .btn { flex: none; white-space: nowrap; min-height: 40px; padding: 6px 12px; }
+  .bienes { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .bien { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .bien:last-child { border-bottom: 0; }
+  .bien[hidden] { display: none; }
+  .b-l1 { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .b-nombre { font-weight: 600; overflow-wrap: anywhere; }
+  .b-pct { flex: none; font-variant-numeric: tabular-nums; font-weight: 650; }
+  .b-l2 { font-size: .875rem; color: var(--muted); line-height: 1.45; }
+  .tag { margin-left: 8px; font-size: .75rem; padding: 0 7px; vertical-align: 1px; border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); color: var(--accent-text); font-weight: 600; }
+  .lista-simple { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .lista-simple li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .lista-simple li:last-child { border-bottom: 0; }
+  .lista-docs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .lista-docs a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); text-decoration: none; }
+  .lista-docs a:hover { border-color: var(--accent); }
+  .lista-docs :global(.icono) { flex: none; color: var(--accent-text); }
+
+  .leyenda-votos { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+  .votos { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+  .votos li { border-bottom: 1px solid var(--border); }
+  /* Cada votación abre su detalle en Votaciones (voto de cada grupo, texto y documentos) */
+  .v-fila { display: grid; grid-template-columns: 100px minmax(0, 1fr) 20px; gap: 12px; align-items: baseline; padding: 12px 8px; margin: 0 -8px; border-radius: 10px; color: inherit; text-decoration: none; transition: background-color .12s; }
+  .v-fila:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); color: inherit; }
+  .v-fila:hover strong { color: var(--accent-text); }
+  .v-ir { align-self: center; color: var(--muted); display: grid; }
+  .votos li:last-child { border-bottom: 0; }
+  .votos .voto { justify-self: start; }
+  .v-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .v-oficial { color: var(--muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  details { margin-top: 1rem; }
+  details summary { cursor: pointer; min-height: 32px; }
+  .anterior { margin-top: 12px; }
+  .lineas { margin: 0; padding-left: 1.1rem; display: grid; gap: 6px; font-size: .95rem; line-height: 1.45; }
+  /* Puede ser largo («Universidad Nacional de Educación a Distancia · pública»): que parta línea en vez de salirse */
+  .tipo { display: inline-block; max-width: 100%; white-space: normal; line-height: 1.4; border-radius: 12px; margin: 3px 6px 0 0; font-size: .75rem; padding: 1px 8px; text-decoration: none; vertical-align: 1px; }
+  .lineas li > .tipo:first-of-type { margin-left: 4px; }
+  .tipo.publica { border-color: color-mix(in srgb, var(--si) 55%, var(--border)); }
+  .tipo.privada { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+  .tipo.otro { border-style: dashed; color: var(--muted); }
+
+  /* Línea de tiempo: fecha | riel con el punto | texto. La línea vertical pasa por el centro de los puntos. */
+  .filtros-tiempo { margin: 0 0 12px; flex-wrap: nowrap; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .filtros-tiempo::-webkit-scrollbar, .filtro-bienes::-webkit-scrollbar { display: none; }
+  .filtros-tiempo .btn { flex: none; white-space: nowrap; }
+  .linea { --fecha: 104px; --riel: 20px; --hueco: 14px; list-style: none; margin: 0; padding: 0; position: relative; }
+  .linea::before { content: ''; position: absolute; top: 22px; bottom: 22px; left: calc(var(--fecha) + var(--hueco) + var(--riel) / 2 - 1px); width: 2px; border-radius: 1px; background: var(--border); }
+  .linea li[hidden] { display: none; }
+  .ev { display: grid; grid-template-columns: var(--fecha) var(--riel) minmax(0, 1fr); column-gap: var(--hueco); padding: 10px 0; line-height: 1.5; --punto: var(--muted); }
+  .ev time { grid-column: 1; text-align: right; line-height: 24px; font-size: .88rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .riel { grid-column: 2; position: relative; height: 24px; }
+  .riel::after { content: ''; position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; transform: translate(-50%, -50%); border-radius: 50%; box-sizing: border-box; background: var(--surface); border: 3px solid var(--punto); }
+  .cuerpo { grid-column: 3; min-width: 0; }
+  .ev-legislatura, .ev-cargo { --punto: var(--accent); }
+  .ev-trayectoria { --punto: var(--text); }
+  .ev-bienes, .ev-intereses { --punto: var(--si); }
+  .ev .etq { display: inline-block; margin-right: 8px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--punto); vertical-align: 1px; }
+  .ev-trayectoria .etq { color: var(--muted); }
+  .ev p { margin: 2px 0 0; }
+  .mas-linea { margin-top: 6px; }
+  .mas-linea[hidden] { display: none; }
+
+  /* Ventana de detalle: centrada en el ordenador; en el móvil, hoja que sube desde abajo */
+  .dlg-detalle {
+    width: min(880px, calc(100vw - 48px)); max-height: min(86vh, 920px); padding: 0; border: 1px solid var(--border); border-radius: 18px;
+    background: var(--bg); color: var(--text); box-shadow: 0 24px 70px rgb(0 0 0 / .28); overflow: hidden;
+  }
+  .dlg-detalle[open] { display: flex; flex-direction: column; animation: aparecer .18s ease-out; }
+  .dlg-detalle::backdrop { background: rgb(20 22 28 / .55); }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(10px); } }
+  .d-cab { display: flex; align-items: center; gap: 12px; padding: 14px 14px 14px 22px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .d-ico[hidden] { display: none; }
+  .d-cab h2 { flex: 1; min-width: 0; margin: 0; font-size: 1.3rem; }
+  .d-cerrar { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+  .d-cerrar:hover { background: var(--chip); color: var(--text); }
+  .d-cuerpo:focus { outline: none; }
+  .d-cuerpo { overflow-y: auto; overscroll-behavior: contain; padding: 18px 22px 24px; }
+  :global(html.dlg-abierto), :global(html.dlg-abierto body) { overflow: hidden; }
+
+  .solo-escritorio { display: inline; }
+  p.solo-escritorio { display: block; }
+
+  @media (max-width: 860px) {
+    .mosaico { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 720px) {
+    .solo-escritorio, p.solo-escritorio, .tt-largo { display: none; }
+    .tt-corto { display: inline; }
+    .volver-p { display: none; }
+    .cabecera { gap: 14px; align-items: center; }
+    .foto { width: 84px; padding: 3px; border-radius: 12px; }
+    .foto img { min-height: 0; height: 104px; border-radius: 9px; }
+    .cab-texto { gap: 6px; }
+    .cab-texto h1 { font-size: 1.45rem; padding-right: 44px; }
+    .cab-grupo { font-size: .9rem; }
+    .cab-grupo .pill { white-space: normal; line-height: 1.35; padding: 2px 10px; }
+    .mosaico { gap: 8px; margin-top: 16px; }
+    .tesela { min-height: 128px; padding: 12px 12px 11px; }
+    .t-cab { gap: 8px; font-size: .85rem; }
+    .t-ico { width: 32px; height: 32px; }
+    .t-ico :global(.icono) { width: 18px; height: 18px; }
+    .t-v { font-size: 1.5rem; }
+    .t-v.texto { font-size: .95rem; }
+    .t-sub { font-size: .8rem; }
+    .pv { width: 15px; height: 15px; }
+    .t-puntos { gap: 5px; }
+    .ver-todo-p { text-align: center; }
+    .dlg-detalle { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: 90dvh; border-radius: 20px 20px 0 0; border-bottom: 0; }
+    .dlg-detalle[open] { animation: subir .22s ease-out; }
+    @keyframes subir { from { transform: translateY(48px); opacity: .5; } }
+    .d-cab { position: relative; padding: 20px 8px 12px 16px; }
+    .d-cab::before { content: ''; position: absolute; top: 7px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: var(--border); }
+    .d-cab h2 { font-size: 1.15rem; }
+    .d-cuerpo { padding: 14px 16px calc(24px + env(safe-area-inset-bottom)); }
+    .v-fila { grid-template-columns: minmax(0, 1fr) 20px; gap: 6px 10px; }
+    .v-fila .voto { grid-column: 1; }
+    .v-fila .v-texto { grid-column: 1; }
+    .v-fila .v-ir { grid-column: 2; grid-row: 1 / span 2; }
+    .s-cifra strong { font-size: 1.6rem; }
+    .bien { padding: 11px 14px; }
+    .importes li { padding: 10px 14px; }
+    .imp { max-width: 50%; }
+    .filtro-bienes .btn { padding: 6px 10px; font-size: .875rem; }
+  }
+  @media (max-width: 560px) {
+    .filtros-tiempo .btn { padding: 6px 10px; font-size: .875rem; }
+    .linea { --fecha: 0px; --hueco: 12px; }
+    .linea::before { left: calc(var(--riel) / 2 - 1px); top: 14px; }
+    .ev { grid-template-columns: var(--riel) minmax(0, 1fr); grid-template-areas: 'riel fecha' 'riel cuerpo'; row-gap: 0; }
+    .ev time { grid-area: fecha; text-align: left; line-height: 22px; }
+    .riel { grid-area: riel; height: 22px; }
+    .cuerpo { grid-area: cuerpo; }
+  }
+  @media (max-width: 359px) {
+    .tesela { padding: 10px; }
+    .tesela :global(.t-ir) { display: none; }
+    .t-cab { font-size: .8rem; }
+    .t-ico { width: 28px; height: 28px; }
+    .t-v { font-size: 1.3rem; }
+  }
+  @media print {
+    :global(.js:not(.ficha-completa)) .secciones { display: block; }
+    .ver-todo-p, .mosaico :global(.t-ir) { display: none; }
+  }
+</style>
+
+<script>
+  import { deslizarParaCerrar } from '../../../scripts/hoja';
+  import { textos, f } from '../../../i18n/cliente';
+  const tx = textos<{ verTodo: string; verResumen: string; verFechas: string }>('ficha');
+  // Línea de tiempo: filtros y, si es larga, solo las primeras fechas hasta pulsar «Ver todas»
+  const linea = document.querySelector<HTMLOListElement>('.linea');
+  if (linea) {
+    const chipsT = [...document.querySelectorAll<HTMLButtonElement>('.filtros-tiempo [data-t]')];
+    const evs = [...linea.querySelectorAll<HTMLLIElement>('.ev')];
+    const mas = document.querySelector<HTMLButtonElement>('.mas-linea')!;
+    const corta = Number(linea.dataset.corta);
+    let filtro = '', todas = false;
+    const pintar = () => {
+      const visibles = evs.filter((e) => !filtro || e.dataset.grupo === filtro);
+      evs.forEach((e) => { e.hidden = !visibles.includes(e); });
+      if (!todas) visibles.slice(corta).forEach((e) => { e.hidden = true; });
+      mas.hidden = todas || visibles.length <= corta;
+      mas.textContent = f(tx.verFechas, { n: visibles.length });
+    };
+    chipsT.forEach((c) => c.addEventListener('click', () => {
+      chipsT.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+      filtro = c.dataset.t ?? ''; pintar();
+    }));
+    mas.addEventListener('click', () => { todas = true; pintar(); });
+    pintar();
+  }
+
+  // Propiedades: todas, solo viviendas u otras
+  const chipsB = [...document.querySelectorAll<HTMLButtonElement>('.filtro-bienes [data-b]')];
+  const bienes = [...document.querySelectorAll<HTMLLIElement>('.bienes .bien')];
+  chipsB.forEach((c) => c.addEventListener('click', () => {
+    chipsB.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+    bienes.forEach((b) => { b.hidden = !!c.dataset.b && b.dataset.b !== c.dataset.b; });
+  }));
+
+  // Cajitas del resumen: cada una abre su sección en la ventana de detalle.
+  // La sección se mueve dentro de la ventana y vuelve a su sitio al cerrarla; el enlace (#propiedades…) se puede compartir
+  // y el botón «atrás» del móvil cierra la ventana.
+  const raiz = document.documentElement;
+  const dlg = document.getElementById('dlg-detalle') as HTMLDialogElement;
+  const titulo = document.getElementById('dlg-detalle-t')!;
+  const destino = dlg.querySelector<HTMLElement>('.d-cuerpo')!;
+  const iconos = [...dlg.querySelectorAll<HTMLElement>('[data-para]')];
+  const verTodo = document.getElementById('ver-todo') as HTMLButtonElement;
+  const ids = [...document.querySelectorAll<HTMLElement>('.seccion')].map((s) => s.id);
+  let abierta: { id: string; cuerpo: HTMLElement; sitio: HTMLElement } | null = null;
+  let empujado = false;
+  let origen: HTMLElement | null = null;
+  const completa = () => raiz.classList.contains('ficha-completa');
+
+  function abrir(id: string, empujar: boolean) {
+    const sec = document.getElementById(id);
+    const cuerpo = sec?.querySelector<HTMLElement>('.s-cuerpo');
+    if (!sec || !cuerpo) return;
+    abierta = { id, cuerpo, sitio: sec };
+    titulo.textContent = sec.querySelector('h2')!.textContent;
+    iconos.forEach((i) => { i.hidden = i.dataset.para !== id; });
+    destino.appendChild(cuerpo);
+    destino.scrollTop = 0;
+    raiz.classList.add('dlg-abierto');
+    dlg.showModal();
+    if (empujar) { history.pushState({ detalle: id }, '', `#${id}`); empujado = true; }
+  }
+  dlg.addEventListener('close', () => {
+    if (abierta) abierta.sitio.appendChild(abierta.cuerpo);
+    abierta = null;
+    raiz.classList.remove('dlg-abierto');
+    if (empujado) { empujado = false; history.back(); }
+    else if (location.hash) history.replaceState(history.state, '', location.pathname + location.search);
+    origen?.focus();
+  });
+  dlg.querySelector('.d-cerrar')!.addEventListener('click', () => dlg.close());
+  deslizarParaCerrar(dlg, { cerrar: () => dlg.close() });
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  addEventListener('popstate', () => {
+    if (dlg.open) { empujado = false; dlg.close(); return; }
+    const id = location.hash.slice(1);
+    if (ids.includes(id) && !completa()) abrir(id, false);
+  });
+  document.querySelectorAll<HTMLAnchorElement>('.tesela[data-detalle]').forEach((a) => a.addEventListener('click', (e) => {
+    if (completa() || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    e.preventDefault();
+    origen = a;
+    abrir(a.dataset.detalle!, true);
+  }));
+
+  // «Ver toda la ficha en una página»: todas las secciones seguidas (se recuerda para la próxima vez)
+  const pintarTodo = () => {
+    verTodo.setAttribute('aria-expanded', String(completa()));
+    verTodo.textContent = completa() ? tx.verResumen : tx.verTodo;
+  };
+  verTodo.addEventListener('click', () => {
+    raiz.classList.toggle('ficha-completa');
+    try { localStorage.setItem('fichaCompleta', completa() ? '1' : '0'); } catch {}
+    pintarTodo();
+    if (completa()) document.getElementById(ids[0])?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  pintarTodo();
+
+  // Si se llega con un enlace a una sección (/diputado/…#deudas), se abre directamente
+  const inicial = location.hash.slice(1);
+  if (ids.includes(inicial) && !completa()) abrir(inicial, false);
+</script>

@@ -3,6 +3,8 @@ import votacionesJson from '../../data/congreso/votaciones.json';
 import resumenJson from '../../data/congreso/resumen.json';
 import plenoJson from '../../data/congreso/votaciones-pleno.json';
 import gruposJson from '../../data/manual/grupos.json';
+import comun from '../i18n/textos/comun';
+import { f, type Idioma } from '../i18n';
 import type { Contenido, Diputado, GrupoInfo, VotacionClave } from './types';
 
 export const diputados = diputadosJson.diputados as unknown as Diputado[];
@@ -42,6 +44,7 @@ export const enlaceError = (que?: string) =>
  * Elecciones generales convocadas tras la disolución de las Cortes de la XV Legislatura.
  * Mientras no se hayan celebrado (fecha de la build), la portada y los textos para compartir las mencionan.
  */
+/** Los textos de cada idioma están en src/i18n/textos/comun.ts (elecciones). */
 export const ELECCIONES = { fecha: '2026-11-29', texto: 'Elecciones generales el 29 de noviembre de 2026', corto: 'elecciones del 29 de noviembre', llamada: 'Antes de votar el 29 de noviembre, conoce a quien te representa. ' };
 export const antesDeElecciones = () => new Date().toISOString().slice(0, 10) <= ELECCIONES.fecha;
 
@@ -65,7 +68,7 @@ export function datosCliente() {
 /** Candidatura por la que fue elegido/a; se indica aparte cuando no coincide con su grupo parlamentario actual. */
 const sinTildes = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
 export const candidaturaDistinta = (d: Diputado) => !sinTildes(d.partido).includes(sinTildes(d.grupoCorto));
-export const etiquetaPartido = (d: Diputado) => (candidaturaDistinta(d) ? `${d.grupoCorto} (candidatura ${d.partido})` : d.partido);
+export const etiquetaPartido = (d: Diputado, lang: Idioma = 'es') => (candidaturaDistinta(d) ? f(comun[lang].candidatura, { grupo: d.grupoCorto, partido: d.partido }) : d.partido);
 
 /** Temas con los que se filtran las votaciones (data/manual/temas.json). */
 export const TEMAS = (votacionesJson as any).temas as { id: string; nombre: string }[];

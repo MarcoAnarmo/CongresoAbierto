@@ -1,4 +1,11 @@
 /** Lógica de cliente de las cajas de compartir (.compartir) y de la ventana emergente de compartir. */
+import { textos } from '../i18n/cliente';
+import type areaCompartir from '../i18n/textos/compartir';
+
+/** Avisos en el idioma de la página: los pinta BotonesTarjeta en <script data-textos="compartir">. */
+type Avisos = (typeof areaCompartir)['es']['cliente'];
+let avisos: Avisos | null = null;
+export const textosCompartir = () => (avisos ??= textos<Avisos>('compartir'));
 export interface DatosCompartir {
   /** Imagen vertical, horizontal (rutas ya con la base), nombre del fichero sin extensión. */
   historia: string; horizontal: string; nombre: string;
@@ -31,6 +38,7 @@ const dentroDeApp = () => /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Bytedanc
 /** Texto completo que se pega o se manda: el texto de la tarjeta y el enlace. */
 export const textoConEnlace = (texto: string, enlace: string) => `${texto} ${enlace}`;
 
+/** Enlaces de WhatsApp y X (BotonesTarjeta monta los mismos en el servidor: este fichero solo se usa en el navegador). */
 export const enlacesRedes = (texto: string, enlace: string) => ({
   whatsapp: `https://wa.me/?text=${encodeURIComponent(textoConEnlace(texto, enlace))}`,
   x: `https://x.com/intent/post?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(enlace)}`,
@@ -107,7 +115,7 @@ export function prepararCaja(caja: HTMLElement) {
     let fichero = listos.get(historia);
     let esperado = false;
     if (!fichero) {
-      avisar('Preparando la imagen…');
+      avisar(textosCompartir().preparando);
       fichero = (await precargar(historia, nombre)) ?? undefined;
       esperado = true;
       if (!fichero) { avisar(''); return false; }
@@ -122,7 +130,7 @@ export function prepararCaja(caja: HTMLElement) {
       const n = (e as Error).name;
       if (n === 'AbortError') { avisar(''); return true; }
       // Si hubo que esperar a la imagen, el navegador ya no deja abrir el menú: el segundo toque sí funciona
-      if (n === 'NotAllowedError' && esperado) { avisar('La imagen ya está lista: vuelve a pulsar el botón.'); return true; }
+      if (n === 'NotAllowedError' && esperado) { avisar(textosCompartir().lista); return true; }
       console.warn('[compartir]', n, (e as Error).message);
       avisar('');
       return false;
@@ -134,23 +142,19 @@ export function prepararCaja(caja: HTMLElement) {
   // No descarga nada: si este navegador no puede, explica cómo hacerlo.
   caja.querySelector('.c-historia')!.addEventListener('click', async () => {
     if (dentroDeApp()) {
-      avisar('Instagram y otras apps no dejan compartir imágenes desde su navegador interno. Abre esta página en Safari o Chrome (menú ··· → «Abrir en el navegador») y vuelve a pulsar: se abrirá Instagram con la imagen lista para tu historia.');
+      avisar(textosCompartir().dentroDeApp);
       return;
     }
     if (movil()) {
       if (await compartirImagen(false)) return;
-      avisar(/Firefox|FxiOS/i.test(navigator.userAgent)
-        ? 'Esta versión de Firefox no deja compartir imágenes desde una web. Actualízalo o abre la página en Chrome (Android) o Safari (iPhone), o descarga la imagen vertical aquí debajo.'
-        : 'Este navegador no ha dejado abrir el menú de compartir con la imagen. Prueba en Safari (iPhone) o Chrome (Android), o descarga la imagen vertical aquí debajo.');
+      avisar(/Firefox|FxiOS/i.test(navigator.userAgent) ? textosCompartir().firefoxMovil : textosCompartir().menuFallido);
       return;
     }
     if (tactil()) {
-      avisar(/Firefox|FxiOS/i.test(navigator.userAgent)
-        ? 'Esta versión de Firefox no permite compartir imágenes desde una web. Actualízalo o abre la página en Chrome (Android) o Safari (iPhone) para mandarla a tu historia, o descarga la imagen vertical aquí debajo.'
-        : 'Este navegador no permite compartir imágenes. Abre la página en Safari (iPhone) o Chrome (Android) para mandarla directamente a tu historia, o descarga la imagen vertical aquí debajo.');
+      avisar(/Firefox|FxiOS/i.test(navigator.userAgent) ? textosCompartir().firefoxTactil : textosCompartir().sinImagenes);
       return;
     }
-    avisar('Las historias de Instagram se publican desde el móvil: abre esta página en tu móvil y pulsa este botón; se abrirá Instagram con la imagen. Desde el ordenador puedes descargarla aquí debajo.');
+    avisar(textosCompartir().ordenador);
   });
 
   // WhatsApp y X: en el móvil, la tarjeta vertical con el texto y el enlace; en el ordenador, el enlace con su vista previa
@@ -164,7 +168,7 @@ export function prepararCaja(caja: HTMLElement) {
 
   caja.querySelector('.c-copiar')!.addEventListener('click', async () => {
     const t = textoConEnlace(datos().texto, datos().enlace);
-    try { await navigator.clipboard.writeText(t); avisar('Texto y enlace copiados. Pégalos donde quieras.'); }
+    try { await navigator.clipboard.writeText(t); avisar(textosCompartir().copiado); }
     catch { avisar(t); }
   });
 
