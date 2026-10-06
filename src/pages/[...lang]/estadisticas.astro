@@ -1,0 +1,215 @@
+---
+/**
+ * Estadísticas: todo se calcula en la build (src/lib/estadisticas.ts) y se pinta en HTML y CSS.
+ * El único JavaScript es el de los selectores de tema y de grupo; sin él se ven todos los bloques.
+ */
+import Base from '../../layouts/Base.astro';
+import Barras from '../../components/Barras.astro';
+import BarraApilada from '../../components/BarraApilada.astro';
+import PestanasDatos from '../../components/PestanasDatos.astro';
+import { diputados, votacionesPleno, grupos, colorGrupo, slug, TEMAS } from '../../lib/data';
+import * as E from '../../lib/estadisticas';
+import { rutasIdioma, idiomaDe, enlace, formatos, f, pl } from '../../i18n';
+import comun from '../../i18n/textos/comun';
+import textos from '../../i18n/textos/estadisticas';
+import { migas } from '../../lib/seo';
+
+export const getStaticPaths = rutasIdioma;
+const lang = idiomaDe(Astro.params.lang);
+const t = textos[lang];
+const tc = comun[lang];
+const { num, eur } = formatos(lang);
+const u = (p: string) => enlace(p, lang);
+
+const G = [...grupos].sort((a, b) => a.orden - b.orden).map((g) => g.corto);
+const COLOR = { 'Sí': 'var(--si)', 'No': 'var(--no)', 'Abstención': 'var(--abs)', 'Empate': 'var(--novota)' } as const;
+const etVoto = { 'Sí': tc.voto['Sí'], 'No': tc.voto['No'], 'Abstención': tc.voto['Abstención'], 'Empate': t.votoTema.empate };
+const nombreTema = (id: string) => tc.temas[id] ?? id;
+
+// 1. Voto por tema (los temas con más votaciones primero; «Otros» al final)
+const { porTema, nVotaciones } = E.votoPorTema(votacionesPleno, G);
+const temas = TEMAS.map((x) => x.id).filter((id) => (nVotaciones.get(id) ?? 0) > 0)
+  .sort((a, b) => Number(a === 'otros') - Number(b === 'otros') || (nVotaciones.get(b) ?? 0) - (nVotaciones.get(a) ?? 0));
+const temaInicial = temas.includes('vivienda') ? 'vivienda' : temas[0];
+
+// 2. Coincidencias entre grupos
+const coin = E.coincidencias(votacionesPleno, G);
+
+// 3. Votos distintos del grupo
+const distintos = E.masDistintos(diputados, 10);
+
+// 4. Formación
+const tipos = E.contar(diputados, (d) => d.perfil?.tipoFormacion ?? 'sin-datos', E.TIPOS_FORMACION);
+const univ = E.universidades(diputados, 10);
+const areas = E.areasEstudio(diputados);
+
+// 5. Rentas por tramos
+const rentas = E.tramosRentas(diputados);
+const cortes = E.CORTES_RENTAS;
+const etTramo = (i: number) => i === 0 ? t.rentas.ninguna
+  : i === 1 ? f(t.rentas.menos, { a: eur(cortes[0]) })
+  : i <= cortes.length ? f(t.rentas.entre, { a: eur(cortes[i - 2]), b: eur(cortes[i - 1]) })
+  : f(t.rentas.mas, { a: eur(cortes[cortes.length - 1]) });
+
+// 6. Rentas de alquiler
+const alquiler = E.conRentasDeAlquiler(diputados).sort((a, b) => G.indexOf(a.grupoCorto) - G.indexOf(b.grupoCorto) || a.apellidos.localeCompare(b.apellidos, 'es'));
+const alquilerGrupo = G.map((g) => ({ g, n: alquiler.filter((d) => d.grupoCorto === g).length })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n);
+
+// 7. Perfil
+const genero = E.generoPorGrupo(diputados, G);
+const dec = E.decadas(diputados);
+
+const secciones = [
+  { id: 'voto-por-tema', t: t.votoTema.titulo },
+  { id: 'coincidencias', t: t.coincidencia.titulo },
+  { id: 'votos-distintos', t: t.distintos.titulo },
+  { id: 'formacion', t: t.formacion.titulo },
+  { id: 'rentas', t: t.rentas.titulo },
+  { id: 'alquileres', t: t.alquiler.titulo },
+  { id: 'perfil', t: t.perfil.titulo },
+];
+const dip = (n: number) => pl(n, tc.palabras.diputados, lang);
+const pct = (n: number, de: number) => (de ? `${Math.round((100 * n) / de)} %` : '—');
+---
+<Base title={t.titulo} tituloSeo={`${t.tituloSeo} · Congreso Abierto`} description={t.descripcion} jsonLd={migas([[t.titulo, u('/estadisticas')]])}>
+  <PestanasDatos actual="estadisticas" />
+  <h1>{t.titulo}</h1>
+  <p class="lead">{t.lead}</p>
+
+  <nav class="indice" aria-label={t.indice}>
+    <ul role="list">{secciones.map((s) => <li><a href={`#${s.id}`}>{s.t}</a></li>)}</ul>
+  </nav>
+
+  <section class="est card" id="voto-por-tema" aria-labelledby="h-voto-por-tema">
+    <h2 id="h-voto-por-tema">{t.votoTema.titulo}</h2>
+    <p class="intro">{t.votoTema.intro}</p>
+    <label class="elige"><span>{t.votoTema.elige}</span>
+      <select data-elige="tema">{temas.map((id) => <option value={id} selected={id === temaInicial}>{nombreTema(id)} ({num(nVotaciones.get(id) ?? 0)})</option>)}</select>
+    </label>
+    <p class="leyenda small">{(['Sí', 'No', 'Abstención', 'Empate'] as const).map((k) => <span><span class="dot" style={`background:${COLOR[k]}`}></span>{etVoto[k]}</span>)}</p>
+    {temas.map((id) => (
+      <div class="bloque" data-bloque="tema" data-id={id} data-activo={id === temaInicial ? '' : undefined}>
+        <h3 class="b-tit">{nombreTema(id)} · {pl(nVotaciones.get(id) ?? 0, t.votoTema.votaciones, lang)}</h3>
+        {G.map((g) => {
+          const c = porTema.get(id)!.get(g)!;
+          return <BarraApilada etiqueta={g} punto={colorGrupo(g)} tramos={(['Sí', 'No', 'Abstención', 'Empate'] as const).map((k) => ({ valor: c[k], color: COLOR[k], texto: `${etVoto[k]} ${num(c[k])}` }))} />;
+        })}
+        <p class="enlaces small"><a href={u(`/votaciones?tema=${id}`)}>{t.votoTema.ver}</a> · <a href={u(`/datos?tabla=votos-grupo&temas=${id}`)}>{t.descargar}</a></p>
+      </div>
+    ))}
+    <details class="como"><summary>{t.fuente}</summary><p class="small">{t.votoTema.nota}</p></details>
+  </section>
+
+  <section class="est card" id="coincidencias" aria-labelledby="h-coincidencias">
+    <h2 id="h-coincidencias">{t.coincidencia.titulo}</h2>
+    <p class="intro">{t.coincidencia.intro}</p>
+    <label class="elige"><span>{t.coincidencia.elige}</span>
+      <select data-elige="grupo">{G.map((g, i) => <option value={g} selected={i === 0}>{g}</option>)}</select>
+    </label>
+    {G.map((g, i) => {
+      const filas = [...coin.get(g)!].map(([b, c]) => ({ b, ...c })).sort((x, y) => y.iguales / (y.ambos || 1) - x.iguales / (x.ambos || 1));
+      return (
+        <div class="bloque" data-bloque="grupo" data-id={g} data-activo={i === 0 ? '' : undefined}>
+          <h3 class="b-tit"><span class="dot" style={`background:${colorGrupo(g)}`}></span> {g}</h3>
+          <Barras max={100} items={filas.map((x) => ({ etiqueta: x.b, punto: colorGrupo(x.b), color: colorGrupo(x.b), valor: x.ambos ? (100 * x.iguales) / x.ambos : 0, texto: `${pct(x.iguales, x.ambos)} · ${f(t.coincidencia.fila, { iguales: num(x.iguales), ambos: num(x.ambos) })}` }))} />
+        </div>
+      );
+    })}
+    <p class="enlaces small"><a href={u('/datos?tabla=votos-grupo')}>{t.descargar}</a></p>
+    <details class="como"><summary>{t.fuente}</summary><p class="small">{t.coincidencia.nota}</p></details>
+  </section>
+
+  <section class="est card" id="votos-distintos" aria-labelledby="h-votos-distintos">
+    <h2 id="h-votos-distintos">{t.distintos.titulo}</h2>
+    <p class="intro">{t.distintos.intro}</p>
+    <Barras items={distintos.map((d) => ({ etiqueta: `${d.nombreCompleto} (${d.grupoCorto})`, punto: colorGrupo(d.grupoCorto), href: u(`/diputado/${slug(d)}`), valor: d.participacion!.distintoGrupo, texto: pl(d.participacion!.distintoGrupo, t.distintos.veces, lang) }))} />
+    <p class="enlaces small"><a href={u('/datos?tabla=diputados')}>{t.descargar}</a></p>
+    <details class="como"><summary>{t.fuente}</summary><p class="small">{t.distintos.nota}</p></details>
+  </section>
+
+  <section class="est card" id="formacion" aria-labelledby="h-formacion">
+    <h2 id="h-formacion">{t.formacion.titulo}</h2>
+    <p class="intro">{t.formacion.intro}</p>
+    <h3 class="sub">{t.formacion.areaTitulo}</h3>
+    <Barras items={areas.map((a) => ({ etiqueta: t.formacion.areas[a.id as keyof typeof t.formacion.areas], valor: a.n, texto: num(a.n) }))} />
+    <p class="nota small muted">{t.formacion.areaNota}</p>
+    <h3 class="sub">{t.formacion.univTitulo}</h3>
+    <Barras items={univ.map((x) => ({ etiqueta: x.nombre, valor: x.n, texto: num(x.n) }))} />
+    <p class="nota small muted">{t.formacion.univNota}</p>
+    <h3 class="sub">{t.formacion.tipoTitulo}</h3>
+    <Barras max={diputados.length} items={E.TIPOS_FORMACION.map((k) => ({ etiqueta: t.formacion.tipos[k], valor: tipos.get(k) ?? 0, texto: num(tipos.get(k) ?? 0) }))} />
+    <p class="enlaces small"><a href={u('/datos?tabla=diputados')}>{t.descargar}</a></p>
+  </section>
+
+  <section class="est card" id="rentas" aria-labelledby="h-rentas">
+    <h2 id="h-rentas">{t.rentas.titulo}</h2>
+    <p class="intro">{t.rentas.intro}</p>
+    <Barras items={rentas.tramos.map((n, i) => ({ etiqueta: etTramo(i), valor: n, texto: num(n) }))} />
+    <p class="nota small muted">{pl(rentas.alMenos, t.rentas.alMenos, lang)} {rentas.sinDeclaracion > 0 && pl(rentas.sinDeclaracion, t.rentas.sinDecl, lang)}</p>
+    <p class="enlaces small"><a href={u('/datos?tabla=diputados')}>{t.descargar}</a></p>
+  </section>
+
+  <section class="est card" id="alquileres" aria-labelledby="h-alquileres">
+    <h2 id="h-alquileres">{t.alquiler.titulo}</h2>
+    <p class="cifra-grande"><strong>{num(alquiler.length)}</strong> <span>{pl(alquiler.length, t.alquiler.intro, lang).replace(/^\S+\s/, '')}</span></p>
+    <h3 class="sub">{t.alquiler.porGrupo}</h3>
+    <Barras items={alquilerGrupo.map((x) => ({ etiqueta: x.g, punto: colorGrupo(x.g), color: colorGrupo(x.g), valor: x.n, texto: num(x.n) }))} />
+    <details class="lista-nombres">
+      <summary>{t.alquiler.verLista}</summary>
+      <ul role="list">{alquiler.map((d) => <li><a href={u(`/diputado/${slug(d)}#rentas`)}><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span>{d.nombreCompleto}</a> <span class="muted small">{d.grupoCorto} · {d.circunscripcion}</span></li>)}</ul>
+    </details>
+    <details class="como"><summary>{t.fuente}</summary><p class="small">{t.alquiler.nota}</p></details>
+  </section>
+
+  <section class="est card" id="perfil" aria-labelledby="h-perfil">
+    <h2 id="h-perfil">{t.perfil.titulo}</h2>
+    <p class="leyenda small"><span><span class="dot" style="background:var(--accent)"></span>{t.perfil.mujeres}</span><span><span class="dot" style="background:var(--int-3)"></span>{t.perfil.hombres}</span></p>
+    {genero.map((x) => <BarraApilada etiqueta={x.g} punto={colorGrupo(x.g)} total={dip(x.F + x.M)} tramos={[{ valor: x.F, color: 'var(--accent)', texto: `${t.perfil.mujeres} ${num(x.F)}` }, { valor: x.M, color: 'var(--int-3)', texto: `${t.perfil.hombres} ${num(x.M)}` }]} />)}
+    <h3 class="sub">{t.perfil.nacTitulo}</h3>
+    <p class="small muted">{t.perfil.nacIntro}</p>
+    <Barras items={dec.porDecada.map(([d, n]) => ({ etiqueta: `${d}–${d + 9}`, valor: n, texto: num(n) }))} />
+    <p class="enlaces small"><a href={u('/datos?tabla=diputados')}>{t.descargar}</a></p>
+  </section>
+</Base>
+
+<script>
+  // Selectores de tema y de grupo: muestran solo su bloque (sin JavaScript se ven todos)
+  document.querySelectorAll<HTMLSelectElement>('select[data-elige]').forEach((sel) => {
+    const seccion = sel.closest('section')!;
+    const bloques = [...seccion.querySelectorAll<HTMLElement>(`[data-bloque="${sel.dataset.elige}"]`)];
+    const mostrar = () => bloques.forEach((b) => b.toggleAttribute('data-activo', b.dataset.id === sel.value));
+    sel.addEventListener('change', mostrar);
+    // El navegador puede recordar la opción al volver atrás
+    addEventListener('pageshow', mostrar);
+  });
+</script>
+
+<style>
+  .indice ul { list-style: none; margin: 0 0 8px; padding: 0 0 4px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .indice ul::-webkit-scrollbar { display: none; }
+  .indice a { display: inline-flex; align-items: center; min-height: 40px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); white-space: nowrap; text-decoration: none; font-size: .88rem; }
+  .indice a:hover { border-color: var(--accent); }
+  .est { margin-top: 16px; padding: 18px 16px; scroll-margin-top: 16px; }
+  .est h2 { margin: 0 0 4px; }
+  .intro { margin: 0 0 12px; color: var(--muted); }
+  .sub { font-size: 1rem; margin: 22px 0 10px; }
+  .b-tit { font-size: .95rem; margin: 0 0 10px; color: var(--muted); font-weight: 650; }
+  .elige { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-weight: 600; }
+  .elige select { flex: 1; min-width: 0; max-width: 360px; }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 12px; color: var(--muted); }
+  .leyenda .dot { margin: -2px 6px 0 0; }
+  :global(.js) .bloque:not([data-activo]) { display: none; }
+  .bloque + .bloque { margin-top: 24px; }
+  .enlaces { margin: 14px 0 0; }
+  .nota { margin: 8px 0 0; }
+  .como { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 4px; }
+  .como summary, .lista-nombres summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--accent-text); font-weight: 600; font-size: .92rem; }
+  .como p { margin: 0 0 6px; color: var(--muted); }
+  .cifra-grande { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 6px; line-height: 1.25; }
+  .cifra-grande strong { font-size: clamp(2.2rem, 9vw, 3rem); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+  .lista-nombres { margin-top: 14px; }
+  .lista-nombres ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px; }
+  .lista-nombres li { line-height: 1.35; }
+  .lista-nombres .dot { margin: -2px 6px 0 0; width: 8px; height: 8px; }
+  @media (min-width: 900px) { .est { padding: 24px; } }
+</style>

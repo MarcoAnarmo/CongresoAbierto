@@ -320,7 +320,11 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   texto.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(() => requestAnimationFrame(() => { mostradas = cfg.primeras; aplicar(); }), 180); });
   texto.addEventListener('keydown', (e) => { if (e.key === 'Enter') { clearTimeout(espera); mostradas = cfg.primeras; aplicar(); texto.blur(); } });
   // El navegador puede recordar los filtros al volver a la página: siempre se empieza con todos los temas
-  addEventListener('pageshow', () => { if ([selTema, selTipo, selRes].some((x) => x.value) || texto.value) { selTema.value = ''; selTipo.value = ''; selRes.value = ''; texto.value = ''; ultimo.clave = ''; aplicar(); } });
+  // (salvo el que pida la dirección, p. ej. /votaciones?tema=vivienda desde Estadísticas)
+  const temaPedido = [...selTema.options].some((o) => o.value && o.value === params.get('tema')) ? params.get('tema')! : '';
+  addEventListener('pageshow', () => {
+    if ([selTipo, selRes].some((x) => x.value) || texto.value || selTema.value !== temaPedido) { selTema.value = temaPedido; selTipo.value = ''; selRes.value = ''; texto.value = ''; ultimo.clave = ''; aplicar(); }
+  });
   [selTema, selTipo, selRes].forEach((s) => s.addEventListener('change', () => { mostradas = cfg.primeras; aplicar(); }));
 
   // ---------- Filtros en una hoja (móvil), como en Diputados ----------

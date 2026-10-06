@@ -1,0 +1,23 @@
+---
+/** Una barra al 100 % partida en tramos (p. ej. sí, no y abstención de un grupo). Las cifras van en texto debajo. */
+export interface Tramo { valor: number; color: string; texto: string }
+interface Props { etiqueta: string; punto?: string; tramos: Tramo[]; total?: string }
+const { etiqueta, punto, tramos, total } = Astro.props;
+const suma = tramos.reduce((a, x) => a + x.valor, 0) || 1;
+const visibles = tramos.filter((x) => x.valor > 0);
+---
+<div class="apilada">
+  <p class="a-cab"><span>{punto && <span class="dot" style={`background:${punto}`}></span>}<strong>{etiqueta}</strong></span>{total && <span class="muted small">{total}</span>}</p>
+  <span class="a-barra" aria-hidden="true">{visibles.map((x) => <span style={`width:${(100 * x.valor) / suma}%;background:${x.color}`}></span>)}</span>
+  <p class="a-pie small">{visibles.map((x) => <span><span class="dot" style={`background:${x.color}`}></span>{x.texto}</span>)}</p>
+</div>
+
+<style>
+  .apilada + :global(.apilada) { margin-top: 14px; }
+  .a-cab { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0 0 4px; line-height: 1.3; }
+  .a-cab .dot { width: 9px; height: 9px; margin: -2px 6px 0 0; }
+  .a-barra { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--chip); gap: 2px; }
+  .a-barra > span { display: block; min-width: 3px; }
+  .a-pie { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 4px 0 0; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .a-pie .dot { width: 8px; height: 8px; margin: -2px 5px 0 0; }
+</style>
