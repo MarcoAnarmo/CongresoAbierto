@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro';
-import { diputados, slug } from '../lib/data';
+import { diputados, slug, circunscripciones } from '../lib/data';
 import { IDIOMAS, enlace } from '../i18n';
 
 /** Mapa del sitio para buscadores: cada página en los cinco idiomas, con sus alternativas (hreflang). */
 export const GET: APIRoute = ({ site }) => {
-  const rutas = ['/', '/diputados', '/votaciones', '/metodologia', '/colabora', '/tarjetas', ...diputados.map((d) => `/diputado/${slug(d)}`)];
+  const rutas = ['/', '/diputados', '/votaciones', '/metodologia', '/colabora', '/tarjetas', ...circunscripciones.map((c) => `/provincia/${c.id}`), ...diputados.map((d) => `/diputado/${slug(d)}`)];
   const abs = (p: string) => new URL(p, site).href;
   const urls = rutas.flatMap((r) => IDIOMAS.map((l) => {
     const alternativas = IDIOMAS.map((o) => `<xhtml:link rel="alternate" hreflang="${o}" href="${abs(enlace(r, o))}"/>`).join('')

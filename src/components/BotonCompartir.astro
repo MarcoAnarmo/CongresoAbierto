@@ -10,20 +10,25 @@ import { slug, url } from '../lib/data';
 import { compartir, rutaTarjeta } from '../lib/tarjetas';
 import { idiomaDeUrl, f } from '../i18n';
 import textosCompartir from '../i18n/textos/compartir';
-/** Un diputado (`d`) o el resumen de todo el Congreso (`resumen`, para la portada). */
-interface Props { d?: Diputado; resumen?: boolean; class?: string }
-const { d, resumen = false, class: clase } = Astro.props;
+/** Datos de una tarjeta cualquiera (provincia, estadística…): rutas de las imágenes y enlace ya con el idioma. */
+export interface TarjetaCompartir { historia: string; horizontal: string; nombre: string; enlace: string; texto: string; titulo: string; etiqueta: string }
+/** Un diputado (`d`), el resumen de todo el Congreso (`resumen`, para la portada) u otra tarjeta (`tarjeta`). */
+interface Props { d?: Diputado; resumen?: boolean; tarjeta?: TarjetaCompartir; class?: string }
+const { d, resumen = false, tarjeta, class: clase } = Astro.props;
 const lang = idiomaDeUrl(Astro.url.pathname);
 const t = textosCompartir[lang].ui;
-const etiqueta = d ? f(t.compartirFicha, { nombre: d.nombreCompleto }) : t.compartirWeb;
+const etiqueta = tarjeta?.etiqueta ?? (d ? f(t.compartirFicha, { nombre: d.nombreCompleto }) : t.compartirWeb);
 // El resumen lleva sus datos completos (es un solo botón); el de un diputado, solo el slug
 // (las imágenes y el enlace del idioma de la página los monta DialogoCompartir en el navegador)
 const datosResumen = resumen ? {
   'data-historia': url(rutaTarjeta.resumen('historia', lang)), 'data-horizontal': url(rutaTarjeta.resumen('horizontal', lang)),
   'data-nombre': 'congreso-abierto', 'data-enlace': compartir.resumen(lang).enlace, 'data-ct': compartir.resumen(lang).texto, 'data-titulo': t.tituloWeb,
+} : tarjeta ? {
+  'data-historia': url(tarjeta.historia), 'data-horizontal': url(tarjeta.horizontal),
+  'data-nombre': tarjeta.nombre, 'data-enlace': tarjeta.enlace, 'data-ct': tarjeta.texto, 'data-titulo': tarjeta.titulo,
 } : {};
 ---
-<button class:list={['boton-compartir', clase]} type="button" data-compartir={d ? slug(d) : 'resumen'} data-cn={d?.nombreCompleto} data-ct={d ? compartir.diputado(d, lang).texto : undefined} {...datosResumen} aria-label={etiqueta} title={etiqueta} aria-haspopup="dialog"><svg width="19" height="19" aria-hidden="true"><use href="#i-compartir" /></svg></button>
+<button class:list={['boton-compartir', clase]} type="button" data-compartir={d ? slug(d) : tarjeta ? tarjeta.nombre : 'resumen'} data-cn={d?.nombreCompleto} data-ct={d ? compartir.diputado(d, lang).texto : undefined} {...datosResumen} aria-label={etiqueta} title={etiqueta} aria-haspopup="dialog"><svg width="19" height="19" aria-hidden="true"><use href="#i-compartir" /></svg></button>
 
 <style>
   .boton-compartir {
