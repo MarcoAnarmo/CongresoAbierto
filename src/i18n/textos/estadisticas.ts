@@ -2,11 +2,14 @@ import { area } from '..';
 
 /** Página Estadísticas (src/lib/estadisticas.ts). Siempre totales, nunca medias. */
 const es = {
+  "pestanas": {"aria": "Apartados de las estadísticas", "votos": "Votos", "perfil": "Perfil", "dinero": "Dinero"},
+  "cifras": {"votaciones": "votaciones del Pleno analizadas", "mujeres": "mujeres entre los 350 diputados", "distintos": "diputados votaron alguna vez distinto de su grupo", "alquiler": "diputados declaran rentas de alquileres"},
+  "verCifras": "Pulsa una fila para ver todas sus cifras.",
+  "matriz": "Porcentaje de votaciones en que coincidieron los dos grupos (fila y columna).",
   "titulo": "Estadísticas",
   "tituloSeo": "Estadísticas de los diputados: cómo vota cada grupo, qué estudiaron y qué declaran",
   "descripcion": "Cómo vota cada grupo por tema, con quién coincide, qué estudiaron los diputados, sus rentas declaradas y quién cobra alquileres. Cifras totales con datos oficiales.",
   "lead": "Cifras de los 350 diputados de la XV Legislatura con datos oficiales del Congreso. Siempre totales, nunca medias.",
-  "indice": "En esta página",
   "fuente": "Cómo se calcula",
   "descargar": "Descargar estos datos",
   "votoTema": {
@@ -102,11 +105,14 @@ const es = {
 
 export default area(es, {
   ca: {
+    "pestanas": {"aria": "Apartats de les estadístiques", "votos": "Vots", "perfil": "Perfil", "dinero": "Diners"},
+    "cifras": {"votaciones": "votacions del Ple analitzades", "mujeres": "dones entre els 350 diputats", "distintos": "diputats han votat alguna vegada diferent del seu grup", "alquiler": "diputats declaren rendes de lloguers"},
+    "verCifras": "Prem una fila per veure’n totes les xifres.",
+    "matriz": "Percentatge de votacions en què els dos grups (fila i columna) van coincidir.",
     "titulo": "Estadístiques",
     "tituloSeo": "Estadístiques dels diputats: com vota cada grup, què van estudiar i què declaren",
     "descripcion": "Com vota cada grup per tema, amb qui coincideix, què van estudiar els diputats, les seves rendes declarades i qui cobra lloguers. Xifres totals amb dades oficials.",
     "lead": "Xifres dels 350 diputats de la XV Legislatura amb dades oficials del Congrés. Sempre totals, mai mitjanes.",
-    "indice": "En aquesta pàgina",
     "fuente": "Com es calcula",
     "descargar": "Descarregar aquestes dades",
     "votoTema": {
@@ -200,11 +206,14 @@ export default area(es, {
     }
   },
   eu: {
+    "pestanas": {"aria": "Estatistiken atalak", "votos": "Botoak", "perfil": "Profila", "dinero": "Dirua"},
+    "cifras": {"votaciones": "Osoko bilkurako bozketa aztertuta", "mujeres": "emakume 350 diputatuen artean", "distintos": "diputatuk bozkatu dute noizbait beren taldeaz bestela", "alquiler": "diputatuk alokairuetatik errentak aitortzen dituzte"},
+    "verCifras": "Sakatu errenkada bat zifrak ikusteko.",
+    "matriz": "Bi taldeek (errenkada eta zutabea) bat egin zuten bozketen ehunekoa.",
     "titulo": "Estatistikak",
     "tituloSeo": "Diputatuen estatistikak: talde bakoitzak nola bozkatzen duen, zer ikasi zuten eta zer aitortzen duten",
     "descripcion": "Talde bakoitzak gaika nola bozkatzen duen, norekin bat egiten duen, diputatuek zer ikasi zuten, aitortutako errentak eta nork kobratzen dituen alokairuak. Guztizko zifrak, datu ofizialekin.",
     "lead": "XV. Legegintzaldiko 350 diputatuen zifrak, Kongresuaren datu ofizialekin. Beti guztizkoak, inoiz ez batez bestekoak.",
-    "indice": "Orrialde honetan",
     "fuente": "Nola kalkulatzen den",
     "descargar": "Deskargatu datu hauek",
     "votoTema": {
@@ -298,11 +307,14 @@ export default area(es, {
     }
   },
   gl: {
+    "pestanas": {"aria": "Apartados das estatísticas", "votos": "Votos", "perfil": "Perfil", "dinero": "Diñeiro"},
+    "cifras": {"votaciones": "votacións do Pleno analizadas", "mujeres": "mulleres entre os 350 deputados", "distintos": "deputados votaron algunha vez distinto do seu grupo", "alquiler": "deputados declaran rendas de alugueiros"},
+    "verCifras": "Preme unha fila para ver todas as súas cifras.",
+    "matriz": "Porcentaxe de votacións en que coincidiron os dous grupos (fila e columna).",
     "titulo": "Estatísticas",
     "tituloSeo": "Estatísticas dos deputados: como vota cada grupo, que estudaron e que declaran",
     "descripcion": "Como vota cada grupo por tema, con quen coincide, que estudaron os deputados, as súas rendas declaradas e quen cobra alugueres. Cifras totais con datos oficiais.",
     "lead": "Cifras dos 350 deputados da XV Lexislatura con datos oficiais do Congreso. Sempre totais, nunca medias.",
-    "indice": "Nesta páxina",
     "fuente": "Como se calcula",
     "descargar": "Descargar estes datos",
     "votoTema": {
@@ -396,11 +408,14 @@ export default area(es, {
     }
   },
   en: {
+    "pestanas": {"aria": "Statistics sections", "votos": "Votes", "perfil": "Profile", "dinero": "Money"},
+    "cifras": {"votaciones": "plenary votes analysed", "mujeres": "women among the 350 MPs", "distintos": "MPs have voted differently from their group at least once", "alquiler": "MPs declare rental income"},
+    "verCifras": "Select a row to see all its figures.",
+    "matriz": "Percentage of votes in which both groups (row and column) voted the same way.",
     "titulo": "Statistics",
     "tituloSeo": "Statistics on Spain’s deputies: how each group votes, what they studied and what they declare",
     "descripcion": "How each group votes by topic, who it votes with, what the deputies studied, their declared income and who earns rent. Totals from official data.",
     "lead": "Figures on the 350 deputies of the 15th Legislature from official Congress data. Always totals, never averages.",
-    "indice": "On this page",
     "fuente": "How it is calculated",
     "descargar": "Download this data",
     "votoTema": {

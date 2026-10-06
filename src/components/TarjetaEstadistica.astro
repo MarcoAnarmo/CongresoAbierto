@@ -1,0 +1,69 @@
+---
+/**
+ * Caja de una estadística: título, una línea de explicación y, arriba a la derecha, «Cómo se calcula» (ⓘ, abre
+ * HojaInfo) y «Descargar estos datos» (↓, lleva a Datos con los filtros puestos). El gráfico va en el contenido
+ * y los enlaces secundarios en el hueco `pie`. Sin JavaScript, «Cómo se calcula» se ve como desplegable.
+ */
+import Icono from './Icono.astro';
+import { idiomaDeUrl } from '../i18n';
+import textos from '../i18n/textos/estadisticas';
+interface Props {
+  id: string;
+  titulo: string;
+  intro?: string;
+  /** Texto de «Cómo se calcula». */
+  como?: string;
+  /** Enlace a la descarga de estos datos. */
+  descargar?: string;
+  /** Ocupa todo el ancho en el ordenador (en el móvil todas lo ocupan). */
+  ancho?: boolean;
+}
+const { id, titulo, intro, como, descargar, ancho = false } = Astro.props;
+const t = textos[idiomaDeUrl(Astro.url.pathname)];
+---
+<section class:list={['est', { ancho }]} id={id} aria-labelledby={`h-${id}`}>
+  <header class="est-cab">
+    <div class="est-tit">
+      <h2 id={`h-${id}`}>{titulo}</h2>
+      {intro && <p class="est-intro">{intro}</p>}
+    </div>
+    <div class="est-acc">
+      {como && <button class="ico-btn b-info" type="button" data-info={`como-${id}`} data-info-titulo={t.fuente} aria-label={`${t.fuente}: ${titulo}`} title={t.fuente}><Icono n="info" tam={19} /></button>}
+      {descargar && <a class="ico-btn" href={descargar} aria-label={`${t.descargar}: ${titulo}`} title={t.descargar}><Icono n="descarga" tam={19} /></a>}
+    </div>
+  </header>
+  <slot />
+  {Astro.slots.has('pie') && <div class="est-pie small"><slot name="pie" /></div>}
+  {como && (
+    <details class="como">
+      <summary>{t.fuente}</summary>
+      <div id={`como-${id}`}><p>{como}</p></div>
+    </details>
+  )}
+</section>
+
+<style>
+  .est {
+    --pad: 16px; min-width: 0; padding: 18px var(--pad); scroll-margin-top: calc(var(--tope) + 72px);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  }
+  .est-cab { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .est-tit { min-width: 0; }
+  .est h2 { margin: 0; font-size: 1.08rem; letter-spacing: -.01em; }
+  .est-intro { margin: 4px 0 0; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+  .est-acc { display: flex; gap: 2px; flex: none; margin: -6px -8px 0 0; }
+  .ico-btn {
+    display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none;
+    color: var(--muted); cursor: pointer; text-decoration: none; transition: background-color .15s, color .15s;
+  }
+  .ico-btn:hover { background: var(--chip); color: var(--accent-text); }
+  :global(html:not(.js)) .b-info { display: none; }
+  :global(html.js) .como { display: none; }
+  .est-pie { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .est-pie :global(a) { color: var(--accent-text); font-weight: 600; text-decoration: none; }
+  .est-pie :global(a:hover) { text-decoration: underline; }
+  .como { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 4px; }
+  .como summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--accent-text); font-weight: 600; font-size: .92rem; }
+  .como p { margin: 0 0 6px; color: var(--muted); font-size: .875rem; }
+  @media (min-width: 900px) { .est { --pad: 24px; padding-block: 22px; } .est.ancho { grid-column: 1 / -1; } }
+</style>
