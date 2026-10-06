@@ -125,6 +125,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
 
 <script>
   import { deslizarParaCerrar } from '../scripts/hoja';
+  import { TRAMOS, tramo } from '../lib/hemiciclo';
   import { precargar } from '../scripts/precarga';
   import { textos, f, locale, localeNum, fmtFechaCorta, prefijo } from '../i18n/cliente';
   type Tx = {
@@ -148,10 +149,9 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   const etVoto: Record<Voto, string> = { S: tx.votos['Sí'], N: tx.votos['No'], A: tx.votos['Abstención'], X: tx.votos['No vota'] };
   const escala = [0, 1, 2, 3, 4, 5].map((i) => `var(--int-${i})`);
   const tramos = {
-    viviendas: { cortes: [0, 1, 2, 4, 7], etiquetas: ['0', '1', '2', '3–4', '5–7', '8+'], aria: tx.tramoViviendas },
-    propiedades: { cortes: [0, 1, 3, 6, 10], etiquetas: ['0', '1', '2–3', '4–6', '7–10', '11+'], aria: tx.tramoPropiedades },
+    viviendas: { ...TRAMOS.viviendas, aria: tx.tramoViviendas },
+    propiedades: { ...TRAMOS.propiedades, aria: tx.tramoPropiedades },
   };
-  const tramo = (v: number | null, cortes: number[]) => (v === null ? -1 : cortes.findIndex((c) => v <= c) === -1 ? cortes.length : cortes.findIndex((c) => v <= c));
 
   const circulos = [...document.querySelectorAll<SVGCircleElement>('.hemi circle[data-cod]')];
   const tip = document.getElementById('hemi-tip')!;
@@ -173,7 +173,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   const item = (color: string, texto: string, clave: string, borde = false) =>
     `<button type="button" class="pill filtro" data-f="${clave}" aria-pressed="false"><span class="dot${borde ? ' vacio' : ''}" style="background:${color}"></span>${texto}</button>`;
   /** Escala ordenada de menos a más: una barra de tramos con su número debajo */
-  const escalaHtml = (etiquetas: string[], aria: string, cuenta: number[], sinDatos: number) =>
+  const escalaHtml = (etiquetas: readonly string[], aria: string, cuenta: number[], sinDatos: number) =>
     `<div class="escala">${escala.map((c, i) => `<button type="button" class="tramo filtro" data-f="${i}" aria-pressed="false" aria-label="${f(aria, { tramo: etiquetas[i], n: cuenta[i] })}"><i style="background:${c}"></i><span>${etiquetas[i]}</span></button>`).join('')}` +
     (sinDatos ? `<button type="button" class="tramo filtro sd" data-f="-1" aria-pressed="false" aria-label="${f(tx.sinDatosAria, { n: sinDatos })}"><i></i><span>${tx.sd}</span></button>` : '') + '</div>';
   const rellenar = (c: SVGCircleElement, color: string | null) => { c.style.fill = color ?? 'transparent'; c.classList.toggle('vacio', color === null); };

@@ -1,13 +1,14 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
 import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, slug, candidaturaDistinta, antesDeElecciones } from './data';
 import { fechaTexto } from '../i18n/fechas';
-import { disponerPorGrupos } from './hemiciclo';
+import { disponerPorGrupos, TRAMOS, tramo } from './hemiciclo';
 import type { Diputado, VotacionClave, Voto } from './types';
 import { C, h, img, lienzo, cabecera, pie, cifra, retrato, barraVotos, fotoDataUri, aPng, type Formato } from './og';
 import { LOCALE, formatos, f, pl, prefijo, type Idioma } from '../i18n';
 import comun from '../i18n/textos/comun';
 import textosTarjetas from '../i18n/textos/tarjetas';
 import textosCompartir from '../i18n/textos/compartir';
+import textosHemiciclo from '../i18n/textos/hemiciclo';
 
 /*
  * Cada tarjeta tiene una versión por idioma (`lang`, castellano por defecto). Se traducen las etiquetas y textos propios
@@ -296,9 +297,15 @@ export async function tarjetaProvincia(id: string, formato: Formato, lang: Idiom
 }
 
 /* ---------- Resumen del Congreso ---------- */
-export async function tarjetaResumen(formato: Formato, lang: Idioma = 'es') {
+/**
+ * Lo que se ve en el hemiciclo de la portada: por grupo (la tarjeta de siempre) o coloreado por propiedades o viviendas.
+ * Al compartir desde la portada se usa la tarjeta del modo que esté elegido.
+ */
+export type ModoHemiciclo = 'grupo' | 'propiedades' | 'viviendas';
+
+export async function tarjetaResumen(formato: Formato, lang: Idioma = 'es', modo: ModoHemiciclo = 'grupo') {
   // Horizontal: la vista previa de la portada. Historia: enfocada en las elecciones, con las cifras y el hemiciclo
-  if (formato === 'horizontal') return tarjetaPagina('inicio', lang);
+  if (formato === 'horizontal') return tarjetaPagina('inicio', lang, modo);
   const tt = textosTarjetas[lang];
   const tc = comun[lang];
   const fmtNum = formatos(lang).num;
@@ -324,31 +331,118 @@ export async function tarjetaResumen(formato: Formato, lang: Idioma = 'es') {
       h('div', { width: 15, height: 15, borderRadius: 8, background: '#fff', flexShrink: 0 }), elecciones ? tc.elecciones.tarjeta : tc.marca.lema),
     h('div', { ...fijo, fontSize: elecciones ? 116 : 96, fontWeight: 800, letterSpacing: -4, lineHeight: 1.02, marginTop: 26 }, elecciones ? tt.resumen.titulo : tc.marca.lema),
     h('div', { ...fijo, fontSize: 36, color: C.apagado, lineHeight: 1.3, marginTop: 18 }, tt.resumen.subtitulo),
-    // Hemiciclo con los 350 escaños por grupo
+    // Hemiciclo con los 350 escaños por grupo, o por propiedades o viviendas (con su escala debajo)
     h('div', { ...fijo, flexDirection: 'column', alignItems: 'center', marginTop: 32, background: C.blanco, border: `3px solid ${C.borde}`, borderRadius: 30, padding: '26px 24px 24px' },
-      img(hemicicloUri(), 780, 412),
-      h('div', { flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px', marginTop: 12, fontSize: 22, fontWeight: 700, color: C.apagado },
-        ...orden.map((g) => h('div', { alignItems: 'center', gap: 7 }, puntoGrupo(g.color, 14), g.corto))),
+      hemicicloNodo(modo, 'historia'),
+      modo === 'grupo'
+        ? h('div', { flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px', marginTop: 12, fontSize: 22, fontWeight: 700, color: C.apagado },
+          ...orden.map((g) => h('div', { alignItems: 'center', gap: 7 }, puntoGrupo(g.color, 14), g.corto)))
+        : leyendaEscala(modo, lang, 1),
       h('div', { alignItems: 'center', gap: 14, marginTop: 20, padding: '14px 32px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 32, fontWeight: 800 }, tt.resumen.llamada, img(FLECHA, 30, 30))),
     // Cifras del Congreso
     h('div', { ...fijo, flexDirection: 'column', gap: 16, marginTop: 26 },
-      h('div', { gap: 16 }, caja(fmtNum(prop), tt.cifras.propiedades, true), caja(fmtNum(viv), tt.cifras.viviendas)),
+      h('div', { gap: 16 }, caja(fmtNum(prop), tt.cifras.propiedades, modo !== 'viviendas'), caja(fmtNum(viv), tt.cifras.viviendas, modo === 'viviendas')),
       h('div', { gap: 16 }, caja(fmtNum(votacionesPleno.length), tt.cifras.votaciones), caja(String(diputados.length), tt.cifras.unoAUno))),
     h('div', { ...fijo, marginTop: 18, fontSize: 24, color: C.apagado, paddingLeft: 6 }, tt.pie),
   ), 'historia');
 }
 
 /* ---------- Vista previa de enlaces (portada y páginas) ---------- */
-/** Hemiciclo con los 350 escaños coloreados por grupo, como imagen SVG para satori. */
-let hemiciclo: string | null = null;
-function hemicicloUri() {
-  if (hemiciclo) return hemiciclo;
+/** Escala de propiedades y viviendas en tema claro (la misma que --int-0…--int-5 de global.css). */
+const ESCALA = ['#ebe8e1', '#c4b9a7', '#a09280', '#776a5b', '#4f453b', '#241e19'];
+/**
+ * Hemiciclo con los 350 escaños como imagen SVG para satori: por grupo o, con propiedades o viviendas, cada escaño con
+ * el color de su tramo. Los escaños siguen el orden de la web (grupo y, dentro, apellidos). Sin datos: solo el borde.
+ */
+const hemiciclos = new Map<ModoHemiciclo, string>();
+function hemicicloUri(modo: ModoHemiciclo = 'grupo') {
+  if (hemiciclos.has(modo)) return hemiciclos.get(modo)!;
+  const orden = [...grupos].sort((a, b) => a.orden - b.orden).map((g) => ({ g, ds: diputados.filter((d) => d.grupoCorto === g.corto).sort((a, b) => a.apellidos.localeCompare(b.apellidos, 'es')) })).filter((x) => x.ds.length);
+  const { escanos, sectores } = disponerPorGrupos(orden.map((x) => x.ds.length), 11);
+  const color = (g: (typeof grupos)[number], d: Diputado) => {
+    if (modo === 'grupo') return g.color;
+    const i = tramo(modo === 'viviendas' ? d.patrimonio.viviendas : d.patrimonio.propiedades, TRAMOS[modo].cortes);
+    return i < 0 ? null : ESCALA[i];
+  };
+  const colores = orden.flatMap((x) => x.ds.map((d) => color(x.g, d)));
+  const puntos = escanos.map((e, i) => {
+    const r = (e.r * 0.92).toFixed(4), c = colores[i];
+    // El tramo 0 es casi del color del fondo: un borde fino mantiene la forma del escaño en la imagen
+    if (c === ESCALA[0]) return `<circle cx="${e.x.toFixed(4)}" cy="${(-e.y).toFixed(4)}" r="${(e.r * 0.86).toFixed(4)}" fill="${c}" stroke="#d6d0c5" stroke-width="${(e.r * 0.12).toFixed(4)}"/>`;
+    return c ? `<circle cx="${e.x.toFixed(4)}" cy="${(-e.y).toFixed(4)}" r="${r}" fill="${c}"/>`
+      : `<circle cx="${e.x.toFixed(4)}" cy="${(-e.y).toFixed(4)}" r="${(e.r * 0.8).toFixed(4)}" fill="none" stroke="${C.apagado}" stroke-width="${(e.r * 0.18).toFixed(4)}" stroke-dasharray="${(e.r * 0.4).toFixed(4)} ${(e.r * 0.3).toFixed(4)}"/>`;
+  }).join('');
+  // Con propiedades o viviendas, una franja del color de cada grupo por fuera (como en la web); los nombres los pone hemicicloNodo
+  const franjas = modo === 'grupo' ? '' : sectores.map((sec, i) => {
+    const p = (a: number) => `${(RB * Math.cos(a)).toFixed(4)} ${(-RB * Math.sin(a)).toFixed(4)}`;
+    return `<path d="M${p(sec.desde)} A${RB} ${RB} 0 0 1 ${p(sec.hasta)}" fill="none" stroke="${orden[i].g.color}" stroke-width="0.032"/>`;
+  }).join('');
+  const vb = modo === 'grupo' ? VB_GRUPO : VB_FRANJAS;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${modo === 'grupo' ? 840 : 924}" height="${modo === 'grupo' ? 444 : Math.round((924 * vb[3]) / vb[2])}" viewBox="${vb.join(' ')}" preserveAspectRatio="xMidYMid meet">${franjas}${puntos}</svg>`;
+  const uri = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+  hemiciclos.set(modo, uri);
+  return uri;
+}
+
+/** Marco del dibujo: solo escaños (grupo) o con franjas y nombres de grupo alrededor (propiedades y viviendas). */
+const VB_GRUPO = [-1.04, -1.06, 2.08, 1.1];
+const VB_FRANJAS = [-1.5, -1.36, 3.0, 1.4];
+/** Radio de la franja de color de cada grupo (el exterior de los escaños es 1). */
+const RB = 1.065;
+
+/**
+ * Hemiciclo para las tarjetas. Por grupo, la imagen de siempre. Por propiedades o viviendas, además, la franja de color
+ * y el nombre de cada grupo alrededor, como en la web: así se ve qué grupo tiene más.
+ */
+function hemicicloNodo(modo: ModoHemiciclo, formato: Formato) {
+  if (modo === 'grupo') return formato === 'historia' ? img(hemicicloUri(), 780, 412) : img(hemicicloUri(), 420, 222);
+  const ancho = formato === 'historia' ? 888 : 440;
+  const [x0, y0, w, hgt] = VB_FRANJAS;
+  const k = ancho / w, alto = Math.round(hgt * k);
+  const letra = formato === 'historia' ? 25 : 13.5;
   const orden = [...grupos].sort((a, b) => a.orden - b.orden).map((g) => ({ g, n: diputados.filter((d) => d.grupoCorto === g.corto).length })).filter((x) => x.n);
-  const { escanos } = disponerPorGrupos(orden.map((x) => x.n), 11);
-  const colores = orden.flatMap((x) => Array(x.n).fill(x.g.color) as string[]);
-  const puntos = escanos.map((e, i) => `<circle cx="${e.x.toFixed(4)}" cy="${(-e.y).toFixed(4)}" r="${(e.r * 0.92).toFixed(4)}" fill="${colores[i]}"/>`).join('');
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="840" height="444" viewBox="-1.04 -1.06 2.08 1.1" preserveAspectRatio="xMidYMid meet">${puntos}</svg>`;
-  return (hemiciclo = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`);
+  const { sectores } = disponerPorGrupos(orden.map((x) => x.n), 11);
+  // Cada nombre, junto a su franja (por fuera, alineado hacia fuera); si dos se pisan (grupos pequeños seguidos),
+  // se aparta uno: en los lados, el de arriba sube; arriba del todo, se separan hacia los lados
+  const cajas = sectores.map((sec, i) => {
+    const ang = (sec.desde + sec.hasta) / 2;
+    const estrecho = sec.desde - sec.hasta < 0.12;
+    const rr = estrecho && i % 2 === 1 ? 1.22 : 1.12;
+    const x = (rr * Math.cos(ang) - x0) * k, y = (-rr * Math.sin(ang) - y0) * k;
+    const c = Math.cos(ang), texto = orden[i].g.corto;
+    const w = texto.length * letra * 0.74; // ancho aproximado (Inter 800, con mayúsculas)
+    const lado = c > 0.25 ? 1 : c < -0.25 ? -1 : 0;
+    return { texto, color: orden[i].g.color, lado, x: lado === 1 ? x : lado === -1 ? x - w : x - w / 2, y: y - letra * 0.6, w };
+  });
+  const hueco = letra * 0.6;
+  for (let pasada = 0; pasada < 4; pasada++) {
+    for (let i = 1; i < cajas.length; i++) for (let j = 0; j < i; j++) {
+      const a = cajas[j], b = cajas[i];
+      const solapaX = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) + hueco;
+      const solapaY = Math.min(a.y, b.y) + letra * 1.15 - Math.max(a.y, b.y);
+      if (solapaX <= 0 || solapaY <= 0) continue;
+      if (a.lado === 0 && b.lado === 0) { a.x -= solapaX / 2; b.x += solapaX / 2; }
+      // A la izquierda, cada grupo siguiente está más arriba; a la derecha, más abajo: sube el que ya está más arriba
+      else if (b.lado === 1 || a.lado === 1) a.y -= solapaY;
+      else b.y -= solapaY;
+    }
+  }
+  const etiquetas = cajas.map((e) => h('div', { position: 'absolute', left: e.x, top: e.y, fontSize: letra, fontWeight: 800, color: e.color, lineHeight: 1.2, whiteSpace: 'nowrap' }, e.texto));
+  return h('div', { position: 'relative', width: ancho, height: alto, flexShrink: 0 }, img(hemicicloUri(modo), ancho, alto), ...etiquetas);
+}
+
+/** Escala de menos a más bajo el hemiciclo (como en la web), con su título: «Propiedades declaradas por cada diputado». */
+function leyendaEscala(modo: Exclude<ModoHemiciclo, 'grupo'>, lang: Idioma, escala: number) {
+  const t = TRAMOS[modo];
+  const hayNulos = diputados.some((d) => (modo === 'viviendas' ? d.patrimonio.viviendas : d.patrimonio.propiedades) === null);
+  const paso = (fondo: Record<string, unknown>, texto: string) => h('div', { flexDirection: 'column', alignItems: 'center', gap: 6 * escala, width: 92 * escala },
+    h('div', { width: 92 * escala, height: 20 * escala, borderRadius: 5 * escala, ...fondo }),
+    h('div', { fontSize: 22 * escala, fontWeight: 700, color: C.apagado }, texto));
+  return h('div', { flexDirection: 'column', alignItems: 'center', gap: 10 * escala, marginTop: 14 * escala },
+    h('div', { fontSize: 24 * escala, fontWeight: 700, color: C.texto }, textosTarjetas[lang].resumen.leyenda[modo]),
+    h('div', { gap: 5 * escala, alignItems: 'flex-start' },
+      ...ESCALA.map((c, i) => paso({ background: c, border: `${Math.max(1, 1.5 * escala)}px solid ${i === 0 ? C.borde : c}` }, t.etiquetas[i])),
+      ...(hayNulos ? [h('div', { width: 10 * escala }), paso({ border: `${2 * escala}px dashed ${C.apagado}` }, textosHemiciclo[lang].cliente.sd)] : [])));
 }
 
 const conDeclaracion = () => diputados.filter((d) => d.patrimonio.viviendas !== null);
@@ -380,7 +474,7 @@ export const PAGINAS: Record<IdPagina, { cifras: (lang: Idioma) => [string, stri
 
 const FLECHA = `data:image/svg+xml;base64,${Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>').toString('base64')}`;
 /** Vista previa de enlaces (1200×630): elecciones, titular, cifras en cajitas y el hemiciclo. */
-export function tarjetaPagina(id: string, lang: Idioma = 'es') {
+export function tarjetaPagina(id: string, lang: Idioma = 'es', modo: ModoHemiciclo = 'grupo') {
   const tt = textosTarjetas[lang];
   const tc = comun[lang];
   const p = { ...tt.paginas[id as IdPagina], cifras: () => PAGINAS[id as IdPagina].cifras(lang) };
@@ -388,11 +482,13 @@ export function tarjetaPagina(id: string, lang: Idioma = 'es') {
   const etiqueta = h('div', { alignItems: 'center', gap: 10, padding: '9px 20px', borderRadius: 999, background: C.naranja, color: '#fff', fontSize: 22, fontWeight: 800 },
     h('div', { width: 12, height: 12, borderRadius: 6, background: '#fff', flexShrink: 0 }),
     elecciones ? tc.elecciones.tarjeta : tc.marca.lema);
+  // Cifra destacada: la primera (propiedades) o, con el hemiciclo de viviendas, la de viviendas
+  const destacada = modo === 'viviendas' ? 1 : 0;
   const caja = ([v, t]: [string, string], i: number) => h('div', {
     flexDirection: 'column', flex: 1, gap: 2, padding: '14px 18px', borderRadius: 16,
-    background: i === 0 ? C.acentoSuave : C.blanco, border: `2px solid ${i === 0 ? '#f7c9a6' : C.borde}`,
+    background: i === destacada ? C.acentoSuave : C.blanco, border: `2px solid ${i === destacada ? '#f7c9a6' : C.borde}`,
   },
-    h('div', { fontSize: 44, fontWeight: 800, letterSpacing: -1, color: i === 0 ? C.acento : C.texto, lineHeight: 1.05 }, v),
+    h('div', { fontSize: 44, fontWeight: 800, letterSpacing: -1, color: i === destacada ? C.acento : C.texto, lineHeight: 1.05 }, v),
     h('div', { fontSize: 19, color: C.apagado, lineHeight: 1.2 }, t));
   return aPng(h('div', {
     width: 1200, height: 630, flexDirection: 'column', justifyContent: 'space-between', background: C.fondo, color: C.texto,
@@ -405,7 +501,8 @@ export function tarjetaPagina(id: string, lang: Idioma = 'es') {
         h('div', { fontSize: 26, color: C.apagado, lineHeight: 1.3 }, p.subtitulo),
         h('div', { gap: 12, marginTop: 6 }, ...p.cifras().map(caja))),
       h('div', { flexDirection: 'column', alignItems: 'center', gap: 16, flex: 1 },
-        img(hemicicloUri(), 420, 222),
+        hemicicloNodo(modo, 'horizontal'),
+        ...(modo === 'grupo' ? [] : [leyendaEscala(modo, lang, 0.62)]),
         h('div', { alignItems: 'center', gap: 12, padding: '12px 22px 12px 26px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 23, fontWeight: 800 }, p.llamada, img(FLECHA, 22, 22)))),
     h('div', { justifyContent: 'space-between', alignItems: 'center', fontSize: 20, color: C.apagado, borderTop: `2px solid ${C.borde}`, paddingTop: 16 },
       h('div', {}, tt.pie),
@@ -421,7 +518,7 @@ export const rutaTarjeta = {
   diputado: (d: Diputado, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/diputado/${slug(d)}.png`,
   votacion: (v: VotacionClave, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/votacion/${v.id}.png`,
   provincia: (id: string, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/provincia/${id}.png`,
-  resumen: (f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/resumen.png`,
+  resumen: (f: Formato, lang: Idioma = 'es', modo: ModoHemiciclo = 'grupo') => `${prefijo(lang)}/tarjetas/${f}/resumen${modo === 'grupo' ? '' : `-${modo}`}.png`,
   pagina: (id: string, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/horizontal/pagina/${id}.png`,
 };
 

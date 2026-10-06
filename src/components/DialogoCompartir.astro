@@ -39,7 +39,12 @@ const t = textosCompartir[lang].ui;
     const b = boton.dataset;
     if (b.historia) {
       // Botón con sus propios datos (p. ej. la portada: resumen de todo el Congreso); su enlace ya lleva el idioma
-      rellenarCaja(caja, { historia: b.historia, horizontal: b.horizontal!, nombre: b.nombre!, enlace: `${sitio}${base}${b.enlace}`, texto: b.ct!, titulo: b.titulo! });
+      // En la portada, la tarjeta lleva el hemiciclo tal como se está viendo: por grupo, propiedades o viviendas
+      // (resumen.png, resumen-propiedades.png, resumen-viviendas.png). Con una votación elegida, el de grupo.
+      const modo = s === 'resumen' ? document.querySelector<HTMLElement>('.hemi')?.dataset.modo : undefined;
+      const fin = modo === 'propiedades' || modo === 'viviendas' ? `-${modo}` : '';
+      const conModo = (ruta: string) => (fin ? ruta.replace(/resumen\.png$/, `resumen${fin}.png`) : ruta);
+      rellenarCaja(caja, { historia: conModo(b.historia), horizontal: conModo(b.horizontal!), nombre: `${b.nombre!}${fin}`, enlace: `${sitio}${base}${b.enlace}`, texto: b.ct!, titulo: b.titulo! });
       dlg.showModal();
       return;
     }

@@ -59,6 +59,8 @@ const es = {
     titulo: 'Prepárate para votar',
     subtitulo: 'Qué declaran tener, cuánto cobran y cómo votan los 350 diputados del Congreso',
     llamada: 'Míralo escaño a escaño',
+    /** Leyenda del hemiciclo cuando se comparte coloreado por propiedades o viviendas. */
+    leyenda: { propiedades: 'Propiedades declaradas por cada diputado', viviendas: 'Viviendas declaradas por cada diputado' },
   },
   /** Vista previa de enlaces de cada página (1200×630). */
   paginas: {
@@ -129,6 +131,7 @@ export default area(es, {
       titulo: 'Prepara’t per votar',
       subtitulo: 'Què declaren tenir, quant cobren i com voten els 350 diputats del Congrés',
       llamada: 'Mira-ho escó a escó',
+      leyenda: { propiedades: 'Propietats declarades per cada diputat', viviendas: 'Habitatges declarats per cada diputat' },
     },
     paginas: {
       inicio: { titulo: 'Prepara’t per votar', subtitulo: 'Què declaren tenir, quant cobren i com voten els 350 diputats del Congrés', llamada: 'Mira-ho escó a escó' },
@@ -193,6 +196,7 @@ export default area(es, {
       titulo: 'Prestatu bozkatzeko',
       subtitulo: 'Kongresuko 350 diputatuek zer aitortzen duten, zenbat kobratzen duten eta nola bozkatzen duten',
       llamada: 'Ikusi eserlekuz eserleku',
+      leyenda: { propiedades: 'Diputatu bakoitzak aitortutako jabetzak', viviendas: 'Diputatu bakoitzak aitortutako etxebizitzak' },
     },
     paginas: {
       inicio: { titulo: 'Prestatu bozkatzeko', subtitulo: 'Kongresuko 350 diputatuek zer aitortzen duten, zenbat kobratzen duten eta nola bozkatzen duten', llamada: 'Ikusi eserlekuz eserleku' },
@@ -256,6 +260,7 @@ export default area(es, {
       titulo: 'Prepárate para votar',
       subtitulo: 'Que declaran ter, canto cobran e como votan os 350 deputados do Congreso',
       llamada: 'Mírao escano a escano',
+      leyenda: { propiedades: 'Propiedades declaradas por cada deputado', viviendas: 'Vivendas declaradas por cada deputado' },
     },
     paginas: {
       inicio: { titulo: 'Prepárate para votar', subtitulo: 'Que declaran ter, canto cobran e como votan os 350 deputados do Congreso', llamada: 'Mírao escano a escano' },
@@ -319,6 +324,7 @@ export default area(es, {
       titulo: 'Get ready to vote',
       subtitulo: 'What the 350 deputies in Congress declare they own, what they earn and how they vote',
       llamada: 'See it seat by seat',
+      leyenda: { propiedades: 'Properties declared by each deputy', viviendas: 'Homes declared by each deputy' },
     },
     paginas: {
       inicio: { titulo: 'Get ready to vote', subtitulo: 'What the 350 deputies in Congress declare they own, what they earn and how they vote', llamada: 'See it seat by seat' },
