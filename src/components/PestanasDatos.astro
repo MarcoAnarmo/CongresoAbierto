@@ -1,7 +1,7 @@
 ---
 /**
  * Estadísticas y Descargar comparten botón en la barra del móvil («Datos»): estas pestañas, arriba de las dos
- * páginas, cambian de una a otra.
+ * páginas, cambian de una a otra. Solo en el móvil: en el ordenador las dos páginas ya están en la cabecera.
  */
 import Icono from './Icono.astro';
 import { idiomaDeUrl, enlace } from '../i18n';
@@ -17,7 +17,8 @@ const t = comun[lang].nav;
 </nav>
 
 <style>
-  .pestanas-datos { display: flex; width: 100%; max-width: 420px; margin: 4px 0 18px; }
+  .pestanas-datos { display: flex; width: 100%; max-width: 420px; margin: 0 0 16px; }
+  @media (min-width: 721px) { .pestanas-datos { display: none; } }
   .pestanas-datos .btn { flex: 1 1 0; min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 10px; text-decoration: none; background-image: none; white-space: nowrap; }
   /* Móvil estrecho (iPhone SE): sin iconos y algo más pequeño, para que «Estadístiques» y «Descarregar» quepan */
   @media (max-width: 380px) { .pestanas-datos .btn { font-size: .9rem; padding: 8px 6px; } .pestanas-datos .btn :global(svg) { display: none; } }
