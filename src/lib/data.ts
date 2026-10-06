@@ -6,6 +6,8 @@ import gruposJson from '../../data/manual/grupos.json';
 import comun from '../i18n/textos/comun';
 import { f, type Idioma } from '../i18n';
 import type { Contenido, Diputado, GrupoInfo, VotacionClave } from './types';
+import { slugTexto, sinTildes as quitarTildes } from './texto';
+import { nombreLegible } from './provincias';
 
 export const diputados = diputadosJson.diputados as unknown as Diputado[];
 export const votaciones = votacionesJson.votaciones as unknown as VotacionClave[];
@@ -26,7 +28,7 @@ export const fmtEur = (n: number) => eur0.format(n);
 export const fmtEur2 = (n: number) => eur2.format(n);
 export const fmtNum = (n: number) => num.format(n);
 export const fmtFecha = (iso: string | null) => (iso ? new Date(iso + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '—');
-export const slug = (d: Diputado) => `${d.codParlamentario}-${d.nombreCompleto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`;
+export const slug = (d: Diputado) => `${d.codParlamentario}-${slugTexto(d.nombreCompleto)}`;
 export const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 export const url = (p: string) => `${base}${p}`;
 
@@ -66,7 +68,7 @@ export function datosCliente() {
 }
 
 /** Candidatura por la que fue elegido/a; se indica aparte cuando no coincide con su grupo parlamentario actual. */
-const sinTildes = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+const sinTildes = (s: string) => quitarTildes(s).toUpperCase();
 export const candidaturaDistinta = (d: Diputado) => !sinTildes(d.partido).includes(sinTildes(d.grupoCorto));
 export const etiquetaPartido = (d: Diputado, lang: Idioma = 'es') => (candidaturaDistinta(d) ? f(comun[lang].candidatura, { grupo: d.grupoCorto, partido: d.partido }) : d.partido);
 
@@ -79,3 +81,15 @@ const LETRA: Record<string, VotacionClave['votos'][string]> = { S: 'Sí', N: 'No
 const expandir = (v: Record<string, string>) => Object.fromEntries(Object.entries(v).flatMap(([l, cs]) => cs.split(' ').filter(Boolean).map((c) => [c, LETRA[l]])));
 export const votacionesPleno = [...votaciones, ...((plenoJson as any).votaciones as VotacionClave[]).map((v) => ({ ...v, votos: expandir(v.votos as unknown as Record<string, string>) }))]
   .sort((a, b) => b.fecha.localeCompare(a.fecha) || b.sesion - a.sesion || b.numeroVotacion - a.numeroVotacion);
+
+/**
+ * Circunscripciones (provincias, Ceuta y Melilla) con diputados, ordenadas por su nombre legible.
+ * `id` es el que se usa en las direcciones: /provincia/<id> y /tarjetas/<formato>/provincia/<id>.png.
+ */
+export const circunscripciones = [...new Set(diputados.map((d) => d.circunscripcion))]
+  .map((c) => ({ id: slugTexto(nombreLegible(c)), nombre: c, legible: nombreLegible(c) }))
+  .sort((a, b) => a.legible.localeCompare(b.legible, 'es'));
+export type Circunscripcion = (typeof circunscripciones)[number];
+const porNombreCirc = new Map(circunscripciones.map((c) => [c.nombre, c]));
+/** Circunscripción de un diputado (para enlazar a la página de su provincia). */
+export const circunscripcionDe = (d: Diputado) => porNombreCirc.get(d.circunscripcion)!;

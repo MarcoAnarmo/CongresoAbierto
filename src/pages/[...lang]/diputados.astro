@@ -9,6 +9,7 @@ import Icono from '../../components/Icono.astro';
 import { rutasIdioma, idiomaDe, enlace, formatos, f, pl } from '../../i18n';
 import textos from '../../i18n/textos/diputados';
 import comun from '../../i18n/textos/comun';
+import { sinTildes as quitarTildes } from '../../lib/texto';
 
 export const getStaticPaths = rutasIdioma;
 const lang = idiomaDe(Astro.params.lang);
@@ -38,7 +39,7 @@ const nLeg = (d: Diputado) => d.perfil?.legislaturas.length ?? 0;
 const conAviso = (d: Diputado) => !!(d.deudas?.principal?.aviso || d.deudas?.anteriores.some((x) => x.aviso));
 // Texto en el que se busca: nombre, provincia, partido, grupo (corto y oficial), cargos, formación y trayectoria, sin tildes
 // (son datos oficiales: se busca en castellano en todos los idiomas)
-const sinTildes = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const sinTildes = (s: string) => quitarTildes(s).toLowerCase();
 const busca = (d: Diputado) => sinTildes([d.nombreCompleto, d.circunscripcion, d.partido, d.grupoCorto, grupos.find((g) => g.corto === d.grupoCorto)?.nombre ?? '', ...d.cargos, ...(d.perfil?.formacion.map((x) => x.texto) ?? []), ...(d.perfil?.trayectoria ?? [])].join(' '));
 const datos = (d: Diputado) => ({
   'data-n': d.apellidos, 'data-busca': busca(d), 'data-g': d.grupoCorto, 'data-c': d.circunscripcion, 'data-f': d.perfil?.tipoFormacion ?? 'sin-datos',
