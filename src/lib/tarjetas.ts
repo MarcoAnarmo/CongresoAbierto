@@ -333,7 +333,7 @@ export async function tarjetaResumen(formato: Formato, lang: Idioma = 'es', modo
     h('div', { ...fijo, fontSize: 36, color: C.apagado, lineHeight: 1.3, marginTop: 18 }, tt.resumen.subtitulo),
     // Hemiciclo con los 350 escaños por grupo, o por propiedades o viviendas (con su escala debajo)
     h('div', { ...fijo, flexDirection: 'column', alignItems: 'center', marginTop: 32, background: C.blanco, border: `3px solid ${C.borde}`, borderRadius: 30, padding: '26px 24px 24px' },
-      img(hemicicloUri(modo), 780, 412),
+      hemicicloNodo(modo, 'historia'),
       modo === 'grupo'
         ? h('div', { flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px', marginTop: 12, fontSize: 22, fontWeight: 700, color: C.apagado },
           ...orden.map((g) => h('div', { alignItems: 'center', gap: 7 }, puntoGrupo(g.color, 14), g.corto)))
@@ -358,7 +358,7 @@ const hemiciclos = new Map<ModoHemiciclo, string>();
 function hemicicloUri(modo: ModoHemiciclo = 'grupo') {
   if (hemiciclos.has(modo)) return hemiciclos.get(modo)!;
   const orden = [...grupos].sort((a, b) => a.orden - b.orden).map((g) => ({ g, ds: diputados.filter((d) => d.grupoCorto === g.corto).sort((a, b) => a.apellidos.localeCompare(b.apellidos, 'es')) })).filter((x) => x.ds.length);
-  const { escanos } = disponerPorGrupos(orden.map((x) => x.ds.length), 11);
+  const { escanos, sectores } = disponerPorGrupos(orden.map((x) => x.ds.length), 11);
   const color = (g: (typeof grupos)[number], d: Diputado) => {
     if (modo === 'grupo') return g.color;
     const i = tramo(modo === 'viviendas' ? d.patrimonio.viviendas : d.patrimonio.propiedades, TRAMOS[modo].cortes);
@@ -372,10 +372,63 @@ function hemicicloUri(modo: ModoHemiciclo = 'grupo') {
     return c ? `<circle cx="${e.x.toFixed(4)}" cy="${(-e.y).toFixed(4)}" r="${r}" fill="${c}"/>`
       : `<circle cx="${e.x.toFixed(4)}" cy="${(-e.y).toFixed(4)}" r="${(e.r * 0.8).toFixed(4)}" fill="none" stroke="${C.apagado}" stroke-width="${(e.r * 0.18).toFixed(4)}" stroke-dasharray="${(e.r * 0.4).toFixed(4)} ${(e.r * 0.3).toFixed(4)}"/>`;
   }).join('');
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="840" height="444" viewBox="-1.04 -1.06 2.08 1.1" preserveAspectRatio="xMidYMid meet">${puntos}</svg>`;
+  // Con propiedades o viviendas, una franja del color de cada grupo por fuera (como en la web); los nombres los pone hemicicloNodo
+  const franjas = modo === 'grupo' ? '' : sectores.map((sec, i) => {
+    const p = (a: number) => `${(RB * Math.cos(a)).toFixed(4)} ${(-RB * Math.sin(a)).toFixed(4)}`;
+    return `<path d="M${p(sec.desde)} A${RB} ${RB} 0 0 1 ${p(sec.hasta)}" fill="none" stroke="${orden[i].g.color}" stroke-width="0.032"/>`;
+  }).join('');
+  const vb = modo === 'grupo' ? VB_GRUPO : VB_FRANJAS;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${modo === 'grupo' ? 840 : 924}" height="${modo === 'grupo' ? 444 : Math.round((924 * vb[3]) / vb[2])}" viewBox="${vb.join(' ')}" preserveAspectRatio="xMidYMid meet">${franjas}${puntos}</svg>`;
   const uri = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
   hemiciclos.set(modo, uri);
   return uri;
+}
+
+/** Marco del dibujo: solo escaños (grupo) o con franjas y nombres de grupo alrededor (propiedades y viviendas). */
+const VB_GRUPO = [-1.04, -1.06, 2.08, 1.1];
+const VB_FRANJAS = [-1.5, -1.36, 3.0, 1.4];
+/** Radio de la franja de color de cada grupo (el exterior de los escaños es 1). */
+const RB = 1.065;
+
+/**
+ * Hemiciclo para las tarjetas. Por grupo, la imagen de siempre. Por propiedades o viviendas, además, la franja de color
+ * y el nombre de cada grupo alrededor, como en la web: así se ve qué grupo tiene más.
+ */
+function hemicicloNodo(modo: ModoHemiciclo, formato: Formato) {
+  if (modo === 'grupo') return formato === 'historia' ? img(hemicicloUri(), 780, 412) : img(hemicicloUri(), 420, 222);
+  const ancho = formato === 'historia' ? 888 : 440;
+  const [x0, y0, w, hgt] = VB_FRANJAS;
+  const k = ancho / w, alto = Math.round(hgt * k);
+  const letra = formato === 'historia' ? 25 : 13.5;
+  const orden = [...grupos].sort((a, b) => a.orden - b.orden).map((g) => ({ g, n: diputados.filter((d) => d.grupoCorto === g.corto).length })).filter((x) => x.n);
+  const { sectores } = disponerPorGrupos(orden.map((x) => x.n), 11);
+  // Cada nombre, junto a su franja (por fuera, alineado hacia fuera); si dos se pisan (grupos pequeños seguidos),
+  // se aparta uno: en los lados, el de arriba sube; arriba del todo, se separan hacia los lados
+  const cajas = sectores.map((sec, i) => {
+    const ang = (sec.desde + sec.hasta) / 2;
+    const estrecho = sec.desde - sec.hasta < 0.12;
+    const rr = estrecho && i % 2 === 1 ? 1.22 : 1.12;
+    const x = (rr * Math.cos(ang) - x0) * k, y = (-rr * Math.sin(ang) - y0) * k;
+    const c = Math.cos(ang), texto = orden[i].g.corto;
+    const w = texto.length * letra * 0.74; // ancho aproximado (Inter 800, con mayúsculas)
+    const lado = c > 0.25 ? 1 : c < -0.25 ? -1 : 0;
+    return { texto, color: orden[i].g.color, lado, x: lado === 1 ? x : lado === -1 ? x - w : x - w / 2, y: y - letra * 0.6, w };
+  });
+  const hueco = letra * 0.6;
+  for (let pasada = 0; pasada < 4; pasada++) {
+    for (let i = 1; i < cajas.length; i++) for (let j = 0; j < i; j++) {
+      const a = cajas[j], b = cajas[i];
+      const solapaX = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) + hueco;
+      const solapaY = Math.min(a.y, b.y) + letra * 1.15 - Math.max(a.y, b.y);
+      if (solapaX <= 0 || solapaY <= 0) continue;
+      if (a.lado === 0 && b.lado === 0) { a.x -= solapaX / 2; b.x += solapaX / 2; }
+      // A la izquierda, cada grupo siguiente está más arriba; a la derecha, más abajo: sube el que ya está más arriba
+      else if (b.lado === 1 || a.lado === 1) a.y -= solapaY;
+      else b.y -= solapaY;
+    }
+  }
+  const etiquetas = cajas.map((e) => h('div', { position: 'absolute', left: e.x, top: e.y, fontSize: letra, fontWeight: 800, color: e.color, lineHeight: 1.2, whiteSpace: 'nowrap' }, e.texto));
+  return h('div', { position: 'relative', width: ancho, height: alto, flexShrink: 0 }, img(hemicicloUri(modo), ancho, alto), ...etiquetas);
 }
 
 /** Escala de menos a más bajo el hemiciclo (como en la web), con su título: «Propiedades declaradas por cada diputado». */
@@ -448,7 +501,7 @@ export function tarjetaPagina(id: string, lang: Idioma = 'es', modo: ModoHemicic
         h('div', { fontSize: 26, color: C.apagado, lineHeight: 1.3 }, p.subtitulo),
         h('div', { gap: 12, marginTop: 6 }, ...p.cifras().map(caja))),
       h('div', { flexDirection: 'column', alignItems: 'center', gap: 16, flex: 1 },
-        img(hemicicloUri(modo), 420, 222),
+        hemicicloNodo(modo, 'horizontal'),
         ...(modo === 'grupo' ? [] : [leyendaEscala(modo, lang, 0.62)]),
         h('div', { alignItems: 'center', gap: 12, padding: '12px 22px 12px 26px', borderRadius: 999, background: C.texto, color: '#fff', fontSize: 23, fontWeight: 800 }, p.llamada, img(FLECHA, 22, 22)))),
     h('div', { justifyContent: 'space-between', alignItems: 'center', fontSize: 20, color: C.apagado, borderTop: `2px solid ${C.borde}`, paddingTop: 16 },
