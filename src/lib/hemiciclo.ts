@@ -49,3 +49,15 @@ export function disponerPorGrupos(tamanos: number[], filas = 12, rInt = 0.38, hu
   const escanos: Escano[] = crudo.flat().map(({ x, y, ang }) => ({ x, y, ang, r: rPunto }));
   return { escanos, sectores, rPunto };
 }
+
+/** Tramos de la escala de propiedades y viviendas (hemiciclo de la web y tarjetas para compartir). */
+export const TRAMOS = {
+  viviendas: { cortes: [0, 1, 2, 4, 7], etiquetas: ['0', '1', '2', '3–4', '5–7', '8+'] },
+  propiedades: { cortes: [0, 1, 3, 6, 10], etiquetas: ['0', '1', '2–3', '4–6', '7–10', '11+'] },
+} as const;
+/** Tramo (0–5) de una cifra; -1 si no hay datos. */
+export const tramo = (v: number | null, cortes: readonly number[]) => {
+  if (v === null) return -1;
+  const i = cortes.findIndex((c) => v <= c);
+  return i === -1 ? cortes.length : i;
+};
