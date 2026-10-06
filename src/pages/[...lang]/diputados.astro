@@ -297,9 +297,12 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
   // Cada palabra de la búsqueda tiene que aparecer (en cualquier orden): «pp sevilla», «abogada icade»…
   const textoBusca = new Map<HTMLElement, string>([...filas, ...tarjetas].map((f) => [f, f.dataset.busca ?? '']));
   /** Reordena las filas y las fichas (solo cuando cambia el orden o la vista: mover nodos es lo que más cuesta). */
+  // Solo se reordena la lista que se ve y solo si su orden cambia: cambiar de vista no mueve 700 nodos cada vez
+  const ordenHecho = { tabla: '', tarjetas: '' };
   function ordenar() {
-    filas.sort(comparar); tarjetas.sort(comparar);
-    cuerpo.append(...filas); lista.append(...tarjetas);
+    const k = `${clave}:${desc}`;
+    if (vista === 'tabla' && ordenHecho.tabla !== k) { ordenHecho.tabla = k; filas.sort(comparar); cuerpo.append(...filas); }
+    if (vista === 'tarjetas' && ordenHecho.tarjetas !== k) { ordenHecho.tarjetas = k; tarjetas.sort(comparar); lista.append(...tarjetas); }
   }
   function aplicar(reordenar = true) {
     if (reordenar) ordenar();
@@ -457,6 +460,8 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
   .tarjetas { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
   .tarjeta[hidden], .tarjetas[hidden], .filtros[hidden] { display: none; }
   .tarjeta { position: relative; }
+  /* Móvil: 350 fichas en una columna; el navegador no calcula las que quedan fuera de la pantalla (cada toque responde antes) */
+  @media (max-width: 720px) { .tarjeta { content-visibility: auto; contain-intrinsic-size: auto 80px; } }
   .tarjeta :global(.compartir-tarjeta) { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; }
   .t-nombre { padding-right: 36px; }
   .segmentado { flex-wrap: wrap; }

@@ -125,6 +125,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
 
 <script>
   import { deslizarParaCerrar } from '../scripts/hoja';
+  import { precargar } from '../scripts/precarga';
   import { textos, f, locale, localeNum, fmtFechaCorta, prefijo } from '../i18n/cliente';
   type Tx = {
     diputados: [string, string]; viviendas: string; propiedades: string; tramoViviendas: string; tramoPropiedades: string; sinDatosAria: string; sd: string;
@@ -274,7 +275,8 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     tipVer.href = `${prefijo()}/diputado/${d.s}`;
     tip.hidden = false;
     circulos.forEach((o) => o.classList.toggle('activo', o === c));
-    if (tactil()) { tip.classList.add('hoja'); tip.style.left = ''; tip.style.top = ''; return; }
+    // En el móvil, la ficha completa se pide ya: así «Ver ficha completa» abre al momento
+    if (tactil()) { tip.classList.add('hoja'); tip.style.left = ''; tip.style.top = ''; precargar(tipVer.href); return; }
     tip.classList.remove('hoja');
     const caja = tip.parentElement!.getBoundingClientRect();
     const b = c.getBoundingClientRect();
@@ -311,7 +313,11 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     circulos.forEach((c) => { const b = c.getBoundingClientRect(); const d = Math.hypot(b.left + b.width / 2 - e.clientX, b.top + b.height / 2 - e.clientY); if (d < dist) { dist = d; mejor = c; } });
     if (mejor) mostrar(mejor);
   });
-  botones.forEach((b) => b.addEventListener('click', () => pintar(b.dataset.modo!)));
+  // El botón se marca al momento y el repintado de los 350 escaños va en el siguiente fotograma, para que el toque responda ya
+  botones.forEach((b) => b.addEventListener('click', () => {
+    botones.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    requestAnimationFrame(() => setTimeout(() => pintar(b.dataset.modo!), 0));
+  }));
   /** Pinta una votación; si no es clave, primero descarga su voto escaño a escaño. */
   async function verVotacion(m: string) {
     const id = m.slice(5);
