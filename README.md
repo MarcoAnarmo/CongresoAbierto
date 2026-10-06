@@ -68,8 +68,12 @@ La intención es mantener la web **actualizada mes a mes** con los datos oficial
 - **Actualización mensual** de diputados, declaraciones y votaciones ([#14](https://github.com/MarcoAnarmo/CongresoAbierto/issues/14)).
 - **Nueva legislatura**: conservar los datos de la XV y cargar los 350 diputados que salgan de las elecciones del 29 de noviembre de 2026 cuando se constituyan las Cortes.
 - **Gobiernos autonómicos** y, después, sus parlamentos ([#15](https://github.com/MarcoAnarmo/CongresoAbierto/issues/15)).
-- **Lenguas cooficiales**: la web en català/valencià, galego, euskara y aranés ([#16](https://github.com/MarcoAnarmo/CongresoAbierto/issues/16)).
+- **Aranés**: la web ya está en català/valencià, galego, euskara e inglés; falta el occitano aranés ([#16](https://github.com/MarcoAnarmo/CongresoAbierto/issues/16)).
 - **Datos abiertos**: descargas en JSON y CSV para que cualquiera pueda reutilizarlos ([#20](https://github.com/MarcoAnarmo/CongresoAbierto/issues/20)).
+
+## Idiomas
+
+La web está en castellano (`/`), català/valencià (`/ca/`), euskara (`/eu/`), galego (`/gl/`) e inglés (`/en/`), con sus tarjetas para compartir. La primera vez se abre en el idioma del navegador o del móvil (si no es ninguno de estos, en inglés) y el selector de la cabecera recuerda la elección. Los datos oficiales se muestran en castellano, tal como los publica el Congreso. Cómo añadir o corregir textos: [src/i18n/LEEME-traduccion.md](src/i18n/LEEME-traduccion.md).
 
 ## Puesta en marcha
 
