@@ -1,0 +1,64 @@
+---
+/**
+ * Ventana de información (una por página): la abren los botones con `data-info="<id>"` y muestra el contenido del
+ * elemento con ese id (p. ej. el «Cómo se calcula» de cada estadística). En el móvil sube desde abajo como una hoja.
+ * Sin JavaScript no hace falta: el contenido sigue a la vista en su desplegable.
+ */
+import { idiomaDeUrl } from '../i18n';
+import comun from '../i18n/textos/comun';
+import Icono from './Icono.astro';
+const t = comun[idiomaDeUrl(Astro.url.pathname)].palabras;
+---
+<dialog class="hoja-info" id="hoja-info" aria-labelledby="hoja-info-t">
+  <div class="hi-cab">
+    <h2 id="hoja-info-t" class="hi-titulo"></h2>
+    <button class="hi-cerrar" type="button" aria-label={t.cerrar} title={t.cerrar}><Icono n="cerrar" tam={20} /></button>
+  </div>
+  <div class="hi-cuerpo"></div>
+</dialog>
+
+<script>
+  import { deslizarParaCerrar } from '../scripts/hoja';
+  const dlg = document.getElementById('hoja-info') as HTMLDialogElement;
+  const titulo = dlg.querySelector<HTMLElement>('.hi-titulo')!;
+  const cuerpo = dlg.querySelector<HTMLElement>('.hi-cuerpo')!;
+  let origen: HTMLElement | null = null;
+  document.addEventListener('click', (e) => {
+    const b = (e.target as Element).closest<HTMLElement>('[data-info]');
+    if (!b) return;
+    const fuente = document.getElementById(b.dataset.info!);
+    if (!fuente) return;
+    origen = b;
+    titulo.textContent = b.dataset.infoTitulo ?? b.getAttribute('aria-label') ?? '';
+    cuerpo.innerHTML = fuente.innerHTML;
+    dlg.showModal();
+  });
+  dlg.querySelector('.hi-cerrar')!.addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('close', () => origen?.focus());
+  deslizarParaCerrar(dlg, { cerrar: () => dlg.close() });
+</script>
+
+<style>
+  .hoja-info {
+    width: min(520px, calc(100vw - 32px)); max-height: min(80dvh, 640px); padding: 0; border: 1px solid var(--border); border-radius: 16px;
+    background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgb(0 0 0 / .25); overflow: hidden;
+  }
+  .hoja-info[open] { display: flex; flex-direction: column; animation: hi-aparecer .16s ease-out; }
+  .hoja-info::backdrop { background: rgb(20 22 28 / .5); }
+  @keyframes hi-aparecer { from { opacity: 0; transform: translateY(8px); } }
+  .hi-cab { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 12px 4px 20px; }
+  .hi-titulo { margin: 6px 0 0; font-size: 1.05rem; }
+  .hi-cerrar { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; }
+  .hi-cerrar:hover { background: var(--chip); color: var(--text); }
+  .hi-cuerpo { padding: 0 20px 20px; overflow-y: auto; color: var(--muted); line-height: 1.55; }
+  .hi-cuerpo :global(p) { margin: .5rem 0; }
+  @media (max-width: 720px) {
+    .hoja-info { width: 100vw; max-width: 100vw; margin: auto 0 0; border-radius: 18px 18px 0 0; border-bottom: 0; }
+    .hoja-info[open] { animation: hi-subir .2s ease-out; }
+    @keyframes hi-subir { from { transform: translateY(40px); opacity: .4; } }
+    .hi-cab { padding-top: 22px; }
+    .hi-cuerpo { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+  }
+  @media (prefers-reduced-motion: reduce) { .hoja-info[open] { animation: none; } }
+</style>

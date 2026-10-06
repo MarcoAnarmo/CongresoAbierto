@@ -1,0 +1,61 @@
+---
+/**
+ * Barra de pestañas que se queda pegada arriba al bajar (Estadísticas, Tarjetas). Cada pestaña abre el panel
+ * `.panel-pestana` con su id; la lógica está en src/scripts/pestanas.ts. Los enlaces `a[data-ir="<id>"]` de la página
+ * también abren su panel. Al cambiar de panel, la barra lanza el evento `pestana` (detail: id).
+ * Sin JavaScript la barra no se ve y se ven todos los paneles.
+ */
+import Icono from './Icono.astro';
+import type { NombreIcono } from '../lib/iconos';
+export interface DefPestana { id: string; texto: string; icono?: NombreIcono }
+interface Props { etiqueta: string; pestanas: DefPestana[]; inicial?: string }
+const { etiqueta, pestanas, inicial = pestanas[0].id } = Astro.props;
+---
+<div class="pestanas" role="tablist" aria-label={etiqueta} data-pestanas style={`--n:${pestanas.length}`}>
+  {pestanas.map((p) => (
+    <a role="tab" href={`#${p.id}`} id={`tab-${p.id}`} data-id={p.id} aria-controls={p.id} aria-selected={p.id === inicial ? 'true' : 'false'} tabindex={p.id === inicial ? 0 : -1}>
+      {p.icono && <Icono n={p.icono} tam={19} />}<span>{p.texto}</span>
+    </a>
+  ))}
+</div>
+
+<script>
+  import { iniciarPestanas } from '../scripts/pestanas';
+  document.querySelectorAll<HTMLElement>('[data-pestanas]').forEach((barra) => {
+    const p = iniciarPestanas(barra, { alCambiar: (id) => barra.dispatchEvent(new CustomEvent('pestana', { detail: id, bubbles: true })) });
+    document.querySelectorAll<HTMLAnchorElement>('a[data-ir]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); p.abrir(a.dataset.ir!); }));
+  });
+</script>
+
+<style>
+  .pestanas {
+    position: sticky; top: var(--tope); z-index: 6; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 2px;
+    margin: 0 -16px 14px; padding: 8px 16px; background: color-mix(in srgb, var(--bg) 88%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  }
+  :global(html:not(.js)) .pestanas { display: none !important; }
+  :global(html.js .panel-pestana:not([data-activo])) { display: none; }
+  .pestanas a {
+    display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 0; min-height: 44px; padding: 6px 8px; border-radius: 4px;
+    color: var(--muted); font-weight: 600; text-decoration: none; background: var(--chip); transition: background-color .15s, color .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pestanas a span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pestanas a :global(svg) { flex: none; }
+  .pestanas a:first-child { border-radius: 12px 4px 4px 12px; }
+  .pestanas a:last-child { border-radius: 4px 12px 12px 4px; }
+  .pestanas a:hover { color: var(--accent-text); }
+  .pestanas a[aria-selected='true'] { background: var(--text); color: var(--surface); }
+  /* Móvil estrecho con cuatro pestañas: solo el texto y, si no caben, se deslizan en horizontal */
+  @media (max-width: 480px) {
+    .pestanas[style*='--n:4'] { display: flex; overflow-x: auto; scrollbar-width: none; }
+    .pestanas[style*='--n:4']::-webkit-scrollbar { display: none; }
+    .pestanas[style*='--n:4'] a { flex: 1 0 auto; padding-inline: 14px; }
+    .pestanas[style*='--n:4'] a :global(svg) { display: none; }
+  }
+  @media (max-width: 380px) { .pestanas a :global(svg) { display: none; } }
+  @media (min-width: 721px) {
+    .pestanas { display: inline-grid; grid-template-columns: repeat(var(--n), auto); margin: 0 0 18px; padding: 10px 0; background: var(--bg); }
+    .pestanas a { padding: 6px 20px; }
+  }
+</style>
