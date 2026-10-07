@@ -1,0 +1,47 @@
+---
+/**
+ * Una fila con una barra al 100 % partida en tramos (p. ej. sí, no y abstención de un grupo).
+ * Etiqueta a la izquierda y barra a la derecha; cada tramo lleva su cifra dentro si cabe. Al pulsar la fila se
+ * despliegan todas las cifras con su nombre (también las de los tramos pequeños, y para los lectores de pantalla).
+ * Sin librerías ni JavaScript.
+ */
+export interface Tramo { valor: number; color: string; texto: string; corto?: string; tinta?: string }
+interface Props { etiqueta: string; punto?: string; tramos: Tramo[]; total?: string }
+const { etiqueta, punto, tramos, total } = Astro.props;
+const suma = tramos.reduce((a, x) => a + x.valor, 0) || 1;
+const visibles = tramos.filter((x) => x.valor > 0);
+// La cifra solo va dentro del tramo si este es bastante ancho para leerla
+const cabe = (x: Tramo) => (100 * x.valor) / suma >= 9;
+---
+<details class="apilada">
+  <summary>
+    <span class="a-et">{punto && <span class="dot" style={`background:${punto}`}></span>}<span class="a-nombre">{etiqueta}</span></span>
+    <span class="a-barra" aria-hidden="true">
+      {visibles.map((x) => <span style={`flex-grow:${x.valor};background:${x.color};color:${x.tinta ?? '#fff'}`}>{cabe(x) ? x.corto ?? x.valor : ''}</span>)}
+    </span>
+  </summary>
+  <p class="a-pie small">
+    {visibles.map((x) => <span><span class="dot" style={`background:${x.color}`}></span>{x.texto}</span>)}
+    {total && <span class="a-total">{total}</span>}
+  </p>
+</details>
+
+<style>
+  .apilada > summary {
+    display: grid; grid-template-columns: minmax(64px, 26%) minmax(0, 1fr); align-items: center; gap: 10px;
+    padding: 4px 0; cursor: pointer; list-style: none; border-radius: 8px; -webkit-tap-highlight-color: transparent;
+  }
+  .apilada > summary::-webkit-details-marker { display: none; }
+  .a-et { display: flex; align-items: center; gap: 6px; min-width: 0; font-weight: 650; font-size: .9rem; line-height: 1.2; }
+  .a-nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .a-et .dot { width: 9px; height: 9px; }
+  .a-barra { display: flex; height: 24px; border-radius: 7px; overflow: hidden; background: var(--chip); gap: 2px; transition: box-shadow .15s; }
+  .a-barra > span {
+    display: flex; align-items: center; justify-content: center; min-width: 3px; flex-basis: 0;
+    font-size: .74rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; overflow: hidden;
+  }
+  .apilada > summary:hover .a-barra, .apilada[open] .a-barra { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent); }
+  .a-pie { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 2px 0 8px calc(max(64px, 26%) + 10px); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .a-pie .dot { width: 8px; height: 8px; margin: -2px 5px 0 0; }
+  .a-total { font-weight: 600; }
+</style>

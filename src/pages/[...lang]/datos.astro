@@ -1,0 +1,447 @@
+---
+/**
+ * Descargas al estilo del INE, como asistente de cuatro pasos: 1) tabla, 2) filtros, 3) columnas, 4) formato y descarga.
+ * Se ve un paso cada vez, con una barra de progreso arriba y los botones Atrás y Siguiente al alcance del pulgar;
+ * en el ordenador, un panel fijo a la derecha resume la descarga y deja descargar en cualquier paso.
+ * La lógica está en src/scripts/descargas.ts (pasos: src/lib/datos/asistente.ts) y las tablas en src/lib/datos/tablas.ts.
+ * Sin JavaScript se ven las tablas completas en CSV, el diccionario y la licencia.
+ */
+import Base from '../../layouts/Base.astro';
+import PestanasDatos from '../../components/PestanasDatos.astro';
+import HojaInfo from '../../components/HojaInfo.astro';
+import Icono from '../../components/Icono.astro';
+import { url, grupos, TEMAS, meta } from '../../lib/data';
+import type { NombreIcono } from '../../lib/iconos';
+import { TABLAS, rutaCsvFijo, columnasPorSeccion } from '../../lib/datos/tablas';
+import { PASOS, TOTAL_PASOS } from '../../lib/datos/asistente';
+import { filasTabla, aniosVotos, filasVotos } from '../../lib/datos/filas';
+import { LICENCIA_DATOS } from '../../lib/datos/licencia';
+import { conjuntoDatos, migas } from '../../lib/seo';
+import { rutasIdioma, idiomaDe, enlace, pl, f, formatos } from '../../i18n';
+import comun from '../../i18n/textos/comun';
+import textos from '../../i18n/textos/datos';
+
+export const getStaticPaths = rutasIdioma;
+const lang = idiomaDe(Astro.params.lang);
+const t = textos[lang];
+const tc = comun[lang];
+const { num } = formatos(lang);
+const u = (p: string) => enlace(p, lang);
+
+// Filas de cada tabla (votos: votaciones × diputados con voto)
+const filas: Record<string, number> = Object.fromEntries(TABLAS.filter((x) => x.particion === 'unica').map((x) => [x.id, filasTabla(x).length]));
+filas.votos = filasVotos();
+const nombre = (id: string) => t.tablas[id as keyof typeof t.tablas];
+const ICONO: Record<string, NombreIcono> = { diputados: 'fichas', inmuebles: 'vivienda', votaciones: 'votaciones', 'votos-grupo': 'grupos', votos: 'voto' };
+const nombrePaso = [t.paso1, t.paso2, t.paso3, t.paso4];
+// Diccionario: nombre y descripción de cada columna; algunas tablas precisan la descripción (p. ej. «no_vota» en el voto de cada grupo)
+const col = (id: string) => t.columnas[id as keyof typeof t.columnas];
+const descripcion = (tabla: string, id: string) => (t.descripciones as Record<string, Record<string, string> | undefined>)[tabla]?.[id] ?? col(id).descripcion;
+const seccion = (id: string | null) => (id ? t.secciones[id as keyof typeof t.secciones] : null);
+
+const config = {
+  base: url(''),
+  filas,
+  anios: aniosVotos(),
+  grupos: [...grupos].sort((a, b) => a.orden - b.orden).map((g) => g.corto),
+  temas: Object.fromEntries(TEMAS.map((x) => [x.id, tc.temas[x.id] ?? x.nombre])),
+  tx: { ...Object.fromEntries(Object.entries(t).filter(([, v]) => typeof v === 'string')) },
+  plFilas: t.filas,
+  pasos: nombrePaso,
+  nombresColumnas: Object.fromEntries(Object.entries(t.columnas).map(([k, v]) => [k, v.nombre])),
+  nombresTablas: Object.fromEntries(Object.entries(t.tablas).map(([k, v]) => [k, v.nombre])),
+  nombresFiltros: t.filtros,
+  nombresSecciones: t.secciones,
+};
+const jsonLd = [
+  conjuntoDatos({
+    nombre: t.tituloSeo, descripcion: t.descripcion, ruta: u('/datos'), licencia: LICENCIA_DATOS.url, lang, modificado: meta.generado.slice(0, 10),
+    palabras: ['Congreso de los Diputados', 'diputados', 'patrimonio', 'votaciones', 'transparencia', 'España'],
+    descargas: TABLAS.filter((x) => x.csvFijo).map((x) => ({ nombre: nombre(x.id).nombre, ruta: rutaCsvFijo(x), formato: 'text/csv' })),
+  }),
+  migas([[tc.nav.estadisticas, u('/estadisticas')], [t.titulo, u('/datos')]]),
+];
+const licencia = `<a href="${LICENCIA_DATOS.url}" rel="license noopener">${LICENCIA_DATOS.nombre}</a>`;
+const pasoDe = (n: number) => f(t.pasoDe, { n, total: TOTAL_PASOS });
+---
+<Base title={t.titulo} tituloSeo={`${t.tituloSeo} · Congreso Abierto`} description={t.descripcion} jsonLd={jsonLd}>
+  <PestanasDatos actual="datos" />
+  <h1>{t.titulo}</h1>
+  <p class="lead">{t.lead}</p>
+
+  <div class="asistente" id="descargas" data-paso="1">
+    <ol class="pasos-barra" aria-label={t.progreso}>
+      {PASOS.map((_, i) => (
+        <li>
+          <button type="button" data-ir-paso={i + 1} aria-current={i === 0 ? 'step' : undefined}>
+            <span class="pb-num" aria-hidden="true"><span class="pb-n">{i + 1}</span><Icono n="hecho" tam={15} class="pb-ok" /></span>
+            <span class="pb-txt">{nombrePaso[i]}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
+
+    <div class="asis-pasos">
+      <!-- 1. Tabla -->
+      <section class="paso" data-paso="1" aria-labelledby="d-p1" data-activo>
+        <h2 class="paso-tit" id="d-p1" tabindex="-1"><span class="paso-de">{pasoDe(1)}</span>{t.paso1}</h2>
+        <div class="tablas" role="radiogroup" aria-labelledby="d-p1">
+          {TABLAS.map((x, i) => (
+            <label class="opcion">
+              <input class="sr-only" type="radio" name="d-tabla" value={x.id} checked={i === 0} />
+              <span class="o-ico" aria-hidden="true"><Icono n={ICONO[x.id] ?? 'tabla'} tam={22} /></span>
+              <span class="o-texto">
+                <span class="o-nombre">{nombre(x.id).nombre}</span>
+                <span class="o-desc">{nombre(x.id).descripcion}</span>
+                <span class="o-n">{pl(filas[x.id], t.filas, lang)}</span>
+              </span>
+              <span class="o-marca" aria-hidden="true"><Icono n="hecho" tam={16} /></span>
+            </label>
+          ))}
+        </div>
+        <p class="small muted nota-tabla" data-nota-tabla="votos" hidden>{t.nota_votos}</p>
+        <p class="small muted nota-tabla" data-nota-tabla="inmuebles" hidden>{t.nota_inmuebles}</p>
+      </section>
+
+      <!-- 2. Filtros -->
+      <section class="paso" data-paso="2" aria-labelledby="d-p2">
+        <h2 class="paso-tit" id="d-p2" tabindex="-1"><span class="paso-de">{pasoDe(2)}</span>{t.paso2}</h2>
+        <div class="aplicados" id="d-aplicados" hidden>
+          <ul class="ap-lista" role="list"></ul>
+          <button class="btn-texto" type="button" id="d-quitar">{t.quitarFiltros}</button>
+        </div>
+        <div class="filtros" id="d-filtros"><p class="muted small">{t.cargando}</p></div>
+      </section>
+
+      <!-- 3. Columnas -->
+      <section class="paso" data-paso="3" aria-labelledby="d-p3">
+        <h2 class="paso-tit" id="d-p3" tabindex="-1"><span class="paso-de">{pasoDe(3)}</span>{t.paso3}</h2>
+        <div class="cols-cab">
+          <p class="cols-n" id="d-cols-n" aria-live="polite"></p>
+          <div class="segmentado cols-botones" role="group">
+            <button class="btn" type="button" id="d-cols-defecto">{t.porDefecto}</button>
+            <button class="btn" type="button" id="d-cols-todas">{t.todas}</button>
+          </div>
+        </div>
+        <div class="cols" id="d-columnas"></div>
+        <button class="btn-texto dic-boton" type="button" id="d-dic" data-info={`dic-${TABLAS[0].id}`} data-info-titulo={nombre(TABLAS[0].id).nombre}><Icono n="info" tam={18} />{t.verColumnas}</button>
+      </section>
+
+      <!-- 4. Formato y descarga -->
+      <section class="paso" data-paso="4" aria-labelledby="d-p4">
+        <h2 class="paso-tit" id="d-p4" tabindex="-1"><span class="paso-de">{pasoDe(4)}</span>{t.paso4}</h2>
+        <fieldset class="formatos">
+          <legend class="sub-tit">{t.formato}</legend>
+          <label class="opcion opcion-fmt"><input class="sr-only" type="radio" name="d-formato" value="excel" checked /><span class="o-texto"><span class="o-nombre">{t.excel}</span><span class="o-desc">{t.excelAyuda}</span></span><span class="o-marca" aria-hidden="true"><Icono n="hecho" tam={16} /></span></label>
+          <label class="opcion opcion-fmt"><input class="sr-only" type="radio" name="d-formato" value="csv" /><span class="o-texto"><span class="o-nombre">{t.csv}</span><span class="o-desc">{t.csvAyuda}</span></span><span class="o-marca" aria-hidden="true"><Icono n="hecho" tam={16} /></span></label>
+        </fieldset>
+        <details class="previa-caja">
+          <summary>{t.verPrevia}<Icono n="abajo" tam={18} /></summary>
+          <div class="previa" id="d-previa"></div>
+        </details>
+      </section>
+
+      <!-- Atrás y Siguiente (en el móvil, pegados abajo; en el último paso, Descargar) -->
+      <div class="asis-acciones" id="d-acciones">
+        <button class="btn b-atras" type="button" data-mover="-1"><Icono n="izquierda" tam={20} /><span>{t.atras}</span></button>
+        <button class="btn primario b-sig" type="button" data-mover="1">
+          <span class="b-sig-txt"><span id="d-sig">{t.siguiente}: {t.paso2}</span><span class="b-sig-n" data-filas></span></span>
+          <Icono n="derecha" tam={20} />
+        </button>
+        <button class="btn primario b-descargar" type="button" data-descargar disabled hidden>
+          <Icono n="descarga" tam={20} /><span class="b-sig-txt"><span>{t.descargar}</span><span class="b-sig-n" data-filas></span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Resumen: fijo a la derecha en el ordenador; en pantallas pequeñas, solo en el último paso -->
+    <aside class="asis-resumen" aria-labelledby="d-res-t">
+      <h2 class="r-tit" id="d-res-t">{t.tuDescarga}</h2>
+      <div class="r-lista">
+        {[1, 2, 3, 4].map((n) => (
+          <button type="button" class="r-fila" data-ir-paso={n}>
+            <span class="r-et">{n === 4 ? t.formato : nombrePaso[n - 1]}</span>
+            <span class="r-val" id={`d-r-${n}`}>{n === 1 ? nombre(TABLAS[0].id).nombre : n === 4 ? t.excel : '…'}</span>
+            <Icono n="derecha" tam={16} class="r-ir" />
+          </button>
+        ))}
+      </div>
+      <p class="r-filas"><strong data-filas>{t.cargando}</strong></p>
+      <p class="estado small" id="d-estado" aria-live="polite"></p>
+      <button class="btn primario descargar" type="button" data-descargar disabled><Icono n="descarga" tam={20} />{t.descargar}</button>
+    </aside>
+  </div>
+
+  <section class="extra" aria-labelledby="d-mas">
+    <h2 id="d-mas">{t.mas}</h2>
+    <div class="extra-rejilla">
+      <div class="extra-caja">
+        <h3>{t.completos}</h3>
+        <p class="muted small">{t.completosTexto}</p>
+        <ul class="completas" role="list">
+          {TABLAS.filter((x) => x.csvFijo).map((x) => <li><a href={url(rutaCsvFijo(x))} download><Icono n="descarga" tam={18} /><span>{nombre(x.id).nombre}</span><span class="muted small">{num(filas[x.id])} · CSV</span></a></li>)}
+        </ul>
+      </div>
+      <div class="extra-caja">
+        <h3>{t.diccionario}</h3>
+        <ul class="completas dic-botones" role="list">
+          {TABLAS.map((x) => (
+            <li><button type="button" data-info={`dic-${x.id}`} data-info-titulo={nombre(x.id).nombre}>
+              <Icono n="info" tam={18} /><span>{nombre(x.id).nombre}</span><span class="muted small">{f(t.columnasDe, { n: x.columnas.length })}</span><Icono n="derecha" tam={16} />
+            </button></li>
+          ))}
+        </ul>
+        <!-- Sin JavaScript, el diccionario se despliega aquí; con JavaScript, cada tabla se abre en una ventana -->
+        <details class="diccionario">
+          <summary>{t.diccionario}<Icono n="abajo" tam={18} /></summary>
+          {TABLAS.map((x) => (
+            <div class="dic-tabla" id={`dic-${x.id}`}>
+              <h4 class="dic-nombre">{nombre(x.id).nombre}</h4>
+              {columnasPorSeccion(x).map((sec) => (
+                <>
+                  {seccion(sec.id) && <h5 class="dic-sec">{seccion(sec.id)}</h5>}
+                  <dl class="dic-lista">{sec.columnas.map((c) => <div class="dic-fila"><dt>{col(c.id).nombre}</dt><dd class="dic-desc">{descripcion(x.id, c.id)}</dd><dd class="dic-id"><code>{c.id}</code></dd></div>)}</dl>
+                </>
+              ))}
+            </div>
+          ))}
+        </details>
+      </div>
+      <div class="extra-caja licencia">
+        <h3>{t.licenciaTitulo}</h3>
+        <p set:html={f(t.licencia, { licencia })} />
+        <p class="cita"><q>{LICENCIA_DATOS.cita}</q></p>
+        <p class="small muted">{t.fuentes}</p>
+      </div>
+    </div>
+  </section>
+
+  <HojaInfo />
+  <script type="application/json" id="datos-config" set:html={JSON.stringify(config).replace(/</g, '\\u003c')} />
+</Base>
+
+<script>
+  import '../../scripts/descargas';
+</script>
+
+<style>
+  /* ---------- Asistente ---------- */
+  .asistente { margin-top: 18px; scroll-margin-top: 12px; }
+  /* Barra de progreso: cuatro pasos unidos por una línea que se llena */
+  .pasos-barra { list-style: none; margin: 0 0 14px; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); counter-reset: paso; }
+  .pasos-barra li { position: relative; }
+  .pasos-barra li + li::before {
+    content: ''; position: absolute; top: 17px; right: calc(50% + 20px); left: calc(-50% + 20px); height: 3px; border-radius: 2px;
+    background: var(--border); transition: background-color .2s;
+  }
+  .pasos-barra li:has([data-hecho], [aria-current])::before { background: var(--accent); }
+  .pasos-barra button {
+    width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0 2px 4px; border: 0; background: none;
+    color: var(--muted); font-size: .8rem; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .pb-num {
+    display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border);
+    font-variant-numeric: tabular-nums; transition: background-color .2s, border-color .2s, color .2s, transform .15s;
+  }
+  .pb-num :global(.pb-ok) { display: none; }
+  .pasos-barra button:hover .pb-num { border-color: var(--accent); }
+  .pasos-barra button[data-hecho] .pb-num { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+  .pasos-barra button[data-hecho] .pb-n { display: none; }
+  .pasos-barra button[data-hecho] :global(.pb-ok) { display: block; }
+  .pasos-barra button[aria-current='step'] { color: var(--text); }
+  .pasos-barra button[aria-current='step'] .pb-num { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; transform: scale(1.06); }
+  .pb-txt { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 360px) { .pasos-barra button { font-size: .72rem; } }
+  :global(html:not(.js)) .pasos-barra, :global(html:not(.js)) .asis-acciones, :global(html:not(.js)) .asis-resumen { display: none; }
+
+  /* Pasos: con JavaScript se ve solo el activo */
+  .paso { margin: 0; padding: 18px 16px; min-width: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  :global(html.js) .paso:not([data-activo]) { display: none; }
+  :global(html:not(.js)) .paso + .paso { margin-top: 12px; }
+  .paso[data-activo] { animation: entrar .18s ease-out; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(6px); } }
+  .paso-tit { display: flex; flex-direction: column; gap: 2px; margin: 0 0 14px; font-size: 1.25rem; font-weight: 750; letter-spacing: -.015em; line-height: 1.2; }
+  .paso-tit:focus { outline: none; }
+  .paso-de { font-size: .75rem; font-weight: 650; text-transform: uppercase; letter-spacing: .08em; color: var(--accent-text); }
+  .sub-tit { font-weight: 650; font-size: .95rem; margin: 0 0 8px; padding: 0; }
+
+  /* Opciones (tabla y formato) como tarjetas */
+  .tablas { display: grid; gap: 8px; }
+  .opcion {
+    position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 12px 40px 12px 12px; border: 1.5px solid var(--border); border-radius: 14px;
+    cursor: pointer; background: var(--surface); transition: border-color .15s, background-color .15s, box-shadow .15s;
+  }
+  .opcion:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+  .opcion:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .opcion:has(input:focus-visible) { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .o-ico { display: grid; place-items: center; width: 42px; height: 42px; flex: none; border-radius: 12px; background: var(--chip); color: var(--muted); }
+  .opcion:has(input:checked) .o-ico { background: var(--surface); color: var(--accent-text); }
+  .o-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .o-nombre { font-weight: 700; line-height: 1.3; }
+  .o-desc { font-size: .85rem; color: var(--muted); line-height: 1.35; }
+  .o-n { margin-top: 4px; font-size: .78rem; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .o-marca {
+    position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--border); color: transparent; transition: background-color .15s, border-color .15s;
+  }
+  .opcion:has(input:checked) .o-marca { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+  .nota-tabla { margin: 10px 0 0; }
+  .formatos { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; min-width: 0; }
+  .formatos legend { grid-column: 1 / -1; }
+  .opcion-fmt { padding: 12px 34px 12px 12px; }
+  .opcion-fmt .o-marca { top: 10px; right: 10px; }
+  @media (max-width: 400px) { .formatos { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Filtros (los pinta el script, por eso van en :global) */
+  .aplicados { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: -4px 0 12px; }
+  .ap-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .ap-lista :global(button) {
+    display: inline-flex; align-items: center; gap: 4px; min-height: 34px; padding: 2px 8px 2px 12px; border: 0; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent-text); font-size: .84rem; font-weight: 600; cursor: pointer;
+  }
+  .ap-lista :global(button:hover) { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); }
+  .filtros { display: grid; gap: 8px; }
+  .filtros :global(.f-valores) { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+  .filtros :global(.f-valores > summary) { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 12px 6px 14px; cursor: pointer; list-style: none; }
+  .filtros :global(.f-valores > summary::-webkit-details-marker) { display: none; }
+  .filtros :global(.f-valores > summary::after) {
+    content: ''; flex: none; width: 8px; height: 8px; margin: -4px 4px 0 2px; border: solid var(--muted); border-width: 0 2px 2px 0; transform: rotate(45deg); transition: transform .15s;
+  }
+  .filtros :global(.f-valores[open] > summary::after) { transform: rotate(-135deg); margin-top: 4px; }
+  .filtros :global(.f-nombre) { font-weight: 650; flex: none; }
+  .filtros :global(.f-resumen) { flex: 1; color: var(--muted); font-size: .88rem; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .filtros :global(.f-valores.con-valor .f-resumen) { color: var(--accent-text); font-weight: 600; }
+  .filtros :global(.f-valores[open] > summary) { border-bottom: 1px solid var(--border); }
+  .filtros :global(.f-valores .f-chips) { padding: 12px; max-height: 50vh; overflow-y: auto; }
+  .filtros :global(.f-texto), .filtros :global(.f-fechas label) { display: flex; flex-direction: column; gap: 4px; font-weight: 650; font-size: .92rem; }
+  .filtros :global(.f-texto input), .filtros :global(.f-fechas input) { border: 1px solid var(--border); background: var(--surface); border-radius: 12px; padding: 8px 12px; min-height: 48px; font-weight: 400; width: 100%; }
+  .filtros :global(.f-fechas) { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-width: 0; }
+  .filtros :global(.f-fechas legend) { font-weight: 650; font-size: .92rem; margin-bottom: 4px; padding: 0; }
+  .filtros :global(.f-fechas span) { font-weight: 400; color: var(--muted); font-size: .85rem; }
+  .cols :global(.f-chips), .filtros :global(.f-chips) { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cols :global(.chip), .filtros :global(.chip) { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 12px 4px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: .88rem; cursor: pointer; background: var(--surface); }
+  .cols :global(.chip:has(input:checked)), .filtros :global(.chip:has(input:checked)) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+  .cols :global(.chip input), .filtros :global(.chip input) { accent-color: var(--accent-strong); width: 16px; height: 16px; margin: 0; }
+  .btn-texto { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--accent-text); padding: 6px 4px; min-height: 40px; font-weight: 600; cursor: pointer; }
+  .btn-texto:hover { text-decoration: underline; }
+
+  /* Columnas */
+  .cols-cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 12px; }
+  .cols-n { margin: 0; font-weight: 650; }
+  .cols-botones .btn { min-height: 36px; padding: 4px 12px; font-size: .88rem; }
+  .dic-boton { margin-top: 10px; }
+
+  /* Vista previa */
+  .previa-caja { margin-top: 14px; border-top: 1px solid var(--border); }
+  .previa-caja > summary { display: flex; align-items: center; justify-content: space-between; min-height: 48px; cursor: pointer; list-style: none; font-weight: 600; color: var(--accent-text); }
+  .previa-caja > summary::-webkit-details-marker { display: none; }
+  .previa-caja[open] > summary :global(svg) { transform: rotate(180deg); }
+  .previa :global(table) { font-size: .82rem; }
+  .previa :global(td) { white-space: nowrap; }
+  .previa :global(.table-scroll) { border: 1px solid var(--border); border-radius: 10px; }
+  .previa :global(p) { margin: 0 0 8px; }
+
+  /* Atrás · Siguiente */
+  .asis-acciones { display: flex; gap: 8px; margin-top: 12px; }
+  .asis-acciones .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 52px; border-radius: 14px; }
+  .b-atras { flex: none; padding: 8px 14px 8px 10px; }
+  .asis-acciones .b-atras:disabled { display: none; }
+  .b-sig, .b-descargar { flex: 1; min-width: 0; padding: 6px 12px 6px 16px; }
+  .b-descargar { padding-left: 12px; }
+  .b-sig-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2; text-align: left; }
+  .b-sig-txt > span:first-child { font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .b-sig-n { font-size: .8rem; font-weight: 500; opacity: .85; font-variant-numeric: tabular-nums; }
+  .asis-acciones .btn[hidden] { display: none; }
+  .b-descargar:disabled { opacity: .55; cursor: default; }
+
+  /* Resumen */
+  .asis-resumen { display: none; padding: 18px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); }
+  .asistente[data-paso='4'] .asis-resumen { display: block; margin-top: 12px; }
+  .r-tit { margin: 0 0 6px; font-size: 1rem; }
+  .r-lista { margin: 0; display: grid; }
+  .r-fila {
+    display: grid; grid-template-columns: 76px minmax(0, 1fr) 16px; align-items: center; gap: 8px; width: 100%; padding: 10px 0; border: 0;
+    border-bottom: 1px solid var(--border); background: none; text-align: left; cursor: pointer; color: var(--text);
+  }
+  .r-fila:hover .r-val { color: var(--accent-text); }
+  .r-fila .r-et { font-size: .8rem; color: var(--muted); font-weight: 600; }
+  .r-fila .r-val { margin: 0; font-size: .9rem; font-weight: 600; overflow-wrap: anywhere; line-height: 1.35; }
+  .r-fila :global(.r-ir) { color: var(--muted); }
+  .r-filas { margin: 14px 0 2px; }
+  .r-filas strong { font-size: 1.6rem; font-weight: 750; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .estado { margin: 0 0 12px; color: var(--muted); }
+  .estado:empty { display: none; }
+  .descargar { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; font-size: 1.05rem; border-radius: 14px; }
+  .descargar:disabled { opacity: .55; cursor: default; }
+
+  /* Móvil: Atrás y Siguiente pegados abajo, encima del menú; el botón de descargar va en esa barra */
+  @media (max-width: 720px) {
+    .asis-acciones {
+      position: sticky; bottom: calc(62px + env(safe-area-inset-bottom)); z-index: 8; margin: 12px -16px 0; padding: 10px 16px;
+      background: color-mix(in srgb, var(--bg) 90%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    }
+    .asis-resumen .descargar { display: none; }
+    .asistente[data-paso='4'] .asis-resumen { margin-top: 0; }
+    .asistente[data-paso='4'] .asis-pasos { display: flex; flex-direction: column; }
+    .asistente[data-paso='4'] .asis-acciones { order: 2; }
+  }
+  @media (min-width: 721px) { .b-descargar { display: none !important; } }
+  /* Ordenador: pasos a la izquierda y resumen fijo a la derecha */
+  @media (min-width: 900px) {
+    .asistente { display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-areas: 'barra barra' 'pasos resumen'; gap: 0 24px; align-items: start; }
+    .pasos-barra { grid-area: barra; max-width: calc(100% - 344px); margin-bottom: 18px; }
+    .asis-pasos { grid-area: pasos; }
+    .asis-resumen, .asistente[data-paso='4'] .asis-resumen { grid-area: resumen; display: block; margin-top: 0; position: sticky; top: 16px; padding: 20px; }
+    .paso { padding: 24px; }
+    .pasos-barra button { font-size: .88rem; }
+    .tablas { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .asistente[data-paso='4'] .b-sig { display: none; }
+    .asis-acciones { justify-content: space-between; }
+    .b-sig { flex: 0 1 320px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .paso[data-activo] { animation: none; } }
+
+  /* ---------- Más formas de usar los datos ---------- */
+  .extra { margin-top: 40px; }
+  .extra > h2 { margin: 0 0 12px; }
+  .extra-rejilla { display: grid; gap: 12px; }
+  .extra-caja { padding: 18px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); min-width: 0; }
+  .extra-caja h3 { margin: 0 0 4px; font-size: 1rem; }
+  .completas { list-style: none; margin: 10px 0 0; padding: 0; display: grid; }
+  .completas a { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 4px 0; border-top: 1px solid var(--border); text-decoration: none; font-weight: 600; }
+  .completas a :global(svg) { color: var(--accent-text); flex: none; }
+  .completas a span:first-of-type { flex: 1; }
+  .dic-botones button {
+    width: 100%; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 4px 0; border: 0; border-top: 1px solid var(--border);
+    background: none; color: var(--text); font-weight: 600; text-align: left; cursor: pointer;
+  }
+  .dic-botones button :global(svg) { flex: none; color: var(--accent-text); }
+  .dic-botones button :global(svg:last-child) { color: var(--muted); }
+  .dic-botones button span:first-of-type { flex: 1; }
+  .dic-botones button:hover span:first-of-type { color: var(--accent-text); }
+  :global(html:not(.js)) .dic-botones { display: none; }
+  :global(html.js) .diccionario { display: none; }
+  .diccionario { margin: 8px 0 0; border-top: 1px solid var(--border); }
+  .diccionario > summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; cursor: pointer; list-style: none; color: var(--muted); font-size: .88rem; }
+  .diccionario > summary::-webkit-details-marker { display: none; }
+  .diccionario[open] > summary :global(svg) { transform: rotate(180deg); }
+  /* Diccionario (también dentro de la ventana HojaInfo, por eso :global) */
+  :global(.dic-nombre) { font-size: 1rem; margin: 16px 0 4px; }
+  :global(.hi-cuerpo .dic-nombre) { display: none; }
+  :global(.dic-sec) { margin: 18px 0 2px; font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent-text); }
+  :global(.hi-cuerpo .dic-sec:first-child) { margin-top: 4px; }
+  :global(.dic-lista) { margin: 0; display: grid; }
+  :global(.dic-fila) { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  :global(.dic-fila:last-child) { border-bottom: 0; }
+  :global(.dic-fila dt) { font-weight: 650; font-size: .92rem; color: var(--text); }
+  :global(.dic-fila .dic-desc) { grid-column: 1; margin: 2px 0 0; color: var(--muted); font-size: .85rem; line-height: 1.4; }
+  :global(.dic-fila .dic-id) { grid-column: 2; grid-row: 1; margin: 0; }
+  :global(.dic-fila code) { font-size: .72rem; color: var(--muted); background: var(--chip); padding: 2px 6px; border-radius: 6px; white-space: nowrap; }
+  .licencia h3 { margin-bottom: 8px; }
+  .licencia p { margin: 4px 0; font-size: .9rem; }
+  .cita { font-weight: 600; }
+  @media (min-width: 900px) { .extra-rejilla { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .extra-caja { padding: 22px 24px; } .extra-caja.licencia { grid-column: 1 / -1; } }
+  /* Columnas del paso 3, por apartados en las tablas largas */
+  .cols :global(.cols-sec) { margin: 14px 0 6px; font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .cols :global(.cols-sec:first-child) { margin-top: 0; }
+</style>

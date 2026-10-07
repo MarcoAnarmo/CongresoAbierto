@@ -5,6 +5,7 @@ import { area } from '..';
  * circunscripciones son datos oficiales y no se traducen. El botón «Diputados» usa comun.nav.diputados.
  */
 const es = {
+  "leyendaAria": "Leyenda: pulsa un tramo para resaltar sus provincias",
   titulo: 'Tus diputados por provincia',
   intro: 'Cada casilla es una circunscripción, colocada de forma aproximada (no es un mapa a escala). Pulsa la tuya o escribe tu código postal.',
   modosAria: 'Qué mostrar en el mapa',
@@ -17,6 +18,9 @@ const es = {
   elige: 'Elige una provincia en el mapa.',
   /** Textos del script del navegador. */
   cliente: {
+    /** Cada tramo de la leyenda (para lectores de pantalla). */
+    tramoAria: '{tramo}: {n} circunscripciones',
+    sinDatosAria: 'Sin datos: {n} circunscripciones',
     /** Último tramo de la escala. */
     escanosMas: '{n} o más',
     masDe: 'más de {n}',
@@ -36,6 +40,7 @@ const es = {
 
 export default area(es, {
   ca: {
+    "leyendaAria": "Llegenda: prem un tram per destacar-ne les circumscripcions",
     titulo: 'Els teus diputats per circumscripció',
     intro: 'Cada casella és una circumscripció, situada de manera aproximada (no és un mapa a escala). Prem la teva o escriu el teu codi postal.',
     modosAria: 'Què vols veure al mapa',
@@ -46,6 +51,9 @@ export default area(es, {
     casillaAria: '{provincia}: {diputados}',
     elige: 'Tria una circumscripció al mapa.',
     cliente: {
+      /** Cada tramo de la leyenda (para lectores de pantalla). */
+      tramoAria: '{tramo}: {n} circumscripcions',
+      sinDatosAria: 'Sense dades: {n} circumscripcions',
       escanosMas: '{n} o més',
       masDe: 'més de {n}',
       leyendaEscanos: 'Diputats elegits: ',
@@ -60,6 +68,7 @@ export default area(es, {
     },
   },
   eu: {
+    "leyendaAria": "Legenda: sakatu tarte bat bere barrutiak nabarmentzeko",
     titulo: 'Zure diputatuak barrutika',
     intro: 'Lauki bakoitza barruti bat da, gutxi gorabehera kokatuta (ez da eskalako mapa bat). Sakatu zurea edo idatzi zure posta-kodea.',
     modosAria: 'Zer erakutsi mapan',
@@ -70,6 +79,9 @@ export default area(es, {
     casillaAria: '{provincia}: {diputados}',
     elige: 'Aukeratu barruti bat mapan.',
     cliente: {
+      /** Cada tramo de la leyenda (para lectores de pantalla). */
+      tramoAria: '{tramo}: {n} barruti',
+      sinDatosAria: 'Daturik ez: {n} barruti',
       escanosMas: '{n} edo gehiago',
       masDe: '{n} baino gehiago',
       leyendaEscanos: 'Hautatutako diputatuak: ',
@@ -84,6 +96,7 @@ export default area(es, {
     },
   },
   gl: {
+    "leyendaAria": "Lenda: preme un tramo para destacar as súas circunscricións",
     titulo: 'Os teus deputados por circunscrición',
     intro: 'Cada cadro é unha circunscrición, colocada de forma aproximada (non é un mapa a escala). Preme a túa ou escribe o teu código postal.',
     modosAria: 'Que mostrar no mapa',
@@ -94,6 +107,9 @@ export default area(es, {
     casillaAria: '{provincia}: {diputados}',
     elige: 'Escolle unha circunscrición no mapa.',
     cliente: {
+      /** Cada tramo de la leyenda (para lectores de pantalla). */
+      tramoAria: '{tramo}: {n} circunscricións',
+      sinDatosAria: 'Sen datos: {n} circunscricións',
       escanosMas: '{n} ou máis',
       masDe: 'máis de {n}',
       leyendaEscanos: 'Deputados elixidos: ',
@@ -108,6 +124,7 @@ export default area(es, {
     },
   },
   en: {
+    "leyendaAria": "Legend: press a range to highlight its constituencies",
     titulo: 'Your deputies by constituency',
     intro: 'Each square is a constituency, placed approximately (this is not a map to scale). Tap yours or enter your postcode.',
     modosAria: 'What to show on the map',
@@ -118,6 +135,9 @@ export default area(es, {
     casillaAria: '{provincia}: {diputados}',
     elige: 'Choose a constituency on the map.',
     cliente: {
+      /** Cada tramo de la leyenda (para lectores de pantalla). */
+      tramoAria: '{tramo}: {n} constituencies',
+      sinDatosAria: 'No data: {n} constituencies',
       escanosMas: '{n} or more',
       masDe: 'over {n}',
       leyendaEscanos: 'Deputies elected: ',

@@ -2,7 +2,7 @@ import { area } from '..';
 
 /** Textos comunes: menú, pie, tema, selector de idioma, elecciones y palabras que se repiten en toda la web. */
 const es = {
-  nav: { hemiciclo: 'Hemiciclo', diputados: 'Diputados', votaciones: 'Votaciones', votacionesCorto: 'Votos', metodologia: 'Metodología', metodologiaCorto: 'Método', colabora: 'Colabora' },
+  nav: { estadisticas: 'Estadísticas', datos: 'Datos', descargar: 'Descargar', mas: 'Más', tarjetas: 'Tarjetas', masTitulo: 'Más páginas', seccionDatos: 'Estadísticas y descargas', hemiciclo: 'Hemiciclo', diputados: 'Diputados', votaciones: 'Votaciones', votacionesCorto: 'Votos', metodologia: 'Metodología', metodologiaCorto: 'Método', colabora: 'Colabora' },
   marca: {
     /** Lema y subtítulo: siempre sin punto final. */
     lema: 'Conoce a quien te representa',
@@ -68,7 +68,7 @@ const es = {
 
 export default area(es, {
   ca: {
-    nav: { hemiciclo: 'Hemicicle', diputados: 'Diputats', votaciones: 'Votacions', votacionesCorto: 'Vots', metodologia: 'Metodologia', metodologiaCorto: 'Mètode', colabora: 'Col·labora' },
+    nav: { estadisticas: 'Estadístiques', datos: 'Dades', descargar: 'Descarregar', mas: 'Més', tarjetas: 'Targetes', masTitulo: 'Més pàgines', seccionDatos: 'Estadístiques i descàrregues', hemiciclo: 'Hemicicle', diputados: 'Diputats', votaciones: 'Votacions', votacionesCorto: 'Vots', metodologia: 'Metodologia', metodologiaCorto: 'Mètode', colabora: 'Col·labora' },
     marca: {
       lema: 'Coneix qui et representa',
       subtitulo: 'Transparència i accés fàcil a dades oficials del Congrés',
@@ -101,7 +101,7 @@ export default area(es, {
     noEncontrada: { titulo: 'Pàgina no trobada', descripcion: 'La pàgina que busques no existeix.', texto: 'L’adreça no existeix o ha canviat.', volver: 'Ves a l’hemicicle' },
   },
   eu: {
-    nav: { hemiciclo: 'Hemizikloa', diputados: 'Diputatuak', votaciones: 'Bozketak', votacionesCorto: 'Botoak', metodologia: 'Metodologia', metodologiaCorto: 'Metodoa', colabora: 'Lagundu' },
+    nav: { estadisticas: 'Estatistikak', datos: 'Datuak', descargar: 'Deskargatu', mas: 'Gehiago', tarjetas: 'Txartelak', masTitulo: 'Orrialde gehiago', seccionDatos: 'Estatistikak eta deskargak', hemiciclo: 'Hemizikloa', diputados: 'Diputatuak', votaciones: 'Bozketak', votacionesCorto: 'Botoak', metodologia: 'Metodologia', metodologiaCorto: 'Metodoa', colabora: 'Lagundu' },
     marca: {
       lema: 'Ezagutu zure ordezkaria',
       subtitulo: 'Gardentasuna eta Kongresuko datu ofizialetarako sarbide erraza',
@@ -134,7 +134,7 @@ export default area(es, {
     noEncontrada: { titulo: 'Ez da orria aurkitu', descripcion: 'Bilatzen duzun orria ez dago.', texto: 'Helbidea ez dago edo aldatu egin da.', volver: 'Joan hemizikloara' },
   },
   gl: {
-    nav: { hemiciclo: 'Hemiciclo', diputados: 'Deputados', votaciones: 'Votacións', votacionesCorto: 'Votos', metodologia: 'Metodoloxía', metodologiaCorto: 'Método', colabora: 'Colabora' },
+    nav: { estadisticas: 'Estatísticas', datos: 'Datos', descargar: 'Descargar', mas: 'Máis', tarjetas: 'Tarxetas', masTitulo: 'Máis páxinas', seccionDatos: 'Estatísticas e descargas', hemiciclo: 'Hemiciclo', diputados: 'Deputados', votaciones: 'Votacións', votacionesCorto: 'Votos', metodologia: 'Metodoloxía', metodologiaCorto: 'Método', colabora: 'Colabora' },
     marca: {
       lema: 'Coñece a quen te representa',
       subtitulo: 'Transparencia e acceso doado a datos oficiais do Congreso',
@@ -167,7 +167,7 @@ export default area(es, {
     noEncontrada: { titulo: 'Páxina non atopada', descripcion: 'A páxina que buscas non existe.', texto: 'O enderezo non existe ou cambiou.', volver: 'Ir ao hemiciclo' },
   },
   en: {
-    nav: { hemiciclo: 'Chamber', diputados: 'Deputies', votaciones: 'Votes', votacionesCorto: 'Votes', metodologia: 'Methodology', metodologiaCorto: 'Method', colabora: 'Contribute' },
+    nav: { estadisticas: 'Statistics', datos: 'Data', descargar: 'Download', mas: 'More', tarjetas: 'Cards', masTitulo: 'More pages', seccionDatos: 'Statistics and downloads', hemiciclo: 'Chamber', diputados: 'Deputies', votaciones: 'Votes', votacionesCorto: 'Votes', metodologia: 'Methodology', metodologiaCorto: 'Method', colabora: 'Contribute' },
     marca: {
       lema: 'Know who represents you',
       subtitulo: 'Transparency and easy access to official data from the Spanish Congress',

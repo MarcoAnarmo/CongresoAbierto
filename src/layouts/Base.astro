@@ -1,8 +1,8 @@
 ---
 import '../styles/global.css';
 import { url, REPO, enlaceSugerencia, enlaceError, enlaceHojaDeRuta } from '../lib/data';
-import type { NombreIcono } from '../lib/iconos';
 import Icono from '../components/Icono.astro';
+import { PRINCIPAL, BARRA_MOVIL, SECUNDARIAS, esActual, type EntradaMenu } from '../lib/navegacion';
 import { IDIOMAS, NOMBRE_IDIOMA, LOCALE, OG_LOCALE, DEFECTO, idiomaDeUrl, enlace, sinIdioma, prefijo, f } from '../i18n';
 import comun from '../i18n/textos/comun';
 import { serializar, type JsonLd } from '../lib/seo';
@@ -30,14 +30,12 @@ const imagen = enlace(imagenRuta, lang);
 const tituloCompleto = tituloSeo ?? (title === 'Congreso Abierto' ? title : `${title} · Congreso Abierto`);
 const absoluta = (p: string) => new URL(p, Astro.site).href;
 const path = ruta.replace(/\/$/, '') || '/';
-const nav: { href: string; label: string; corto?: string; icono: NombreIcono }[] = [
-  { href: '/', label: t.nav.hemiciclo, icono: 'hemiciclo' },
-  { href: '/diputados', label: t.nav.diputados, icono: 'fichas' },
-  { href: '/votaciones', label: t.nav.votaciones, corto: t.nav.votacionesCorto, icono: 'votaciones' },
-  { href: '/metodologia', label: t.nav.metodologia, corto: t.nav.metodologiaCorto, icono: 'metodo' },
-  { href: '/colabora', label: t.nav.colabora, icono: 'colabora' },
-];
-const activo = (href: string) => (href === '/' ? path === '/' || path === '' : path.startsWith(href) || (href === '/diputados' && path.startsWith('/diputado/')));
+const etiqueta = (e: EntradaMenu) => t.nav[e.texto];
+const corta = (e: EntradaMenu) => (e.corto ? t.nav[e.corto] : undefined);
+const actual = (e: EntradaMenu) => esActual(e, path);
+const enMas = SECUNDARIAS.some(actual);
+/** Pie: todas las secciones (las tarjetas van en «Participa»). */
+const navPie = [...PRINCIPAL, ...SECUNDARIAS.filter((e) => e.href !== '/tarjetas')];
 // Misma página en cada idioma (hreflang y selector)
 const versiones = IDIOMAS.map((l) => ({ lang: l, href: enlace(ruta, l) }));
 const es404 = Astro.url.pathname.includes('404');
@@ -161,9 +159,15 @@ const fuentes = f(t.pie.fuentes, {
           </svg>
           <span>Congreso Abierto</span>
         </a>
-        <nav aria-label={t.marca.navPrincipal}>
-          {nav.map((n) => <a class="subraya" href={u(n.href)} aria-current={activo(n.href) ? 'page' : undefined}>{n.corto ? <><span class="l-largo">{n.label}</span><span class="l-corto" aria-hidden="true">{n.corto}</span></> : n.label}</a>)}
+        <nav class="nav-escritorio" aria-label={t.marca.navPrincipal}>
+          {PRINCIPAL.map((e) => <a class="subraya" href={u(e.href)} aria-current={actual(e) ? 'page' : undefined}>{corta(e) ? <><span class="l-largo">{etiqueta(e)}</span><span class="l-corto" aria-hidden="true">{corta(e)}</span></> : etiqueta(e)}</a>)}
         </nav>
+        <details class="desplegable mas-escritorio" id="mas-escritorio">
+          <summary class="subraya" aria-current={enMas ? 'page' : undefined}>{t.nav.mas}<Icono n="abajo" tam={16} /></summary>
+          <ul class="menu-desplegable" role="list">
+            {SECUNDARIAS.map((e) => <li><a href={u(e.href)} aria-current={actual(e) ? 'page' : undefined}><Icono n={e.icono} tam={18} />{etiqueta(e)}</a></li>)}
+          </ul>
+        </details>
         <details class="idioma" id="selector-idioma">
           <summary class="idioma-boton" aria-label={t.idioma.boton} title={t.idioma.titulo}>
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" /></svg>
@@ -181,8 +185,21 @@ const fuentes = f(t.pie.fuentes, {
     </header>
     <!-- Móvil: el menú va abajo, fijo y al alcance del pulgar -->
     <nav class="nav-movil" aria-label={t.marca.navPrincipal}>
-      {nav.map((n) => <a href={u(n.href)} aria-current={activo(n.href) ? 'page' : undefined}><span class="nm-ico"><Icono n={n.icono} tam={22} /></span><span>{n.corto ?? n.label}</span></a>)}
+      {BARRA_MOVIL.map((e) => <a href={u(e.href)} aria-current={actual(e) ? 'page' : undefined}><span class="nm-ico"><Icono n={e.icono} tam={22} /></span><span>{corta(e) ?? etiqueta(e)}</span></a>)}
+      <!-- Sin JavaScript lleva al menú del pie; con JavaScript abre la hoja «Más» -->
+      <a href="#pie-explora" id="boton-mas" role="button" aria-haspopup="dialog" aria-controls="hoja-mas" aria-current={enMas ? 'page' : undefined}><span class="nm-ico"><Icono n="mas" tam={22} /></span><span>{t.nav.mas}</span></a>
     </nav>
+    <dialog class="hoja-mas" id="hoja-mas" aria-labelledby="hoja-mas-t">
+      <h2 id="hoja-mas-t" class="hm-titulo">{t.nav.masTitulo}</h2>
+      <ul class="hm-lista" role="list">
+        {SECUNDARIAS.map((e) => <li><a href={u(e.href)} aria-current={actual(e) ? 'page' : undefined}><span class="hm-ico"><Icono n={e.icono} tam={20} /></span>{etiqueta(e)}<Icono n="derecha" tam={18} class="hm-ir" /></a></li>)}
+      </ul>
+      <ul class="hm-lista hm-externas" role="list">
+        <li><a href={enlaceHojaDeRuta} rel="noopener"><span class="hm-ico"><Icono n="ruta" tam={20} /></span>{t.pie.hojaDeRuta}</a></li>
+        <li><a href={REPO} rel="noopener"><span class="hm-ico"><Icono n="codigo" tam={20} /></span>{t.pie.codigo}</a></li>
+      </ul>
+      <button class="btn hm-cerrar" type="button" data-cerrar>{t.palabras.cerrar}</button>
+    </dialog>
     <script is:inline>
       (function () {
         var b = document.getElementById('boton-tema'), raiz = document.documentElement, meta = document.querySelector('meta[name="theme-color"]');
@@ -224,8 +241,8 @@ const fuentes = f(t.pie.fuentes, {
           <p class="pie-sub">{t.marca.subtitulo}</p>
         </div>
         <div class="pie-col">
-          <h2 class="pie-t">{t.pie.explora}</h2>
-          <ul>{nav.map((n) => <li><a href={u(n.href)}>{n.label}</a></li>)}</ul>
+          <h2 class="pie-t" id="pie-explora">{t.pie.explora}</h2>
+          <ul>{navPie.map((e) => <li><a href={u(e.href)}>{etiqueta(e)}</a></li>)}</ul>
         </div>
         <div class="pie-col">
           <h2 class="pie-t">{t.pie.participa}</h2>
@@ -250,7 +267,9 @@ const fuentes = f(t.pie.fuentes, {
     </div>
     <script>
       import { precargarAlTocar } from '../scripts/precarga';
+      import { iniciarMenu } from '../scripts/menu';
       precargarAlTocar();
+      iniciarMenu();
     </script>
     <script is:inline>
       // Selector de idioma: recuerda la elección y conserva la búsqueda o la votación abierta (?…#…)
@@ -279,6 +298,26 @@ const fuentes = f(t.pie.fuentes, {
   .bar { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; min-height: 56px; }
   .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; text-decoration: none; letter-spacing: -0.02em; white-space: nowrap; min-height: 44px; }
   nav { display: flex; gap: 2px; margin-left: auto; }
+  .nav-escritorio { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .nav-escritorio::-webkit-scrollbar { display: none; }
+  /* «Más» en el ordenador: desplegable con las páginas secundarias (fuera del menú, para que no lo recorte) */
+  .desplegable { position: relative; flex: none; }
+  .desplegable > summary { display: inline-flex; align-items: center; gap: 4px; padding: 10px 12px; font-size: .95rem; color: var(--muted); white-space: nowrap; cursor: pointer; list-style: none; --sub-x: 12px; }
+  .desplegable > summary::-webkit-details-marker { display: none; }
+  .desplegable > summary[aria-current='page'] { color: var(--text); font-weight: 650; }
+  .desplegable[open] > summary { color: var(--text); }
+  .desplegable[open] > summary :global(svg) { transform: rotate(180deg); }
+  .menu-desplegable { position: absolute; right: 0; top: calc(100% + 6px); z-index: 40; min-width: 210px; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 28px rgb(0 0 0 / .16); }
+  .menu-desplegable a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--text); text-decoration: none; background-image: none; }
+  .menu-desplegable a :global(svg) { color: var(--muted); flex: none; }
+  .menu-desplegable a:hover { background: var(--chip); }
+  .menu-desplegable a[aria-current='page'] { font-weight: 700; color: var(--accent-text); background: var(--accent-soft); }
+  /* Hoja «Más» del móvil */
+  .hoja-mas { display: none; }
+  @media (min-width: 1001px) { .nav-escritorio .l-corto { display: none; } }
+  /* Tableta y portátil estrecho: solo el logo, para que quepan todas las secciones sin desplazarse */
+  @media (min-width: 721px) and (max-width: 1000px) { .brand > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+  @media (max-width: 1000px) { .nav-escritorio .l-largo { display: none; } .nav-escritorio .l-corto { display: inline; } .nav-escritorio a, .desplegable > summary { padding: 10px 9px; --sub-x: 9px; } }
   .tema { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--muted); cursor: pointer; transition: color .15s, border-color .15s, background-color .15s; }
   .tema:hover { color: var(--accent-text); border-color: var(--accent); }
   .logo { flex: none; width: 84px; height: 44px; padding: 4px 5px; border-radius: 10px; transition: background-color .15s; }
@@ -332,7 +371,25 @@ const fuentes = f(t.pie.fuentes, {
   .l-corto { display: none; }
   @media (max-width: 720px) {
     .bar { min-height: 52px; gap: 8px; }
-    .bar nav { display: none; }
+    .bar nav, .mas-escritorio { display: none; }
+    .hoja-mas[open] {
+      display: block; position: fixed; inset: auto 0 0 0; width: auto; max-width: none; max-height: 85dvh; margin: 0; overflow-y: auto;
+      padding: 26px 16px calc(16px + env(safe-area-inset-bottom)); border: 1px solid var(--border); border-bottom: 0; border-radius: 18px 18px 0 0;
+      background: var(--surface); color: var(--text); box-shadow: 0 -10px 40px rgb(0 0 0 / .2); animation: subir-hoja .2s ease-out;
+    }
+    .hoja-mas::backdrop { background: rgb(20 22 28 / .5); }
+    @keyframes subir-hoja { from { transform: translateY(40px); opacity: .4; } }
+    .hm-titulo { margin: 0 0 8px; font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+    .hm-lista { list-style: none; margin: 0; padding: 0; }
+    .hm-lista a { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 4px; color: var(--text); text-decoration: none; background-image: none; font-size: 1.02rem; font-weight: 550; border-radius: 10px; }
+    .hm-lista a:active { background: var(--chip); }
+    .hm-lista a[aria-current='page'] { color: var(--accent-text); }
+    .hm-ico { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 12px; background: var(--chip); color: var(--muted); }
+    .hm-lista a[aria-current='page'] .hm-ico { background: var(--accent-soft); color: var(--accent-text); }
+    .hm-lista :global(.hm-ir) { margin-left: auto; color: var(--muted); }
+    .hm-externas { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+    .hm-externas a { font-weight: 450; font-size: .95rem; color: var(--muted); }
+    .hm-cerrar { width: 100%; margin-top: 12px; }
     .logo { width: 70px; height: 38px; }
     .brand { margin-right: auto; }
     .idioma-boton { height: 36px; padding: 0 9px; }

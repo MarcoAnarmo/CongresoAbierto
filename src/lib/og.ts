@@ -23,13 +23,11 @@ let fuentes: { name: string; data: Buffer; weight: 400 | 700 | 800; style: 'norm
 const cargarFuentes = () => (fuentes ??= (['latin', 'latin-ext'] as const).flatMap((sub) =>
   ([400, 700, 800] as const).map((w) => ({ name: 'Inter', data: fuente(sub, w), weight: w, style: 'normal' as const }))));
 
-export const FORMATOS = { historia: { ancho: 1080, alto: 1920 }, horizontal: { ancho: 1200, alto: 630 } } as const;
-export type Formato = keyof typeof FORMATOS;
+import { C as COLORES, FORMATOS, type Formato } from './tarjetas/diseno';
+export { FORMATOS, type Formato };
 
-export const C = {
-  fondo: '#f7f6f2', texto: '#15171c', apagado: '#555c68', borde: '#e2dfd8', acento: '#c2410c', naranja: '#f26a1b',
-  acentoSuave: '#fff3ea', blanco: '#ffffff', chip: '#ecebe6', si: '#2e7d32', no: '#c62828', abs: '#e0a100', novota: '#a9adb5',
-};
+/** Colores de las tarjetas (src/lib/tarjetas/diseno.ts, compartidos con las que se dibujan en el navegador). */
+export const C = COLORES;
 
 const LOGO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="1 15 62 30" fill="none" stroke="#16181d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(32 46) scale(.94) translate(-32 -46)" stroke-width="1.1"><circle cx="20.9" cy="41.4" r="2.2" fill="#ffd36e"/><circle cx="27.4" cy="34.9" r="2.2" fill="#ffd36e"/><circle cx="36.6" cy="34.9" r="2.2" fill="#ffd36e"/><circle cx="43.1" cy="41.4" r="2.2" fill="#ffd36e"/><circle cx="14.6" cy="41.5" r="2.2" fill="#f7a04b"/><circle cx="16.5" cy="36.8" r="2.2" fill="#f7a04b"/><circle cx="22.8" cy="30.5" r="2.2" fill="#f7a04b"/><circle cx="27.5" cy="28.6" r="2.2" fill="#f7a04b"/><circle cx="36.5" cy="28.6" r="2.2" fill="#f7a04b"/><circle cx="41.2" cy="30.5" r="2.2" fill="#f7a04b"/><circle cx="47.5" cy="36.8" r="2.2" fill="#f7a04b"/><circle cx="49.4" cy="41.5" r="2.2" fill="#f7a04b"/><circle cx="8.4" cy="41.5" r="2.2" fill="#f7a04b"/><circle cx="9.8" cy="36.8" r="2.2" fill="#f7a04b"/><circle cx="12.2" cy="32.5" r="2.2" fill="#f7a04b"/><circle cx="18.5" cy="26.2" r="2.2" fill="#f7a04b"/><circle cx="22.8" cy="23.8" r="2.2" fill="#f7a04b"/><circle cx="27.5" cy="22.4" r="2.2" fill="#f7a04b"/><circle cx="36.5" cy="22.4" r="2.2" fill="#f7a04b"/><circle cx="41.2" cy="23.8" r="2.2" fill="#f7a04b"/><circle cx="45.5" cy="26.2" r="2.2" fill="#f7a04b"/><circle cx="51.8" cy="32.5" r="2.2" fill="#f7a04b"/><circle cx="54.2" cy="36.8" r="2.2" fill="#f7a04b"/><circle cx="55.6" cy="41.5" r="2.2" fill="#f7a04b"/><circle cx="2.3" cy="41.5" r="2.2" fill="#e2852f"/><circle cx="3.4" cy="36.8" r="2.2" fill="#e2852f"/><circle cx="5.3" cy="32.3" r="2.2" fill="#e2852f"/><circle cx="7.9" cy="28.2" r="2.2" fill="#e2852f"/><circle cx="14.2" cy="21.9" r="2.2" fill="#e2852f"/><circle cx="18.3" cy="19.3" r="2.2" fill="#e2852f"/><circle cx="22.8" cy="17.4" r="2.2" fill="#e2852f"/><circle cx="27.5" cy="16.3" r="2.2" fill="#e2852f"/><circle cx="36.5" cy="16.3" r="2.2" fill="#e2852f"/><circle cx="41.2" cy="17.4" r="2.2" fill="#e2852f"/><circle cx="45.7" cy="19.3" r="2.2" fill="#e2852f"/><circle cx="49.8" cy="21.9" r="2.2" fill="#e2852f"/><circle cx="56.1" cy="28.2" r="2.2" fill="#e2852f"/><circle cx="58.7" cy="32.3" r="2.2" fill="#e2852f"/><circle cx="60.6" cy="36.8" r="2.2" fill="#e2852f"/><circle cx="61.7" cy="41.5" r="2.2" fill="#e2852f"/></g></svg>`;
 const LOGO_URI = `data:image/svg+xml;base64,${Buffer.from(LOGO).toString('base64')}`;

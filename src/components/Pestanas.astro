@@ -1,0 +1,61 @@
+---
+/**
+ * Pestañas que se quedan pegadas arriba al bajar (Estadísticas, Tarjetas), sobre una franja translúcida con desenfoque
+ * para que el contenido que pasa por debajo no se mezcle con ellas. Cada pestaña abre el panel `.panel-pestana` con
+ * su id; la lógica está en src/scripts/pestanas.ts. Los enlaces `a[data-ir="<id>"]` de la página también abren su
+ * panel. Al cambiar de panel, la barra lanza el evento `pestana` (detail: id).
+ * Sin JavaScript la barra no se ve y se ven todos los paneles.
+ */
+import Icono from './Icono.astro';
+import type { NombreIcono } from '../lib/iconos';
+export interface DefPestana { id: string; texto: string; icono?: NombreIcono }
+interface Props { etiqueta: string; pestanas: DefPestana[]; inicial?: string }
+const { etiqueta, pestanas, inicial = pestanas[0].id } = Astro.props;
+---
+<span class="pestanas-marca" aria-hidden="true"></span>
+<div class="pestanas-pegada">
+  <div class="segmentado pestanas" role="tablist" aria-label={etiqueta} data-pestanas style={`--n:${pestanas.length}`}>
+    {pestanas.map((p) => (
+      <a class="btn" role="tab" href={`#${p.id}`} id={`tab-${p.id}`} data-id={p.id} aria-controls={p.id} aria-selected={p.id === inicial ? 'true' : 'false'} tabindex={p.id === inicial ? 0 : -1}>
+        {p.icono && <Icono n={p.icono} tam={18} />}<span>{p.texto}</span>
+      </a>
+    ))}
+  </div>
+</div>
+
+<script>
+  import { iniciarPestanas } from '../scripts/pestanas';
+  document.querySelectorAll<HTMLElement>('[data-pestanas]').forEach((barra) => {
+    const p = iniciarPestanas(barra, { alCambiar: (id) => barra.dispatchEvent(new CustomEvent('pestana', { detail: id, bubbles: true })) });
+    document.querySelectorAll<HTMLAnchorElement>('a[data-ir]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); p.abrir(a.dataset.ir!); }));
+  });
+</script>
+
+<style>
+  .pestanas-marca { display: block; height: 1px; margin-bottom: -1px; }
+  /* Franja pegada arriba: ocupa todo el ancho y desenfoca lo que pasa por debajo (variables en global.css) */
+  .pestanas-pegada {
+    position: sticky; top: var(--tope); z-index: 6; margin: 0 -16px 14px; padding: 8px 16px;
+    background: var(--franja-fondo); -webkit-backdrop-filter: var(--franja-filtro); backdrop-filter: var(--franja-filtro);
+    border-bottom: 1px solid transparent; transition: border-color .2s, box-shadow .2s;
+  }
+  .pestanas-pegada[data-pegada] { border-bottom-color: var(--border); box-shadow: 0 6px 18px -12px rgb(0 0 0 / .25); }
+  :global(html:not(.js)) .pestanas-pegada { display: none; }
+  :global(html.js .panel-pestana:not([data-activo])) { display: none; }
+  /* El aspecto es el del control segmentado común (.segmentado en global.css); aquí solo la colocación */
+  .pestanas { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+  .pestanas .btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 0; min-height: 52px; padding: 6px 4px;
+    font-size: .78rem; font-weight: 650; line-height: 1.15; -webkit-tap-highlight-color: transparent;
+  }
+  .pestanas .btn span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pestanas .btn :global(svg) { flex: none; }
+  /* Móvil estrecho (iPhone SE): letra algo menor para que quepan cuatro pestañas */
+  @media (max-width: 380px) { .pestanas { gap: 2px; padding: 3px; } .pestanas .btn { font-size: .7rem; padding-inline: 1px; letter-spacing: -.01em; } }
+  @media (min-width: 721px) {
+    .pestanas-pegada { margin: 0 0 18px; padding: 10px 0; }
+    .pestanas { display: inline-grid; grid-template-columns: repeat(var(--n), auto); }
+    .pestanas .btn { flex-direction: row; gap: 8px; min-height: 42px; padding: 6px 18px; font-size: .92rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .pestanas-pegada { transition: none; } }
+</style>

@@ -15,6 +15,8 @@ const es = {
   },
   /** Botones y ventana de compartir (servidor). */
   ui: {
+    /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */
+    masTarjetas: 'Más tarjetas para compartir',
     compartirFicha: 'Compartir la ficha de {nombre}',
     compartirWeb: 'Compartir Congreso Abierto',
     tituloWeb: 'Comparte Congreso Abierto',
@@ -56,6 +58,8 @@ export default area(es, {
       resumen: 'Els 350 diputats de la XV legislatura: què declaren, quant cobren i com voten, amb les dades oficials.',
     },
     ui: {
+      /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */
+      masTarjetas: 'Més targetes per compartir',
       compartirFicha: 'Comparteix la fitxa de {nombre}',
       compartirWeb: 'Comparteix Congreso Abierto',
       tituloWeb: 'Comparteix Congreso Abierto',
@@ -95,6 +99,8 @@ export default area(es, {
       resumen: 'XV. legegintzaldiko 350 diputatuak: zer aitortzen duten, zenbat kobratzen duten eta nola bozkatzen duten, datu ofizialekin.',
     },
     ui: {
+      /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */
+      masTarjetas: 'Partekatzeko txartel gehiago',
       compartirFicha: 'Partekatu fitxa: {nombre}',
       compartirWeb: 'Partekatu Congreso Abierto',
       tituloWeb: 'Partekatu Congreso Abierto',
@@ -133,6 +139,8 @@ export default area(es, {
       resumen: 'Os 350 deputados da XV Lexislatura: que declaran, canto cobran e como votan, cos seus datos oficiais.',
     },
     ui: {
+      /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */
+      masTarjetas: 'Máis tarxetas para compartir',
       compartirFicha: 'Compartir a ficha de {nombre}',
       compartirWeb: 'Compartir Congreso Abierto',
       tituloWeb: 'Comparte Congreso Abierto',
@@ -171,6 +179,8 @@ export default area(es, {
       resumen: 'The 350 deputies of the 15th term: what they declare, what they earn and how they vote, with their official data.',
     },
     ui: {
+      /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */
+      masTarjetas: 'More cards to share',
       compartirFicha: 'Share the profile of {nombre}',
       compartirWeb: 'Share Congreso Abierto',
       tituloWeb: 'Share Congreso Abierto',

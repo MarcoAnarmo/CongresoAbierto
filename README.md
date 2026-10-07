@@ -153,4 +153,8 @@ Congreso Abierto es un proyecto independiente, sin relación con el Congreso de 
 
 ## Licencia
 
-Código bajo licencia MIT. Los datos y las fotografías proceden de fuentes públicas oficiales (Congreso de los Diputados, BOE y BOCG) y se reutilizan citando su origen; cada dato enlaza a su documento original. La web carga las fotos desde congreso.es y las tarjetas para compartir usan una copia de esas fotos oficiales guardada en `data/fotos/` (fotografías © Congreso de los Diputados).
+Código bajo licencia MIT.
+
+Las tablas que publica Congreso Abierto (página Datos, `/datos/tablas/*.json` y `/datos/csv/*.csv`) se publican con licencia [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): se pueden reutilizar, también con fines comerciales, citando «Congreso Abierto (congresoabierto.org), a partir de datos oficiales del Congreso de los Diputados». Las tablas se definen en `src/lib/datos/tablas.ts`; para añadir otra (por ejemplo, de un parlamento autonómico) basta con declararla allí, escribir sus filas en `src/lib/datos/filas.ts` y sus textos en `src/i18n/textos/datos.ts`.
+
+Los datos y las fotografías proceden de fuentes públicas oficiales (Congreso de los Diputados, BOE y BOCG) y se reutilizan citando su origen; cada dato enlaza a su documento original. La web carga las fotos desde congreso.es y las tarjetas para compartir usan una copia de esas fotos oficiales guardada en `data/fotos/` (fotografías © Congreso de los Diputados).

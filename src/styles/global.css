@@ -73,11 +73,22 @@ button, select, input { font: inherit; color: inherit; }
 .btn:hover { border-color: var(--accent); }
 .btn.primario { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
 .btn.primario:hover { background: #9a3412; border-color: #9a3412; color: #fff; }
-/* Control segmentado (p. ej. modos del hemiciclo) */
-.segmentado { display: inline-flex; gap: 2px; padding: 4px; background: var(--chip); border-radius: 12px; }
-.segmentado .btn { border: 0; background: transparent; color: var(--muted); min-height: 40px; border-radius: 9px; }
-.segmentado .btn:hover { color: var(--accent-text); background: color-mix(in srgb, var(--accent) 12%, transparent); }
-.segmentado .btn[aria-pressed='true'] { background: var(--surface); color: var(--accent-text); font-weight: 650; box-shadow: 0 1px 3px rgb(0 0 0 / .12), 0 0 0 1px var(--border); }
+/*
+ * Control segmentado: el mismo en toda la web (modos del hemiciclo y del mapa, vistas de Diputados y Votaciones,
+ * pestañas de Estadísticas y Tarjetas…). Cápsula blanca con borde y la opción elegida en oscuro.
+ * La elegida se marca con aria-pressed (botones), aria-selected (pestañas) o aria-current (enlaces).
+ */
+.segmentado { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; box-shadow: 0 1px 2px rgb(0 0 0 / .04); }
+.segmentado .btn { border: 0; background: transparent; color: var(--muted); min-height: 40px; padding: 6px 16px; border-radius: 999px; font-weight: 600; text-decoration: none; }
+.segmentado .btn:hover { color: var(--text); background: var(--chip); border-color: transparent; }
+.segmentado .btn[aria-pressed='true'], .segmentado .btn[aria-selected='true'], .segmentado .btn[aria-current='page'] { background: var(--text); color: var(--surface); box-shadow: none; }
+/* En el móvil los segmentados suelen ocupar todo el ancho, con el icono encima: esquinas menos redondas */
+@media (max-width: 720px) { .segmentado { border-radius: 18px; } .segmentado .btn { border-radius: 14px; } }
+/*
+ * Franja que se pega arriba al bajar (pestañas, fecha de cada día en Votaciones): translúcida y con desenfoque,
+ * para que lo que pasa por debajo no se mezcle con ella.
+ */
+:root { --franja-fondo: color-mix(in srgb, var(--bg) 72%, transparent); --franja-filtro: blur(16px) saturate(1.5); }
 /* Subrayado naranja animado (menús e índices) */
 .subraya { position: relative; text-decoration: none; }
 .subraya::after { content: ''; position: absolute; left: var(--sub-x, 12px); right: var(--sub-x, 12px); bottom: var(--sub-y, 4px); height: 2.5px; border-radius: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left center; transition: transform .16s ease-out; }
@@ -105,3 +116,16 @@ td.num, th.num { text-align: right; }
 .asa-hoja { display: none; }
 .es-hoja > .asa-hoja { display: block; position: absolute; top: 7px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: color-mix(in srgb, var(--muted) 45%, transparent); pointer-events: none; z-index: 2; }
 .es-hoja { touch-action: pan-y; will-change: transform; }
+/* Leyenda en escala de menos a más (hemiciclo y mapa por provincias, src/scripts/leyenda.ts): tramos seguidos, como una regla.
+   Cada tramo es un botón que resalta solo lo de ese color. */
+.escala { display: flex; gap: 3px; width: 100%; max-width: 440px; }
+.tramo { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-height: 44px; padding: 6px 0 2px; border: 0; background: none; border-radius: 8px; font: inherit; font-size: .8rem; line-height: 1.2; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tramo i { display: block; height: 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgb(127 127 127 / .3); transition: box-shadow .15s; }
+.tramo:first-child i { border-radius: 7px 3px 3px 7px; }
+.tramo:nth-child(6) i { border-radius: 3px 7px 7px 3px; }
+.tramo.sd { flex: .8 1 0; margin-left: 8px; }
+.tramo.sd i { box-shadow: none; border: 1.5px dashed var(--muted); border-radius: 7px; }
+.tramo:hover span { color: var(--accent-text); }
+.tramo[aria-pressed='true'] i { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--text); }
+.tramo[aria-pressed='true'] span { color: var(--text); font-weight: 700; }
+.filtrando .tramo[aria-pressed='false'] { opacity: .5; }

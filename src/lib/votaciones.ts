@@ -51,6 +51,8 @@ export interface TextosLista {
   locale: string;
   /** «Votación clave», «· solo totales». */
   clave: string; soloTotales: string;
+  /** «Comparar»: si está, cada fila con voto por grupo lleva el botón ＋ para añadirla a una tarjeta (Votaciones). */
+  comparar?: string;
   /** Piezas de los totales: «{n} sí», «{n} no», «{n} abst.», «{n} no vota». */
   si: string; no: string; abst: string; noVota: string;
   /** Cabecera de cada día: ['{n} votación', '{n} votaciones']. */
@@ -109,7 +111,22 @@ export function barraHtml(to: number[], fina = true) {
   const [si, no, ab, nv] = to; const tot = si + no + ab + nv;
   return `<span class="barra${fina ? ' fina' : ''}" aria-hidden="true"><span class="b-si" style="width:${pct(si, tot)}"></span><span class="b-no" style="width:${pct(no, tot)}"></span><span class="b-abs" style="width:${pct(ab, tot)}"></span><span class="b-nv" style="width:${pct(nv, tot)}"></span></span>`;
 }
+/** Votaciones que caben, como mucho, en una tarjeta de comparación. */
+export const MAX_COMPARAR = 7;
+
+/** Texto que acompaña al enlace al compartir una votación (página Votaciones y galería de tarjetas). {resultado} va en minúscula. */
+export function textoCompartirVotacion(i: ItemVotacion, plantilla: string, tx: TextosLista, fecha: (iso: string) => string) {
+  const [si, no, ab] = i.to;
+  const titulo = i.c ?? (i.t.length > 140 ? `${i.t.slice(0, 138).trimEnd()}…` : i.t);
+  const v: Record<string, string | number> = { titulo, fecha: fecha(i.f), resultado: resultadoTexto(i.r, tx).toLocaleLowerCase(tx.locale), si, no, ab };
+  return plantilla.replace(/\{([^{}\s]+)\}/g, (_, k) => (k in v ? String(v[k]) : `{${k}}`));
+}
 export const totalesTexto = (to: number[], tx: TextosLista) => [conN(tx.si, to[0]), conN(tx.no, to[1]), conN(tx.abst, to[2]), ...(to[3] ? [conN(tx.noVota, to[3])] : [])].join(' · ');
+
+/** Botón ＋ (✓ cuando ya está) para añadir una votación a la comparación; lo activa src/scripts/tarjetas-votaciones.ts. */
+const botonComparar = (id: string, texto: string) => `<button type="button" class="vf-comp" data-comparar="${esc(id)}" aria-pressed="false" title="${esc(texto)}"><span class="sr-only">${esc(texto)}</span>`
+  + '<svg class="vc-mas" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'
+  + '<svg class="vc-ok" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></button>';
 
 /** Fila compacta de una votación (se abre en la ventana de detalle). `base` lleva ya el prefijo del idioma. */
 export function filaHtml(i: ItemVotacion, base: string, tx: TextosLista) {
@@ -122,7 +139,7 @@ export function filaHtml(i: ItemVotacion, base: string, tx: TextosLista) {
     + `<span class="vf-res"><span class="insignia ${fav}">${esc(resultadoTexto(i.r, tx))}</span>${i.pe ? '' : `<span class="vf-n">${totalesTexto(i.to, tx)}</span>`}${i.nv ? `<span class="vf-n">${esc(tx.soloTotales)}</span>` : ''}</span>`
     + (i.pe ? '' : barraHtml(i.to))
     + `<svg class="vf-ir" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6" /></svg>`
-    + `</a></li>`;
+    + `</a>${tx.comparar && i.g?.length && !i.pe ? botonComparar(i.id, tx.comparar) : ''}</li>`;
 }
 
 const fechaDia = (iso: string, locale: string) => {

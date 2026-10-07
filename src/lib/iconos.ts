@@ -20,6 +20,9 @@ export const TRAZOS = {
   cerrar: '<path d="M6 6l12 12M18 6 6 18"/>',
   abajo: '<path d="m6 9 6 6 6-6"/>',
   derecha: '<path d="m9 6 6 6-6 6"/>',
+  izquierda: '<path d="m15 6-6 6 6 6"/>',
+  hecho: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  buscar: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
   filtros: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
   fichas: '<rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.5" cy="10.5" r="2"/><path d="M5.5 16c.6-1.6 1.6-2.4 3-2.4s2.4.8 3 2.4M14 9.5h4M14 13h4"/>',
   tabla: '<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9.5h18M3 14.5h18M9 9.5v10"/>',
@@ -30,5 +33,11 @@ export const TRAZOS = {
   votaciones: '<path d="m4 7 1.6 1.6L9 5.2M4 15.5l1.6 1.6L9 13.7"/><path d="M12.5 7h7.5M12.5 15.5h7.5"/>',
   metodo: '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7.5h6"/>',
   colabora: '<circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c.7-3.2 2.6-5 5.5-5s4.8 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.6c2.4-.3 4 1.2 4.6 4.4"/>',
+  estadisticas: '<path d="M3.5 20.5h17"/><rect x="5" y="11" width="3.2" height="6.5" rx="1"/><rect x="10.4" y="5.5" width="3.2" height="12" rx="1"/><rect x="15.8" y="13.5" width="3.2" height="4" rx="1"/>',
+  descarga: '<path d="M12 3.5v11.5"/><path d="m7 10.5 5 5 5-5"/><path d="M4 20h16"/>',
+  mas: '<circle cx="5.5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18.5" cy="12" r="1.2"/>',
+  imagen: '<rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="9" cy="9.5" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/>',
+  codigo: '<path d="m8 7-5 5 5 5M16 7l5 5-5 5"/>',
+  ruta: '<path d="M5 20V5"/><path d="M5 5h11l-2 3.5 2 3.5H5"/>',
 } as const;
 export type NombreIcono = keyof typeof TRAZOS;

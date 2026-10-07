@@ -2,10 +2,13 @@
 import Base from '../../layouts/Base.astro';
 import Icono from '../../components/Icono.astro';
 import { votacionesPleno, pendientes, grupos, url, TEMAS } from '../../lib/data';
+import DialogoCompartir from '../../components/DialogoCompartir.astro';
+import TarjetasVotacion from '../../components/TarjetasVotacion.astro';
 import { aItem, itemPendiente, ordenar, listaHtml, filaHtml, TIPOS, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
 import { rutasIdioma, idiomaDe, enlace, formatos, f, pl, LOCALE } from '../../i18n';
 import comun from '../../i18n/textos/comun';
 import textos from '../../i18n/textos/votaciones';
+import textosTarjetaVotacion from '../../i18n/textos/tarjeta-votacion';
 
 export const getStaticPaths = rutasIdioma;
 const lang = idiomaDe(Astro.params.lang);
@@ -17,7 +20,9 @@ const { fecha: fmtFecha, num: fmtNum } = formatos(lang);
 const base = url('');
 const pre = enlace('', lang);
 // Textos de las filas: resultados oficiales (comun) y propios de la web, tipos e idioma de las fechas
-const tx: TextosLista = { ...t.cliente.lista, locale: LOCALE[lang], resultados: { ...c.resultado, ...t.cliente.lista.resultados } };
+const tv = textosTarjetaVotacion[lang];
+// Con «comparar», cada fila lleva el botón ＋ para añadirla a una tarjeta (solo se ve en el modo «Crear tarjeta»)
+const tx: TextosLista = { ...t.cliente.lista, locale: LOCALE[lang], resultados: { ...c.resultado, ...t.cliente.lista.resultados }, comparar: tv.comparar };
 const nombreTema = (id: string, nombre: string) => c.temas[id] ?? nombre;
 // Iniciales de los días de la semana (de lunes a domingo), sin punto final
 const semana = Array.from({ length: 7 }, (_, d) => new Date(Date.UTC(2024, 0, 1 + d, 12)).toLocaleDateString(LOCALE[lang], { weekday: t.calendario.semana === 'short' ? 'short' : 'narrow', timeZone: 'UTC' }).replace(/\.$/, ''));
@@ -74,7 +79,13 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
         <option value="no">{t.filtros.no}</option>
       </select>
     </div>
+    <button class="btn b-modo" type="button" id="v-modo-boton" aria-pressed="false" aria-controls="v-modo" title={tv.crear}><Icono n="imagen" tam={19} /><span>{tv.crear}</span></button>
     <p class="small muted cuenta" id="v-cuenta" aria-live="polite">{pl(todas.length, t.cliente.cuenta, lang)}</p>
+  </div>
+  <div class="modo-aviso" id="v-modo" role="region" aria-label={tv.modoTitulo} hidden>
+    <span class="ma-ico" aria-hidden="true"><Icono n="imagen" tam={22} /></span>
+    <p><strong>{tv.modoTitulo}</strong><span>{tv.modoTexto}</span></p>
+    <button class="btn ma-listo" type="button" id="v-modo-listo">{tv.listo}</button>
   </div>
   <dialog class="dlg-filtros" id="v-dlg-filtros" aria-labelledby="v-dlg-filtros-t">
     <div class="df-cab">
@@ -143,6 +154,8 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
     </div>
     <div class="d-cuerpo" id="dlg-voto-c" tabindex="-1" autofocus></div>
   </dialog>
+  <TarjetasVotacion />
+  <DialogoCompartir />
 </Base>
 
 <script type="application/json" data-textos="votaciones" set:html={JSON.stringify({ ...t.cliente, lista: tx })} />
@@ -158,9 +171,10 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
 
 <script>
   import { deslizarParaCerrar } from '../../scripts/hoja';
-  import { listaHtml, barraHtml, totalesTexto, nombreTipo, resultadoTexto, favorable, normalizar, palabrasDe, coincide, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
+  import { listaHtml, barraHtml, totalesTexto, nombreTipo, resultadoTexto, favorable, normalizar, palabrasDe, coincide, textoCompartirVotacion, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
   import { textos, f, pl, fmtNum, fmtFecha, locale, idioma, nombreMes as mesDe, koEko, prefijo, base as baseDatos } from '../../i18n/cliente';
   import type T from '../../i18n/textos/votaciones';
+  import { iniciarTarjetasVotacion } from '../../scripts/tarjetas-votaciones';
 
   interface Contenido { etiqueta: string; items: string[]; fuente: { titulo: string; url: string } }
   interface Extra { contenido: Contenido[]; documentos: { titulo: string; url: string; tipo?: string }[]; expediente?: string; expedienteUrl?: string; estado?: string }
@@ -320,16 +334,19 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   texto.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(() => requestAnimationFrame(() => { mostradas = cfg.primeras; aplicar(); }), 180); });
   texto.addEventListener('keydown', (e) => { if (e.key === 'Enter') { clearTimeout(espera); mostradas = cfg.primeras; aplicar(); texto.blur(); } });
   // El navegador puede recordar los filtros al volver a la página: siempre se empieza con todos los temas
-  addEventListener('pageshow', () => { if ([selTema, selTipo, selRes].some((x) => x.value) || texto.value) { selTema.value = ''; selTipo.value = ''; selRes.value = ''; texto.value = ''; ultimo.clave = ''; aplicar(); } });
+  // (salvo el que pida la dirección, p. ej. /votaciones?tema=vivienda desde Estadísticas)
+  const temaPedido = [...selTema.options].some((o) => o.value && o.value === params.get('tema')) ? params.get('tema')! : '';
+  addEventListener('pageshow', () => {
+    if ([selTipo, selRes].some((x) => x.value) || texto.value || selTema.value !== temaPedido) { selTema.value = temaPedido; selTipo.value = ''; selRes.value = ''; texto.value = ''; ultimo.clave = ''; aplicar(); }
+  });
   [selTema, selTipo, selRes].forEach((s) => s.addEventListener('change', () => { mostradas = cfg.primeras; aplicar(); }));
 
-  // ---------- Filtros en una hoja (móvil), como en Diputados ----------
+  // ---------- Filtros en una ventana (en el móvil, hoja que sube desde abajo), como en Diputados ----------
   const mqMovil = matchMedia('(max-width: 720px)');
   const dlgF = $<HTMLDialogElement>('v-dlg-filtros');
   const abrirF = $<HTMLButtonElement>('v-abrir-filtros');
-  const filtrosMas = $('v-filtros-mas');
-  const colocar = () => { if (mqMovil.matches) $('v-df-cuerpo').append(filtrosMas); else { if (dlgF.open) dlgF.close(); abrirF.after(filtrosMas); } };
-  colocar(); mqMovil.addEventListener?.('change', colocar);
+  // Sin JavaScript los selectores están en la fila; con JavaScript pasan a la ventana
+  $('v-df-cuerpo').append($('v-filtros-mas'));
   abrirF.addEventListener('click', () => { document.documentElement.classList.add('dlg-abierto'); dlgF.showModal(); });
   dlgF.addEventListener('close', () => { document.documentElement.classList.remove('dlg-abierto'); abrirF.focus(); });
   dlgF.querySelector('.df-cerrar')!.addEventListener('click', () => dlgF.close());
@@ -364,7 +381,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
       + (x?.contenido ?? []).map((c) => `<p class="docs-t">${esc(c.etiqueta)}</p><ul class="contenido">${c.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul><p class="small muted">${esc(t.fuente)} <a href="${esc(c.fuente.url)}" rel="noopener">${esc(c.fuente.titulo)} ↗</a></p>`).join('')
       + (x?.expediente ? `<p class="small muted">${esc(t.expediente)} <a href="${esc(x.expedienteUrl ?? '')}" rel="noopener">${esc(x.expediente)} ↗</a></p>` : '')
       + (i.s ? `<p class="small muted">${esc(f(t.sesion, { tipo: i.tp, s: i.s, n: i.n }))}</p>` : '');
-    const acciones = i.pe ? '' : `<div class="d-acciones">${i.nv ? '' : `<a class="btn primario" href="${base}/?votacion=${encodeURIComponent(i.id)}#hemiciclo"><span class="largo">${esc(t.hemicicloLargo)}</span><span class="corto">${esc(t.hemicicloCorto)}</span></a>`}<button class="d-compartir" type="button" id="d-compartir" aria-label="${esc(t.compartirEsta)}" title="${esc(t.compartirEsta)}">${iconoCompartir}${i.nv ? `<span>${esc(t.compartir)}</span>` : ''}</button></div><p class="small c-aviso" id="d-aviso" role="status"></p>`;
+    const acciones = i.pe ? '' : `<div class="d-acciones">${i.nv ? '' : `<a class="btn primario" href="${base}/?votacion=${encodeURIComponent(i.id)}#hemiciclo"><span class="largo">${esc(t.hemicicloLargo)}</span><span class="corto">${esc(t.hemicicloCorto)}</span></a>`}<button class="d-compartir" type="button" id="d-compartir" aria-label="${esc(t.compartirEsta)}" title="${esc(t.compartirEsta)}">${iconoCompartir}${i.nv ? `<span>${esc(t.compartir)}</span>` : ''}</button></div><p class="small c-aviso" id="d-aviso" role="status"></p>${tarjetas.botones(i)}`;
     return `<p class="d-meta small"><span class="etq">${esc(nombreTipo(i.k, i.tp, tx))}</span>${i.cl ? `<span class="etq clave">${esc(tx.clave)}</span>` : ''}</p>`
       + (i.c ? `<h3 class="d-corto">${esc(i.c)}</h3>` : `<p class="d-titulo${largo ? ' recorte' : ''}">${esc(i.t)}</p>`)
       + `<div class="d-res"><span class="insignia ${favorable(i.r)}">${esc(resultadoTexto(i.r, tx))}</span>${i.pe ? '' : `<span class="small"><strong>${totalesTexto(i.to, tx)}</strong></span>`}</div>`
@@ -377,16 +394,28 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
       + (docs ? pliegue(esc(t.documentos), `<ul class="docs">${docs}</ul>`) : '')
       + `</div>`;
   }
-  function textoCompartir(i: ItemVotacion) {
-    const [si, no, ab] = i.to;
-    const tit = i.c ?? (i.t.length > 140 ? `${i.t.slice(0, 138).trimEnd()}…` : i.t);
-    return f(t.compartirTexto, { titulo: tit, fecha: fechaLarga(i.f), resultado: resultadoTexto(i.r, tx).toLocaleLowerCase(locale()), si, no, ab });
+  const textoCompartir = (i: ItemVotacion) => textoCompartirVotacion(i, t.compartirTexto, tx, fechaLarga);
+  // Tarjeta de cualquier votación y comparación de varias (el dibujo se descarga solo al pulsar)
+  const tarjetas = iniciarTarjetasVotacion({ buscar: (id) => porId.get(id), prefijo: base, textoCompartir });
+  // Modo «Crear tarjeta» (?crear=1, p. ej. desde la página Tarjetas): cada fila lleva ＋ para añadirla a la comparación
+  const botonModo = $<HTMLButtonElement>('v-modo-boton'), avisoModo = $('v-modo');
+  function modoTarjeta(si: boolean) {
+    document.documentElement.classList.toggle('modo-tarjeta', si);
+    botonModo.setAttribute('aria-pressed', String(si));
+    avisoModo.hidden = !si;
+    const u = new URL(location.href);
+    if (si) u.searchParams.set('crear', '1'); else u.searchParams.delete('crear');
+    if (u.href !== location.href) history.replaceState(history.state, '', u);
   }
+  botonModo.addEventListener('click', () => modoTarjeta(botonModo.getAttribute('aria-pressed') !== 'true'));
+  $('v-modo-listo').addEventListener('click', () => modoTarjeta(false));
+  if (params.has('crear') || tarjetas.seleccion().length) modoTarjeta(true);
   function abrir(id: string, empujar: boolean) {
     const i = porId.get(id);
     if (!i) return false;
     $('dlg-voto-t').textContent = f(t.tituloDialogo, { fecha: fechaLarga(i.f) });
     cuerpo.innerHTML = detalleHtml(i);
+    tarjetas.conectar(cuerpo);
     cuerpo.scrollTop = 0;
     const rec = cuerpo.querySelector<HTMLElement>('.d-titulo.recorte');
     if (rec) {
@@ -455,21 +484,39 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   /* Buscador y filtros (en el móvil, los filtros van en una hoja) */
   .filtros { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin-bottom: 8px; }
   .filtros[hidden] { display: none; }
-  .filtros input { flex: 1 1 260px; min-width: 0; }
+  .filtros input { flex: 1 1 0; min-width: 0; }
   .filtros-mas { display: flex; flex-wrap: wrap; gap: 8px; }
   .filtros-mas select { max-width: 260px; }
-  .boton-filtrar { display: none; align-items: center; gap: 8px; }
+  .boton-filtrar { display: inline-flex; align-items: center; gap: 8px; }
+  :global(html:not(.js)) .boton-filtrar { display: none; }
   .n-filtros { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent-strong); color: #fff; font-size: .75rem; }
   .n-filtros[hidden] { display: none; }
   .cuenta { flex-basis: 100%; margin: 0; }
+  /* Modo «Crear tarjeta»: botón junto a los filtros y aviso con lo que hay que hacer */
+  .b-modo { display: inline-flex; align-items: center; gap: 8px; }
+  .b-modo[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
+  .modo-aviso {
+    display: flex; align-items: center; gap: 12px; margin: 4px 0 14px; padding: 12px 12px 12px 14px; border-radius: 16px;
+    background: var(--accent-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  .modo-aviso[hidden] { display: none; }
+  .ma-ico { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 12px; background: var(--surface); color: var(--accent-text); }
+  .modo-aviso p { flex: 1; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; line-height: 1.35; font-size: .9rem; }
+  .modo-aviso p span { color: var(--muted); }
+  .ma-listo { flex: none; }
   .cuenta[hidden] { display: none; }
 
   /* Lista: días y filas */
   .v-lista { display: grid; gap: 18px; margin-top: 8px; }
-  .v-lista :global(.v-dia h3) { position: sticky; top: var(--tope, 0px); z-index: 2; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0; padding: 8px 2px; font-size: .95rem; background: var(--bg); }
-  .v-lista :global(.v-dia h3 span) { color: var(--muted); font-weight: 500; font-size: .82rem; white-space: nowrap; }
+  /* Fecha de cada día: se queda arriba al bajar, sobre la franja desenfocada de toda la web (global.css) */
+  .v-lista :global(.v-dia h3) {
+    position: sticky; top: calc(var(--tope, 0px) + 6px); z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    margin: 0 -10px 4px; padding: 8px 10px 8px 12px; border-radius: 14px; font-size: .95rem;
+    background: var(--franja-fondo); -webkit-backdrop-filter: var(--franja-filtro); backdrop-filter: var(--franja-filtro);
+  }
+  .v-lista :global(.v-dia h3 span) { flex: none; padding: 2px 10px; border-radius: 999px; background: var(--chip); color: var(--muted); font-weight: 600; font-size: .76rem; white-space: nowrap; }
   .v-lista > :global(*) { min-width: 0; }
-  .v-lista :global(.v-dia h3) { flex-wrap: wrap; row-gap: 0; }
+  .v-lista :global(.v-dia h3 time) { min-width: 0; line-height: 1.3; }
   :global(.v-filas) { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   :global(.v-filas.sueltas) { margin-top: 8px; }
   :global(.vf + .vf) { border-top: 1px solid var(--border); }
@@ -537,9 +584,13 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   .glosario { margin-top: 2rem; }
   .glosario summary { cursor: pointer; font-weight: 650; }
 
-  /* Hoja de filtros (móvil) */
-  .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; padding: 0; max-height: 90dvh; border: 1px solid var(--border); border-bottom: 0; border-radius: 20px 20px 0 0; background: var(--surface); color: var(--text); box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
-  .dlg-filtros[open] { display: flex; flex-direction: column; animation: subir .22s ease-out; }
+  /* Ventana de filtros: centrada en el ordenador; en el móvil, hoja que sube desde abajo */
+  .dlg-filtros { width: min(460px, calc(100vw - 32px)); padding: 0; max-height: min(85dvh, 640px); border: 1px solid var(--border); border-radius: 18px; background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgb(0 0 0 / .25); }
+  .dlg-filtros[open] { display: flex; flex-direction: column; animation: aparecer .18s ease-out; }
+  @media (max-width: 720px) {
+    .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: 90dvh; border-bottom: 0; border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
+    .dlg-filtros[open] { animation: subir .22s ease-out; }
+  }
   .dlg-filtros::backdrop { background: rgb(20 22 28 / .55); }
   @keyframes subir { from { transform: translateY(48px); opacity: .5; } }
   .df-cab { position: relative; display: flex; align-items: center; gap: 12px; padding: 20px 8px 8px 16px; }
@@ -612,11 +663,12 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
     .vista-barra .segmentado .btn { flex-direction: column; gap: 2px; font-size: .82rem; min-height: 54px; padding: 6px 4px; }
     .segmentado .largo { display: none; }
     .segmentado .corto { display: inline; }
-    .boton-filtrar { display: inline-flex; }
-    .filtros input { flex: 1 1 0; }
-    #v-filtros > .filtros-mas { display: none; }
+    .b-modo { width: 44px; padding: 0; justify-content: center; }
+    .b-modo span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .modo-aviso { align-items: flex-start; }
     :global(.vf-a) { padding: 11px 40px 12px 14px; }
-    .v-lista :global(.v-dia h3) { font-size: .88rem; }
+    .v-lista :global(.v-dia h3) { font-size: .84rem; gap: 8px; letter-spacing: -.01em; }
+    .v-lista :global(.v-dia h3 span) { font-size: .7rem; padding: 1px 8px; }
     .calendario { max-width: none; padding: 10px 10px 12px; }
     .cal-rejilla { grid-template-columns: minmax(0, 1fr); gap: 12px; }
     .cal-rejilla .calendario { position: static; }
