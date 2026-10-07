@@ -7,6 +7,7 @@ import { area } from '..';
  */
 const es = {
   "licenciaTitulo": "Licencia y cómo citar",
+  "avisoLegal": "Uso de los datos y aviso legal",
   "secciones": {"perfil": "Perfil", "dinero": "Sueldo, bienes y deudas", "votos": "Votos", "fuentes": "Avisos y enlaces"},
   "descripciones": {"votaciones": {"id": "Identificador de la votación (sesión y número)", "no_vota": "Diputados que no votaron"}, "votos-grupo": {"si": "Diputados del grupo que votaron sí", "no": "Diputados del grupo que votaron no", "abstencion": "Diputados del grupo que se abstuvieron", "no_vota": "Diputados del grupo que no votaron"}},
   "columnasDe": "{n} columnas",
@@ -67,6 +68,25 @@ const es = {
   "aplicar": "Ver {n}",
   "nota_votos": "Solo diputados de la composición actual. El grupo es el actual.",
   "nota_inmuebles": "Una fila por línea de la declaración (una línea puede declarar varias unidades).",
+  "nota_entidades": "Que una entidad aparezca no implica ninguna irregularidad: es lo que consta en los documentos oficiales.",
+  "nota_borme": "Solo actos confirmados por otro documento oficial. El BORME no publica el DNI: las coincidencias de nombre sin confirmar no se incluyen.",
+  "conf_declarada": "En sus documentos",
+  "conf_cargo-publico": "Empresa pública de su cargo",
+  "conf_apellido": "Lleva su nombre",
+  "tipo_empresa": "Empresa",
+  "tipo_publica": "Sector público",
+  "tipo_fundacion": "Fundación",
+  "tipo_asociacion": "Asociación u ONG",
+  "tipo_partido": "Partido político",
+  "tipo_sindicato": "Sindicato",
+  "tipo_educacion": "Educación e investigación",
+  "tipo_colegio": "Colegio profesional",
+  "tipo_otra": "Otra",
+  "fuente_compatibilidad": "Acuerdo del Congreso (BOCG)",
+  "fuente_registro": "Registro de Intereses",
+  "fuente_intereses": "Declaración de intereses económicos",
+  "fuente_bienes": "Declaración de bienes",
+  "fuente_ficha": "Ficha oficial",
   "tablas": {
     "diputados": {
       "nombre": "Diputados",
@@ -75,6 +95,14 @@ const es = {
     "inmuebles": {
       "nombre": "Inmuebles",
       "descripcion": "Una fila por inmueble declarado"
+    },
+    "entidades": {
+      "nombre": "Empresas y entidades",
+      "descripcion": "Una fila por cada documento oficial que nombra una empresa o entidad junto a un diputado"
+    },
+    "borme": {
+      "nombre": "Cargos en el BORME",
+      "descripcion": "Una fila por cada acto del Registro Mercantil (nombramiento, cese…) a nombre de un diputado, confirmado por otro documento oficial"
     },
     "votaciones": {
       "nombre": "Votaciones",
@@ -96,6 +124,11 @@ const es = {
     "genero": "Sexo",
     "es_vivienda": "Vivienda",
     "titular": "Titular",
+    "tipo_entidad": "Tipo de entidad",
+    "tipo_relacion": "Tipo de relación",
+    "remuneracion": "Remuneración",
+    "fuente": "Documento",
+    "confirmacion": "Cómo se confirma",
     "fechas": "Fechas",
     "temas": "Tema",
     "resultado": "Resultado",
@@ -286,6 +319,66 @@ const es = {
       "nombre": "Declaración",
       "descripcion": "PDF oficial"
     },
+    "entidad": {
+      "nombre": "Entidad",
+      "descripcion": "Nombre de la empresa o entidad, como aparece en el documento (variantes agrupadas)"
+    },
+    "tipo_entidad": {
+      "nombre": "Tipo de entidad",
+      "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio u otra"
+    },
+    "tipo_relacion": {
+      "nombre": "Tipo de relación",
+      "descripcion": "Según la sección del documento o el artículo de la LOREG del acuerdo: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria u otras"
+    },
+    "remuneracion": {
+      "nombre": "Remuneración",
+      "descripcion": "Lo que dice el documento: si, no, dietas (solo dietas, indemnizaciones o gastos), complemento (solo complemento por antigüedad) o no-consta (el documento no lo dice; no significa que cobre)"
+    },
+    "cargo_o_actividad": {
+      "nombre": "Cargo o actividad",
+      "descripcion": "Resumen del cargo o la actividad tomado del texto"
+    },
+    "fuente": {
+      "nombre": "Documento",
+      "descripcion": "compatibilidad (BOCG), registro (Registro de Intereses), intereses (declaración de intereses económicos), bienes (declaración de bienes) o ficha (ficha oficial)"
+    },
+    "texto": {
+      "nombre": "Texto literal",
+      "descripcion": "Texto del documento oficial donde aparece"
+    },
+    "url_documento": {
+      "nombre": "Documento (enlace)",
+      "descripcion": "PDF o página oficial"
+    },
+    "empresa": {
+      "nombre": "Sociedad",
+      "descripcion": "Nombre de la sociedad tal como lo publica el BORME"
+    },
+    "confirmacion": {
+      "nombre": "Cómo se confirma",
+      "descripcion": "declarada (la empresa está en sus documentos), cargo-publico (empresa pública de una administración en la que declara un cargo) o apellido (la sociedad lleva su nombre)"
+    },
+    "motivo": {
+      "nombre": "Documento que lo confirma",
+      "descripcion": "Entidad de sus documentos oficiales que confirma que es la misma persona"
+    },
+    "acto": {
+      "nombre": "Acto",
+      "descripcion": "Nombramientos, Ceses/Dimisiones, Revocaciones… tal como lo escribe el BORME"
+    },
+    "cargo": {
+      "nombre": "Cargo",
+      "descripcion": "Cargo con las abreviaturas del BORME"
+    },
+    "registro": {
+      "nombre": "Registro Mercantil",
+      "descripcion": "Provincia del registro donde se inscribe"
+    },
+    "url_borme": {
+      "nombre": "BORME (enlace)",
+      "descripcion": "Anuncio oficial en boe.es"
+    },
     "fecha": {
       "nombre": "Fecha",
       "descripcion": "AAAA-MM-DD"
@@ -348,6 +441,7 @@ const es = {
 export default area(es, {
   ca: {
     "licenciaTitulo": "Llicència i com citar",
+    "avisoLegal": "Ús de les dades i avís legal",
     "secciones": {"perfil": "Perfil", "dinero": "Sou, béns i deutes", "votos": "Vots", "fuentes": "Avisos i enllaços"},
     "descripciones": {"votaciones": {"id": "Identificador de la votació (sessió i número)", "no_vota": "Diputats que no van votar"}, "votos-grupo": {"si": "Diputats del grup que van votar sí", "no": "Diputats del grup que van votar no", "abstencion": "Diputats del grup que es van abstenir", "no_vota": "Diputats del grup que no van votar"}},
     "columnasDe": "{n} columnes",
@@ -408,6 +502,25 @@ export default area(es, {
     "aplicar": "Veure {n}",
     "nota_votos": "Només diputats de la composició actual. El grup és l’actual.",
     "nota_inmuebles": "Una fila per línia de la declaració (una línia pot declarar diverses unitats).",
+    "nota_entidades": "Que hi aparegui una entitat no implica cap irregularitat: és el que consta als documents oficials.",
+    "nota_borme": "Només actes confirmats per un altre document oficial. El BORME no publica el DNI: les coincidències de nom sense confirmar no s’hi inclouen.",
+    "conf_declarada": "Als seus documents",
+    "conf_cargo-publico": "Empresa pública del seu càrrec",
+    "conf_apellido": "Porta el seu nom",
+    "tipo_empresa": "Empresa",
+    "tipo_publica": "Sector públic",
+    "tipo_fundacion": "Fundació",
+    "tipo_asociacion": "Associació o ONG",
+    "tipo_partido": "Partit polític",
+    "tipo_sindicato": "Sindicat",
+    "tipo_educacion": "Educació i recerca",
+    "tipo_colegio": "Col·legi professional",
+    "tipo_otra": "Altra",
+    "fuente_compatibilidad": "Acord del Congrés (BOCG)",
+    "fuente_registro": "Registre d’Interessos",
+    "fuente_intereses": "Declaració d’interessos econòmics",
+    "fuente_bienes": "Declaració de béns",
+    "fuente_ficha": "Fitxa oficial",
     "tablas": {
       "diputados": {
         "nombre": "Diputats",
@@ -416,6 +529,14 @@ export default area(es, {
       "inmuebles": {
         "nombre": "Immobles",
         "descripcion": "Una fila per immoble declarat"
+      },
+      "entidades": {
+        "nombre": "Empreses i entitats",
+        "descripcion": "Una fila per cada document oficial que esmenta una empresa o entitat al costat d’un diputat"
+      },
+      "borme": {
+        "nombre": "Càrrecs al BORME",
+        "descripcion": "Una fila per cada acte del Registre Mercantil (nomenament, cessament…) a nom d’un diputat, confirmat per un altre document oficial"
       },
       "votaciones": {
         "nombre": "Votacions",
@@ -437,6 +558,11 @@ export default area(es, {
       "genero": "Sexe",
       "es_vivienda": "Habitatge",
       "titular": "Titular",
+      "tipo_entidad": "Tipus d’entitat",
+      "tipo_relacion": "Tipus de relació",
+      "remuneracion": "Remuneració",
+      "fuente": "Document",
+      "confirmacion": "Com es confirma",
       "fechas": "Dates",
       "temas": "Tema",
       "resultado": "Resultat",
@@ -627,6 +753,66 @@ export default area(es, {
         "nombre": "Declaració",
         "descripcion": "PDF oficial"
       },
+      "entidad": {
+        "nombre": "Entitat",
+        "descripcion": "Nom de l’empresa o entitat, tal com apareix al document (variants agrupades)"
+      },
+      "tipo_entidad": {
+        "nombre": "Tipus d’entitat",
+        "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio o otra"
+      },
+      "tipo_relacion": {
+        "nombre": "Tipus de relació",
+        "descripcion": "Segons la secció del document o l’article de la LOREG de l’acord: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria o otras"
+      },
+      "remuneracion": {
+        "nombre": "Remuneració",
+        "descripcion": "El que diu el document: si, no, dietas (només dietes, indemnitzacions o despeses), complemento (només complement d’antiguitat) o no-consta (el document no ho diu; no vol dir que cobri)"
+      },
+      "cargo_o_actividad": {
+        "nombre": "Càrrec o activitat",
+        "descripcion": "Resum del càrrec o l’activitat pres del text"
+      },
+      "fuente": {
+        "nombre": "Document",
+        "descripcion": "compatibilidad (BOCG), registro (Registre d’Interessos), intereses (declaració d’interessos econòmics), bienes (declaració de béns) o ficha (fitxa oficial)"
+      },
+      "texto": {
+        "nombre": "Text literal",
+        "descripcion": "Text del document oficial on apareix (en castellà)"
+      },
+      "url_documento": {
+        "nombre": "Document (enllaç)",
+        "descripcion": "PDF o pàgina oficial"
+      },
+      "empresa": {
+        "nombre": "Societat",
+        "descripcion": "Nom de la societat tal com el publica el BORME"
+      },
+      "confirmacion": {
+        "nombre": "Com es confirma",
+        "descripcion": "declarada (l’empresa és als seus documents), cargo-publico (empresa pública d’una administració en què declara un càrrec) o apellido (la societat porta el seu nom)"
+      },
+      "motivo": {
+        "nombre": "Document que ho confirma",
+        "descripcion": "Entitat dels seus documents oficials que confirma que és la mateixa persona"
+      },
+      "acto": {
+        "nombre": "Acte",
+        "descripcion": "Nomenaments, cessaments, revocacions… tal com ho escriu el BORME (en castellà)"
+      },
+      "cargo": {
+        "nombre": "Càrrec",
+        "descripcion": "Càrrec amb les abreviatures del BORME"
+      },
+      "registro": {
+        "nombre": "Registre Mercantil",
+        "descripcion": "Província del registre on s’inscriu"
+      },
+      "url_borme": {
+        "nombre": "BORME (enllaç)",
+        "descripcion": "Anunci oficial a boe.es"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "AAAA-MM-DD"
@@ -687,6 +873,7 @@ export default area(es, {
   },
   eu: {
     "licenciaTitulo": "Lizentzia eta nola aipatu",
+    "avisoLegal": "Datuen erabilera eta lege-oharra",
     "secciones": {"perfil": "Profila", "dinero": "Soldata, ondasunak eta zorrak", "votos": "Botoak", "fuentes": "Oharrak eta estekak"},
     "descripciones": {"votaciones": {"id": "Bozketaren identifikatzailea (saioa eta zenbakia)", "no_vota": "Bozkatu ez zuten diputatuak"}, "votos-grupo": {"si": "Baiezkoa bozkatu zuten taldeko diputatuak", "no": "Ezezkoa bozkatu zuten taldeko diputatuak", "abstencion": "Abstenitu ziren taldeko diputatuak", "no_vota": "Bozkatu ez zuten taldeko diputatuak"}},
     "columnasDe": "{n} zutabe",
@@ -747,6 +934,25 @@ export default area(es, {
     "aplicar": "Ikusi {n}",
     "nota_votos": "Egungo osaerako diputatuak soilik. Taldea egungoa da.",
     "nota_inmuebles": "Errenkada bat aitorpeneko lerro bakoitzeko (lerro batek hainbat unitate izan ditzake).",
+    "nota_entidades": "Erakunde bat agertzeak ez du esan nahi irregulartasunik dagoenik: dokumentu ofizialetan jasotakoa da.",
+    "nota_borme": "Beste dokumentu ofizial batek baieztatutako egintzak bakarrik. BORMEk ez du NANa argitaratzen: baieztatu gabeko izen-kointzidentziak ez dira sartzen.",
+    "conf_declarada": "Bere dokumentuetan",
+    "conf_cargo-publico": "Bere karguaren enpresa publikoa",
+    "conf_apellido": "Bere izena darama",
+    "tipo_empresa": "Enpresa",
+    "tipo_publica": "Sektore publikoa",
+    "tipo_fundacion": "Fundazioa",
+    "tipo_asociacion": "Elkartea edo GKE",
+    "tipo_partido": "Alderdi politikoa",
+    "tipo_sindicato": "Sindikatua",
+    "tipo_educacion": "Hezkuntza eta ikerketa",
+    "tipo_colegio": "Elkargo profesionala",
+    "tipo_otra": "Bestelakoa",
+    "fuente_compatibilidad": "Kongresuaren erabakia (BOCG)",
+    "fuente_registro": "Interesen Erregistroa",
+    "fuente_intereses": "Interes ekonomikoen adierazpena",
+    "fuente_bienes": "Ondasunen adierazpena",
+    "fuente_ficha": "Fitxa ofiziala",
     "tablas": {
       "diputados": {
         "nombre": "Diputatuak",
@@ -755,6 +961,14 @@ export default area(es, {
       "inmuebles": {
         "nombre": "Higiezinak",
         "descripcion": "Errenkada bat aitortutako higiezin bakoitzeko"
+      },
+      "entidades": {
+        "nombre": "Enpresak eta erakundeak",
+        "descripcion": "Errenkada bat diputatu batekin batera enpresa edo erakunde bat aipatzen duen dokumentu ofizial bakoitzeko"
+      },
+      "borme": {
+        "nombre": "Karguak BORMEn",
+        "descripcion": "Errenkada bat diputatu baten izenean dagoen Merkataritza Erregistroko egintza bakoitzeko (izendapena, kargu-uztea…), beste dokumentu ofizial batek baieztatua"
       },
       "votaciones": {
         "nombre": "Bozketak",
@@ -776,6 +990,11 @@ export default area(es, {
       "genero": "Sexua",
       "es_vivienda": "Etxebizitza",
       "titular": "Titularra",
+      "tipo_entidad": "Erakunde mota",
+      "tipo_relacion": "Harreman mota",
+      "remuneracion": "Ordainsaria",
+      "fuente": "Dokumentua",
+      "confirmacion": "Nola baieztatzen den",
       "fechas": "Datak",
       "temas": "Gaia",
       "resultado": "Emaitza",
@@ -966,6 +1185,66 @@ export default area(es, {
         "nombre": "Aitorpena",
         "descripcion": "PDF ofiziala"
       },
+      "entidad": {
+        "nombre": "Erakundea",
+        "descripcion": "Enpresaren edo erakundearen izena, dokumentuan agertzen den bezala (aldaerak elkartuta)"
+      },
+      "tipo_entidad": {
+        "nombre": "Erakunde mota",
+        "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio edo otra"
+      },
+      "tipo_relacion": {
+        "nombre": "Harreman mota",
+        "descripcion": "Dokumentuaren atalaren edo erabakiko LOREGen artikuluaren arabera: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria edo otras"
+      },
+      "remuneracion": {
+        "nombre": "Ordainsaria",
+        "descripcion": "Dokumentuak dioena: si, no, dietas (dietak, kalte-ordainak edo gastuak bakarrik), complemento (antzinatasun-osagarria bakarrik) edo no-consta (dokumentuak ez du esaten; ez du esan nahi kobratzen duenik)"
+      },
+      "cargo_o_actividad": {
+        "nombre": "Kargua edo jarduera",
+        "descripcion": "Testutik hartutako karguaren edo jardueraren laburpena"
+      },
+      "fuente": {
+        "nombre": "Dokumentua",
+        "descripcion": "compatibilidad (BOCG), registro (Interesen Erregistroa), intereses (interes ekonomikoen adierazpena), bienes (ondasunen adierazpena) edo ficha (fitxa ofiziala)"
+      },
+      "texto": {
+        "nombre": "Testu literala",
+        "descripcion": "Agertzen den dokumentu ofizialaren testua (gaztelaniaz)"
+      },
+      "url_documento": {
+        "nombre": "Dokumentua (esteka)",
+        "descripcion": "PDF edo orri ofiziala"
+      },
+      "empresa": {
+        "nombre": "Sozietatea",
+        "descripcion": "Sozietatearen izena, BORMEk argitaratzen duen bezala"
+      },
+      "confirmacion": {
+        "nombre": "Nola baieztatzen den",
+        "descripcion": "declarada (enpresa bere dokumentuetan dago), cargo-publico (kargu bat adierazten duen administrazio baten enpresa publikoa) edo apellido (sozietateak bere izena darama)"
+      },
+      "motivo": {
+        "nombre": "Baieztatzen duen dokumentua",
+        "descripcion": "Pertsona bera dela baieztatzen duen bere dokumentu ofizialetako erakundea"
+      },
+      "acto": {
+        "nombre": "Egintza",
+        "descripcion": "Izendapenak, kargu-uzteak, ezeztapenak… BORMEk idazten duen bezala (gaztelaniaz)"
+      },
+      "cargo": {
+        "nombre": "Kargua",
+        "descripcion": "Kargua, BORMEren laburdurekin"
+      },
+      "registro": {
+        "nombre": "Merkataritza Erregistroa",
+        "descripcion": "Inskribatzen den erregistroaren probintzia"
+      },
+      "url_borme": {
+        "nombre": "BORME (esteka)",
+        "descripcion": "Iragarki ofiziala boe.es-en"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "UUUU-HH-EE"
@@ -1026,6 +1305,7 @@ export default area(es, {
   },
   gl: {
     "licenciaTitulo": "Licenza e como citar",
+    "avisoLegal": "Uso dos datos e aviso legal",
     "secciones": {"perfil": "Perfil", "dinero": "Soldo, bens e débedas", "votos": "Votos", "fuentes": "Avisos e ligazóns"},
     "descripciones": {"votaciones": {"id": "Identificador da votación (sesión e número)", "no_vota": "Deputados que non votaron"}, "votos-grupo": {"si": "Deputados do grupo que votaron si", "no": "Deputados do grupo que votaron non", "abstencion": "Deputados do grupo que se abstiveron", "no_vota": "Deputados do grupo que non votaron"}},
     "columnasDe": "{n} columnas",
@@ -1086,6 +1366,25 @@ export default area(es, {
     "aplicar": "Ver {n}",
     "nota_votos": "Só deputados da composición actual. O grupo é o actual.",
     "nota_inmuebles": "Unha fila por liña da declaración (unha liña pode declarar varias unidades).",
+    "nota_entidades": "Que apareza unha entidade non implica ningunha irregularidade: é o que consta nos documentos oficiais.",
+    "nota_borme": "Só actos confirmados por outro documento oficial. O BORME non publica o DNI: as coincidencias de nome sen confirmar non se inclúen.",
+    "conf_declarada": "Nos seus documentos",
+    "conf_cargo-publico": "Empresa pública do seu cargo",
+    "conf_apellido": "Leva o seu nome",
+    "tipo_empresa": "Empresa",
+    "tipo_publica": "Sector público",
+    "tipo_fundacion": "Fundación",
+    "tipo_asociacion": "Asociación ou ONG",
+    "tipo_partido": "Partido político",
+    "tipo_sindicato": "Sindicato",
+    "tipo_educacion": "Educación e investigación",
+    "tipo_colegio": "Colexio profesional",
+    "tipo_otra": "Outra",
+    "fuente_compatibilidad": "Acordo do Congreso (BOCG)",
+    "fuente_registro": "Rexistro de Intereses",
+    "fuente_intereses": "Declaración de intereses económicos",
+    "fuente_bienes": "Declaración de bens",
+    "fuente_ficha": "Ficha oficial",
     "tablas": {
       "diputados": {
         "nombre": "Deputados",
@@ -1094,6 +1393,14 @@ export default area(es, {
       "inmuebles": {
         "nombre": "Inmobles",
         "descripcion": "Unha fila por inmoble declarado"
+      },
+      "entidades": {
+        "nombre": "Empresas e entidades",
+        "descripcion": "Unha fila por cada documento oficial que nomea unha empresa ou entidade xunto a un deputado"
+      },
+      "borme": {
+        "nombre": "Cargos no BORME",
+        "descripcion": "Unha fila por cada acto do Rexistro Mercantil (nomeamento, cesamento…) en nome dun deputado, confirmado por outro documento oficial"
       },
       "votaciones": {
         "nombre": "Votacións",
@@ -1115,6 +1422,11 @@ export default area(es, {
       "genero": "Sexo",
       "es_vivienda": "Vivenda",
       "titular": "Titular",
+      "tipo_entidad": "Tipo de entidade",
+      "tipo_relacion": "Tipo de relación",
+      "remuneracion": "Remuneración",
+      "fuente": "Documento",
+      "confirmacion": "Como se confirma",
       "fechas": "Datas",
       "temas": "Tema",
       "resultado": "Resultado",
@@ -1305,6 +1617,66 @@ export default area(es, {
         "nombre": "Declaración",
         "descripcion": "PDF oficial"
       },
+      "entidad": {
+        "nombre": "Entidade",
+        "descripcion": "Nome da empresa ou entidade, tal como aparece no documento (variantes agrupadas)"
+      },
+      "tipo_entidad": {
+        "nombre": "Tipo de entidade",
+        "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio ou otra"
+      },
+      "tipo_relacion": {
+        "nombre": "Tipo de relación",
+        "descripcion": "Segundo a sección do documento ou o artigo da LOREG do acordo: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria ou otras"
+      },
+      "remuneracion": {
+        "nombre": "Remuneración",
+        "descripcion": "O que di o documento: si, no, dietas (só dietas, indemnizacións ou gastos), complemento (só complemento por antigüidade) ou no-consta (o documento non o di; non significa que cobre)"
+      },
+      "cargo_o_actividad": {
+        "nombre": "Cargo ou actividade",
+        "descripcion": "Resumo do cargo ou da actividade tomado do texto"
+      },
+      "fuente": {
+        "nombre": "Documento",
+        "descripcion": "compatibilidad (BOCG), registro (Rexistro de Intereses), intereses (declaración de intereses económicos), bienes (declaración de bens) ou ficha (ficha oficial)"
+      },
+      "texto": {
+        "nombre": "Texto literal",
+        "descripcion": "Texto do documento oficial onde aparece (en castelán)"
+      },
+      "url_documento": {
+        "nombre": "Documento (ligazón)",
+        "descripcion": "PDF ou páxina oficial"
+      },
+      "empresa": {
+        "nombre": "Sociedade",
+        "descripcion": "Nome da sociedade tal como o publica o BORME"
+      },
+      "confirmacion": {
+        "nombre": "Como se confirma",
+        "descripcion": "declarada (a empresa está nos seus documentos), cargo-publico (empresa pública dunha administración na que declara un cargo) ou apellido (a sociedade leva o seu nome)"
+      },
+      "motivo": {
+        "nombre": "Documento que o confirma",
+        "descripcion": "Entidade dos seus documentos oficiais que confirma que é a mesma persoa"
+      },
+      "acto": {
+        "nombre": "Acto",
+        "descripcion": "Nomeamentos, cesamentos, revogacións… tal como o escribe o BORME (en castelán)"
+      },
+      "cargo": {
+        "nombre": "Cargo",
+        "descripcion": "Cargo coas abreviaturas do BORME"
+      },
+      "registro": {
+        "nombre": "Rexistro Mercantil",
+        "descripcion": "Provincia do rexistro onde se inscribe"
+      },
+      "url_borme": {
+        "nombre": "BORME (ligazón)",
+        "descripcion": "Anuncio oficial en boe.es"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "AAAA-MM-DD"
@@ -1365,6 +1737,7 @@ export default area(es, {
   },
   en: {
     "licenciaTitulo": "Licence and how to cite",
+    "avisoLegal": "Use of the data and legal notice",
     "secciones": {"perfil": "Profile", "dinero": "Pay, assets and debts", "votos": "Votes", "fuentes": "Warnings and links"},
     "descripciones": {"votaciones": {"id": "Vote identifier (sitting and number)", "no_vota": "MPs who did not vote"}, "votos-grupo": {"si": "MPs in the group who voted yes", "no": "MPs in the group who voted no", "abstencion": "MPs in the group who abstained", "no_vota": "MPs in the group who did not vote"}},
     "columnasDe": "{n} columns",
@@ -1425,6 +1798,25 @@ export default area(es, {
     "aplicar": "Show {n}",
     "nota_votos": "Current members only. The group is their current one.",
     "nota_inmuebles": "One row per line of the declaration (a line may declare several units).",
+    "nota_entidades": "An organisation appearing here does not imply any wrongdoing: it is what the official documents state.",
+    "nota_borme": "Only acts confirmed by another official document. The BORME does not publish ID numbers: unconfirmed name matches are not included.",
+    "conf_declarada": "In their documents",
+    "conf_cargo-publico": "Public company of their position",
+    "conf_apellido": "Bears their name",
+    "tipo_empresa": "Company",
+    "tipo_publica": "Public sector",
+    "tipo_fundacion": "Foundation",
+    "tipo_asociacion": "Association or NGO",
+    "tipo_partido": "Political party",
+    "tipo_sindicato": "Trade union",
+    "tipo_educacion": "Education and research",
+    "tipo_colegio": "Professional association",
+    "tipo_otra": "Other",
+    "fuente_compatibilidad": "Congress decision (BOCG)",
+    "fuente_registro": "Register of Interests",
+    "fuente_intereses": "Economic interests declaration",
+    "fuente_bienes": "Assets declaration",
+    "fuente_ficha": "Official profile",
     "tablas": {
       "diputados": {
         "nombre": "Deputies",
@@ -1433,6 +1825,14 @@ export default area(es, {
       "inmuebles": {
         "nombre": "Properties",
         "descripcion": "One row per declared property"
+      },
+      "entidades": {
+        "nombre": "Companies and organisations",
+        "descripcion": "One row per official document that names a company or organisation together with a member"
+      },
+      "borme": {
+        "nombre": "BORME positions",
+        "descripcion": "One row per Companies Register act (appointment, resignation…) under a member’s name, confirmed by another official document"
       },
       "votaciones": {
         "nombre": "Votes",
@@ -1454,6 +1854,11 @@ export default area(es, {
       "genero": "Sex",
       "es_vivienda": "Home",
       "titular": "Holder",
+      "tipo_entidad": "Type of organisation",
+      "tipo_relacion": "Type of relationship",
+      "remuneracion": "Pay",
+      "fuente": "Document",
+      "confirmacion": "How it is confirmed",
       "fechas": "Dates",
       "temas": "Topic",
       "resultado": "Result",
@@ -1643,6 +2048,66 @@ export default area(es, {
       "url_declaracion": {
         "nombre": "Declaration",
         "descripcion": "Official PDF"
+      },
+      "entidad": {
+        "nombre": "Organisation",
+        "descripcion": "Name of the company or organisation as it appears in the document (variants grouped)"
+      },
+      "tipo_entidad": {
+        "nombre": "Type of organisation",
+        "descripcion": "empresa (company), publica (public sector), fundacion, asociacion, partido, sindicato, educacion, colegio or otra"
+      },
+      "tipo_relacion": {
+        "nombre": "Type of relationship",
+        "descripcion": "From the document section or the LOREG article cited in the decision: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria or otras"
+      },
+      "remuneracion": {
+        "nombre": "Pay",
+        "descripcion": "What the document says: si (paid), no (unpaid), dietas (only allowances, attendance fees or expenses), complemento (only a seniority supplement) or no-consta (the document does not say; it does not mean it is paid)"
+      },
+      "cargo_o_actividad": {
+        "nombre": "Position or activity",
+        "descripcion": "Summary of the position or activity taken from the text"
+      },
+      "fuente": {
+        "nombre": "Document",
+        "descripcion": "compatibilidad (BOCG), registro (Register of Interests), intereses (economic interests), bienes (assets) or ficha (official profile)"
+      },
+      "texto": {
+        "nombre": "Original text",
+        "descripcion": "Text of the official document where it appears (in Spanish)"
+      },
+      "url_documento": {
+        "nombre": "Document (link)",
+        "descripcion": "Official PDF or page"
+      },
+      "empresa": {
+        "nombre": "Company",
+        "descripcion": "Company name as published in the BORME"
+      },
+      "confirmacion": {
+        "nombre": "How it is confirmed",
+        "descripcion": "declarada (the company is in their documents), cargo-publico (public company of an administration where they declare a position) or apellido (the company bears their name)"
+      },
+      "motivo": {
+        "nombre": "Confirming document",
+        "descripcion": "Organisation in their official documents that confirms it is the same person"
+      },
+      "acto": {
+        "nombre": "Act",
+        "descripcion": "Appointments, resignations, revocations… as written in the BORME (in Spanish)"
+      },
+      "cargo": {
+        "nombre": "Position",
+        "descripcion": "Position with the BORME’s abbreviations"
+      },
+      "registro": {
+        "nombre": "Companies Register",
+        "descripcion": "Province of the register where it is recorded"
+      },
+      "url_borme": {
+        "nombre": "BORME (link)",
+        "descripcion": "Official notice on boe.es"
       },
       "fecha": {
         "nombre": "Date",

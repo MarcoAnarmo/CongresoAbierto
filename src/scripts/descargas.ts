@@ -20,6 +20,9 @@ interface Config {
   /** Orden de los grupos (hemiciclo) y de los temas, y nombres para mostrar. */
   grupos: string[];
   temas: Record<string, string>;
+  /** Nombres de los tipos de relación y de la remuneración (empresas y entidades). */
+  rel: Record<string, string>;
+  rem: Record<string, string>;
   tx: Record<string, string>;
   plFilas: [string, string];
   /** Nombre de cada paso del asistente. */
@@ -142,6 +145,11 @@ const nombreValor = (fi: string, v: string) =>
   : v === 'true' ? cfg.tx.verdadero : v === 'false' ? cfg.tx.falso
   : fi === 'genero' ? (v === 'F' ? cfg.tx.mujer : v === 'M' ? cfg.tx.hombre : v)
   : fi === 'titular' ? (cfg.tx[v] ?? v)
+  : fi === 'tipo_entidad' ? (cfg.tx[`tipo_${v}`] ?? v)
+  : fi === 'fuente' ? (cfg.tx[`fuente_${v}`] ?? v)
+  : fi === 'confirmacion' ? (cfg.tx[`conf_${v}`] ?? v)
+  : fi === 'tipo_relacion' ? (cfg.rel[v] ?? v)
+  : fi === 'remuneracion' ? (cfg.rem[v === 'no-consta' ? 'nc' : v] ?? v)
   : v;
 
 /** Valores posibles de un filtro: de los datos cargados, en un orden útil (grupos como en el hemiciclo, temas como en la web). */

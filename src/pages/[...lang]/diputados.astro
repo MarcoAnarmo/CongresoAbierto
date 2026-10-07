@@ -11,6 +11,8 @@ import { rutasIdioma, idiomaDe, enlace, formatos, f, pl } from '../../i18n';
 import textos from '../../i18n/textos/diputados';
 import comun from '../../i18n/textos/comun';
 import { sinTildes as quitarTildes } from '../../lib/texto';
+import { TIPOS_ENTIDAD, RELACIONES, claveEntidad } from '../../lib/vinculos';
+import { resumenInversiones } from '../../lib/inversiones';
 
 export const getStaticPaths = rutasIdioma;
 const lang = idiomaDe(Astro.params.lang);
@@ -42,9 +44,47 @@ const conAviso = (d: Diputado) => !!(d.deudas?.principal?.aviso || d.deudas?.ant
 // (son datos oficiales: se busca en castellano en todos los idiomas)
 const sinTildes = (s: string) => quitarTildes(s).toLowerCase();
 const busca = (d: Diputado) => sinTildes([d.nombreCompleto, d.circunscripcion, d.partido, d.grupoCorto, grupos.find((g) => g.corto === d.grupoCorto)?.nombre ?? '', ...d.cargos, ...(d.perfil?.formacion.map((x) => x.texto) ?? []), ...(d.perfil?.trayectoria ?? [])].join(' '));
+/**
+ * Empresas y entidades de cada diputado para filtrar y ordenar (data-vc): un código por entidad y relación,
+ * «entidad.tipo.relación.remuneración» (índices de TIPOS_ENTIDAD y RELACIONES; remuneración s/n/d/c o x si el documento no lo dice).
+ * Las sociedades del BORME que ya están en sus documentos cuentan como la misma entidad.
+ */
+const REM: Record<string, string> = { si: 's', no: 'n', dietas: 'd', complemento: 'c' };
+const ES_PUBLICA = /\b(municipal|municipals|municipales|provincial|sme|estatal|mixta|insular|metropolita|publica|publics)\b/i;
+function codigosVinculos(d: Diputado): string {
+  const v = d.vinculos;
+  if (!v) return '';
+  const idx = new Map<string, number>();
+  const cods = new Set<string>();
+  v.entidades.forEach((e, i) => {
+    idx.set(claveEntidad(e.nombre), i);
+    for (const a of e.apariciones) cods.add(`${i}.${TIPOS_ENTIDAD.indexOf(e.tipo)}.${RELACIONES.indexOf(a.relacion)}.${(a.remuneracion && REM[a.remuneracion]) || 'x'}`);
+  });
+  v.borme.forEach((b, j) => {
+    const i = idx.get(claveEntidad(b.nombre)) ?? v.entidades.length + j;
+    const tipo = b.confirmacion === 'cargo-publico' || ES_PUBLICA.test(quitarTildes(b.nombre)) ? 'publica' : 'empresa';
+    cods.add(`${i}.${TIPOS_ENTIDAD.indexOf(tipo)}.${RELACIONES.indexOf('borme')}.x`);
+  });
+  return [...cods].join(' ');
+}
+const tv = comun[lang].vinculos;
+/**
+ * Acciones y fondos (tabla «Deuda pública, obligaciones, acciones y participaciones» de la declaración de bienes):
+ * total de la tabla (data-itot), euros de las filas que mencionan acciones (data-iac) o fondos (data-ifo) y qué menciona (data-inv).
+ * -1 si no hay declaración. Solo se suman importes legibles.
+ */
+function datosInversion(d: Diputado) {
+  const fz = d.finanzas;
+  if (!fz) return { 'data-itot': -1, 'data-iac': -1, 'data-ifo': -1, 'data-inv': '' };
+  const filas = fz.valores?.filas ?? [];
+  const r = resumenInversiones(filas);
+  const inv = [filas.length ? 'v' : 'no', r.nAcciones ? 'a' : '', r.nFondos ? 'f' : ''].filter(Boolean).join(' ');
+  return { 'data-itot': Math.round(fz.valores?.total ?? 0), 'data-iac': r.acciones, 'data-ifo': r.fondos, 'data-inv': inv };
+}
 const datos = (d: Diputado) => ({
   'data-id': slug(d), 'data-n': d.apellidos, 'data-busca': busca(d), 'data-g': d.grupoCorto, 'data-c': d.circunscripcion, 'data-f': d.perfil?.tipoFormacion ?? 'sin-datos',
   'data-pr': d.patrimonio.propiedades ?? -1, 'data-v': d.patrimonio.viviendas ?? -1, 'data-co': d.patrimonio.vehiculos ?? -1, 'data-r': d.retribucion.totalMensual, 'data-l': nLeg(d),
+  'data-vc': codigosVinculos(d), 'data-vin': 0, ...datosInversion(d),
 });
 const c = t.col;
 const columnas = [
@@ -94,6 +134,33 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
       <option value="sin-centro">{t.filtros.sinCentro}</option>
       <option value="sin-datos">{t.filtros.sinDatos}</option>
     </select>
+    <label class="sr-only" for="f-inv">{t.filtros.inv}</label>
+    <select id="f-inv">
+      <option value="">{t.filtros.todaInversion}</option>
+      <option value="a">{t.filtros.invAcciones}</option>
+      <option value="f">{t.filtros.invFondos}</option>
+      <option value="v">{t.filtros.invAlguno}</option>
+      <option value="no">{t.filtros.invNinguno}</option>
+    </select>
+    <label class="sr-only" for="f-vtipo">{t.filtros.vtipo}</label>
+    <select id="f-vtipo">
+      <option value="">{t.filtros.todasEntidades}</option>
+      {TIPOS_ENTIDAD.map((x, i) => <option value={String(i)}>{tv.tipos[x]}</option>)}
+    </select>
+    <label class="sr-only" for="f-vrel">{t.filtros.vrel}</label>
+    <select id="f-vrel">
+      <option value="">{t.filtros.todasRelaciones}</option>
+      {RELACIONES.map((x, i) => <option value={String(i)}>{tv.relaciones[x]}</option>)}
+    </select>
+    <label class="sr-only" for="f-vrem">{t.filtros.vrem}</label>
+    <select id="f-vrem">
+      <option value="">{t.filtros.todaRemuneracion}</option>
+      <option value="s">{tv.remuneracion.si}</option>
+      <option value="n">{tv.remuneracion.no}</option>
+      <option value="d">{tv.remuneracion.dietas}</option>
+      <option value="c">{tv.remuneracion.complemento}</option>
+      <option value="x">{tv.remuneracion.nc}</option>
+    </select>
     <label class="sr-only" for="f-orden">{t.filtros.ordenar}</label>
     <select id="f-orden">
       <option value="n">{t.filtros.orden.n}</option>
@@ -102,10 +169,16 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
       <option value="v">{t.filtros.orden.v}</option>
       <option value="co">{t.filtros.orden.co}</option>
       <option value="r">{t.filtros.orden.r}</option>
+      <option value="itot">{t.filtros.orden.itot}</option>
+      <option value="iac">{t.filtros.orden.iac}</option>
+      <option value="ifo">{t.filtros.orden.ifo}</option>
+      <option value="vin">{t.filtros.orden.vin}</option>
     </select>
     </div>
     <span class="small muted cuenta" id="f-cuenta" aria-live="polite"></span>
   </div>
+  <p class="small muted nota-vin" id="nota-inv" hidden>{t.filtros.notaInversion}<a href={u('/metodologia#rentas')}>{t.formacion.comoSeObtiene}</a>.</p>
+  <p class="small muted nota-vin" id="nota-vin" hidden>{t.filtros.notaVinculos}<a href={u('/metodologia#entidades')}>{t.formacion.comoSeObtiene}</a>.</p>
   <HojaFiltros id="dlg-filtros" titulo={t.filtros.titulo} quitar={{ id: 'quitar-filtros', texto: t.filtros.quitar }} ver={{ id: 'ver-resultados', texto: t.filtros.verResultados }} />
 
   <ul class="tarjetas" id="tarjetas">
@@ -121,6 +194,7 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
               {d.perfil && etTipo[d.perfil.tipoFormacion] && <span class={`pill tipo ${d.perfil.tipoFormacion}`}>{etTipo[d.perfil.tipoFormacion]}</span>}
               {nLeg(d) > 0 && <span class="pill">{pl(nLeg(d), t.ficha.legislaturas, lang)}</span>}
               {d.patrimonio.propiedades !== null && <span class="pill">{pl(d.patrimonio.propiedades, palabras.propiedades, lang)} ({pl(d.patrimonio.viviendas ?? 0, palabras.viviendas, lang)})</span>}
+              <span class="pill p-vin" hidden></span>
             </span>
           </span>
           <span class="t-cifra">
@@ -129,6 +203,10 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
             <span data-k="co"><strong>{d.patrimonio.vehiculos ?? '—'}</strong><small>{t.ficha.vehiculos}</small></span>
             <span data-k="r"><strong>{fmtNum(Math.round(d.retribucion.totalMensual))}</strong><small>{t.ficha.alMes}</small></span>
             <span data-k="l"><strong>{nLeg(d) || '—'}</strong><small>{nLeg(d) === 1 ? t.ficha.legislatura[0] : t.ficha.legislatura[1]}</small></span>
+            <span data-k="vin"><strong class="n-vin">0</strong><small>{t.ficha.entidades}</small></span>
+            <span data-k="itot"><strong>{fmtNum(Math.round(d.finanzas?.valores?.total ?? 0))} €</strong><small>{t.ficha.enValores}</small></span>
+            <span data-k="iac"><strong>{fmtNum(resumenInversiones(d.finanzas?.valores?.filas ?? []).acciones)} €</strong><small>{t.ficha.enAcciones}</small></span>
+            <span data-k="ifo"><strong>{fmtNum(resumenInversiones(d.finanzas?.valores?.filas ?? []).fondos)} €</strong><small>{t.ficha.enFondos}</small></span>
           </span>
           <Icono n="derecha" tam={18} class="t-flecha" />
         </a>
@@ -248,12 +326,13 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
     <MapaProvincias enVista />
   </div>
 
+  <script type="application/json" id="vin-claves" set:html={JSON.stringify({ tipos: TIPOS_ENTIDAD, relaciones: RELACIONES })} />
   <script type="application/json" data-textos="diputados" set:html={JSON.stringify(t.cliente)} />
 </Base>
 
 <script>
   import { textos, pl, locale } from '../../i18n/cliente';
-  const t = textos<{ cuenta: string[]; ver: string[]; filtrarActivos: string[]; filtrarYOrdenar: string }>('diputados');
+  const t = textos<{ cuenta: string[]; ver: string[]; filtrarActivos: string[]; filtrarYOrdenar: string; entidades: string[] }>('diputados');
   const loc = locale();
   const lista = document.getElementById('tarjetas') as HTMLUListElement;
   const tarjetas = [...lista.children] as HTMLLIElement[];
@@ -271,6 +350,12 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
   const grupo = document.getElementById('f-grupo') as HTMLSelectElement;
   const prov = document.getElementById('f-prov') as HTMLSelectElement;
   const form = document.getElementById('f-form') as HTMLSelectElement;
+  const vtipo = document.getElementById('f-vtipo') as HTMLSelectElement;
+  const vrel = document.getElementById('f-vrel') as HTMLSelectElement;
+  const vrem = document.getElementById('f-vrem') as HTMLSelectElement;
+  const notaVin = document.getElementById('nota-vin')!;
+  const inv = document.getElementById('f-inv') as HTMLSelectElement;
+  const notaInv = document.getElementById('nota-inv')!;
   const orden = document.getElementById('f-orden') as HTMLSelectElement;
   const cuenta = document.getElementById('f-cuenta')!;
   const filtrosMas = document.getElementById('filtros-mas')!;
@@ -323,33 +408,61 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
       boton.setAttribute('aria-expanded', String(abierta));
     });
   }
+  /** Empresas y entidades distintas que cumplen los filtros de participación (códigos en data-vt). */
+  const codigos = new Map<HTMLElement, string[][]>();
+  const codigosDe = (f: HTMLElement) => { let c = codigos.get(f); if (!c) { c = (f.dataset.vc ?? '').split(' ').filter(Boolean).map((x) => x.split('.')); codigos.set(f, c); } return c; };
+  const filtroVin = () => !!(vtipo.value || vrel.value || vrem.value);
+  let ultimoVin = '';
+  function contarVinculos(f: HTMLElement) {
+    const ids = new Set<string>();
+    for (const [i, ti, ri, rm] of codigosDe(f)) {
+      if ((!vtipo.value || ti === vtipo.value) && (!vrel.value || ri === vrel.value) && (!vrem.value || rm === vrem.value)) ids.add(i);
+    }
+    f.dataset.vin = String(ids.size);
+    return ids.size;
+  }
   /** Reordena las filas y las fichas (solo cuando cambia el orden o la vista: mover nodos es lo que más cuesta). */
   // Solo se reordena la lista que se ve y solo si su orden cambia: cambiar de vista no mueve 700 nodos cada vez
   const ordenHecho = { tabla: '', tarjetas: '' };
   function ordenar() {
-    const k = `${clave}:${desc}`;
+    const k = `${clave}:${desc}` + (clave === 'vin' ? `:${vtipo.value}.${vrel.value}.${vrem.value}` : '');
     if (vista === 'tabla' && cuerpo && ordenHecho.tabla !== k) { ordenHecho.tabla = k; filas.sort(comparar); cuerpo.append(...filas); }
     if (vista === 'tarjetas' && ordenHecho.tarjetas !== k) { ordenHecho.tarjetas = k; tarjetas.sort(comparar); lista.append(...tarjetas); }
   }
   function aplicar(reordenar = true) {
-    if (reordenar) ordenar();
+    // La cifra de empresas y entidades depende de los filtros: se calcula antes de ordenar
+    const verVin = filtroVin() || clave === 'vin';
+    const kv = `${vtipo.value}.${vrel.value}.${vrem.value}.${verVin}.${filas.length}`;
+    if (kv !== ultimoVin) for (const f of [...tarjetas, ...filas]) {
+      const n = contarVinculos(f);
+      const pill = f.querySelector<HTMLElement>('.p-vin');
+      if (pill) { pill.hidden = !verVin; if (verVin) pill.textContent = pl(n, t.entidades); }
+      const cifra = f.querySelector<HTMLElement>('.n-vin');
+      if (cifra) cifra.textContent = String(n);
+    }
+    ultimoVin = kv;
+    notaVin.hidden = !verVin;
+    notaInv.hidden = !(inv.value || ['itot', 'iac', 'ifo'].includes(clave));
+    if (reordenar || clave === 'vin') ordenar();
     const palabras = quitarTildes(texto.value.trim().toLowerCase()).split(/\s+/).filter(Boolean);
     const pasa = (f: HTMLElement) => (!grupo.value || f.dataset.g === grupo.value) && (!prov.value || f.dataset.c === prov.value)
-      && (!form.value || f.dataset.f === form.value) && palabras.every((w) => textoBusca.get(f)!.includes(w));
+      && (!form.value || f.dataset.f === form.value) && (!filtroVin() || f.dataset.vin !== '0') && (!inv.value || (f.dataset.inv ?? '').split(' ').includes(inv.value)) && palabras.every((w) => textoBusca.get(f)!.includes(w));
     let n = 0;
     for (const f of filas) {
       const ok = pasa(f);
       if (f.hidden === ok) f.hidden = !ok;
       if (ok) { n++; const pos = f.querySelector('.pos') as HTMLElement; if (pos.textContent !== String(n)) { pos.textContent = String(n); (f.querySelector('.quien') as HTMLElement).dataset.pos = String(n); } }
     }
-    for (const t of tarjetas) { const ok = pasa(t); if (t.hidden === ok) t.hidden = !ok; }
-    cuenta.textContent = pl(n, t.cuenta);
-    verResultados.textContent = pl(n, t.ver);
-    const activos = [grupo, prov, form].filter((x) => x.value).length;
+    // La tabla se crea al abrir su vista: la cuenta sale de las fichas, que siempre están
+    let visibles = 0;
+    for (const t of tarjetas) { const ok = pasa(t); if (t.hidden === ok) t.hidden = !ok; if (ok) visibles++; }
+    cuenta.textContent = pl(visibles, t.cuenta);
+    verResultados.textContent = pl(visibles, t.ver);
+    const activos = [grupo, prov, form, inv, vtipo, vrel, vrem].filter((x) => x.value).length;
     nFiltros.hidden = !activos; nFiltros.textContent = String(activos);
     abrirFiltros.setAttribute('aria-label', activos ? pl(activos, t.filtrarActivos) : t.filtrarYOrdenar);
     if (ordenes[vista]) ordenes[vista] = { clave, desc };
-    try { localStorage.setItem('diputados', JSON.stringify({ g: grupo.value, f: form.value, ordenes, vista })); } catch {}
+    try { localStorage.setItem('diputados', JSON.stringify({ g: grupo.value, f: form.value, vt: vtipo.value, vr: vrel.value, vm: vrem.value, iv: inv.value, ordenes, vista })); } catch {}
   }
   function marcar() {
     if (tabla) {
@@ -382,24 +495,33 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
   // Los selectores van en la ventana de filtros (components/HojaFiltros.astro), como en Votaciones.
   // Sin JavaScript se quedan en la fila del buscador.
   dlgFiltros.querySelector('.df-cuerpo')!.appendChild(filtrosMas);
-  document.getElementById('quitar-filtros')!.addEventListener('click', () => { grupo.value = ''; prov.value = ''; form.value = ''; aplicar(false); });
+  document.getElementById('quitar-filtros')!.addEventListener('click', () => { grupo.value = ''; prov.value = ''; form.value = ''; vtipo.value = ''; vrel.value = ''; vrem.value = ''; inv.value = ''; aplicar(false); });
 
-  [grupo, prov, form].forEach((e) => e.addEventListener('change', () => aplicar(false)));
+  [grupo, prov, form, inv, vtipo, vrel, vrem].forEach((e) => e.addEventListener('change', () => aplicar(false)));
   try {
     const s = JSON.parse(localStorage.getItem('diputados') ?? 'null');
-    if (s) { grupo.value = s.g ?? ''; form.value = s.f ?? ''; vista = s.vista ?? 'tarjetas'; if (s.ordenes) Object.assign(ordenes, s.ordenes); }
+    if (s) { grupo.value = s.g ?? ''; form.value = s.f ?? ''; vtipo.value = s.vt ?? ''; vrel.value = s.vr ?? ''; vrem.value = s.vm ?? ''; inv.value = s.iv ?? ''; vista = s.vista ?? 'tarjetas'; if (s.ordenes) Object.assign(ordenes, s.ordenes); }
   } catch {}
   // Filtros desde la dirección: /diputados?provincia=Sevilla&grupo=PSOE&q=derecho
   const ps = new URLSearchParams(location.search);
   if (ps.has('provincia')) prov.value = ps.get('provincia')!;
   if (ps.has('grupo')) grupo.value = ps.get('grupo')!;
   if (ps.has('q')) texto.value = ps.get('q')!;
+  // /diputados?entidad=empresa&relacion=autorizada&remuneracion=s&inversion=f: un enlace así sustituye los filtros guardados de participación
+  if (['entidad', 'relacion', 'remuneracion', 'inversion'].some((k) => ps.has(k))) { vtipo.value = ''; vrel.value = ''; vrem.value = ''; inv.value = ''; }
+  const ix = (lista: readonly string[], k: string) => (ps.has(k) && lista.includes(ps.get(k)!) ? String(lista.indexOf(ps.get(k)!)) : null);
+  const tiposVin = JSON.parse(document.getElementById('vin-claves')!.textContent!) as { tipos: string[]; relaciones: string[] };
+  vtipo.value = ix(tiposVin.tipos, 'entidad') ?? vtipo.value;
+  vrel.value = ix(tiposVin.relaciones, 'relacion') ?? vrel.value;
+  if (ps.has('remuneracion')) vrem.value = ps.get('remuneracion')!;
+  if (ps.has('inversion')) inv.value = ps.get('inversion')!;
   if (ps.has('vista')) vista = ps.get('vista')!;
   else if (location.hash === '#mapa') vista = 'mapa';
   verVista(vista); marcar(); aplicar();
 </script>
 
 <style>
+  .nota-vin { margin: 4px 0 12px; }
   .barras { display: grid; gap: 10px; }
   .barra { display: grid; grid-template-columns: 84px 1fr 150px; gap: 10px; align-items: center; }
   .barra .cifras { text-align: right; }
@@ -499,9 +621,10 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
     .t-cifra > span { display: none; flex-direction: column; align-items: flex-end; }
     .t-cifra strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
     .t-cifra small { font-size: .75rem; color: var(--muted); white-space: nowrap; }
-    .tarjetas:not([data-clave='v']):not([data-clave='co']):not([data-clave='r']):not([data-clave='l']) .t-cifra > [data-k='pr'],
+    .tarjetas:not([data-clave='v']):not([data-clave='co']):not([data-clave='r']):not([data-clave='l']):not([data-clave='vin']):not([data-clave='itot']):not([data-clave='iac']):not([data-clave='ifo']) .t-cifra > [data-k='pr'],
     .tarjetas[data-clave='v'] .t-cifra > [data-k='v'], .tarjetas[data-clave='co'] .t-cifra > [data-k='co'],
-    .tarjetas[data-clave='r'] .t-cifra > [data-k='r'], .tarjetas[data-clave='l'] .t-cifra > [data-k='l'] { display: flex; }
+    .tarjetas[data-clave='r'] .t-cifra > [data-k='r'], .tarjetas[data-clave='l'] .t-cifra > [data-k='l'], .tarjetas[data-clave='vin'] .t-cifra > [data-k='vin'], .tarjetas[data-clave='itot'] .t-cifra > [data-k='itot'],
+    .tarjetas[data-clave='iac'] .t-cifra > [data-k='iac'], .tarjetas[data-clave='ifo'] .t-cifra > [data-k='ifo'] { display: flex; }
     .tarjeta :global(.t-flecha) { display: block; flex: none; color: var(--muted); margin-left: -4px; }
   }
   .desplegar { display: none; }

@@ -11,6 +11,7 @@ import { rutaTarjeta, rotulo } from '../../../lib/tarjetas';
 import TablaPrestamos from '../../../components/TablaPrestamos.astro';
 import AvisoDudoso from '../../../components/AvisoDudoso.astro';
 import Icono from '../../../components/Icono.astro';
+import { TIPOS_ENTIDAD, type TipoEntidad, type VinculoEntidad } from '../../../lib/vinculos';
 import { conIdiomas, enlace, formatos, f, pl, LOCALE, type Idioma } from '../../../i18n';
 import comun from '../../../i18n/textos/comun';
 import textos, { textoEvento, detalleEvento } from '../../../i18n/textos/ficha';
@@ -97,6 +98,40 @@ const tInv = !fz ? { valor: '—', sub: t.tes.sinDeclaracion }
 const act = d.actividades;
 const inter = d.intereses;
 const nTrab = inter?.trabajos.length ?? 0;
+// Empresas y entidades que nombran sus documentos oficiales, agrupadas por tipo
+const vin = d.vinculos;
+const bor = vin?.borme ?? [];
+const tv = tc.vinculos;
+const anio = (x: string) => x.slice(0, 4);
+/** Las entidades se reparten en tres cajitas por tipo; el Registro Mercantil es la cuarta. */
+const GRUPOS_ENT = [
+  { id: 'empresas', icono: 'empresa', tipos: ['empresa'] },
+  { id: 'publicas', icono: 'publica', tipos: ['publica'] },
+  { id: 'otras-entidades', icono: 'entidades', tipos: TIPOS_ENTIDAD.filter((k) => k !== 'empresa' && k !== 'publica') },
+] as const satisfies readonly { id: string; icono: NombreIcono; tipos: readonly TipoEntidad[] }[];
+/**
+ * Remuneración de una entidad: lo máximo que dice alguno de sus documentos (con remuneración, luego complemento por antigüedad,
+ * luego solo dietas o gastos, luego sin remuneración). Si ninguno lo dice, «no consta»: nunca se supone que cobra ni que no cobra.
+ */
+const ORDEN_REM = ['si', 'complemento', 'dietas', 'no'] as const;
+const remDe = (e: VinculoEntidad) => ORDEN_REM.find((r) => e.apariciones.some((a) => a.remuneracion === r)) ?? 'nc';
+const gruposEnt = GRUPOS_ENT.map((gr) => {
+  const ents = (vin?.entidades ?? []).filter((e) => (gr.tipos as readonly TipoEntidad[]).includes(e.tipo));
+  const rem = { si: 0, complemento: 0, dietas: 0, no: 0, nc: 0 };
+  for (const e of ents) rem[remDe(e)]++;
+  const porTipo = gr.tipos.filter((k) => ents.some((e) => e.tipo === k)).map((k) => ({ k, ents: ents.filter((e) => e.tipo === k) }));
+  return { ...gr, ents, rem, porTipo };
+});
+/** Texto de la cajita: cuántas entidades tienen remuneración, complemento o solo dietas según sus documentos. */
+const acentoRem = (n: number, rem: (typeof gruposEnt)[number]['rem']) => {
+  if (!n) return undefined;
+  const partes = [
+    rem.si && f(t.tes.remSi, { n: fmtNum(rem.si) }),
+    rem.complemento && f(t.tes.remComplemento, { n: fmtNum(rem.complemento) }),
+    rem.dietas && f(t.tes.remDietas, { n: fmtNum(rem.dietas) }),
+  ].filter(Boolean);
+  return partes.length ? partes.join(' · ') : t.tes.remNoConsta;
+};
 // Sus votos en todas las votaciones del Pleno
 const pa = d.participacion;
 const votoEmitido = pa ? pa.si + pa.no + pa.abstencion : 0;
@@ -125,6 +160,21 @@ const teselas: Tesela[] = [
     sub: sinDeclaracion ? t.tes.sinDeclaracion : p.vehiculos === 0 ? t.tes.noVehiculos : t.tes.vehiculosDeclarados[p.vehiculos === 1 ? 0 : 1],
   },
   { id: 'retribucion', icono: 'sueldo', titulo: t.tes.retribucion, valor: fmtEur(d.retribucion.totalMensual), sub: t.tes.alMes },
+  ...gruposEnt.map((gr, i) => {
+    const n = gr.ents.length;
+    const subs = { empresas: t.tes.empresasSub, publicas: t.tes.publicasSub, 'otras-entidades': t.tes.entidadesSub }[gr.id];
+    const titulo = { empresas: t.tes.empresasT, publicas: t.tes.publicasT, 'otras-entidades': t.tes.otrasT }[gr.id];
+    const acento = acentoRem(n, gr.rem);
+    return {
+      grupo: i === 0 ? t.grupos.vinculos : undefined, id: gr.id, icono: gr.icono as NombreIcono, titulo,
+      corto: gr.id === 'otras-entidades' ? t.tes.otrasCorto : undefined,
+      valor: String(n), sub: n ? subs[n === 1 ? 0 : 1] + (acento ? ' · ' : '') : t.tes.sinEntidades, acento,
+    };
+  }),
+  {
+    id: 'borme', icono: 'registro', titulo: t.tes.borme, corto: t.tes.bormeCorto,
+    valor: String(bor.length), sub: bor.length ? t.tes.bormeSub[bor.length === 1 ? 0 : 1] : t.tes.sinBorme,
+  },
   ...(pa ? [{
     grupo: t.grupos.congreso, id: 'participacion', icono: 'votaciones' as const, titulo: t.tes.participacion, corto: t.tes.participacionCorto,
     valor: fmtNum(votoEmitido), sub: f(t.tes.conEscano, { n: fmtNum(pa.enEscano) }),
@@ -204,7 +254,7 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   </nav>
   <p class="ver-todo-p"><button class="ver-todo" type="button" id="ver-todo" aria-controls="secciones" aria-expanded="false">{t.verTodo}</button></p>
 
-  <div class="secciones" id="secciones">
+  <div class="secciones" id="secciones" data-entidades={gruposEnt.find((x) => x.ents.length)?.id ?? 'empresas'}>
 
   <section class="seccion" id="propiedades" aria-labelledby="h-propiedades">
     <h2 id="h-propiedades"><span class="s-ico"><Icono n="propiedades" /></span>{t.prop.titulo}</h2>
@@ -413,6 +463,76 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
         {t.ret.noIncluye}
       </p>
       <p class="fuente"><Icono n="info" tam={16} /><span><a href={u('/metodologia#retribuciones')}>{t.comun.comoSeCalcula}</a></span></p>
+    </div>
+  </section>
+
+  {gruposEnt.map((gr) => (
+  <section class="seccion" id={gr.id} aria-labelledby={`h-${gr.id}`}>
+    <h2 id={`h-${gr.id}`}><span class="s-ico"><Icono n={gr.icono} /></span>{t.ent.titulos[gr.id]}</h2>
+    <div class="s-cuerpo">
+      {gr.ents.length === 0 ? <p>{t.ent.ningunas[gr.id]}</p> : (
+        <>
+          <p class="small muted">{g(t.ent.intro)}</p>
+          <div class="rem-resumen">
+            <h3>{t.ent.remTitulo}</h3>
+            <ul>{(['si', 'complemento', 'dietas', 'no', 'nc'] as const).filter((r) => gr.rem[r]).map((r) => (
+              <li class:list={[`rem-${r}`]}><span>{tv.remuneracion[r]}</span><strong>{fmtNum(gr.rem[r])}</strong></li>
+            ))}</ul>
+            <p class="small muted">{t.ent.remNota}</p>
+          </div>
+          {gr.porTipo.map(({ k, ents }) => (
+            <>
+              {gr.porTipo.length > 1 || gr.id === 'otras-entidades' ? <h3>{t.ent.tipos[k]} <span class="muted n-tipo">{fmtNum(ents.length)}</span></h3> : null}
+              <ul class="entidades">{ents.map((e) => (
+                <li>
+                  <details class="ent">
+                    <summary>
+                      <span class="ent-nombre">{e.nombre}</span>
+                      <span class="ent-rol">{[...new Set(e.apariciones.map((a) => tv.relaciones[a.relacion]))].slice(0, 2).join(' · ')}</span>
+                    </summary>
+                    <ul class="ent-apar">{e.apariciones.map((a) => (
+                      <li>
+                        <span class="ent-etq"><span class="etq-rel">{tv.relaciones[a.relacion]}</span>{a.remuneracion && <span class:list={['etq-rem', `rem-${a.remuneracion}`]}>{tv.remuneracion[a.remuneracion]}</span>}</span>
+                        <a href={a.url} rel="noopener" class="ent-doc">{t.ent.fuentes[a.fuente]}{a.fecha && <span class="muted"> · {fmtFecha(a.fecha)}</span>} ↗</a>
+                        {a.periodo && <span class="small muted"> · {f(t.ent.periodo, { p: a.periodo })}</span>}
+                        <blockquote class="ent-lit" lang="es">{a.texto}</blockquote>
+                      </li>
+                    ))}</ul>
+                  </details>
+                </li>
+              ))}</ul>
+            </>
+          ))}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{t.ent.fuente}<a href={u('/metodologia#entidades')}>{t.comun.comoSeObtiene}</a> · {t.ent.avisar}<a href={enlaceError(d.nombreCompleto)} rel="noopener">{t.cab.avisarError}</a></span></p>
+    </div>
+  </section>
+  ))}
+
+  <section class="seccion" id="borme" aria-labelledby="h-borme">
+    <h2 id="h-borme"><span class="s-ico"><Icono n="registro" /></span>{t.bor.titulo}</h2>
+    <div class="s-cuerpo">
+      <p class="small muted">{g(t.bor.intro)}</p>
+      {bor.length === 0 ? <p>{t.bor.ninguna}</p> : (
+        <ul class="entidades">{bor.map((e) => (
+          <li>
+            <details class="ent">
+              <summary>
+                <span class="ent-nombre">{e.nombre}</span>
+                <span class="ent-rol">{[[...new Set(e.actos.map((a) => a.cargo).filter(Boolean))].slice(0, 2).join(', '), anio(e.desde) === anio(e.hasta) ? anio(e.desde) : f(t.bor.periodo, { desde: anio(e.desde), hasta: anio(e.hasta) })].filter(Boolean).join(' · ')}</span>
+              </summary>
+              <div class="ent-apar">
+                <p class="small bor-conf"><Icono n="hecho" tam={16} /><span>{f(t.bor.confirmacion[e.confirmacion], { motivo: e.motivo })}</span></p>
+                <ul class="bor-actos">{e.actos.map((a) => (
+                  <li><a href={a.url} rel="noopener"><span class="bor-fecha">{fmtFecha(a.fecha)}</span><span lang="es">{[a.acto, a.cargo].filter(Boolean).join(' · ')}</span><span class="muted small">{f(t.bor.registro, { p: a.provincia })} ↗</span></a></li>
+                ))}</ul>
+              </div>
+            </details>
+          </li>
+        ))}</ul>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{t.bor.fuente}<a href={u('/metodologia#borme')}>{t.comun.comoSeObtiene}</a> · {t.ent.avisar}<a href={enlaceError(d.nombreCompleto)} rel="noopener">{t.cab.avisarError}</a></span></p>
     </div>
   </section>
 
@@ -711,6 +831,36 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   .lista-simple { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
   .lista-simple li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
   .lista-simple li:last-child { border-bottom: 0; }
+  /* Empresas y entidades: cada una se despliega con los documentos que la nombran y su texto literal */
+  .n-tipo { font-weight: 400; font-size: .85em; }
+  .entidades { list-style: none; margin: 0 0 8px; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .entidades > li { border-bottom: 1px solid var(--border); }
+  .entidades > li:last-child { border-bottom: 0; }
+  .ent summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 12px 40px 12px 16px; min-height: 44px; cursor: pointer; list-style: none; position: relative; }
+  .ent summary::-webkit-details-marker { display: none; }
+  .ent summary::after { content: ''; position: absolute; right: 18px; top: 50%; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-70%) rotate(45deg); transition: transform .15s; }
+  .ent[open] summary::after { transform: translateY(-30%) rotate(-135deg); }
+  .ent-nombre { font-weight: 600; overflow-wrap: anywhere; }
+  .ent-rol { font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+  .ent-apar { list-style: none; margin: 0; padding: 0 16px 12px; display: grid; gap: 10px; }
+  .ent-doc { font-size: .88rem; font-weight: 600; }
+  .ent-etq { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-bottom: 4px; }
+  .etq-rel, .etq-rem { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .78rem; line-height: 1.6; background: var(--chip); color: var(--text); }
+  .etq-rem { background: transparent; box-shadow: inset 0 0 0 1px var(--border); color: var(--muted); }
+  .etq-rem.rem-si { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent); color: var(--accent-text); }
+  .rem-resumen { margin: 12px 0 4px; padding: 12px 14px; border-radius: var(--radius); background: var(--bg); border: 1px solid var(--border); }
+  .rem-resumen h3 { margin: 0 0 6px; font-size: .9rem; }
+  .rem-resumen ul { list-style: none; margin: 0 0 6px; padding: 0; display: grid; gap: 2px; }
+  .rem-resumen li { display: flex; justify-content: space-between; gap: 12px; font-size: .9rem; }
+  .rem-resumen li.rem-si strong { color: var(--accent-text); }
+  .rem-resumen p { margin: 0; }
+  .ent-lit { margin: 4px 0 0; padding: 6px 10px; border-left: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); font-size: .88rem; line-height: 1.5; color: var(--text); background: var(--bg); border-radius: 0 6px 6px 0; overflow-wrap: anywhere; }
+  .bor-conf { display: flex; gap: 6px; align-items: flex-start; margin: 0 0 8px; color: var(--muted); }
+  .bor-conf :global(.icono) { flex: none; margin-top: 2px; color: var(--accent-text); }
+  .bor-actos { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .bor-actos a { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; padding: 6px 10px; min-height: 40px; border-radius: 8px; background: var(--bg); text-decoration: none; font-size: .9rem; }
+  .bor-actos a:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+  .bor-fecha { font-weight: 600; font-variant-numeric: tabular-nums; }
   .lista-docs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
   .lista-docs a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); text-decoration: none; }
   .lista-docs a:hover { border-color: var(--accent); }
@@ -893,6 +1043,11 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   let empujado = false;
   let origen: HTMLElement | null = null;
   const completa = () => raiz.classList.contains('ficha-completa');
+  /** Sección del enlace (#deudas…). Los enlaces antiguos a #entidades abren la primera cajita de entidades con datos. */
+  const idDeHash = () => {
+    const h = location.hash.slice(1);
+    return h === 'entidades' ? (document.getElementById('secciones')!.dataset.entidades ?? '') : h;
+  };
 
   function abrir(id: string, empujar: boolean) {
     const sec = document.getElementById(id);
@@ -920,7 +1075,7 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
   addEventListener('popstate', () => {
     if (dlg.open) { empujado = false; dlg.close(); return; }
-    const id = location.hash.slice(1);
+    const id = idDeHash();
     if (ids.includes(id) && !completa()) abrir(id, false);
   });
   document.querySelectorAll<HTMLAnchorElement>('.tesela[data-detalle]').forEach((a) => a.addEventListener('click', (e) => {
@@ -944,6 +1099,6 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   pintarTodo();
 
   // Si se llega con un enlace a una sección (/diputado/…#deudas), se abre directamente
-  const inicial = location.hash.slice(1);
+  const inicial = idDeHash();
   if (ids.includes(inicial) && !completa()) abrir(inicial, false);
 </script>

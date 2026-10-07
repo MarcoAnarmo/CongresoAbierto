@@ -17,3 +17,7 @@ data/raw/pdf_faltan.txt
 data/raw/votaciones/descargas/
 # PDF oficiales del registro de intereses (el resultado está en data/raw/intereses/*.jsonl)
 data/raw/intereses/pdf/
+# BORME: coincidencias de nombre en bruto (incluyen homónimos, es decir, personas que no son diputados), fuentes del INE y
+# casos pendientes de revisar. Solo se publica lo confirmado por un segundo documento oficial (vinculos-borme.jsonl).
+data/raw/borme/*
+!data/raw/borme/vinculos-borme.jsonl

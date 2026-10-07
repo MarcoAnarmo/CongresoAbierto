@@ -104,6 +104,39 @@ export const TABLAS: DefTabla[] = [
     ],
   },
   {
+    id: 'entidades',
+    particion: 'unica',
+    csvFijo: true,
+    columnas: [
+      c('diputado_id', 'entero'), c('diputado', 'texto', true), c('grupo', 'texto', true), c('circunscripcion', 'texto'),
+      c('entidad', 'texto', true), c('tipo_entidad', 'texto', true), c('tipo_relacion', 'texto', true), c('remuneracion', 'texto', true), c('cargo_o_actividad', 'texto', true), c('fuente', 'texto', true), c('fecha', 'fecha', true),
+      c('texto', 'texto'), c('url_documento', 'url', true), c('url_congreso_abierto', 'url'),
+    ],
+    filtros: [
+      { id: 'buscar', tipo: 'texto', columnas: ['diputado', 'entidad'] },
+      { id: 'grupo', tipo: 'valores', columna: 'grupo' },
+      { id: 'tipo_entidad', tipo: 'valores', columna: 'tipo_entidad' },
+      { id: 'tipo_relacion', tipo: 'valores', columna: 'tipo_relacion' },
+      { id: 'remuneracion', tipo: 'valores', columna: 'remuneracion' },
+      { id: 'fuente', tipo: 'valores', columna: 'fuente' },
+    ],
+  },
+  {
+    id: 'borme',
+    particion: 'unica',
+    csvFijo: true,
+    columnas: [
+      c('diputado_id', 'entero'), c('diputado', 'texto', true), c('grupo', 'texto', true), c('circunscripcion', 'texto'),
+      c('empresa', 'texto', true), c('confirmacion', 'texto', true), c('motivo', 'texto'), c('fecha', 'fecha', true), c('acto', 'texto', true),
+      c('cargo', 'texto', true), c('registro', 'texto'), c('url_borme', 'url', true), c('url_congreso_abierto', 'url'),
+    ],
+    filtros: [
+      { id: 'buscar', tipo: 'texto', columnas: ['diputado', 'empresa'] },
+      { id: 'grupo', tipo: 'valores', columna: 'grupo' },
+      { id: 'confirmacion', tipo: 'valores', columna: 'confirmacion' },
+    ],
+  },
+  {
     id: 'votaciones',
     particion: 'unica',
     csvFijo: true,
