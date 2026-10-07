@@ -1,3 +1,4 @@
+import type { Vinculos } from './vinculos';
 /**
  * Esquema de datos del proyecto. Pensado para crecer: hoy solo hay Congreso,
  * mañana se añaden parlamentos autonómicos con `camara` distinta.
@@ -233,6 +234,8 @@ export interface Diputado {
   actividades: Actividades | null;
   intereses: InteresesEconomicos | null;
   participacion: Participacion | null;
+  /** Empresas, administraciones y entidades que nombran sus documentos oficiales. */
+  vinculos: Vinculos | null;
 }
 
 export interface VotacionClave {

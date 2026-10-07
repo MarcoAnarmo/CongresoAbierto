@@ -1,0 +1,28 @@
+{
+  "_leeme": "Correcciones a mano de las entidades de data/raw/vinculos/entidades.jsonl. «unir»: nombre tal como aparece → nombre con el que se agrupa y se muestra (solo cuando es sin duda la misma entidad). «excluir»: nombres que no se muestran como entidad. «tipos»: tipo corregido. Las claves ignoran tildes, mayúsculas y la forma jurídica (S.A., S.L.…).",
+  "unir": {
+    "PP": "Partido Popular",
+    "Partido Popular de España": "Partido Popular",
+    "Partido Socialista Obrero Español": "PSOE",
+    "Partit dels Socialistes de Catalunya": "PSC",
+    "VOX España": "VOX",
+    "EHBILDU": "EH Bildu",
+    "Junts": "Junts per Catalunya",
+    "EAJ/PNV": "EAJ-PNV",
+    "Cruz Roja Española": "Cruz Roja",
+    "AECC": "Asociación Española contra el Cáncer",
+    "Santander": "Banco Santander",
+    "JCCM": "Junta de Comunidades de Castilla-La Mancha",
+    "Parlamento Andalucía": "Parlamento de Andalucía",
+    "Corts Valencianes": "Cortes Valencianas",
+    "Comisión Española de Ayuda al Refugiado": "CEAR"
+  },
+  "excluir": [
+    "Congreso de los Diputados",
+    "Congreso",
+    "Cortes Generales",
+    "Senado",
+    "Gobierno"
+  ],
+  "tipos": {}
+}
