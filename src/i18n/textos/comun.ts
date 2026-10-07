@@ -52,6 +52,11 @@ const es = {
   },
   /** Temas con los que se agrupan las votaciones (data/manual/temas.json). */
   temas: { vivienda: 'Vivienda', economia: 'Economía e impuestos', trabajo: 'Trabajo y pensiones', sanidad: 'Sanidad y cuidados', educacion: 'Educación y cultura', igualdad: 'Igualdad y derechos sociales', justicia: 'Justicia y seguridad', migracion: 'Migración y nacionalidad', exterior: 'Política exterior', defensa: 'Defensa', transporte: 'Transporte e infraestructuras', territorio: 'Comunidades autónomas', 'campo-medioambiente': 'Campo, energía y medio ambiente', instituciones: 'Instituciones y transparencia', otros: 'Otros' } as Record<string, string>,
+  vinculos: {
+    tipos: { empresa: 'Empresas privadas', publica: 'Sector público', fundacion: 'Fundaciones', asociacion: 'Asociaciones y ONG', partido: 'Partidos', sindicato: 'Sindicatos', educacion: 'Educación e investigación', colegio: 'Colegios profesionales', otra: 'Otras entidades' } as Record<string, string>,
+    relaciones: { autorizada: 'Actividad autorizada por el Congreso', 'cargo-publico': 'Cargo público', excedencia: 'Empleo en excedencia o servicios especiales', docencia: 'Docencia', publicaciones: 'Publicaciones y creación', partido: 'Cargo en partido o grupo', pension: 'Pensión', cese: 'Cese o renuncia comunicada', 'trabajo-anterior': 'Trabajo en los 5 años antes del escaño', acciones: 'Acciones o participaciones', aportacion: 'Cuota o donativo que aporta', regalo: 'Regalo o donación recibida', trayectoria: 'Trayectoria de su ficha', borme: 'Cargo en sociedad (BORME)', otras: 'Otra relación' } as Record<string, string>,
+    remuneracion: { si: 'Con remuneración, según el documento', no: 'Sin remuneración, según el documento', dietas: 'Solo dietas, indemnizaciones o gastos', complemento: 'Solo complemento por antigüedad', nc: 'El documento no dice si cobra' } as Record<string, string>,
+  },
   /** Grupo actual y candidatura por la que fue elegido/a, cuando no coinciden. */
   candidatura: '{grupo} (candidatura {partido})',
   palabras: {
@@ -94,6 +99,11 @@ export default area(es, {
       mini: 'Eleccions: 29 de novembre', tarjeta: 'Eleccions generals · 29 de novembre', llamada: 'Abans de votar el 29 de novembre, coneix qui et representa. ',
     },
     temas: { vivienda: 'Habitatge', economia: 'Economia i impostos', trabajo: 'Treball i pensions', sanidad: 'Sanitat i cures', educacion: 'Educació i cultura', igualdad: 'Igualtat i drets socials', justicia: 'Justícia i seguretat', migracion: 'Migració i nacionalitat', exterior: 'Política exterior', defensa: 'Defensa', transporte: 'Transport i infraestructures', territorio: 'Comunitats autònomes', 'campo-medioambiente': 'Camp, energia i medi ambient', instituciones: 'Institucions i transparència', otros: 'Altres' },
+    vinculos: {
+      tipos: { empresa: 'Empreses privades', publica: 'Sector públic', fundacion: 'Fundacions', asociacion: 'Associacions i ONG', partido: 'Partits', sindicato: 'Sindicats', educacion: 'Educació i recerca', colegio: 'Col·legis professionals', otra: 'Altres entitats' },
+      relaciones: { autorizada: 'Activitat autoritzada pel Congrés', 'cargo-publico': 'Càrrec públic', excedencia: 'Feina en excedència o serveis especials', docencia: 'Docència', publicaciones: 'Publicacions i creació', partido: 'Càrrec en partit o grup', pension: 'Pensió', cese: 'Cessament o renúncia comunicada', 'trabajo-anterior': 'Feina als 5 anys abans de l’escó', acciones: 'Accions o participacions', aportacion: 'Quota o donatiu que aporta', regalo: 'Regal o donació rebuda', trayectoria: 'Trajectòria de la fitxa', borme: 'Càrrec en societat (BORME)', otras: 'Una altra relació' },
+      remuneracion: { si: 'Amb remuneració, segons el document', no: 'Sense remuneració, segons el document', dietas: 'Només dietes, indemnitzacions o despeses', complemento: 'Només complement d’antiguitat', nc: 'El document no diu si cobra' },
+    },
     candidatura: '{grupo} (candidatura {partido})',
     palabras: {
       diputados: ['{n} diputat', '{n} diputats'], propiedades: ['{n} propietat', '{n} propietats'], viviendas: ['{n} habitatge', '{n} habitatges'],
@@ -127,6 +137,11 @@ export default area(es, {
       mini: 'Hauteskundeak: azaroaren 29a', tarjeta: 'Hauteskunde orokorrak · azaroaren 29a', llamada: 'Azaroaren 29an bozkatu aurretik, ezagutu zure ordezkaria. ',
     },
     temas: { vivienda: 'Etxebizitza', economia: 'Ekonomia eta zergak', trabajo: 'Lana eta pentsioak', sanidad: 'Osasuna eta zaintzak', educacion: 'Hezkuntza eta kultura', igualdad: 'Berdintasuna eta gizarte-eskubideak', justicia: 'Justizia eta segurtasuna', migracion: 'Migrazioa eta nazionalitatea', exterior: 'Kanpo-politika', defensa: 'Defentsa', transporte: 'Garraioa eta azpiegiturak', territorio: 'Autonomia-erkidegoak', 'campo-medioambiente': 'Landa, energia eta ingurumena', instituciones: 'Erakundeak eta gardentasuna', otros: 'Besteak' },
+    vinculos: {
+      tipos: { empresa: 'Enpresa pribatuak', publica: 'Sektore publikoa', fundacion: 'Fundazioak', asociacion: 'Elkarteak eta GKEak', partido: 'Alderdiak', sindicato: 'Sindikatuak', educacion: 'Hezkuntza eta ikerketa', colegio: 'Elkargo profesionalak', otra: 'Beste erakunde batzuk' },
+      relaciones: { autorizada: 'Kongresuak baimendutako jarduera', 'cargo-publico': 'Kargu publikoa', excedencia: 'Eszedentzian edo zerbitzu berezietan dagoen lana', docencia: 'Irakaskuntza', publicaciones: 'Argitalpenak eta sorkuntza', partido: 'Kargua alderdi edo talde batean', pension: 'Pentsioa', cese: 'Jakinarazitako kargu-uztea edo uko egitea', 'trabajo-anterior': 'Eserlekuaren aurreko 5 urteetako lana', acciones: 'Akzioak edo partaidetzak', aportacion: 'Ordaintzen duen kuota edo dohaintza', regalo: 'Jasotako oparia edo dohaintza', trayectoria: 'Fitxako ibilbidea', borme: 'Kargua sozietate batean (BORME)', otras: 'Beste harreman bat' },
+      remuneracion: { si: 'Ordainsariarekin, dokumentuaren arabera', no: 'Ordainsaririk gabe, dokumentuaren arabera', dietas: 'Dietak, kalte-ordainak edo gastuak bakarrik', complemento: 'Antzinatasun-osagarria bakarrik', nc: 'Dokumentuak ez du esaten kobratzen duen' },
+    },
     candidatura: '{grupo} ({partido} hautagaitza)',
     palabras: {
       diputados: ['{n} diputatu', '{n} diputatu'], propiedades: ['{n} jabetza', '{n} jabetza'], viviendas: ['{n} etxebizitza', '{n} etxebizitza'],
@@ -160,6 +175,11 @@ export default area(es, {
       mini: 'Eleccións: 29 de novembro', tarjeta: 'Eleccións xerais · 29 de novembro', llamada: 'Antes de votar o 29 de novembro, coñece a quen te representa. ',
     },
     temas: { vivienda: 'Vivenda', economia: 'Economía e impostos', trabajo: 'Traballo e pensións', sanidad: 'Sanidade e coidados', educacion: 'Educación e cultura', igualdad: 'Igualdade e dereitos sociais', justicia: 'Xustiza e seguridade', migracion: 'Migración e nacionalidade', exterior: 'Política exterior', defensa: 'Defensa', transporte: 'Transporte e infraestruturas', territorio: 'Comunidades autónomas', 'campo-medioambiente': 'Campo, enerxía e medio ambiente', instituciones: 'Institucións e transparencia', otros: 'Outros' },
+    vinculos: {
+      tipos: { empresa: 'Empresas privadas', publica: 'Sector público', fundacion: 'Fundacións', asociacion: 'Asociacións e ONG', partido: 'Partidos', sindicato: 'Sindicatos', educacion: 'Educación e investigación', colegio: 'Colexios profesionais', otra: 'Outras entidades' },
+      relaciones: { autorizada: 'Actividade autorizada polo Congreso', 'cargo-publico': 'Cargo público', excedencia: 'Emprego en excedencia ou servizos especiais', docencia: 'Docencia', publicaciones: 'Publicacións e creación', partido: 'Cargo en partido ou grupo', pension: 'Pensión', cese: 'Cesamento ou renuncia comunicada', 'trabajo-anterior': 'Traballo nos 5 anos antes do escano', acciones: 'Accións ou participacións', aportacion: 'Cota ou donativo que achega', regalo: 'Agasallo ou doazón recibida', trayectoria: 'Traxectoria da súa ficha', borme: 'Cargo en sociedade (BORME)', otras: 'Outra relación' },
+      remuneracion: { si: 'Con remuneración, segundo o documento', no: 'Sen remuneración, segundo o documento', dietas: 'Só dietas, indemnizacións ou gastos', complemento: 'Só complemento por antigüidade', nc: 'O documento non di se cobra' },
+    },
     candidatura: '{grupo} (candidatura {partido})',
     palabras: {
       diputados: ['{n} deputado', '{n} deputados'], propiedades: ['{n} propiedade', '{n} propiedades'], viviendas: ['{n} vivenda', '{n} vivendas'],
@@ -193,6 +213,11 @@ export default area(es, {
       mini: 'Election: 29 November', tarjeta: 'General election · 29 November', llamada: 'Before you vote on 29 November, know who represents you. ',
     },
     temas: { vivienda: 'Housing', economia: 'Economy and taxes', trabajo: 'Work and pensions', sanidad: 'Health and care', educacion: 'Education and culture', igualdad: 'Equality and social rights', justicia: 'Justice and security', migracion: 'Migration and nationality', exterior: 'Foreign policy', defensa: 'Defence', transporte: 'Transport and infrastructure', territorio: 'Autonomous communities', 'campo-medioambiente': 'Farming, energy and environment', instituciones: 'Institutions and transparency', otros: 'Other' },
+    vinculos: {
+      tipos: { empresa: 'Private companies', publica: 'Public sector', fundacion: 'Foundations', asociacion: 'Associations and NGOs', partido: 'Parties', sindicato: 'Trade unions', educacion: 'Education and research', colegio: 'Professional associations', otra: 'Other organisations' },
+      relaciones: { autorizada: 'Activity authorised by Congress', 'cargo-publico': 'Public office', excedencia: 'Job on leave or special service', docencia: 'Teaching', publicaciones: 'Publications and creative work', partido: 'Party or group position', pension: 'Pension', cese: 'Reported resignation or end of post', 'trabajo-anterior': 'Job in the 5 years before taking their seat', acciones: 'Shares or holdings', aportacion: 'Fee or donation they pay', regalo: 'Gift or donation received', trayectoria: 'Career in their profile', borme: 'Company position (BORME)', otras: 'Other relationship' },
+      remuneracion: { si: 'Paid, according to the document', no: 'Unpaid, according to the document', dietas: 'Only allowances, attendance fees or expenses', complemento: 'Only a seniority supplement', nc: 'The document does not say whether it is paid' },
+    },
     candidatura: '{grupo} (elected on the {partido} ticket)',
     palabras: {
       diputados: ['{n} deputy', '{n} deputies'], propiedades: ['{n} property', '{n} properties'], viviendas: ['{n} home', '{n} homes'],

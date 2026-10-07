@@ -103,6 +103,7 @@ const vin = d.vinculos;
 const nEnt = vin?.entidades.length ?? 0;
 const nEmpresas = vin?.porTipo.empresa ?? 0;
 const bor = vin?.borme ?? [];
+const tv = tc.vinculos;
 const anio = (x: string) => x.slice(0, 4);
 const tiposVin = TIPOS_ENTIDAD.filter((k) => vin?.porTipo[k]).map((k) => ({ k, ents: vin!.entidades.filter((e) => e.tipo === k) }));
 // Sus votos en todas las votaciones del Pleno
@@ -447,10 +448,11 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
                   <details class="ent">
                     <summary>
                       <span class="ent-nombre">{e.nombre}</span>
-                      <span class="ent-rol">{[e.apariciones.find((a) => a.rol)?.rol, pl(new Set(e.apariciones.map((a) => a.url)).size, t.ent.documentos, lang)].filter(Boolean).join(' · ')}</span>
+                      <span class="ent-rol">{[...new Set(e.apariciones.map((a) => tv.relaciones[a.relacion]))].slice(0, 2).join(' · ')}</span>
                     </summary>
                     <ul class="ent-apar">{e.apariciones.map((a) => (
                       <li>
+                        <span class="ent-etq"><span class="etq-rel">{tv.relaciones[a.relacion]}</span>{a.remuneracion && <span class:list={['etq-rem', `rem-${a.remuneracion}`]}>{tv.remuneracion[a.remuneracion]}</span>}</span>
                         <a href={a.url} rel="noopener" class="ent-doc">{t.ent.fuentes[a.fuente]}{a.fecha && <span class="muted"> · {fmtFecha(a.fecha)}</span>} ↗</a>
                         {a.periodo && <span class="small muted"> · {f(t.ent.periodo, { p: a.periodo })}</span>}
                         <blockquote class="ent-lit" lang="es">{a.texto}</blockquote>
@@ -801,6 +803,10 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   .ent-rol { font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
   .ent-apar { list-style: none; margin: 0; padding: 0 16px 12px; display: grid; gap: 10px; }
   .ent-doc { font-size: .88rem; font-weight: 600; }
+  .ent-etq { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-bottom: 4px; }
+  .etq-rel, .etq-rem { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .78rem; line-height: 1.6; background: var(--chip); color: var(--text); }
+  .etq-rem { background: transparent; box-shadow: inset 0 0 0 1px var(--border); color: var(--muted); }
+  .etq-rem.rem-si { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent); color: var(--accent-text); }
   .ent-lit { margin: 4px 0 0; padding: 6px 10px; border-left: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); font-size: .88rem; line-height: 1.5; color: var(--text); background: var(--bg); border-radius: 0 6px 6px 0; overflow-wrap: anywhere; }
   .bor-conf { display: flex; gap: 6px; align-items: flex-start; margin: 0 0 8px; color: var(--muted); }
   .bor-conf :global(.icono) { flex: none; margin-top: 2px; color: var(--accent-text); }

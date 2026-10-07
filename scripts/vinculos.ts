@@ -9,7 +9,7 @@
  * Reglas en docs/metodologia.md («Empresas y entidades»).
  */
 import { readFileSync, existsSync } from 'node:fs';
-import { claveEntidad, esLiteral, slugEntidad, TIPOS_ENTIDAD, type AparicionVinculo, type ActoBorme, type ConfirmacionBorme, type EmpresaBorme, type EntidadExtraida, type TextoFuente, type TipoEntidad, type Vinculos, type VinculoEntidad } from '../src/lib/vinculos.ts';
+import { claveEntidad, esLiteral, relacionDe, remuneracionDe, slugEntidad, TIPOS_ENTIDAD, type AparicionVinculo, type ActoBorme, type ConfirmacionBorme, type EmpresaBorme, type EntidadExtraida, type TextoFuente, type TipoEntidad, type Vinculos, type VinculoEntidad } from '../src/lib/vinculos.ts';
 
 const leer = <T>(ruta: string): T[] => (existsSync(ruta) ? readFileSync(ruta, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l) as T) : []);
 
@@ -60,7 +60,7 @@ for (const t of textos) {
     const x = g.get(clave)!;
     x.tipos.set(e.tipo, (x.tipos.get(e.tipo) ?? 0) + 1);
     if (!x.apariciones.some((a) => a.url === t.url && a.texto === t.texto)) {
-      x.apariciones.push({ fuente: t.fuente, apartado: t.apartado, rol: e.rol.trim(), texto: t.texto, fecha: t.fecha, periodo: t.periodo ?? null, url: t.url });
+      x.apariciones.push({ fuente: t.fuente, apartado: t.apartado, relacion: relacionDe(t), remuneracion: remuneracionDe(t.texto), rol: e.rol.trim(), texto: t.texto, fecha: t.fecha, periodo: t.periodo ?? null, url: t.url });
     }
   }
 }

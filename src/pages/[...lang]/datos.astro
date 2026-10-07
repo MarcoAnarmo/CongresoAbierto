@@ -45,6 +45,8 @@ const config = {
   anios: aniosVotos(),
   grupos: [...grupos].sort((a, b) => a.orden - b.orden).map((g) => g.corto),
   temas: Object.fromEntries(TEMAS.map((x) => [x.id, tc.temas[x.id] ?? x.nombre])),
+  rel: tc.vinculos.relaciones,
+  rem: tc.vinculos.remuneracion,
   tx: { ...Object.fromEntries(Object.entries(t).filter(([, v]) => typeof v === 'string')) },
   plFilas: t.filas,
   pasos: nombrePaso,

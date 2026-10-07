@@ -125,6 +125,8 @@ const es = {
     "es_vivienda": "Vivienda",
     "titular": "Titular",
     "tipo_entidad": "Tipo de entidad",
+    "tipo_relacion": "Tipo de relación",
+    "remuneracion": "Remuneración",
     "fuente": "Documento",
     "confirmacion": "Cómo se confirma",
     "fechas": "Fechas",
@@ -325,9 +327,17 @@ const es = {
       "nombre": "Tipo de entidad",
       "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio u otra"
     },
-    "relacion": {
-      "nombre": "Relación",
-      "descripcion": "Cargo o actividad que dice el documento, resumido de su texto"
+    "tipo_relacion": {
+      "nombre": "Tipo de relación",
+      "descripcion": "Según la sección del documento o el artículo de la LOREG del acuerdo: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria u otras"
+    },
+    "remuneracion": {
+      "nombre": "Remuneración",
+      "descripcion": "Lo que dice el documento: si, no, dietas (solo dietas, indemnizaciones o gastos), complemento (solo complemento por antigüedad) o no-consta (el documento no lo dice; no significa que cobre)"
+    },
+    "cargo_o_actividad": {
+      "nombre": "Cargo o actividad",
+      "descripcion": "Resumen del cargo o la actividad tomado del texto"
     },
     "fuente": {
       "nombre": "Documento",
@@ -549,6 +559,8 @@ export default area(es, {
       "es_vivienda": "Habitatge",
       "titular": "Titular",
       "tipo_entidad": "Tipus d’entitat",
+      "tipo_relacion": "Tipus de relació",
+      "remuneracion": "Remuneració",
       "fuente": "Document",
       "confirmacion": "Com es confirma",
       "fechas": "Dates",
@@ -749,9 +761,17 @@ export default area(es, {
         "nombre": "Tipus d’entitat",
         "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio o otra"
       },
-      "relacion": {
-        "nombre": "Relació",
-        "descripcion": "Càrrec o activitat que diu el document, resumit del seu text"
+      "tipo_relacion": {
+        "nombre": "Tipus de relació",
+        "descripcion": "Segons la secció del document o l’article de la LOREG de l’acord: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria o otras"
+      },
+      "remuneracion": {
+        "nombre": "Remuneració",
+        "descripcion": "El que diu el document: si, no, dietas (només dietes, indemnitzacions o despeses), complemento (només complement d’antiguitat) o no-consta (el document no ho diu; no vol dir que cobri)"
+      },
+      "cargo_o_actividad": {
+        "nombre": "Càrrec o activitat",
+        "descripcion": "Resum del càrrec o l’activitat pres del text"
       },
       "fuente": {
         "nombre": "Document",
@@ -971,6 +991,8 @@ export default area(es, {
       "es_vivienda": "Etxebizitza",
       "titular": "Titularra",
       "tipo_entidad": "Erakunde mota",
+      "tipo_relacion": "Harreman mota",
+      "remuneracion": "Ordainsaria",
       "fuente": "Dokumentua",
       "confirmacion": "Nola baieztatzen den",
       "fechas": "Datak",
@@ -1171,9 +1193,17 @@ export default area(es, {
         "nombre": "Erakunde mota",
         "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio edo otra"
       },
-      "relacion": {
-        "nombre": "Harremana",
-        "descripcion": "Dokumentuak dioen kargua edo jarduera, bere testutik laburtua"
+      "tipo_relacion": {
+        "nombre": "Harreman mota",
+        "descripcion": "Dokumentuaren atalaren edo erabakiko LOREGen artikuluaren arabera: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria edo otras"
+      },
+      "remuneracion": {
+        "nombre": "Ordainsaria",
+        "descripcion": "Dokumentuak dioena: si, no, dietas (dietak, kalte-ordainak edo gastuak bakarrik), complemento (antzinatasun-osagarria bakarrik) edo no-consta (dokumentuak ez du esaten; ez du esan nahi kobratzen duenik)"
+      },
+      "cargo_o_actividad": {
+        "nombre": "Kargua edo jarduera",
+        "descripcion": "Testutik hartutako karguaren edo jardueraren laburpena"
       },
       "fuente": {
         "nombre": "Dokumentua",
@@ -1393,6 +1423,8 @@ export default area(es, {
       "es_vivienda": "Vivenda",
       "titular": "Titular",
       "tipo_entidad": "Tipo de entidade",
+      "tipo_relacion": "Tipo de relación",
+      "remuneracion": "Remuneración",
       "fuente": "Documento",
       "confirmacion": "Como se confirma",
       "fechas": "Datas",
@@ -1593,9 +1625,17 @@ export default area(es, {
         "nombre": "Tipo de entidade",
         "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio ou otra"
       },
-      "relacion": {
-        "nombre": "Relación",
-        "descripcion": "Cargo ou actividade que di o documento, resumido do seu texto"
+      "tipo_relacion": {
+        "nombre": "Tipo de relación",
+        "descripcion": "Segundo a sección do documento ou o artigo da LOREG do acordo: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria ou otras"
+      },
+      "remuneracion": {
+        "nombre": "Remuneración",
+        "descripcion": "O que di o documento: si, no, dietas (só dietas, indemnizacións ou gastos), complemento (só complemento por antigüidade) ou no-consta (o documento non o di; non significa que cobre)"
+      },
+      "cargo_o_actividad": {
+        "nombre": "Cargo ou actividade",
+        "descripcion": "Resumo do cargo ou da actividade tomado do texto"
       },
       "fuente": {
         "nombre": "Documento",
@@ -1815,6 +1855,8 @@ export default area(es, {
       "es_vivienda": "Home",
       "titular": "Holder",
       "tipo_entidad": "Type of organisation",
+      "tipo_relacion": "Type of relationship",
+      "remuneracion": "Pay",
       "fuente": "Document",
       "confirmacion": "How it is confirmed",
       "fechas": "Dates",
@@ -2015,9 +2057,17 @@ export default area(es, {
         "nombre": "Type of organisation",
         "descripcion": "empresa (company), publica (public sector), fundacion, asociacion, partido, sindicato, educacion, colegio or otra"
       },
-      "relacion": {
-        "nombre": "Relationship",
-        "descripcion": "Position or activity stated in the document, summarised from its text"
+      "tipo_relacion": {
+        "nombre": "Type of relationship",
+        "descripcion": "From the document section or the LOREG article cited in the decision: autorizada, cargo-publico, excedencia, docencia, publicaciones, partido, pension, cese, trabajo-anterior, acciones, aportacion, regalo, trayectoria or otras"
+      },
+      "remuneracion": {
+        "nombre": "Pay",
+        "descripcion": "What the document says: si (paid), no (unpaid), dietas (only allowances, attendance fees or expenses), complemento (only a seniority supplement) or no-consta (the document does not say; it does not mean it is paid)"
+      },
+      "cargo_o_actividad": {
+        "nombre": "Position or activity",
+        "descripcion": "Summary of the position or activity taken from the text"
       },
       "fuente": {
         "nombre": "Document",

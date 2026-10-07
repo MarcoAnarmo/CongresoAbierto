@@ -29,7 +29,7 @@ const es = {
     resumenAria: 'Resumen de la ficha de {nombre}',
   },
   /** Cajitas del resumen */
-  grupos: { dinero: 'Dinero y bienes', vinculos: 'Empresas y entidades', congreso: 'En el Congreso', perfil: 'Perfil' },
+  grupos: { dinero: 'Dinero y bienes', vinculos: 'Participación en empresas y entidades', congreso: 'En el Congreso', perfil: 'Perfil' },
   tes: {
     propiedades: 'Propiedades',
     sinDeclaracion: 'sin declaración publicada',
@@ -301,8 +301,8 @@ const es = {
     noCoincide: '¿Ves algo que no coincide con el original? ',
   },
   ent: {
-    titulo: 'Empresas y entidades en sus documentos',
-    intro: ['Empresas, administraciones y organizaciones que nombran los documentos oficiales del diputado: lo que él declara, lo que acuerda el Congreso sobre sus actividades y su ficha. Cada línea enlaza al documento de donde sale. Solo aparece lo que consta por escrito.', 'Empresas, administraciones y organizaciones que nombran los documentos oficiales de la diputada: lo que ella declara, lo que acuerda el Congreso sobre sus actividades y su ficha. Cada línea enlaza al documento de donde sale. Solo aparece lo que consta por escrito.'],
+    titulo: 'Participación en empresas y entidades',
+    intro: ['Empresas, administraciones y organizaciones que nombran los documentos oficiales del diputado: lo que él declara, lo que acuerda el Congreso sobre sus actividades y su ficha. Cada línea enlaza al documento de donde sale. Solo aparece lo que consta por escrito. Participar no significa ser dueño ni cobrar: cada relación indica de qué tipo es y, si el documento lo dice, si tiene remuneración.', 'Empresas, administraciones y organizaciones que nombran los documentos oficiales de la diputada: lo que ella declara, lo que acuerda el Congreso sobre sus actividades y su ficha. Cada línea enlaza al documento de donde sale. Solo aparece lo que consta por escrito. Participar no significa ser dueño ni cobrar: cada relación indica de qué tipo es y, si el documento lo dice, si tiene remuneración.'],
     ninguna: 'Sus documentos oficiales no nombran ninguna empresa ni entidad.',
     tipos: { empresa: 'Empresas', publica: 'Sector público', fundacion: 'Fundaciones', asociacion: 'Asociaciones y ONG', partido: 'Partidos políticos', sindicato: 'Sindicatos', educacion: 'Educación e investigación', colegio: 'Colegios profesionales', otra: 'Otras entidades' } as Record<string, string>,
     fuentes: { compatibilidad: 'Acuerdo del Congreso sobre sus actividades (BOCG)', registro: 'Registro de Intereses - Actividades', intereses: 'Declaración de intereses económicos', bienes: 'Declaración de bienes', ficha: 'Ficha oficial en congreso.es' } as Record<string, string>,
@@ -362,7 +362,7 @@ export default area(es, {
       avisoGeneral: ['Alguna dada d’aquesta fitxa té una lectura dubtosa al PDF o un canvi comunicat que no identifica el bé. Està marcada amb «Lectura no confirmada». Comprova-ho al PDF oficial i, si hi veus un error, ', 'avisa’ns', '.'],
       resumenAria: 'Resum de la fitxa de {nombre}',
     },
-    grupos: { dinero: 'Diners i béns', vinculos: 'Empreses i entitats', congreso: 'Al Congrés', perfil: 'Perfil' },
+    grupos: { dinero: 'Diners i béns', vinculos: 'Participació en empreses i entitats', congreso: 'Al Congrés', perfil: 'Perfil' },
     tes: {
       propiedades: 'Propietats',
       sinDeclaracion: 'sense declaració publicada',
@@ -623,8 +623,8 @@ export default area(es, {
       noCoincide: 'Hi veus alguna cosa que no coincideix amb l’original? ',
     },
     ent: {
-      titulo: 'Empreses i entitats als seus documents',
-      intro: ['Empreses, administracions i organitzacions que esmenten els documents oficials del diputat: el que ell declara, el que acorda el Congrés sobre les seves activitats i la seva fitxa. Cada línia enllaça al document d’on surt. Només hi apareix el que consta per escrit.', 'Empreses, administracions i organitzacions que esmenten els documents oficials de la diputada: el que ella declara, el que acorda el Congrés sobre les seves activitats i la seva fitxa. Cada línia enllaça al document d’on surt. Només hi apareix el que consta per escrit.'],
+      titulo: 'Participació en empreses i entitats',
+      intro: ['Empreses, administracions i organitzacions que esmenten els documents oficials del diputat: el que ell declara, el que acorda el Congrés sobre les seves activitats i la seva fitxa. Cada línia enllaça al document d’on surt. Només hi apareix el que consta per escrit. Participar no vol dir ser-ne propietari ni cobrar-ne: cada relació indica de quin tipus és i, si el document ho diu, si té remuneració.', 'Empreses, administracions i organitzacions que esmenten els documents oficials de la diputada: el que ella declara, el que acorda el Congrés sobre les seves activitats i la seva fitxa. Cada línia enllaça al document d’on surt. Només hi apareix el que consta per escrit. Participar no vol dir ser-ne propietari ni cobrar-ne: cada relació indica de quin tipus és i, si el document ho diu, si té remuneració.'],
       ninguna: 'Els seus documents oficials no esmenten cap empresa ni entitat.',
       tipos: { empresa: 'Empreses', publica: 'Sector públic', fundacion: 'Fundacions', asociacion: 'Associacions i ONG', partido: 'Partits polítics', sindicato: 'Sindicats', educacion: 'Educació i recerca', colegio: 'Col·legis professionals', otra: 'Altres entitats' },
       fuentes: { compatibilidad: 'Acord del Congrés sobre les seves activitats (BOCG)', registro: 'Registre d’Interessos - Activitats', intereses: 'Declaració d’interessos econòmics', bienes: 'Declaració de béns', ficha: 'Fitxa oficial a congreso.es' },
@@ -676,7 +676,7 @@ export default area(es, {
       avisoGeneral: ['Fitxa honetako datuen batek irakurketa zalantzagarria du PDFan, edo ondasuna identifikatzen ez duen aldaketa jakinarazi bat. «Irakurketa berretsi gabea» markaz adierazita dago. Egiaztatu PDF ofizialean eta, akatsen bat ikusten baduzu, ', 'jakinarazi iezaguzu', '.'],
       resumenAria: '{nombre}: fitxaren laburpena',
     },
-    grupos: { dinero: 'Dirua eta ondasunak', vinculos: 'Enpresak eta erakundeak', congreso: 'Kongresuan', perfil: 'Profila' },
+    grupos: { dinero: 'Dirua eta ondasunak', vinculos: 'Partaidetza enpresetan eta erakundeetan', congreso: 'Kongresuan', perfil: 'Profila' },
     tes: {
       propiedades: 'Jabetzak',
       sinDeclaracion: 'aitorpenik argitaratu gabe',
@@ -937,8 +937,8 @@ export default area(es, {
       noCoincide: 'Jatorrizkoarekin bat ez datorren zerbait ikusten duzu? ',
     },
     ent: {
-      titulo: 'Enpresak eta erakundeak bere dokumentuetan',
-      intro: ['Diputatuaren dokumentu ofizialek aipatzen dituzten enpresak, administrazioak eta erakundeak: berak adierazten duena, Kongresuak bere jarduerei buruz erabakitzen duena eta bere fitxa. Lerro bakoitzak jatorrizko dokumentura eramaten du. Idatziz jasota dagoena bakarrik agertzen da.', 'Diputatuaren dokumentu ofizialek aipatzen dituzten enpresak, administrazioak eta erakundeak: berak adierazten duena, Kongresuak bere jarduerei buruz erabakitzen duena eta bere fitxa. Lerro bakoitzak jatorrizko dokumentura eramaten du. Idatziz jasota dagoena bakarrik agertzen da.'],
+      titulo: 'Partaidetza enpresetan eta erakundeetan',
+      intro: ['Diputatuaren dokumentu ofizialek aipatzen dituzten enpresak, administrazioak eta erakundeak: berak adierazten duena, Kongresuak bere jarduerei buruz erabakitzen duena eta bere fitxa. Lerro bakoitzak jatorrizko dokumentura eramaten du. Idatziz jasota dagoena bakarrik agertzen da. Parte hartzeak ez du esan nahi jabea denik edo kobratzen duenik: harreman bakoitzak zer motatakoa den adierazten du eta, dokumentuak esaten badu, ordainsaria duen.', 'Diputatuaren dokumentu ofizialek aipatzen dituzten enpresak, administrazioak eta erakundeak: berak adierazten duena, Kongresuak bere jarduerei buruz erabakitzen duena eta bere fitxa. Lerro bakoitzak jatorrizko dokumentura eramaten du. Idatziz jasota dagoena bakarrik agertzen da. Parte hartzeak ez du esan nahi jabea denik edo kobratzen duenik: harreman bakoitzak zer motatakoa den adierazten du eta, dokumentuak esaten badu, ordainsaria duen.'],
       ninguna: 'Bere dokumentu ofizialek ez dute enpresarik ez erakunderik aipatzen.',
       tipos: { empresa: 'Enpresak', publica: 'Sektore publikoa', fundacion: 'Fundazioak', asociacion: 'Elkarteak eta GKEak', partido: 'Alderdi politikoak', sindicato: 'Sindikatuak', educacion: 'Hezkuntza eta ikerketa', colegio: 'Elkargo profesionalak', otra: 'Beste erakunde batzuk' },
       fuentes: { compatibilidad: 'Kongresuaren erabakia bere jarduerei buruz (BOCG)', registro: 'Interesen Erregistroa - Jarduerak', intereses: 'Interes ekonomikoen adierazpena', bienes: 'Ondasunen adierazpena', ficha: 'Fitxa ofiziala congreso.es-en' },
@@ -990,7 +990,7 @@ export default area(es, {
       avisoGeneral: ['Algún dato desta ficha ten unha lectura dubidosa no PDF ou un cambio comunicado que non identifica o ben. Está marcado con «Lectura non confirmada». Compróbao no PDF oficial e, se ves un erro, ', 'avísanos', '.'],
       resumenAria: 'Resumo da ficha de {nombre}',
     },
-    grupos: { dinero: 'Diñeiro e bens', vinculos: 'Empresas e entidades', congreso: 'No Congreso', perfil: 'Perfil' },
+    grupos: { dinero: 'Diñeiro e bens', vinculos: 'Participación en empresas e entidades', congreso: 'No Congreso', perfil: 'Perfil' },
     tes: {
       propiedades: 'Propiedades',
       sinDeclaracion: 'sen declaración publicada',
@@ -1251,8 +1251,8 @@ export default area(es, {
       noCoincide: 'Ves algo que non coincide co orixinal? ',
     },
     ent: {
-      titulo: 'Empresas e entidades nos seus documentos',
-      intro: ['Empresas, administracións e organizacións que nomean os documentos oficiais do deputado: o que el declara, o que acorda o Congreso sobre as súas actividades e a súa ficha. Cada liña leva ao documento de onde sae. Só aparece o que consta por escrito.', 'Empresas, administracións e organizacións que nomean os documentos oficiais da deputada: o que ela declara, o que acorda o Congreso sobre as súas actividades e a súa ficha. Cada liña leva ao documento de onde sae. Só aparece o que consta por escrito.'],
+      titulo: 'Participación en empresas e entidades',
+      intro: ['Empresas, administracións e organizacións que nomean os documentos oficiais do deputado: o que el declara, o que acorda o Congreso sobre as súas actividades e a súa ficha. Cada liña leva ao documento de onde sae. Só aparece o que consta por escrito. Participar non significa ser dono nin cobrar: cada relación indica de que tipo é e, se o documento o di, se ten remuneración.', 'Empresas, administracións e organizacións que nomean os documentos oficiais da deputada: o que ela declara, o que acorda o Congreso sobre as súas actividades e a súa ficha. Cada liña leva ao documento de onde sae. Só aparece o que consta por escrito. Participar non significa ser dono nin cobrar: cada relación indica de que tipo é e, se o documento o di, se ten remuneración.'],
       ninguna: 'Os seus documentos oficiais non nomean ningunha empresa nin entidade.',
       tipos: { empresa: 'Empresas', publica: 'Sector público', fundacion: 'Fundacións', asociacion: 'Asociacións e ONG', partido: 'Partidos políticos', sindicato: 'Sindicatos', educacion: 'Educación e investigación', colegio: 'Colexios profesionais', otra: 'Outras entidades' },
       fuentes: { compatibilidad: 'Acordo do Congreso sobre as súas actividades (BOCG)', registro: 'Rexistro de Intereses - Actividades', intereses: 'Declaración de intereses económicos', bienes: 'Declaración de bens', ficha: 'Ficha oficial en congreso.es' },
@@ -1304,7 +1304,7 @@ export default area(es, {
       avisoGeneral: ['Some information in this profile has an uncertain reading in the PDF, or a reported change that does not identify the asset. It is marked “Unconfirmed reading”. Check the official PDF and, if you spot an error, ', 'let us know', '.'],
       resumenAria: 'Summary of the profile of {nombre}',
     },
-    grupos: { dinero: 'Money and assets', vinculos: 'Companies and organisations', congreso: 'In Congress', perfil: 'Profile' },
+    grupos: { dinero: 'Money and assets', vinculos: 'Involvement in companies and organisations', congreso: 'In Congress', perfil: 'Profile' },
     tes: {
       propiedades: 'Properties',
       sinDeclaracion: 'no declaration published',
@@ -1565,8 +1565,8 @@ export default area(es, {
       noCoincide: 'Spotted something that does not match the original? ',
     },
     ent: {
-      titulo: 'Companies and organisations in their documents',
-      intro: ['Companies, public bodies and organisations named in his official documents: what he declares, what Congress decides about his activities, and his profile. Each line links to the document it comes from. Only what is on record appears here.', 'Companies, public bodies and organisations named in her official documents: what she declares, what Congress decides about her activities, and her profile. Each line links to the document it comes from. Only what is on record appears here.'],
+      titulo: 'Involvement in companies and organisations',
+      intro: ['Companies, public bodies and organisations named in his official documents: what he declares, what Congress decides about his activities, and his profile. Each line links to the document it comes from. Only what is on record appears here. Involvement does not mean ownership or payment: each relationship shows its type and, if the document says so, whether it is paid.', 'Companies, public bodies and organisations named in her official documents: what she declares, what Congress decides about her activities, and her profile. Each line links to the document it comes from. Only what is on record appears here. Involvement does not mean ownership or payment: each relationship shows its type and, if the document says so, whether it is paid.'],
       ninguna: 'Their official documents name no companies or organisations.',
       tipos: { empresa: 'Companies', publica: 'Public sector', fundacion: 'Foundations', asociacion: 'Associations and NGOs', partido: 'Political parties', sindicato: 'Trade unions', educacion: 'Education and research', colegio: 'Professional associations', otra: 'Other organisations' },
       fuentes: { compatibilidad: 'Congress decision on their activities (BOCG)', registro: 'Register of Interests - Activities', intereses: 'Declaration of economic interests', bienes: 'Declaration of assets', ficha: 'Official profile on congreso.es' },

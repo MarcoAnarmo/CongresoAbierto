@@ -52,7 +52,7 @@ function* entidades(): Generator<Registro> {
     const base = { diputado_id: d.codParlamentario, diputado: d.nombreCompleto, grupo: d.grupoCorto, circunscripcion: d.circunscripcion, url_congreso_abierto: `${SITIO}/diputado/${slug(d)}#entidades` };
     for (const e of d.vinculos?.entidades ?? []) {
       for (const a of e.apariciones) {
-        yield { ...base, entidad: e.nombre, tipo_entidad: e.tipo, relacion: a.rol || null, fuente: a.fuente, fecha: a.fecha, texto: a.texto, url_documento: a.url };
+        yield { ...base, entidad: e.nombre, tipo_entidad: e.tipo, tipo_relacion: a.relacion, remuneracion: a.remuneracion ?? 'no-consta', cargo_o_actividad: a.rol || null, fuente: a.fuente, fecha: a.fecha, texto: a.texto, url_documento: a.url };
       }
     }
   }
