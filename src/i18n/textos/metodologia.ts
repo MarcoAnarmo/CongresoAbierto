@@ -26,6 +26,7 @@ const es = {
     actividades: 'Cargos y actividades',
     intereses: 'Trabajos anteriores e intereses',
     entidades: 'Empresas y entidades',
+    borme: 'Registro Mercantil (BORME)',
     revision: 'Cómo se han copiado los datos',
     retribuciones: 'Retribuciones',
     votaciones: 'Votaciones',
@@ -95,6 +96,20 @@ const es = {
 </ul>
 <p>Los textos son libres, así que los nombres se han localizado con ayuda de un asistente de inteligencia artificial y con reglas estrictas: solo nombres que aparecen <strong>literalmente</strong> en el texto (una comprobación automática lo verifica uno a uno), nunca personas particulares y nunca referencias genéricas («una empresa privada»). Las variantes de un mismo nombre (mayúsculas, tildes, «S.A.» o «SA») se agrupan; las uniones hechas a mano están en <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a>. El tipo (empresa, sector público, fundación…) solo sirve para ordenar la lista.</p>
 <p><strong>Que una entidad aparezca no implica ninguna irregularidad ni conflicto de intereses:</strong> es lo que consta en esos documentos. Tampoco es una lista completa de sus relaciones, sino de lo que está por escrito en documentos oficiales.</p>`,
+    borme: `<p>El <a href="https://www.boe.es/diario_borme/">Boletín Oficial del Registro Mercantil (BORME)</a> publica cada día los actos inscritos de las sociedades: constituciones, nombramientos y ceses de administradores, consejeros y apoderados, socios únicos… El BOE los ofrece como <a href="https://www.boe.es/datosabiertos/">datos abiertos</a> desde 2009.</p>
+<ul>
+<li>Se han revisado todos los actos inscritos desde enero de 2009 (unos 9,6 millones en más de 126.000 boletines provinciales) buscando el nombre completo de cada diputado tal como lo escribe el BORME (apellidos y nombre).</li>
+<li><strong>El BORME no publica el DNI.</strong> Que el nombre coincida no demuestra que sea la misma persona: en España hay nombres que comparten cientos de personas. Por eso <strong>solo se publica una coincidencia cuando otro documento oficial la confirma</strong>:
+<ul>
+<li>la misma empresa aparece en sus declaraciones, en los acuerdos del Congreso sobre sus actividades o en su ficha;</li>
+<li>es una empresa pública (municipal, provincial, insular…) de un lugar o una administración en la que el diputado declara un cargo, como un concejal en el consejo de una empresa de su ayuntamiento;</li>
+<li>la sociedad lleva su nombre y apellido y está inscrita en la provincia de su circunscripción.</li>
+</ul></li>
+<li>Las coincidencias que no se pueden confirmar así <strong>no se publican</strong>, aunque el nombre sea poco frecuente. Para estimar cuántas personas se llaman igual se usan las estadísticas de <a href="https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177009&menu=resultados&idp=1254734710990">nombres y apellidos del INE</a>, pero solo como ayuda para revisarlas, nunca para publicarlas.</li>
+<li>Cada acto enlaza a su anuncio oficial en boe.es. Los nombres de las sociedades, los actos y los cargos se copian tal cual, con las abreviaturas del BORME («Adm. Unico» es administrador único; «Apo.Man.Soli», apoderado mancomunado y solidario).</li>
+<li>Un cargo en el BORME no indica si se cobraba ni si sigue vigente: muestra la fecha de cada acto publicado. El BORME empieza en 2009; lo anterior no está.</li>
+</ul>
+<p>El código que lo hace es público: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (búsqueda) y <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (confirmación). Las coincidencias sin confirmar no se suben al repositorio, porque en su mayoría son de otras personas.</p>`,
     revision: `<p>Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila (las deudas, con dos transcripciones independientes cuyas diferencias se resuelven mirando el PDF), incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura no confirmada llevan un aviso (*) y un enlace al PDF para comprobarlo. Las rentas, cuentas, acciones y declaraciones de intereses se han transcrito del PDF y comparado con una lectura automática (OCR) independiente: cada importe o palabra que no coincide se ha vuelto a mirar en el original ampliado.</p>`,
     retribuciones: `<p>Se muestran los importes mensuales oficiales de 2026 que corresponden a cada diputado durante su mandato, según su circunscripción y sus cargos:</p>
 <ul>
@@ -140,6 +155,7 @@ export default area(es, {
       actividades: 'Càrrecs i activitats',
       intereses: 'Feines anteriors i interessos',
       entidades: 'Empreses i entitats',
+      borme: 'Registre Mercantil (BORME)',
       revision: 'Com s’han copiat les dades',
       retribuciones: 'Retribucions',
       votaciones: 'Votacions',
@@ -209,6 +225,20 @@ export default area(es, {
 </ul>
 <p>Els textos són lliures, així que els noms s’han localitzat amb l’ajuda d’un assistent d’intel·ligència artificial i amb regles estrictes: només noms que apareixen <strong>literalment</strong> al text (una comprovació automàtica ho verifica un per un), mai persones particulars i mai referències genèriques («una empresa privada»). Les variants d’un mateix nom (majúscules, accents, «S.A.» o «SA») s’agrupen; les unions fetes a mà són a <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a>. El tipus (empresa, sector públic, fundació…) només serveix per ordenar la llista.</p>
 <p><strong>Que hi aparegui una entitat no implica cap irregularitat ni conflicte d’interessos:</strong> és el que consta en aquests documents. Tampoc no és una llista completa de les seves relacions, sinó del que és per escrit en documents oficials.</p>`,
+      borme: `<p>El <a href="https://www.boe.es/diario_borme/">Butlletí Oficial del Registre Mercantil (BORME)</a> publica cada dia els actes inscrits de les societats: constitucions, nomenaments i cessaments d’administradors, consellers i apoderats, socis únics… El BOE els ofereix com a <a href="https://www.boe.es/datosabiertos/">dades obertes</a> des del 2009.</p>
+<ul>
+<li>S’han revisat tots els actes inscrits des del gener del 2009 (uns 9,6 milions en més de 126.000 butlletins provincials) buscant el nom complet de cada diputat tal com l’escriu el BORME (cognoms i nom).</li>
+<li><strong>El BORME no publica el DNI.</strong> Que el nom coincideixi no demostra que sigui la mateixa persona: a Espanya hi ha noms que comparteixen centenars de persones. Per això <strong>només es publica una coincidència quan un altre document oficial la confirma</strong>:
+<ul>
+<li>la mateixa empresa apareix a les seves declaracions, als acords del Congrés sobre les seves activitats o a la seva fitxa;</li>
+<li>és una empresa pública (municipal, provincial, insular…) d’un lloc o una administració on el diputat declara un càrrec, com un regidor al consell d’una empresa del seu ajuntament;</li>
+<li>la societat porta el seu nom i cognom i està inscrita a la província de la seva circumscripció.</li>
+</ul></li>
+<li>Les coincidències que no es poden confirmar així <strong>no es publiquen</strong>, encara que el nom sigui poc freqüent. Per estimar quantes persones es diuen igual es fan servir les estadístiques de <a href="https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177009&menu=resultados&idp=1254734710990">noms i cognoms de l’INE</a>, però només com a ajuda per revisar-les, mai per publicar-les.</li>
+<li>Cada acte enllaça al seu anunci oficial a boe.es. Els noms de les societats, els actes i els càrrecs es copien tal com són, amb les abreviatures del BORME («Adm. Unico» és administrador únic; «Apo.Man.Soli», apoderat mancomunat i solidari).</li>
+<li>Un càrrec al BORME no indica si es cobrava ni si continua vigent: mostra la data de cada acte publicat. El BORME comença el 2009; el que és anterior no hi és.</li>
+</ul>
+<p>El codi que ho fa és públic: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (cerca) i <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (confirmació). Les coincidències sense confirmar no es pugen al repositori, perquè la majoria són d’altres persones.</p>`,
       revision: `<p>Les declaracions es publiquen com a PDF escanejats, sense dades estructurades. Cadascuna s’ha copiat a mà a partir del PDF i després s’ha revisat una segona vegada, fila a fila (els deutes, amb dues transcripcions independents les diferències de les quals es resolen mirant el PDF), incloses les observacions de la pàgina 4 i la seva possible continuació. Les fitxes amb alguna lectura no confirmada porten un avís (*) i un enllaç al PDF per comprovar-ho. Les rendes, comptes, accions i declaracions d’interessos s’han transcrit del PDF i s’han comparat amb una lectura automàtica (OCR) independent: cada import o paraula que no coincideix s’ha tornat a mirar a l’original ampliat.</p>`,
       retribuciones: `<p>Es mostren els imports mensuals oficials del 2026 que corresponen a cada diputat durant el seu mandat, segons la seva circumscripció i els seus càrrecs:</p>
 <ul>
@@ -252,6 +282,7 @@ export default area(es, {
       actividades: 'Karguak eta jarduerak',
       intereses: 'Aurreko lanak eta interesak',
       entidades: 'Enpresak eta erakundeak',
+      borme: 'Merkataritza Erregistroa (BORME)',
       revision: 'Nola kopiatu diren datuak',
       retribuciones: 'Ordainsariak',
       votaciones: 'Bozketak',
@@ -321,6 +352,20 @@ export default area(es, {
 </ul>
 <p>Testuak libreak direnez, izenak adimen artifizialeko laguntzaile baten laguntzaz eta arau zorrotzekin aurkitu dira: testuan <strong>hitzez hitz</strong> agertzen diren izenak bakarrik (egiaztapen automatiko batek banan-banan egiaztatzen du), inoiz ez partikularrak eta inoiz ez aipamen orokorrak («enpresa pribatu bat»). Izen beraren aldaerak (maiuskulak, azentuak, «S.A.» edo «SA») elkartu egiten dira; eskuz egindako elkarketak <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a> fitxategian daude. Mota (enpresa, sektore publikoa, fundazioa…) zerrenda ordenatzeko baino ez da.</p>
 <p><strong>Erakunde bat agertzeak ez du esan nahi irregulartasunik edo interes-gatazkarik dagoenik:</strong> dokumentu horietan jasota dagoena da. Ez da haren harreman guztien zerrenda ere, dokumentu ofizialetan idatzita dagoenarena baizik.</p>`,
+      borme: `<p><a href="https://www.boe.es/diario_borme/">Merkataritza Erregistroko Aldizkari Ofizialak (BORME)</a> egunero argitaratzen ditu sozietateen egintza inskribatuak: eraketak, administratzaile, kontseilari eta ahaldunen izendapenak eta kargu-uzteak, bazkide bakarrak… BOEk <a href="https://www.boe.es/datosabiertos/">datu ireki</a> gisa eskaintzen ditu 2009tik.</p>
+<ul>
+<li>2009ko urtarriletik inskribatutako egintza guztiak berrikusi dira (9,6 milioi inguru, 126.000 probintzia-aldizkari baino gehiagotan), diputatu bakoitzaren izen osoa bilatuz, BORMEk idazten duen bezala (abizenak eta izena).</li>
+<li><strong>BORMEk ez du NANa argitaratzen.</strong> Izena bat etortzeak ez du frogatzen pertsona bera denik: Espainian ehunka pertsonak partekatzen dituzten izenak daude. Horregatik, <strong>beste dokumentu ofizial batek baieztatzen duenean bakarrik argitaratzen da kointzidentzia bat</strong>:
+<ul>
+<li>enpresa bera bere adierazpenetan, Kongresuak bere jarduerei buruz hartutako erabakietan edo bere fitxan agertzen da;</li>
+<li>diputatuak kargu bat adierazten duen leku edo administrazio bateko enpresa publikoa da (udalekoa, probintziakoa, uhartekoa…), adibidez zinegotzi bat bere udaleko enpresa baten kontseiluan;</li>
+<li>sozietateak bere izena eta abizena darama eta bere hauteskunde-barrutiko probintzian dago inskribatuta.</li>
+</ul></li>
+<li>Horrela baieztatu ezin diren kointzidentziak <strong>ez dira argitaratzen</strong>, izena gutxitan errepikatzen bada ere. Zenbat pertsonak izen bera duten kalkulatzeko <a href="https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177009&menu=resultados&idp=1254734710990">INEren izen eta abizenen estatistikak</a> erabiltzen dira, baina berrikusteko laguntza gisa bakarrik, inoiz ez argitaratzeko.</li>
+<li>Egintza bakoitzak boe.es-eko iragarki ofizialera eramaten du. Sozietateen izenak, egintzak eta karguak dauden bezala kopiatzen dira, BORMEren laburdurekin («Adm. Unico» administratzaile bakarra da; «Apo.Man.Soli», ahaldun mankomunatu eta solidarioa).</li>
+<li>BORMEko kargu batek ez du adierazten ordaintzen zen edo indarrean jarraitzen duen: argitaratutako egintza bakoitzaren data erakusten du. BORME 2009an hasten da; aurrekoa ez dago.</li>
+</ul>
+<p>Hori egiten duen kodea publikoa da: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (bilaketa) eta <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (baieztapena). Baieztatu gabeko kointzidentziak ez dira biltegira igotzen, gehienak beste pertsona batzuenak direlako.</p>`,
       revision: `<p>Aitorpenak PDF eskaneatu gisa argitaratzen dira, datu egituraturik gabe. Bakoitza eskuz kopiatu da PDFtik abiatuta, eta gero bigarren aldiz berrikusi da, errenkadaz errenkada (zorrak, bi transkripzio independenterekin, eta haien arteko aldeak PDFa begiratuta ebazten dira), 4. orriko oharrak eta haien balizko jarraipena barne. Irakurketa berretsi gaberen bat duten fitxek abisu bat (*) eta PDFrako esteka bat dute, egiaztatu ahal izateko. Errentak, kontuak, akzioak eta interesen aitorpenak PDFtik transkribatu dira, eta irakurketa automatiko (OCR) independente batekin alderatu: bat ez datorren zenbateko edo hitz bakoitza berriro begiratu da jatorrizkoan, handituta.</p>`,
       retribuciones: `<p>Diputatu bakoitzari bere agintaldian dagozkion 2026ko hileko zenbateko ofizialak erakusten dira, haren barrutiaren eta karguen arabera:</p>
 <ul>
@@ -364,6 +409,7 @@ export default area(es, {
       actividades: 'Cargos e actividades',
       intereses: 'Traballos anteriores e intereses',
       entidades: 'Empresas e entidades',
+      borme: 'Rexistro Mercantil (BORME)',
       revision: 'Como se copiaron os datos',
       retribuciones: 'Retribucións',
       votaciones: 'Votacións',
@@ -433,6 +479,20 @@ export default area(es, {
 </ul>
 <p>Os textos son libres, así que os nomes localizáronse coa axuda dun asistente de intelixencia artificial e con regras estritas: só nomes que aparecen <strong>literalmente</strong> no texto (unha comprobación automática verifícao un a un), nunca persoas particulares e nunca referencias xenéricas («unha empresa privada»). As variantes dun mesmo nome (maiúsculas, tiles, «S.A.» ou «SA») agrúpanse; as unións feitas a man están en <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a>. O tipo (empresa, sector público, fundación…) só serve para ordenar a lista.</p>
 <p><strong>Que apareza unha entidade non implica ningunha irregularidade nin conflito de intereses:</strong> é o que consta nesos documentos. Tampouco é unha lista completa das súas relacións, senón do que está por escrito en documentos oficiais.</p>`,
+      borme: `<p>O <a href="https://www.boe.es/diario_borme/">Boletín Oficial do Rexistro Mercantil (BORME)</a> publica cada día os actos inscritos das sociedades: constitucións, nomeamentos e cesamentos de administradores, conselleiros e apoderados, socios únicos… O BOE ofréceos como <a href="https://www.boe.es/datosabiertos/">datos abertos</a> desde 2009.</p>
+<ul>
+<li>Revisáronse todos os actos inscritos desde xaneiro de 2009 (uns 9,6 millóns en máis de 126.000 boletíns provinciais) buscando o nome completo de cada deputado tal como o escribe o BORME (apelidos e nome).</li>
+<li><strong>O BORME non publica o DNI.</strong> Que o nome coincida non demostra que sexa a mesma persoa: en España hai nomes que comparten centos de persoas. Por iso <strong>só se publica unha coincidencia cando outro documento oficial a confirma</strong>:
+<ul>
+<li>a mesma empresa aparece nas súas declaracións, nos acordos do Congreso sobre as súas actividades ou na súa ficha;</li>
+<li>é unha empresa pública (municipal, provincial, insular…) dun lugar ou dunha administración na que o deputado declara un cargo, como un concelleiro no consello dunha empresa do seu concello;</li>
+<li>a sociedade leva o seu nome e apelido e está inscrita na provincia da súa circunscrición.</li>
+</ul></li>
+<li>As coincidencias que non se poden confirmar así <strong>non se publican</strong>, aínda que o nome sexa pouco frecuente. Para estimar cantas persoas se chaman igual úsanse as estatísticas de <a href="https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177009&menu=resultados&idp=1254734710990">nomes e apelidos do INE</a>, pero só como axuda para revisalas, nunca para publicalas.</li>
+<li>Cada acto leva ao seu anuncio oficial en boe.es. Os nomes das sociedades, os actos e os cargos cópianse tal cal, coas abreviaturas do BORME («Adm. Unico» é administrador único; «Apo.Man.Soli», apoderado mancomunado e solidario).</li>
+<li>Un cargo no BORME non indica se se cobraba nin se segue vixente: mostra a data de cada acto publicado. O BORME comeza en 2009; o anterior non está.</li>
+</ul>
+<p>O código que o fai é público: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (busca) e <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (confirmación). As coincidencias sen confirmar non se soben ao repositorio, porque na súa maioría son doutras persoas.</p>`,
       revision: `<p>As declaracións publícanse como PDF escaneados, sen datos estruturados. Cada unha copiouse a man a partir do PDF e despois revisouse unha segunda vez, fila a fila (as débedas, con dúas transcricións independentes cuxas diferenzas se resolven mirando o PDF), incluídas as observacións da páxina 4 e a súa posible continuación. As fichas con algunha lectura non confirmada levan un aviso (*) e unha ligazón ao PDF para comprobalo. As rendas, contas, accións e declaracións de intereses transcribíronse do PDF e comparáronse cunha lectura automática (OCR) independente: cada importe ou palabra que non coincide volveuse mirar no orixinal ampliado.</p>`,
       retribuciones: `<p>Móstranse os importes mensuais oficiais de 2026 que lle corresponden a cada deputado durante o seu mandato, segundo a súa circunscrición e os seus cargos:</p>
 <ul>
@@ -476,6 +536,7 @@ export default area(es, {
       actividades: 'Positions and activities',
       intereses: 'Previous jobs and interests',
       entidades: 'Companies and organisations',
+      borme: 'Companies Register (BORME)',
       revision: 'How the data were copied',
       retribuciones: 'Pay',
       votaciones: 'Votes',
@@ -545,6 +606,20 @@ export default area(es, {
 </ul>
 <p>These are free texts, so the names were located with the help of an artificial intelligence assistant under strict rules: only names that appear <strong>word for word</strong> in the text (an automatic check verifies each one), never private individuals and never generic references (“a private company”). Variants of the same name (capitals, accents, “S.A.” or “SA”) are grouped; manual merges are listed in <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a>. The type (company, public sector, foundation…) is only used to sort the list.</p>
 <p><strong>An organisation appearing here does not imply any wrongdoing or conflict of interest:</strong> it is what those documents state. Nor is it a complete list of their relationships, only of what is written in official documents.</p>`,
+      borme: `<p>The <a href="https://www.boe.es/diario_borme/">Official Gazette of the Companies Register (BORME)</a> publishes the registered acts of companies every day: incorporations, appointments and resignations of directors, board members and attorneys, sole shareholders… The Official State Gazette provides them as <a href="https://www.boe.es/datosabiertos/">open data</a> from 2009.</p>
+<ul>
+<li>All registered acts since January 2009 (about 9.6 million in over 126,000 provincial gazettes) were searched for each member’s full name as the BORME writes it (surnames and first name).</li>
+<li><strong>The BORME does not publish ID numbers.</strong> A matching name does not prove it is the same person: in Spain some names are shared by hundreds of people. That is why <strong>a match is only published when another official document confirms it</strong>:
+<ul>
+<li>the same company appears in their declarations, in Congress decisions on their activities or in their profile;</li>
+<li>it is a public company (municipal, provincial, island…) of a place or administration where the member declares a position, such as a councillor on the board of a company owned by their town hall;</li>
+<li>the company bears their name and surname and is registered in the province of their constituency.</li>
+</ul></li>
+<li>Matches that cannot be confirmed this way <strong>are not published</strong>, even if the name is rare. The <a href="https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177009&menu=resultados&idp=1254734710990">National Statistics Institute’s name and surname statistics</a> are used to estimate how many people share a name, but only to help review them, never to publish them.</li>
+<li>Each act links to its official notice on boe.es. Company names, acts and positions are copied as published, with the BORME’s abbreviations (in Spanish: “Adm. Unico” is sole director; “Apo.Man.Soli”, joint and several attorney).</li>
+<li>A BORME position does not show whether it was paid or is still current: it shows the date of each published act. The BORME starts in 2009; earlier acts are not included.</li>
+</ul>
+<p>The code is public: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (search) and <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (confirmation). Unconfirmed matches are not uploaded to the repository, because most of them belong to other people.</p>`,
       revision: `<p>The declarations are published as scanned PDFs, with no structured data. Each one has been copied by hand from the PDF and then checked a second time, row by row (debts with two independent transcriptions, whose differences are resolved by looking at the PDF), including the remarks on page 4 and any continuation. Profiles with an unconfirmed reading carry a notice (*) and a link to the PDF so it can be checked. Income, accounts, shares and declarations of interests have been transcribed from the PDF and compared with an independent automatic reading (OCR): every amount or word that did not match has been checked again in the enlarged original.</p>`,
       retribuciones: `<p>This shows the official 2026 monthly amounts that correspond to each deputy during their term of office, according to their constituency and positions:</p>
 <ul>
