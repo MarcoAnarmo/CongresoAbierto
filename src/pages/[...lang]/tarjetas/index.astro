@@ -1,35 +1,38 @@
 ---
 /**
- * Galería de tarjetas para compartir, por tipos (pestañas): resumen, «Crea la tuya», votaciones, provincias y diputados.
+ * Galería de tarjetas para compartir, por tipos (pestañas): resumen, votaciones, provincias y diputados.
  * Al tocar una tarjeta se abre la ventana de compartir (DialogoCompartir, una sola por página) con la tarjeta grande,
  * los botones de redes y las descargas vertical y horizontal. Las imágenes solo se cargan al ver su pestaña.
- * Las provincias se filtran con un buscador; los diputados se buscan en un JSON (diputados.json) que se descarga
- * solo al abrir su pestaña. «Crea la tuya» dibuja en el navegador la tarjeta de cualquier votación o la comparación de
- * hasta 7 (src/scripts/tarjetas-votaciones.ts, como en Votaciones), con un atajo para las votaciones clave de vivienda;
- * el índice de votaciones (/datos/votaciones.json) se descarga solo al abrir esa pestaña.
- * Sin JavaScript se ven todas las tarjetas ya hechas y cada una abre su imagen.
+ * Provincias y diputados: una tarjeta de muestra y, al lado, la lista con buscador; al elegir uno, la muestra cambia
+ * (en el móvil se abre ya la ventana de compartir). Los diputados llegan en un JSON (diputados.json) que se descarga
+ * solo al abrir su pestaña; sin buscar se ven los que declaran más propiedades.
+ * Las tarjetas de cualquier votación y las comparaciones se crean en Votaciones (?crear=1): el aviso de arriba lleva allí.
+ * Sin JavaScript se ven las tarjetas ya hechas y cada una abre su imagen.
  */
 import Base from '../../../layouts/Base.astro';
 import DialogoCompartir from '../../../components/DialogoCompartir.astro';
 import Icono from '../../../components/Icono.astro';
 import Pestanas from '../../../components/Pestanas.astro';
-import TarjetasVotacion from '../../../components/TarjetasVotacion.astro';
-import { votaciones, votacionesPleno, url, grupos, circunscripciones } from '../../../lib/data';
+import { votaciones, diputados, url, grupos, circunscripciones, slug } from '../../../lib/data';
+import { nombreLegible } from '../../../lib/provincias';
 import { rutaTarjeta, temaCorto, compartir, type ModoHemiciclo } from '../../../lib/tarjetas';
-import { favorable, aItem, MAX_COMPARAR, type TextosLista } from '../../../lib/votaciones';
-import { rutasIdioma, idiomaDe, enlace, formatos, f, prefijo, LOCALE } from '../../../i18n';
-import textosVotaciones from '../../../i18n/textos/votaciones';
+import { favorable } from '../../../lib/votaciones';
+import { rutasIdioma, idiomaDe, enlace, formatos, f, pl, prefijo } from '../../../i18n';
 import textos from '../../../i18n/textos/tarjetas-pagina';
 import comun from '../../../i18n/textos/comun';
+import textosCompartir from '../../../i18n/textos/compartir';
 import { sinTildes } from '../../../lib/texto';
 
 export const getStaticPaths = rutasIdioma;
 const lang = idiomaDe(Astro.params.lang);
 const t = textos[lang];
-const { fecha: fmtFecha } = formatos(lang);
-const resultados = comun[lang].resultado as Record<string, string>;
+const tc = comun[lang];
+const tco = textosCompartir[lang];
+const { fecha: fmtFecha, comparar } = formatos(lang);
+const resultados = tc.resultado as Record<string, string>;
 const r = rutaTarjeta;
 const norm = (s: string) => sinTildes(s).toLowerCase();
+const dip = (n: number) => pl(n, tc.palabras.diputados, lang);
 
 const vots = [...votaciones].sort((a, b) => b.fecha.localeCompare(a.fecha));
 const MODOS: ModoHemiciclo[] = ['grupo', 'propiedades', 'viviendas'];
@@ -39,31 +42,32 @@ const datos = (historia: string, horizontal: string, nombre: string, c: { enlace
   'data-nombre': nombre, 'data-enlace': c.enlace, 'data-ct': c.texto, 'data-titulo': titulo,
   'aria-label': f(t.abrir, { nombre: titulo }), 'aria-haspopup': 'dialog' as const,
 });
-// «Crea la tuya»: atajo con las votaciones clave de vivienda (con voto por grupo), de la más antigua a la más reciente
-const vivienda = vots.filter((v) => v.temas?.includes('vivienda') && v.porGrupo?.length).slice(0, MAX_COMPARAR).reverse();
-const idsVivienda = new Set(vivienda.map((v) => v.id));
-const tv = textosVotaciones[lang].cliente;
-const lista: TextosLista = { ...tv.lista, locale: LOCALE[lang], resultados: { ...comun[lang].resultado, ...tv.lista.resultados } };
+const sinHref = ({ href: _, ...x }: ReturnType<typeof datos>) => x;
+// Provincias: cuántos diputados elige cada una; muestra inicial, Barcelona
+const nDip = (nombre: string) => diputados.filter((d) => d.circunscripcion === nombre).length;
+const provIni = circunscripciones.find((c) => c.id === 'barcelona') ?? circunscripciones[0];
+// Diputados: muestra inicial, quien declara más propiedades
+const dipIni = [...diputados].sort((a, b) => (b.patrimonio.propiedades ?? -1) - (a.patrimonio.propiedades ?? -1) || comparar(a.apellidos, b.apellidos))[0];
+const subDip = (d: typeof dipIni) => `${d.grupoCorto} · ${nombreLegible(d.circunscripcion)}`;
 const config = {
   json: url(`${prefijo(lang)}/tarjetas/diputados.json`),
   colores: Object.fromEntries(grupos.map((g) => [g.corto, g.color])),
-  abrir: t.abrir, sinResultados: t.sinResultados, mas: t.masResultados,
-  crea: t.crea, lista, compartirTexto: tv.compartirTexto, cuenta: tv.cuenta,
-  clave: votacionesPleno.filter((v) => idsVivienda.has(v.id)).map(aItem),
+  abrir: t.abrir, sinResultados: t.sinResultados, mas: t.masResultados, masPropiedades: t.masPropiedades,
+  diputados: tc.palabras.diputados, propiedades: tc.palabras.propiedades,
 };
 const PESTANAS = [
   { id: 'resumen', texto: t.categorias.resumen, icono: 'hemiciclo' as const },
-  { id: 'crea', texto: t.categorias.crea, icono: 'sumar' as const },
   { id: 'votaciones', texto: t.categorias.votaciones, icono: 'votaciones' as const },
   { id: 'provincias', texto: t.categorias.provincias, icono: 'mapa' as const },
   { id: 'diputados', texto: t.categorias.diputados, icono: 'fichas' as const },
 ];
+const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="#i-compartir" /></svg>';
 ---
 <Base title={t.titulo} imagen={r.pagina('tarjetas')} description={t.descripcion}>
   <h1>{t.titulo}</h1>
   <p class="lead">{t.lead}</p>
 
-  <a class="crear" href={enlace('/votaciones', lang)} data-ir="crea">
+  <a class="crear" href={`${enlace('/votaciones', lang)}?crear=1`}>
     <span class="crear-ico" aria-hidden="true"><Icono n="imagen" tam={24} /></span>
     <span class="crear-txt"><strong>{t.crear.titulo}</strong><span>{t.crear.texto}</span></span>
     <span class="crear-ir"><span class="crear-boton">{t.crear.boton}</span><Icono n="derecha" tam={20} /></span>
@@ -85,31 +89,6 @@ const PESTANAS = [
     </ul>
   </section>
 
-  <section class="panel-pestana" id="crea" role="tabpanel" aria-labelledby="tab-crea">
-    <h2 class="panel-tit">{t.categorias.crea}</h2>
-    <p class="crea-intro">{t.crea.intro}</p>
-    <div class="destacada">
-      <div class="dest-cab">
-        <span class="crear-ico" aria-hidden="true"><Icono n="vivienda" tam={24} /></span>
-        <div><h3>{f(t.crea.vivienda, { n: vivienda.length })}</h3><p>{t.crea.viviendaTexto}</p></div>
-      </div>
-      <ol class="dest-lista" role="list">
-        {vivienda.map((v) => <li><span class="dest-nombre">{temaCorto(v.tema)}</span><span class:list={['res', favorable(v.resultado)]}>{resultados[v.resultado] ?? v.resultado}</span></li>)}
-      </ol>
-      <button class="btn primario dest-boton" type="button" id="t-vivienda" data-ids={vivienda.map((v) => v.id).join(',')}><Icono n="imagen" tam={20} />{t.crea.viviendaBoton}</button>
-      <p class="small c-aviso" id="t-vivienda-aviso" role="status"></p>
-    </div>
-    <h3 class="sub" id="t-cv-tit">{t.crea.recientes}</h3>
-    <label class="buscador">
-      <Icono n="buscar" tam={20} />
-      <span class="sr-only">{t.crea.buscar}</span>
-      <input type="search" id="t-cv" placeholder={t.crea.buscar} autocomplete="off" enterkeyhint="search" />
-    </label>
-    <ul class="cvs" role="list" id="t-cv-lista" aria-live="polite" aria-busy="true"><li class="muted small">{t.crea.cargando}</li></ul>
-    <p class="vacio muted small" id="t-cv-mas" hidden></p>
-    <p class="small muted">{t.crea.nota}</p>
-  </section>
-
   <section class="panel-pestana" id="votaciones" role="tabpanel" aria-labelledby="tab-votaciones">
     <h2 class="panel-tit">{t.votaciones}</h2>
     <ul class="galeria" role="list">
@@ -127,165 +106,194 @@ const PESTANAS = [
     </ul>
   </section>
 
+  <!-- Provincias: muestra (Barcelona) y lista con buscador -->
   <section class="panel-pestana" id="provincias" role="tabpanel" aria-labelledby="tab-provincias">
     <h2 class="panel-tit">{t.provincia}</h2>
-    <label class="buscador">
-      <Icono n="buscar" tam={20} />
-      <span class="sr-only">{t.buscarProvincia}</span>
-      <input type="search" id="t-prov" placeholder={t.buscarProvincia} autocomplete="off" enterkeyhint="search" />
-    </label>
-    <ul class="lista" role="list" id="t-prov-lista">
-      {circunscripciones.map((c) => (
-        <li data-n={norm(c.legible)}>
-          <a class="fila" {...datos(r.provincia(c.id, 'historia', lang), r.provincia(c.id, 'horizontal', lang), `congreso-abierto-${c.id}`, compartir.provincia(c.id, lang), c.legible)}>
-            <span class="f-nombre">{c.legible}</span><span class="f-ico" aria-hidden="true"><svg width="18" height="18"><use href="#i-compartir" /></svg></span>
-          </a>
-        </li>
-      ))}
-    </ul>
-    <p class="vacio muted" id="t-prov-vacio" hidden>{t.sinResultados}</p>
+    <div class="elige" data-elige="prov">
+      <figure class="muestra">
+        <button type="button" class="m-img" tabindex="-1" aria-hidden="true">
+          <img src={url(r.provincia(provIni.id, 'historia', lang))} alt={f(t.altProvincia, { provincia: provIni.legible })} width="270" height="480" loading="lazy" decoding="async" />
+        </button>
+        <figcaption>
+          <strong class="m-nombre">{provIni.legible}</strong>
+          <span class="m-sub">{dip(nDip(provIni.nombre))}</span>
+          <button type="button" class="btn primario m-compartir" {...sinHref(datos(r.provincia(provIni.id, 'historia', lang), r.provincia(provIni.id, 'horizontal', lang), `congreso-abierto-${provIni.id}`, compartir.provincia(provIni.id, lang), provIni.legible))}><Fragment set:html={icoCompartir} />{tco.ui.dialogo}</button>
+          <span class="m-ayuda small muted">{t.ejemplo}</span>
+        </figcaption>
+      </figure>
+      <div class="e-lista">
+        <label class="buscador">
+          <Icono n="buscar" tam={20} />
+          <span class="sr-only">{t.buscarProvincia}</span>
+          <input type="search" data-filtro placeholder={t.buscarProvincia} autocomplete="off" enterkeyhint="search" />
+        </label>
+        <ul class="lista" role="list">
+          {circunscripciones.map((c) => (
+            <li data-n={norm(c.legible)}>
+              <a class="fila" href={url(r.provincia(c.id, 'historia', lang))} aria-current={c.id === provIni.id ? 'true' : undefined}
+                data-t-historia={url(r.provincia(c.id, 'historia', lang))} data-t-horizontal={url(r.provincia(c.id, 'horizontal', lang))}
+                data-t-nombre={`congreso-abierto-${c.id}`} data-t-enlace={compartir.provincia(c.id, lang).enlace} data-t-ct={compartir.provincia(c.id, lang).texto}
+                data-t-titulo={c.legible} data-t-sub={dip(nDip(c.nombre))} data-t-alt={f(t.altProvincia, { provincia: c.legible })}>
+                <span class="f-nombre">{c.legible}<span class="f-sub">{dip(nDip(c.nombre))}</span></span><Icono n="derecha" tam={18} class="f-ir" />
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="vacio muted small" data-vacio hidden>{t.sinResultados}</p>
+      </div>
+    </div>
   </section>
 
+  <!-- Diputados: muestra (quien declara más propiedades) y lista con buscador -->
   <section class="panel-pestana" id="diputados" role="tabpanel" aria-labelledby="tab-diputados">
     <h2 class="panel-tit">{t.diputado}</h2>
-    <label class="buscador">
-      <Icono n="buscar" tam={20} />
-      <span class="sr-only">{t.buscarDiputado}</span>
-      <input type="search" id="t-dip" placeholder={t.buscarDiputado} autocomplete="off" enterkeyhint="search" />
-    </label>
-    <ul class="lista" role="list" id="t-dip-lista" aria-live="polite"></ul>
-    <p class="vacio muted small" id="t-dip-mas" hidden></p>
-    <p class="small muted tambien" set:html={f(t.tambien, { enlace: `<a href="${enlace('/diputados', lang)}">${t.fichaEnlace}</a>` })} />
+    <div class="elige" data-elige="dip">
+      <figure class="muestra">
+        <button type="button" class="m-img" tabindex="-1" aria-hidden="true">
+          <img src={url(r.diputado(dipIni, 'historia', lang))} alt={f(t.altDiputado, { nombre: dipIni.nombreCompleto })} width="270" height="480" loading="lazy" decoding="async" />
+        </button>
+        <figcaption>
+          <strong class="m-nombre">{dipIni.nombreCompleto}</strong>
+          <span class="m-sub">{subDip(dipIni)}</span>
+          <button type="button" class="btn primario m-compartir" data-compartir={slug(dipIni)} data-cn={dipIni.nombreCompleto} data-ct={compartir.diputado(dipIni, lang).texto} aria-haspopup="dialog" aria-label={f(t.abrir, { nombre: dipIni.nombreCompleto })}><Fragment set:html={icoCompartir} />{tco.ui.dialogo}</button>
+          <span class="m-ayuda small muted">{t.ejemplo}</span>
+        </figcaption>
+      </figure>
+      <div class="e-lista">
+        <label class="buscador">
+          <Icono n="buscar" tam={20} />
+          <span class="sr-only">{t.buscarDiputado}</span>
+          <input type="search" data-filtro placeholder={t.buscarDiputado} autocomplete="off" enterkeyhint="search" />
+        </label>
+        <p class="e-tit small" id="t-dip-tit">{t.masPropiedades}</p>
+        <ul class="lista" role="list" id="t-dip-lista" aria-live="polite"></ul>
+        <p class="vacio muted small" id="t-dip-mas" hidden></p>
+        <p class="small muted tambien" set:html={f(t.tambien, { enlace: `<a href="${enlace('/diputados', lang)}">${t.fichaEnlace}</a>` })} />
+      </div>
+    </div>
   </section>
 
   <DialogoCompartir />
-  <TarjetasVotacion />
   <script type="application/json" id="tarjetas-cfg" set:html={JSON.stringify(config).replace(/</g, '\\u003c')} />
 </Base>
 
 <script>
   import { sinTildes } from '../../../lib/texto';
-  import { f, pl, fmtFecha, prefijo, base } from '../../../i18n/cliente';
-  import { normalizar, palabrasDe, coincide, totalesTexto, resultadoTexto, favorable, textoCompartirVotacion, type ItemVotacion, type TextosLista } from '../../../lib/votaciones';
-  import { iniciarTarjetasVotacion } from '../../../scripts/tarjetas-votaciones';
-  import type T from '../../../i18n/textos/tarjetas-pagina';
+  import { f, pl, prefijo } from '../../../i18n/cliente';
   const cfg = JSON.parse(document.getElementById('tarjetas-cfg')!.textContent!) as {
-    json: string; colores: Record<string, string>; abrir: string; sinResultados: string; mas: [string, string];
-    crea: (typeof T)['es']['crea']; lista: TextosLista; compartirTexto: string; cuenta: [string, string]; clave: ItemVotacion[];
+    json: string; colores: Record<string, string>; abrir: string; sinResultados: string; mas: [string, string]; masPropiedades: string;
+    diputados: [string, string]; propiedades: [string, string];
   };
   const norm = (s: string) => sinTildes(s).toLowerCase().trim();
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const movil = matchMedia('(max-width: 720px)');
 
-  // ---------- Provincias: filtrar la lista ----------
-  const prov = document.getElementById('t-prov') as HTMLInputElement;
-  const filasProv = [...document.querySelectorAll<HTMLElement>('#t-prov-lista > li')];
+  /** Muestra de una tarjeta (provincia o diputado) con su botón de compartir. */
+  function muestra(raiz: HTMLElement) {
+    const img = raiz.querySelector<HTMLImageElement>('.muestra img')!;
+    const boton = raiz.querySelector<HTMLButtonElement>('.m-compartir')!;
+    raiz.querySelector('.m-img')!.addEventListener('click', () => boton.click());
+    return (d: { historia: string; titulo: string; sub: string; alt: string; datos: Record<string, string> }) => {
+      img.src = d.historia;
+      img.alt = d.alt;
+      raiz.querySelector('.m-nombre')!.textContent = d.titulo;
+      raiz.querySelector('.m-sub')!.textContent = d.sub;
+      // Datos para la ventana de compartir: los de antes se borran (provincia: rutas completas; diputado: solo el slug)
+      Object.keys(boton.dataset).forEach((k) => delete boton.dataset[k]);
+      Object.assign(boton.dataset, d.datos);
+      boton.setAttribute('aria-label', f(cfg.abrir, { nombre: d.titulo }));
+      // En el móvil la muestra puede quedar fuera de la vista: se abre ya la ventana de compartir
+      if (movil.matches) boton.click();
+    };
+  }
+  const marcar = (lista: HTMLElement, el: Element) => lista.querySelectorAll('[aria-current]').forEach((x) => x !== el && x.removeAttribute('aria-current'));
+
+  // ---------- Provincias ----------
+  const prov = document.querySelector<HTMLElement>('[data-elige="prov"]')!;
+  const provLista = prov.querySelector<HTMLElement>('.lista')!;
+  const provFiltro = prov.querySelector<HTMLInputElement>('[data-filtro]')!;
+  const mostrarProv = muestra(prov);
   const filtrarProv = () => {
-    const q = norm(prov.value);
+    const q = norm(provFiltro.value);
     let n = 0;
-    filasProv.forEach((li) => { const si = !q || li.dataset.n!.includes(q); li.hidden = !si; if (si) n++; });
-    document.getElementById('t-prov-vacio')!.hidden = n > 0;
+    provLista.querySelectorAll<HTMLElement>('li').forEach((li) => { const si = !q || li.dataset.n!.includes(q); li.hidden = !si; if (si) n++; });
+    prov.querySelector<HTMLElement>('[data-vacio]')!.hidden = n > 0;
   };
-  prov.addEventListener('input', filtrarProv);
+  provFiltro.addEventListener('input', filtrarProv);
+  provLista.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a.fila');
+    if (!a) return;
+    e.preventDefault();
+    const x = a.dataset;
+    a.setAttribute('aria-current', 'true');
+    marcar(provLista, a);
+    mostrarProv({
+      historia: x.tHistoria!, titulo: x.tTitulo!, sub: x.tSub!, alt: x.tAlt!,
+      datos: { compartir: x.tNombre!, historia: x.tHistoria!, horizontal: x.tHorizontal!, nombre: x.tNombre!, enlace: x.tEnlace!, ct: x.tCt!, titulo: x.tTitulo! },
+    });
+  });
 
-  // ---------- Diputados: se descargan al abrir su pestaña y se buscan por nombre, grupo o provincia ----------
-  type Fila = [slug: string, nombre: string, grupo: string, provincia: string, texto: string];
-  const MAX = 30;
-  const dip = document.getElementById('t-dip') as HTMLInputElement;
+  // ---------- Diputados: se descargan al abrir su pestaña ----------
+  type Fila = [slug: string, nombre: string, grupo: string, provincia: string, texto: string, propiedades: number | null];
+  const MAX = 15;
+  const dipRaiz = document.querySelector<HTMLElement>('[data-elige="dip"]')!;
+  const dipFiltro = dipRaiz.querySelector<HTMLInputElement>('[data-filtro]')!;
   const lista = document.getElementById('t-dip-lista')!;
   const mas = document.getElementById('t-dip-mas')!;
-  let filas: (Fila & { q?: string })[] | null = null;
+  const titulo = document.getElementById('t-dip-tit')!;
+  const mostrarDip = muestra(dipRaiz);
+  let filas: Fila[] | null = null;
   let indice: string[] = [];
+  let porPropiedades: number[] = [];
   let cargando: Promise<void> | null = null;
   const cargar = () => (cargando ??= fetch(cfg.json).then((r) => r.json()).then((x: Fila[]) => {
     filas = x;
     indice = x.map(([, n, g, p]) => norm(`${n} ${g} ${p}`));
+    // Sin buscar: quienes declaran más propiedades (y, a igualdad, por apellidos, como llega la lista)
+    porPropiedades = x.map((_, i) => i).sort((a, b) => (x[b][5] ?? -1) - (x[a][5] ?? -1) || a - b);
     pintar();
   }).catch(() => { cargando = null; }));
   function pintar() {
     if (!filas) return;
-    const palabras = norm(dip.value).split(/\s+/).filter(Boolean);
-    const hallados = filas.filter((_, i) => palabras.every((w) => indice[i].includes(w)));
-    lista.innerHTML = hallados.slice(0, MAX).map(([s, n, g, p, t]) =>
-      `<li><button type="button" class="fila" data-compartir="${esc(s)}" data-cn="${esc(n)}" data-ct="${esc(t)}" aria-haspopup="dialog" aria-label="${esc(f(cfg.abrir, { nombre: n }))}">`
-      + `<span class="dot" style="background:${esc(cfg.colores[g] ?? 'var(--muted)')}"></span><span class="f-nombre">${esc(n)}<span class="f-sub">${esc(g)} · ${esc(p)}</span></span>`
-      + '<span class="f-ico" aria-hidden="true"><svg width="18" height="18"><use href="#i-compartir" /></svg></span></button></li>').join('');
+    const palabras = norm(dipFiltro.value).split(/\s+/).filter(Boolean);
+    const hallados = palabras.length ? filas.map((_, i) => i).filter((i) => palabras.every((w) => indice[i].includes(w))) : porPropiedades;
+    titulo.textContent = palabras.length ? pl(hallados.length, cfg.diputados) : cfg.masPropiedades;
+    const actual = lista.querySelector<HTMLElement>('[aria-current]')?.dataset.slug;
+    lista.innerHTML = hallados.slice(0, MAX).map((i) => {
+      const [s, n, g, p, , prop] = filas![i];
+      return `<li><button type="button" class="fila" data-i="${i}" data-slug="${esc(s)}"${s === actual ? ' aria-current="true"' : ''}>`
+        + `<span class="dot" style="background:${esc(cfg.colores[g] ?? 'var(--muted)')}"></span><span class="f-nombre">${esc(n)}<span class="f-sub">${esc(g)} · ${esc(p)}</span></span>`
+        + (prop ? `<span class="f-n">${esc(pl(prop, cfg.propiedades))}</span>` : '')
+        + '</button></li>';
+    }).join('');
     const resto = hallados.length - MAX;
     mas.hidden = !(resto > 0 || !hallados.length);
     mas.textContent = !hallados.length ? cfg.sinResultados : resto > 0 ? pl(resto, cfg.mas) : '';
   }
-  let espera = 0;
-  dip.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(pintar, 120); });
-  dip.addEventListener('focus', cargar, { once: true });
-  const panelDip = document.getElementById('diputados')!;
-  document.addEventListener('pestana', (e) => { if ((e as CustomEvent<string>).detail === 'diputados') cargar(); });
-  if (panelDip.hasAttribute('data-activo')) cargar();
-
-  // ---------- Crea la tuya: tarjeta de cualquier votación o comparación de varias ----------
-  const porId = new Map(cfg.clave.map((i) => [i.id, i]));
-  const tarjetas = iniciarTarjetasVotacion({
-    buscar: (id) => porId.get(id), prefijo: prefijo(),
-    textoCompartir: (i) => textoCompartirVotacion(i, cfg.compartirTexto, cfg.lista, (iso) => fmtFecha(iso)),
+  lista.addEventListener('click', (e) => {
+    const b = (e.target as Element).closest<HTMLButtonElement>('.fila');
+    if (!b || !filas) return;
+    const [s, n, g, p, texto] = filas[Number(b.dataset.i)];
+    b.setAttribute('aria-current', 'true');
+    marcar(lista, b);
+    const historia = `${prefijo()}/tarjetas/historia/diputado/${s}.png`;
+    mostrarDip({ historia, titulo: n, sub: `${g} · ${p}`, alt: n, datos: { compartir: s, cn: n, ct: texto } });
   });
-  const botonViv = document.getElementById('t-vivienda') as HTMLButtonElement;
-  botonViv.addEventListener('click', () => tarjetas.comparar(botonViv.dataset.ids!.split(','), botonViv, document.getElementById('t-vivienda-aviso')!));
-
-  // Sin buscar, solo las más recientes; buscando, más resultados
-  const CV_RECIENTES = 10, CV_MAX = 30;
-  const cvInput = document.getElementById('t-cv') as HTMLInputElement;
-  const cvLista = document.getElementById('t-cv-lista')!;
-  const cvMas = document.getElementById('t-cv-mas')!;
-  const cvTit = document.getElementById('t-cv-tit')!;
-  let votos: { i: ItemVotacion; q: string }[] | null = null;
-  let cargandoVotos: Promise<void> | null = null;
-  // Solo las que tienen el voto de cada grupo (las demás no tienen tarjeta), de la más reciente a la más antigua
-  const cargarVotaciones = () => (cargandoVotos ??= fetch(`${base()}/datos/votaciones.json`).then((r) => r.json()).then((xs: ItemVotacion[]) => {
-    votos = xs.filter((i) => i.g?.length && !i.pe && !i.nv).map((i) => ({ i, q: normalizar([i.c, i.t, i.d, i.tp].filter(Boolean).join(' ')) }));
-    votos.forEach(({ i }) => porId.set(i.id, i));
-    pintarVotaciones();
-    tarjetas.pintarBarra();
-  }).catch(() => {
-    cargandoVotos = null;
-    cvLista.innerHTML = `<li class="muted small">${esc(cfg.crea.error)}</li>`;
-  }));
-  function filaVotacion(i: ItemVotacion) {
-    return `<li class="cv"><p class="cv-meta"><time datetime="${i.f}">${esc(fmtFecha(i.f))}</time><span class="res ${favorable(i.r)}">${esc(resultadoTexto(i.r, cfg.lista))}</span></p>`
-      + `<p class="cv-tit">${esc(i.c ?? i.t)}</p>${i.d ? `<p class="cv-d">${esc(i.d)}</p>` : ''}`
-      + `<p class="cv-n">${esc(totalesTexto(i.to, cfg.lista))}</p>${tarjetas.botones(i)}</li>`;
-  }
-  function pintarVotaciones() {
-    if (!votos) return;
-    const palabras = palabrasDe(cvInput.value);
-    const hallados = palabras.length ? votos.filter((x) => coincide(x.q, palabras)) : votos;
-    cvTit.textContent = palabras.length ? pl(hallados.length, cfg.cuenta) : cfg.crea.recientes;
-    const max = palabras.length ? CV_MAX : CV_RECIENTES;
-    cvLista.innerHTML = hallados.slice(0, max).map((x) => filaVotacion(x.i)).join('');
-    cvLista.removeAttribute('aria-busy');
-    cvLista.querySelectorAll<HTMLElement>('li.cv').forEach((li) => tarjetas.conectar(li));
-    const resto = hallados.length - max;
-    cvMas.hidden = !(resto > 0 || !hallados.length);
-    cvMas.textContent = !hallados.length ? cfg.sinResultados : resto > 0 ? pl(resto, cfg.mas) : '';
-  }
-  let esperaCv = 0;
-  cvInput.addEventListener('input', () => { clearTimeout(esperaCv); esperaCv = window.setTimeout(pintarVotaciones, 150); });
-  cvInput.addEventListener('focus', cargarVotaciones, { once: true });
-  document.addEventListener('pestana', (e) => { if ((e as CustomEvent<string>).detail === 'crea') cargarVotaciones(); });
-  if (document.getElementById('crea')!.hasAttribute('data-activo')) cargarVotaciones();
-  // Un enlace con votaciones para comparar (?comparar=…) abre «Crea la tuya» con ellas ya elegidas
-  if (tarjetas.seleccion().length) {
-    cargarVotaciones();
-    if (!location.hash) { history.replaceState(history.state, '', `${location.pathname}${location.search}#crea`); dispatchEvent(new HashChangeEvent('hashchange')); }
-  }
-
+  let espera = 0;
+  dipFiltro.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(pintar, 120); });
+  dipFiltro.addEventListener('focus', cargar, { once: true });
+  document.addEventListener('pestana', (e) => { if ((e as CustomEvent<string>).detail === 'diputados') cargar(); });
+  if (document.getElementById('diputados')!.hasAttribute('data-activo')) cargar();
   // El navegador puede recordar lo escrito al volver atrás
-  addEventListener('pageshow', () => { filtrarProv(); if (filas) pintar(); if (votos) pintarVotaciones(); });
+  addEventListener('pageshow', () => { filtrarProv(); if (filas) pintar(); });
 </script>
 
 <style>
   h1 { margin-bottom: .3rem; }
   .lead { margin-top: 0; }
-  /* Crear la tarjeta de cualquier votación */
+  /* Crear la tarjeta de cualquier votación: lleva a Votaciones */
   .crear {
-    display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px 14px; margin: 16px 0 20px; padding: 14px 16px;
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px 14px; margin: 16px 0 20px; padding: 14px 16px;
     border-radius: 16px; text-decoration: none; color: var(--text); background: var(--accent-soft);
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); transition: box-shadow .15s;
   }
@@ -293,7 +301,6 @@ const PESTANAS = [
   .crear-ico { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: var(--surface); color: var(--accent-text); }
   .crear-txt { display: flex; flex-direction: column; gap: 2px; line-height: 1.35; }
   .crear-txt span { font-size: .88rem; color: var(--muted); }
-  .crear { grid-template-columns: auto minmax(0, 1fr) auto; }
   .crear-ir { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 40px; min-height: 40px; border-radius: 12px; background: var(--accent-strong); color: #fff; font-weight: 650; }
   .crear-boton { display: none; }
   @media (min-width: 721px) {
@@ -304,20 +311,20 @@ const PESTANAS = [
 
   .panel-tit { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   :global(html:not(.js)) .panel-tit { position: static; width: auto; height: auto; clip: auto; }
-  .panel-pestana { scroll-margin-top: calc(var(--tope) + 72px); }
+  .panel-pestana { scroll-margin-top: calc(var(--tope) + 90px); }
 
   /* Galería de tarjetas verticales */
   .galeria { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
   @media (min-width: 600px) { .galeria { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 18px; } }
   @media (min-width: 1000px) { .galeria { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
   .tarjeta { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: var(--text); -webkit-tap-highlight-color: transparent; }
-  .tarjeta img {
+  .tarjeta img, .muestra img {
     display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 14px; background: var(--chip);
     box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .08); outline: 1px solid var(--border); outline-offset: -1px;
     transition: transform .2s ease, box-shadow .2s ease;
   }
   .tarjeta:hover { color: var(--text); }
-  .tarjeta:hover img { transform: translateY(-3px); box-shadow: 0 2px 4px rgb(0 0 0 / .08), 0 16px 36px rgb(0 0 0 / .14); }
+  .tarjeta:hover img, .m-img:hover img { transform: translateY(-3px); box-shadow: 0 2px 4px rgb(0 0 0 / .08), 0 16px 36px rgb(0 0 0 / .14); }
   .tarjeta:active img { transform: scale(.98); }
   .t-pie { display: flex; flex-direction: column; gap: 4px; line-height: 1.3; font-size: .9rem; }
   .t-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: .8rem; color: var(--muted); }
@@ -327,63 +334,42 @@ const PESTANAS = [
   :global(:root[data-theme='dark']) .res.si { color: #7fd287; }
   :global(:root[data-theme='dark']) .res.no { color: #ff8a80; }
 
-  /* Provincias y diputados: buscador y lista */
-  .buscador { position: relative; display: block; max-width: 520px; margin: 0 0 12px; }
+  /* Provincias y diputados: muestra y lista con buscador */
+  .elige { display: grid; gap: 16px; }
+  .muestra { margin: 0; display: grid; grid-template-columns: 42% minmax(0, 1fr); gap: 14px; align-items: end; }
+  .m-img { display: block; padding: 0; border: 0; background: none; cursor: pointer; }
+  .muestra figcaption { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; padding-bottom: 4px; }
+  .m-nombre { font-size: 1.1rem; line-height: 1.25; overflow-wrap: anywhere; }
+  .m-sub { color: var(--muted); font-size: .88rem; }
+  .m-compartir { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; border-radius: 12px; padding: 8px 16px; }
+  .m-ayuda { margin-top: 6px; }
+  .e-lista { min-width: 0; }
+  .e-tit { margin: 0 0 8px; font-weight: 650; color: var(--muted); }
+  .buscador { position: relative; display: block; margin: 0 0 10px; }
   .buscador :global(svg) { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
   .buscador input { width: 100%; min-height: 50px; padding: 10px 14px 10px 44px; border-radius: 14px; font-size: 1rem; }
-  .lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-  @media (min-width: 600px) { .lista { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (min-width: 1000px) { .lista { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .lista {
+    list-style: none; margin: 0; padding: 6px; display: grid; gap: 2px; max-height: min(56vh, 520px); overflow-y: auto; overscroll-behavior: contain;
+    border: 1px solid var(--border); border-radius: 16px; background: var(--surface);
+  }
   .lista li[hidden] { display: none; }
   .lista :global(.fila) {
-    width: 100%; display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 8px 12px 8px 16px; border: 1px solid var(--border);
-    border-radius: 14px; background: var(--surface); color: var(--text); text-decoration: none; text-align: left; font-weight: 600; cursor: pointer;
-    transition: border-color .15s, background-color .15s;
+    width: 100%; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 10px 6px 12px; border: 0; border-radius: 12px;
+    background: none; color: var(--text); text-decoration: none; text-align: left; font-weight: 600; cursor: pointer; transition: background-color .12s;
   }
-  .lista :global(.fila:hover) { border-color: var(--accent); color: var(--text); }
-  .lista :global(.fila:active) { background: var(--accent-soft); }
+  .lista :global(.fila:hover) { background: var(--chip); color: var(--text); }
+  .lista :global(.fila[aria-current]) { background: var(--accent-soft); color: var(--accent-text); }
   .lista :global(.f-nombre) { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
   .lista :global(.f-sub) { font-size: .8rem; font-weight: 450; color: var(--muted); }
-  .lista :global(.f-ico) { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; background: var(--chip); color: var(--muted); }
-  .lista :global(.fila:hover .f-ico) { background: var(--accent-soft); color: var(--accent-text); }
+  .lista :global(.f-n) { flex: none; font-size: .78rem; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .lista :global(.f-ir) { flex: none; color: var(--muted); }
   .lista :global(.dot) { width: 10px; height: 10px; }
-  .vacio { margin: 12px 0 0; }
-
-  /* Crea la tuya */
-  .crea-intro { margin: 0 0 16px; max-width: 70ch; color: var(--muted); }
-  .destacada { padding: 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 26px; }
-  .dest-cab { display: flex; gap: 14px; align-items: flex-start; }
-  .dest-cab .crear-ico { flex: none; background: var(--accent-soft); }
-  .dest-cab h3 { margin: 2px 0 2px; font-size: 1.05rem; }
-  .dest-cab p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.4; }
-  .dest-lista { list-style: none; margin: 14px 0; padding: 0; display: grid; gap: 0; counter-reset: v; }
-  .dest-lista li { counter-increment: v; display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: .9rem; }
-  .dest-lista li::before { content: counter(v); flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--chip); color: var(--muted); font-size: .75rem; font-weight: 700; }
-  .dest-nombre { flex: 1; min-width: 0; font-weight: 600; }
-  .dest-boton { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; border-radius: 14px; }
-  .dest-boton[aria-busy='true'] { opacity: .65; }
-  .c-aviso, :global(.cv .c-aviso) { margin: 6px 0 0; color: var(--muted); }
-  .c-aviso:empty, :global(.cv .c-aviso:empty) { display: none; }
-  @media (min-width: 900px) {
-    .destacada { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 8px 28px; padding: 22px 24px; align-items: start; }
-    .dest-cab, .dest-boton { grid-column: 1; }
-    .dest-lista { grid-column: 2; grid-row: 1 / span 3; margin: 0; }
-    .dest-boton { width: auto; justify-self: start; padding: 0 22px; margin-top: 8px; }
+  .vacio { margin: 10px 0 0; }
+  .tambien { margin-top: 12px; }
+  @media (min-width: 721px) {
+    .elige { grid-template-columns: 280px minmax(0, 1fr); gap: 28px; align-items: start; }
+    .muestra { grid-template-columns: 1fr; align-items: start; position: sticky; top: 90px; }
+    .lista { max-height: 560px; }
   }
-  .sub { font-size: 1rem; margin: 0 0 10px; }
-  .cvs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-  @media (min-width: 900px) { .cvs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .cvs :global(.cv) { display: flex; flex-direction: column; padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); min-width: 0; }
-  .cvs :global(.cv-meta) { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 0 4px; font-size: .8rem; color: var(--muted); }
-  .cvs :global(.cv-tit) { margin: 0; font-weight: 650; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .cvs :global(.cv-d) { margin: 2px 0 0; font-size: .82rem; color: var(--muted); }
-  .cvs :global(.cv-n) { margin: 4px 0 0; font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .cvs :global(.d-tarjetas) { margin-top: auto; padding-top: 10px; }
-  .cvs :global(.res) { padding: 1px 8px; border-radius: 999px; font-weight: 650; font-size: .74rem; }
-  .cvs :global(.res.si) { background: color-mix(in srgb, var(--si) 16%, transparent); color: var(--si); }
-  .cvs :global(.res.no) { background: color-mix(in srgb, var(--no) 14%, transparent); color: var(--no); }
-  :global(:root[data-theme='dark']) .cvs :global(.res.si) { color: #7fd287; }
-  :global(:root[data-theme='dark']) .cvs :global(.res.no) { color: #ff8a80; }
-  :global(html:not(.js)) #crea { display: none; }
-  .tambien { margin-top: 16px; }
+  :global(html:not(.js)) .m-ayuda { display: none; }
 </style>
