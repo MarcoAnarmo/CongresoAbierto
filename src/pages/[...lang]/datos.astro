@@ -12,7 +12,7 @@ import HojaInfo from '../../components/HojaInfo.astro';
 import Icono from '../../components/Icono.astro';
 import { url, grupos, TEMAS, meta } from '../../lib/data';
 import type { NombreIcono } from '../../lib/iconos';
-import { TABLAS, rutaCsvFijo } from '../../lib/datos/tablas';
+import { TABLAS, rutaCsvFijo, columnasPorSeccion } from '../../lib/datos/tablas';
 import { PASOS, TOTAL_PASOS } from '../../lib/datos/asistente';
 import { filasTabla, aniosVotos, filasVotos } from '../../lib/datos/filas';
 import { LICENCIA_DATOS } from '../../lib/datos/licencia';
@@ -34,6 +34,10 @@ filas.votos = filasVotos();
 const nombre = (id: string) => t.tablas[id as keyof typeof t.tablas];
 const ICONO: Record<string, NombreIcono> = { diputados: 'fichas', inmuebles: 'vivienda', votaciones: 'votaciones', 'votos-grupo': 'grupos', votos: 'voto' };
 const nombrePaso = [t.paso1, t.paso2, t.paso3, t.paso4];
+// Diccionario: nombre y descripción de cada columna; algunas tablas precisan la descripción (p. ej. «no_vota» en el voto de cada grupo)
+const col = (id: string) => t.columnas[id as keyof typeof t.columnas];
+const descripcion = (tabla: string, id: string) => (t.descripciones as Record<string, Record<string, string> | undefined>)[tabla]?.[id] ?? col(id).descripcion;
+const seccion = (id: string | null) => (id ? t.secciones[id as keyof typeof t.secciones] : null);
 
 const config = {
   base: url(''),
@@ -47,6 +51,7 @@ const config = {
   nombresColumnas: Object.fromEntries(Object.entries(t.columnas).map(([k, v]) => [k, v.nombre])),
   nombresTablas: Object.fromEntries(Object.entries(t.tablas).map(([k, v]) => [k, v.nombre])),
   nombresFiltros: t.filtros,
+  nombresSecciones: t.secciones,
 };
 const jsonLd = [
   conjuntoDatos({
@@ -118,8 +123,8 @@ const pasoDe = (n: number) => f(t.pasoDe, { n, total: TOTAL_PASOS });
             <button class="btn" type="button" id="d-cols-todas">{t.todas}</button>
           </div>
         </div>
-        <div class="f-chips" id="d-columnas"></div>
-        <button class="btn-texto dic-boton" type="button" id="d-dic" data-info={`dic-${TABLAS[0].id}`} data-info-titulo={t.diccionario}><Icono n="info" tam={18} />{t.diccionario}</button>
+        <div class="cols" id="d-columnas"></div>
+        <button class="btn-texto dic-boton" type="button" id="d-dic" data-info={`dic-${TABLAS[0].id}`} data-info-titulo={nombre(TABLAS[0].id).nombre}><Icono n="info" tam={18} />{t.verColumnas}</button>
       </section>
 
       <!-- 4. Formato y descarga -->
@@ -179,20 +184,34 @@ const pasoDe = (n: number) => f(t.pasoDe, { n, total: TOTAL_PASOS });
       </div>
       <div class="extra-caja">
         <h3>{t.diccionario}</h3>
+        <ul class="completas dic-botones" role="list">
+          {TABLAS.map((x) => (
+            <li><button type="button" data-info={`dic-${x.id}`} data-info-titulo={nombre(x.id).nombre}>
+              <Icono n="info" tam={18} /><span>{nombre(x.id).nombre}</span><span class="muted small">{f(t.columnasDe, { n: x.columnas.length })}</span><Icono n="derecha" tam={16} />
+            </button></li>
+          ))}
+        </ul>
+        <!-- Sin JavaScript, el diccionario se despliega aquí; con JavaScript, cada tabla se abre en una ventana -->
         <details class="diccionario">
-          <summary>{TABLAS.map((x) => nombre(x.id).nombre).join(' · ')}<Icono n="abajo" tam={18} /></summary>
+          <summary>{t.diccionario}<Icono n="abajo" tam={18} /></summary>
           {TABLAS.map((x) => (
             <div class="dic-tabla" id={`dic-${x.id}`}>
-              <h4>{nombre(x.id).nombre}</h4>
-              <dl>{x.columnas.map((c) => <><dt><code>{c.id}</code> · {t.columnas[c.id as keyof typeof t.columnas].nombre}</dt><dd>{t.columnas[c.id as keyof typeof t.columnas].descripcion}</dd></>)}</dl>
+              <h4 class="dic-nombre">{nombre(x.id).nombre}</h4>
+              {columnasPorSeccion(x).map((sec) => (
+                <>
+                  {seccion(sec.id) && <h5 class="dic-sec">{seccion(sec.id)}</h5>}
+                  <dl class="dic-lista">{sec.columnas.map((c) => <div class="dic-fila"><dt>{col(c.id).nombre}</dt><dd class="dic-desc">{descripcion(x.id, c.id)}</dd><dd class="dic-id"><code>{c.id}</code></dd></div>)}</dl>
+                </>
+              ))}
             </div>
           ))}
         </details>
-        <div class="licencia">
-          <p set:html={f(t.licencia, { licencia })} />
-          <p class="cita"><q>{LICENCIA_DATOS.cita}</q></p>
-          <p class="small muted">{t.fuentes}</p>
-        </div>
+      </div>
+      <div class="extra-caja licencia">
+        <h3>{t.licenciaTitulo}</h3>
+        <p set:html={f(t.licencia, { licencia })} />
+        <p class="cita"><q>{LICENCIA_DATOS.cita}</q></p>
+        <p class="small muted">{t.fuentes}</p>
       </div>
     </div>
   </section>
@@ -299,10 +318,10 @@ const pasoDe = (n: number) => f(t.pasoDe, { n, total: TOTAL_PASOS });
   .filtros :global(.f-fechas) { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-width: 0; }
   .filtros :global(.f-fechas legend) { font-weight: 650; font-size: .92rem; margin-bottom: 4px; padding: 0; }
   .filtros :global(.f-fechas span) { font-weight: 400; color: var(--muted); font-size: .85rem; }
-  .f-chips, .filtros :global(.f-chips) { display: flex; flex-wrap: wrap; gap: 6px; }
-  .f-chips :global(.chip), .filtros :global(.chip) { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 12px 4px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: .88rem; cursor: pointer; background: var(--surface); }
-  .f-chips :global(.chip:has(input:checked)), .filtros :global(.chip:has(input:checked)) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
-  .f-chips :global(.chip input), .filtros :global(.chip input) { accent-color: var(--accent-strong); width: 16px; height: 16px; margin: 0; }
+  .cols :global(.f-chips), .filtros :global(.f-chips) { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cols :global(.chip), .filtros :global(.chip) { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 12px 4px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: .88rem; cursor: pointer; background: var(--surface); }
+  .cols :global(.chip:has(input:checked)), .filtros :global(.chip:has(input:checked)) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+  .cols :global(.chip input), .filtros :global(.chip input) { accent-color: var(--accent-strong); width: 16px; height: 16px; margin: 0; }
   .btn-texto { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--accent-text); padding: 6px 4px; min-height: 40px; font-weight: 600; cursor: pointer; }
   .btn-texto:hover { text-decoration: underline; }
 
@@ -393,17 +412,37 @@ const pasoDe = (n: number) => f(t.pasoDe, { n, total: TOTAL_PASOS });
   .completas a { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 4px 0; border-top: 1px solid var(--border); text-decoration: none; font-weight: 600; }
   .completas a :global(svg) { color: var(--accent-text); flex: none; }
   .completas a span:first-of-type { flex: 1; }
-  .diccionario { margin: 8px 0 14px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .dic-botones button {
+    width: 100%; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 4px 0; border: 0; border-top: 1px solid var(--border);
+    background: none; color: var(--text); font-weight: 600; text-align: left; cursor: pointer;
+  }
+  .dic-botones button :global(svg) { flex: none; color: var(--accent-text); }
+  .dic-botones button :global(svg:last-child) { color: var(--muted); }
+  .dic-botones button span:first-of-type { flex: 1; }
+  .dic-botones button:hover span:first-of-type { color: var(--accent-text); }
+  :global(html:not(.js)) .dic-botones { display: none; }
+  :global(html.js) .diccionario { display: none; }
+  .diccionario { margin: 8px 0 0; border-top: 1px solid var(--border); }
   .diccionario > summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; cursor: pointer; list-style: none; color: var(--muted); font-size: .88rem; }
   .diccionario > summary::-webkit-details-marker { display: none; }
   .diccionario[open] > summary :global(svg) { transform: rotate(180deg); }
-  .dic-tabla h4 { font-size: .95rem; margin: 12px 0 6px; }
-  .dic-tabla dl, :global(.hi-cuerpo dl) { margin: 0 0 12px; display: grid; gap: 2px; }
-  .dic-tabla dt, :global(.hi-cuerpo dt) { font-weight: 600; font-size: .88rem; margin-top: 6px; overflow-wrap: anywhere; color: var(--text); }
-  .dic-tabla dd, :global(.hi-cuerpo dd) { margin: 0; color: var(--muted); font-size: .85rem; }
-  .dic-tabla code, :global(.hi-cuerpo code) { font-size: .82rem; background: var(--chip); padding: 1px 5px; border-radius: 5px; }
-  :global(.hi-cuerpo h4) { display: none; }
+  /* Diccionario (también dentro de la ventana HojaInfo, por eso :global) */
+  :global(.dic-nombre) { font-size: 1rem; margin: 16px 0 4px; }
+  :global(.hi-cuerpo .dic-nombre) { display: none; }
+  :global(.dic-sec) { margin: 18px 0 2px; font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent-text); }
+  :global(.hi-cuerpo .dic-sec:first-child) { margin-top: 4px; }
+  :global(.dic-lista) { margin: 0; display: grid; }
+  :global(.dic-fila) { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  :global(.dic-fila:last-child) { border-bottom: 0; }
+  :global(.dic-fila dt) { font-weight: 650; font-size: .92rem; color: var(--text); }
+  :global(.dic-fila .dic-desc) { grid-column: 1; margin: 2px 0 0; color: var(--muted); font-size: .85rem; line-height: 1.4; }
+  :global(.dic-fila .dic-id) { grid-column: 2; grid-row: 1; margin: 0; }
+  :global(.dic-fila code) { font-size: .72rem; color: var(--muted); background: var(--chip); padding: 2px 6px; border-radius: 6px; white-space: nowrap; }
+  .licencia h3 { margin-bottom: 8px; }
   .licencia p { margin: 4px 0; font-size: .9rem; }
   .cita { font-weight: 600; }
-  @media (min-width: 900px) { .extra-rejilla { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .extra-caja { padding: 22px 24px; } }
+  @media (min-width: 900px) { .extra-rejilla { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .extra-caja { padding: 22px 24px; } .extra-caja.licencia { grid-column: 1 / -1; } }
+  /* Columnas del paso 3, por apartados en las tablas largas */
+  .cols :global(.cols-sec) { margin: 14px 0 6px; font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .cols :global(.cols-sec:first-child) { margin-top: 0; }
 </style>

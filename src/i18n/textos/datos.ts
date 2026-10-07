@@ -6,6 +6,11 @@ import { area } from '..';
  * Los valores oficiales (grupos, votos, resultados, textos) no se traducen.
  */
 const es = {
+  "licenciaTitulo": "Licencia y cómo citar",
+  "secciones": {"perfil": "Perfil", "dinero": "Sueldo, bienes y deudas", "votos": "Votos", "fuentes": "Avisos y enlaces"},
+  "descripciones": {"votaciones": {"id": "Identificador de la votación (sesión y número)", "no_vota": "Diputados que no votaron"}, "votos-grupo": {"si": "Diputados del grupo que votaron sí", "no": "Diputados del grupo que votaron no", "abstencion": "Diputados del grupo que se abstuvieron", "no_vota": "Diputados del grupo que no votaron"}},
+  "columnasDe": "{n} columnas",
+  "verColumnas": "Ver qué significa cada columna",
   "formato": "Formato",
   "siguiente": "Siguiente",
   "atras": "Atrás",
@@ -103,11 +108,11 @@ const es = {
     },
     "nombre": {
       "nombre": "Nombre",
-      "descripcion": "Nombre"
+      "descripcion": "Nombre de pila, como en la ficha oficial"
     },
     "apellidos": {
       "nombre": "Apellidos",
-      "descripcion": "Apellidos"
+      "descripcion": "Apellidos, como en la ficha oficial"
     },
     "genero": {
       "nombre": "Sexo",
@@ -275,7 +280,7 @@ const es = {
     },
     "titulo": {
       "nombre": "Título",
-      "descripcion": "Texto oficial"
+      "descripcion": "Texto oficial del asunto votado"
     },
     "url_declaracion": {
       "nombre": "Declaración",
@@ -315,7 +320,7 @@ const es = {
     },
     "abstencion": {
       "nombre": "Abstención",
-      "descripcion": "Abstenciones"
+      "descripcion": "Votos de abstención"
     },
     "url_votacion": {
       "nombre": "Votación (oficial)",
@@ -342,6 +347,11 @@ const es = {
 
 export default area(es, {
   ca: {
+    "licenciaTitulo": "Llicència i com citar",
+    "secciones": {"perfil": "Perfil", "dinero": "Sou, béns i deutes", "votos": "Vots", "fuentes": "Avisos i enllaços"},
+    "descripciones": {"votaciones": {"id": "Identificador de la votació (sessió i número)", "no_vota": "Diputats que no van votar"}, "votos-grupo": {"si": "Diputats del grup que van votar sí", "no": "Diputats del grup que van votar no", "abstencion": "Diputats del grup que es van abstenir", "no_vota": "Diputats del grup que no van votar"}},
+    "columnasDe": "{n} columnes",
+    "verColumnas": "Veure què vol dir cada columna",
     "formato": "Format",
     "siguiente": "Següent",
     "atras": "Enrere",
@@ -439,11 +449,11 @@ export default area(es, {
       },
       "nombre": {
         "nombre": "Nom",
-        "descripcion": "Nom"
+        "descripcion": "Nom de pila, com a la fitxa oficial"
       },
       "apellidos": {
         "nombre": "Cognoms",
-        "descripcion": "Cognoms"
+        "descripcion": "Cognoms, com a la fitxa oficial"
       },
       "genero": {
         "nombre": "Sexe",
@@ -611,7 +621,7 @@ export default area(es, {
       },
       "titulo": {
         "nombre": "Títol",
-        "descripcion": "Text oficial"
+        "descripcion": "Text oficial de l’assumpte votat"
       },
       "url_declaracion": {
         "nombre": "Declaració",
@@ -651,7 +661,7 @@ export default area(es, {
       },
       "abstencion": {
         "nombre": "Abstenció",
-        "descripcion": "Abstencions"
+        "descripcion": "Vots d’abstenció"
       },
       "url_votacion": {
         "nombre": "Votació (oficial)",
@@ -676,6 +686,11 @@ export default area(es, {
     }
   },
   eu: {
+    "licenciaTitulo": "Lizentzia eta nola aipatu",
+    "secciones": {"perfil": "Profila", "dinero": "Soldata, ondasunak eta zorrak", "votos": "Botoak", "fuentes": "Oharrak eta estekak"},
+    "descripciones": {"votaciones": {"id": "Bozketaren identifikatzailea (saioa eta zenbakia)", "no_vota": "Bozkatu ez zuten diputatuak"}, "votos-grupo": {"si": "Baiezkoa bozkatu zuten taldeko diputatuak", "no": "Ezezkoa bozkatu zuten taldeko diputatuak", "abstencion": "Abstenitu ziren taldeko diputatuak", "no_vota": "Bozkatu ez zuten taldeko diputatuak"}},
+    "columnasDe": "{n} zutabe",
+    "verColumnas": "Ikusi zutabe bakoitzaren esanahia",
     "formato": "Formatua",
     "siguiente": "Hurrengoa",
     "atras": "Atzera",
@@ -773,11 +788,11 @@ export default area(es, {
       },
       "nombre": {
         "nombre": "Izena",
-        "descripcion": "Izena"
+        "descripcion": "Izena, fitxa ofizialean bezala"
       },
       "apellidos": {
         "nombre": "Abizenak",
-        "descripcion": "Abizenak"
+        "descripcion": "Abizenak, fitxa ofizialean bezala"
       },
       "genero": {
         "nombre": "Sexua",
@@ -945,7 +960,7 @@ export default area(es, {
       },
       "titulo": {
         "nombre": "Izenburua",
-        "descripcion": "Testu ofiziala"
+        "descripcion": "Bozkatutako gaiaren testu ofiziala"
       },
       "url_declaracion": {
         "nombre": "Aitorpena",
@@ -985,7 +1000,7 @@ export default area(es, {
       },
       "abstencion": {
         "nombre": "Abstentzioa",
-        "descripcion": "Abstentzioak"
+        "descripcion": "Abstentzio botoak"
       },
       "url_votacion": {
         "nombre": "Bozketa (ofiziala)",
@@ -1010,6 +1025,11 @@ export default area(es, {
     }
   },
   gl: {
+    "licenciaTitulo": "Licenza e como citar",
+    "secciones": {"perfil": "Perfil", "dinero": "Soldo, bens e débedas", "votos": "Votos", "fuentes": "Avisos e ligazóns"},
+    "descripciones": {"votaciones": {"id": "Identificador da votación (sesión e número)", "no_vota": "Deputados que non votaron"}, "votos-grupo": {"si": "Deputados do grupo que votaron si", "no": "Deputados do grupo que votaron non", "abstencion": "Deputados do grupo que se abstiveron", "no_vota": "Deputados do grupo que non votaron"}},
+    "columnasDe": "{n} columnas",
+    "verColumnas": "Ver que significa cada columna",
     "formato": "Formato",
     "siguiente": "Seguinte",
     "atras": "Atrás",
@@ -1107,11 +1127,11 @@ export default area(es, {
       },
       "nombre": {
         "nombre": "Nome",
-        "descripcion": "Nome"
+        "descripcion": "Nome de pía, como na ficha oficial"
       },
       "apellidos": {
         "nombre": "Apelidos",
-        "descripcion": "Apelidos"
+        "descripcion": "Apelidos, como na ficha oficial"
       },
       "genero": {
         "nombre": "Sexo",
@@ -1279,7 +1299,7 @@ export default area(es, {
       },
       "titulo": {
         "nombre": "Título",
-        "descripcion": "Texto oficial"
+        "descripcion": "Texto oficial del asunto votado"
       },
       "url_declaracion": {
         "nombre": "Declaración",
@@ -1319,7 +1339,7 @@ export default area(es, {
       },
       "abstencion": {
         "nombre": "Abstención",
-        "descripcion": "Abstencións"
+        "descripcion": "Votos de abstención"
       },
       "url_votacion": {
         "nombre": "Votación (oficial)",
@@ -1344,6 +1364,11 @@ export default area(es, {
     }
   },
   en: {
+    "licenciaTitulo": "Licence and how to cite",
+    "secciones": {"perfil": "Profile", "dinero": "Pay, assets and debts", "votos": "Votes", "fuentes": "Warnings and links"},
+    "descripciones": {"votaciones": {"id": "Vote identifier (sitting and number)", "no_vota": "MPs who did not vote"}, "votos-grupo": {"si": "MPs in the group who voted yes", "no": "MPs in the group who voted no", "abstencion": "MPs in the group who abstained", "no_vota": "MPs in the group who did not vote"}},
+    "columnasDe": "{n} columns",
+    "verColumnas": "See what each column means",
     "formato": "Format",
     "siguiente": "Next",
     "atras": "Back",
@@ -1441,11 +1466,11 @@ export default area(es, {
       },
       "nombre": {
         "nombre": "First name",
-        "descripcion": "First name"
+        "descripcion": "Given name, as in the official profile"
       },
       "apellidos": {
         "nombre": "Surnames",
-        "descripcion": "Surnames"
+        "descripcion": "Surnames, as in the official profile"
       },
       "genero": {
         "nombre": "Sex",
@@ -1613,7 +1638,7 @@ export default area(es, {
       },
       "titulo": {
         "nombre": "Title",
-        "descripcion": "Official text"
+        "descripcion": "Official text of the matter voted on"
       },
       "url_declaracion": {
         "nombre": "Declaration",
@@ -1653,7 +1678,7 @@ export default area(es, {
       },
       "abstencion": {
         "nombre": "Abstention",
-        "descripcion": "Abstentions"
+        "descripcion": "Abstention votes"
       },
       "url_votacion": {
         "nombre": "Vote (official)",

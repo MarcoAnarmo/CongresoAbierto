@@ -38,3 +38,13 @@ test('quitar un filtro deja los demás y no cambia el estado de entrada', () => 
   assert.equal(quitarFiltro(estado, { filtro: 'fechas', campo: 'desde' }).desde, '');
   assert.equal(quitarFiltro(estado, { filtro: 'buscar', campo: 'texto' }).texto, '');
 });
+
+test('columnas por apartados: cada una en su apartado y en el orden de la tabla', async () => {
+  const { TABLAS, columnasPorSeccion } = await import('../src/lib/datos/tablas');
+  const dip = TABLAS.find((t) => t.id === 'diputados')!;
+  const s = columnasPorSeccion(dip);
+  assert.deepEqual(s.map((x) => x.id), ['perfil', 'dinero', 'votos', 'fuentes']);
+  assert.deepEqual(s.flatMap((x) => x.columnas.map((c) => c.id)), dip.columnas.map((c) => c.id));
+  const vot = TABLAS.find((t) => t.id === 'votaciones')!;
+  assert.deepEqual(columnasPorSeccion(vot).map((x) => x.id), [null]);
+});

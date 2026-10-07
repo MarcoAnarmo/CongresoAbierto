@@ -7,7 +7,7 @@
  * 700.000 votos no llena la memoria del móvil. Las tablas anuales (votos) solo descargan los años que pide el filtro.
  * El estado (tabla, filtros, columnas y formato) va en la dirección, para poder compartir una descarga concreta.
  */
-import { TABLAS, SEP_LISTA, rutaTabla, type Celda, type DefTabla, type FicheroTabla } from '../lib/datos/tablas';
+import { TABLAS, SEP_LISTA, rutaTabla, columnasPorSeccion, type Celda, type DefTabla, type FicheroTabla } from '../lib/datos/tablas';
 import { celdaCsv, type FormatoCsv } from '../lib/datos/csv';
 import { pasoInicial, mover, filtrosAplicados, quitarFiltro, TOTAL_PASOS, type Paso, type Aplicado } from '../lib/datos/asistente';
 import { sinTildes } from '../lib/texto';
@@ -27,6 +27,7 @@ interface Config {
   nombresColumnas: Record<string, string>;
   nombresTablas: Record<string, string>;
   nombresFiltros: Record<string, string>;
+  nombresSecciones: Record<string, string>;
 }
 const cfg = JSON.parse(document.getElementById('datos-config')!.textContent!) as Config;
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -221,7 +222,9 @@ $('d-quitar').addEventListener('click', () => { e.valores = {}; e.desde = ''; e.
 const cajaCols = $('d-columnas');
 function pintarColumnas() {
   const t = e.tabla;
-  cajaCols.innerHTML = t.columnas.map((c) => `<label class="chip"><input type="checkbox" value="${c.id}" ${e.columnas.includes(c.id) ? 'checked' : ''} /><span>${esc(cfg.nombresColumnas[c.id] ?? c.id)}</span></label>`).join('');
+  // Por apartados en las tablas largas (Perfil, Sueldo y bienes…)
+  cajaCols.innerHTML = columnasPorSeccion(t).map((s) => (s.id ? `<p class="cols-sec">${esc(cfg.nombresSecciones[s.id] ?? s.id)}</p>` : '')
+    + `<div class="f-chips">${s.columnas.map((c) => `<label class="chip"><input type="checkbox" value="${c.id}" ${e.columnas.includes(c.id) ? 'checked' : ''} /><span>${esc(cfg.nombresColumnas[c.id] ?? c.id)}</span></label>`).join('')}</div>`).join('');
   resumenColumnas();
 }
 function resumenColumnas() {
@@ -334,6 +337,7 @@ document.querySelectorAll<HTMLInputElement>('input[name="d-formato"]').forEach((
 function resumenTabla() {
   $('d-r-1').textContent = cfg.nombresTablas[e.tabla.id] ?? e.tabla.id;
   $('d-dic').dataset.info = `dic-${e.tabla.id}`;
+  $('d-dic').dataset.infoTitulo = cfg.nombresTablas[e.tabla.id] ?? e.tabla.id;
 }
 const resumenFormato = () => { $('d-r-4').textContent = e.formato === 'excel' ? cfg.tx.excel : cfg.tx.csv; };
 

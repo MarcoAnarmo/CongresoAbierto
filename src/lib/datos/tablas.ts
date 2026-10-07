@@ -36,6 +36,20 @@ export interface DefTabla {
   particion: 'unica' | 'anual';
   /** También se publica completa como CSV fijo (/datos/csv/<id>.csv). */
   csvFijo: boolean;
+  /** Apartados de las columnas (tablas con muchas): cada uno empieza en la columna `desde`. Nombres en datos.ts (secciones). */
+  secciones?: { id: string; desde: string }[];
+}
+
+/** Columnas de una tabla agrupadas en sus apartados (una sola sección sin nombre si la tabla no tiene apartados). */
+export function columnasPorSeccion(t: DefTabla): { id: string | null; columnas: DefColumna[] }[] {
+  if (!t.secciones?.length) return [{ id: null, columnas: t.columnas }];
+  const r: { id: string | null; columnas: DefColumna[] }[] = [];
+  for (const col of t.columnas) {
+    const s = t.secciones.find((x) => x.desde === col.id);
+    if (s || !r.length) r.push({ id: s?.id ?? null, columnas: [] });
+    r[r.length - 1].columnas.push(col);
+  }
+  return r;
 }
 
 /** Separador de los valores de las columnas de tipo 'lista' (temas, cargos…). */
@@ -59,6 +73,10 @@ export const TABLAS: DefTabla[] = [
       c('votaciones_en_escano', 'entero'), c('votos_si', 'entero'), c('votos_no', 'entero'), c('votos_abstencion', 'entero'), c('no_vota', 'entero'),
       c('votos_distintos_del_grupo', 'entero'),
       c('lectura_no_confirmada', 'booleano', true), c('url_ficha_oficial', 'url'), c('url_declaracion_bienes', 'url'), c('url_congreso_abierto', 'url'),
+    ],
+    secciones: [
+      { id: 'perfil', desde: 'id' }, { id: 'dinero', desde: 'retribucion_mensual' },
+      { id: 'votos', desde: 'votaciones_en_escano' }, { id: 'fuentes', desde: 'lectura_no_confirmada' },
     ],
     filtros: [
       { id: 'buscar', tipo: 'texto', columnas: ['nombre', 'apellidos'] },
