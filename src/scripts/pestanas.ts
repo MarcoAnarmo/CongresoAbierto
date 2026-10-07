@@ -17,6 +17,16 @@ export function iniciarPestanas(barra: HTMLElement, { alCambiar }: Opciones = {}
   const tabs = [...barra.querySelectorAll<HTMLAnchorElement>('[role="tab"]')];
   const paneles = tabs.map((x) => document.getElementById(x.dataset.id!)!);
   let actual = paneles.find((p) => p.hasAttribute('data-activo'))?.id ?? tabs[0].dataset.id!;
+  // La franja que se pega arriba (Pestanas.astro) o, si no hay, la propia barra
+  const pegada = barra.closest<HTMLElement>('.pestanas-pegada') ?? barra;
+  const tope = () => parseFloat(getComputedStyle(pegada).top) || 0;
+  // Sombra solo cuando ya está pegada: lo dice una marca de 1 px justo antes de la franja
+  const marca = pegada.previousElementSibling as HTMLElement | null;
+  /** Lleva la barra arriba (se desplaza hasta la marca, que no se pega, para que el navegador calcule bien). */
+  const subirA = () => (marca ?? pegada).scrollIntoView({ block: 'start', behavior: suave() });
+  if (marca?.classList.contains('pestanas-marca') && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => pegada.toggleAttribute('data-pegada', !e.isIntersecting && e.boundingClientRect.top < innerHeight / 2), { rootMargin: `-${Math.round(tope()) + 1}px 0px 0px 0px` }).observe(marca);
+  }
 
   function activar(id: string, { foco = false, subir = false } = {}) {
     tabs.forEach((x) => {
@@ -26,11 +36,8 @@ export function iniciarPestanas(barra: HTMLElement, { alCambiar }: Opciones = {}
       if (si && foco) x.focus();
     });
     paneles.forEach((p) => p.toggleAttribute('data-activo', p.id === id));
-    // Barra que se desliza en horizontal (móvil estrecho): la pestaña elegida, a la vista
-    const sel = tabs.find((x) => x.dataset.id === id);
-    if (sel && barra.scrollWidth > barra.clientWidth) barra.scrollLeft = sel.offsetLeft - (barra.clientWidth - sel.offsetWidth) / 2;
     // Si la barra ya está pegada arriba, se vuelve al principio del panel
-    if (subir && barra.getBoundingClientRect().top <= (parseFloat(getComputedStyle(barra).top) || 0) + 1) barra.scrollIntoView({ block: 'start', behavior: suave() });
+    if (subir && pegada.getBoundingClientRect().top <= tope() + 1) subirA();
     if (id !== actual) { actual = id; alCambiar?.(id); }
   }
   const ir = (id: string, opciones?: { foco?: boolean; subir?: boolean }) => {
@@ -60,7 +67,7 @@ export function iniciarPestanas(barra: HTMLElement, { alCambiar }: Opciones = {}
   desdeDireccion();
   return {
     /** Abre un panel desde otro enlace de la página (p. ej. las cifras de arriba) y baja hasta las pestañas. */
-    abrir: (id: string) => { ir(id); barra.scrollIntoView({ block: 'start', behavior: suave() }); },
+    abrir: (id: string) => { ir(id); subirA(); },
     actual: () => actual,
   };
 }
