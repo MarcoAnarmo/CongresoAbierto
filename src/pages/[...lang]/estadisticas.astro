@@ -2,12 +2,12 @@
 /**
  * Estadísticas: todo se calcula en la build (src/lib/estadisticas.ts) y se pinta en HTML y CSS.
  * Cifras clave arriba y tres pestañas (Votos, Perfil y Dinero), con la pestaña en la dirección (#votos…).
- * El JavaScript solo cambia de pestaña (components/Pestanas.astro) y de chip; sin él se ven todas las estadísticas, una debajo de otra.
+ * El JavaScript solo cambia de pestaña (components/Pestanas.astro) y de tema o grupo (components/Selector.astro); sin él se ven todas las estadísticas, una debajo de otra.
  */
 import Base from '../../layouts/Base.astro';
 import Barras from '../../components/Barras.astro';
 import BarraApilada from '../../components/BarraApilada.astro';
-import Chips from '../../components/Chips.astro';
+import Selector from '../../components/Selector.astro';
 import HojaInfo from '../../components/HojaInfo.astro';
 import Icono from '../../components/Icono.astro';
 import PestanasDatos from '../../components/PestanasDatos.astro';
@@ -98,7 +98,7 @@ const CIFRAS: { v: number; l: string; p: Pestana }[] = [
   <div class="panel panel-pestana" role="tabpanel" id="votos" aria-labelledby="tab-votos" data-activo>
     <h2 class="panel-tit">{t.pestanas.votos}</h2>
     <Tarjeta id="voto-por-tema" titulo={t.votoTema.titulo} intro={t.votoTema.intro} como={t.votoTema.nota} descargar={u('/datos?tabla=votos-grupo')}>
-      <Chips elige="tema" etiqueta={t.votoTema.elige} inicial={temaInicial} opciones={[temaInicial, ...temas.filter((x) => x !== temaInicial)].map((id) => ({ id, texto: nombreTema(id), n: num(nVotaciones.get(id) ?? 0) }))} />
+      <Selector elige="tema" etiqueta={t.votoTema.elige} inicial={temaInicial} opciones={temas.map((id) => ({ id, texto: nombreTema(id), n: num(nVotaciones.get(id) ?? 0) }))} />
       <p class="leyenda small">{POSICIONES.map((k) => <span><span class="dot" style={`background:${COLOR[k]}`}></span>{etVoto[k]}</span>)}</p>
       {temas.map((id) => (
         <div class="bloque" data-bloque="tema" data-id={id} data-activo={id === temaInicial ? '' : undefined}>
@@ -139,7 +139,7 @@ const CIFRAS: { v: number; l: string; p: Pestana }[] = [
       </div>
       <!-- Móvil: un grupo cada vez -->
       <div class="coin-movil">
-        <Chips elige="grupo" etiqueta={t.coincidencia.elige} inicial={G[0]} opciones={G.map((g) => ({ id: g, texto: g, punto: colorGrupo(g) }))} />
+        <Selector elige="grupo" etiqueta={t.coincidencia.elige} inicial={G[0]} opciones={G.map((g) => ({ id: g, texto: g, punto: colorGrupo(g) }))} />
         {G.map((g, i) => {
           const filas = [...coin.get(g)!].map(([b, c]) => ({ b, ...c })).sort((x, y) => y.iguales / (y.ambos || 1) - x.iguales / (x.ambos || 1));
           return (
@@ -234,6 +234,8 @@ const CIFRAS: { v: number; l: string; p: Pestana }[] = [
   .leyenda { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 10px; color: var(--muted); }
   .leyenda .dot { margin: -2px 6px 0 0; width: 9px; height: 9px; }
   :global(html.js) .bloque:not([data-activo]) { display: none; }
+  /* Con JavaScript el selector ya dice qué tema o grupo se ve */
+  :global(html.js) .bloque > .b-tit { display: none; }
   .bloque + .bloque { margin-top: 24px; }
   .b-tit { font-size: .9rem; margin: 0 0 8px; color: var(--muted); font-weight: 650; }
   .b-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; margin: 12px 0 0; }

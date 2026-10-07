@@ -1,0 +1,116 @@
+---
+/**
+ * Selector que abre una ventana emergente con las opciones (en el móvil, una hoja que sube desde abajo).
+ * Cada opción muestra solo su bloque: los elementos `[data-bloque="<elige>"][data-id="<valor>"]` de la misma sección;
+ * el activo lleva `data-activo`. Sin JavaScript el selector no se ve y se ven todos los bloques.
+ */
+import Icono from './Icono.astro';
+import { idiomaDeUrl } from '../i18n';
+import comun from '../i18n/textos/comun';
+export interface OpcionSelector { id: string; texto: string; n?: string; punto?: string }
+interface Props { elige: string; etiqueta: string; opciones: OpcionSelector[]; inicial: string }
+const { elige, etiqueta, opciones, inicial } = Astro.props;
+const cerrar = comun[idiomaDeUrl(Astro.url.pathname)].palabras.cerrar;
+const ini = opciones.find((o) => o.id === inicial) ?? opciones[0];
+const idDlg = `sel-${elige}`;
+---
+<div class="selector" data-selector={elige}>
+  <button type="button" class="sel-boton" aria-haspopup="dialog" aria-controls={idDlg}>
+    <span class="sel-et">{etiqueta}</span>
+    <span class="sel-valor">{ini.punto && <span class="dot" style={`background:${ini.punto}`}></span>}<span class="sel-texto">{ini.texto}</span>{ini.n && <span class="sel-n">{ini.n}</span>}</span>
+    <Icono n="abajo" tam={20} />
+  </button>
+  <dialog class="sel-hoja" id={idDlg} aria-labelledby={`${idDlg}-t`}>
+    <div class="sh-cab">
+      <h2 id={`${idDlg}-t`}>{etiqueta}</h2>
+      <button class="sh-cerrar" type="button" aria-label={cerrar} title={cerrar}><Icono n="cerrar" tam={20} /></button>
+    </div>
+    <ul class="sh-lista" role="list">
+      {opciones.map((o) => (
+        <li>
+          <button type="button" class="sh-op" data-valor={o.id} aria-pressed={o.id === ini.id ? 'true' : 'false'}>
+            {o.punto && <span class="dot" style={`background:${o.punto}`}></span>}
+            <span class="sh-texto">{o.texto}</span>
+            {o.n && <span class="sel-n">{o.n}</span>}
+            <Icono n="hecho" tam={18} class="sh-ok" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  </dialog>
+</div>
+
+<script>
+  import { deslizarParaCerrar } from '../scripts/hoja';
+  document.querySelectorAll<HTMLElement>('[data-selector]').forEach((sel) => {
+    const clave = sel.dataset.selector!;
+    const ambito = sel.closest('section') ?? document.body;
+    const bloques = [...ambito.querySelectorAll<HTMLElement>(`[data-bloque="${clave}"]`)];
+    const boton = sel.querySelector<HTMLButtonElement>('.sel-boton')!;
+    const dlg = sel.querySelector<HTMLDialogElement>('.sel-hoja')!;
+    const cerrar = () => dlg.close();
+    boton.addEventListener('click', () => {
+      dlg.showModal();
+      dlg.querySelector<HTMLElement>('.sh-op[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest' });
+    });
+    dlg.querySelector('.sh-cerrar')!.addEventListener('click', cerrar);
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) cerrar(); });
+    dlg.addEventListener('close', () => boton.focus());
+    deslizarParaCerrar(dlg, { cerrar });
+    dlg.querySelector('.sh-lista')!.addEventListener('click', (e) => {
+      const op = (e.target as Element).closest<HTMLButtonElement>('.sh-op');
+      if (!op) return;
+      dlg.querySelectorAll('.sh-op').forEach((x) => x.setAttribute('aria-pressed', String(x === op)));
+      bloques.forEach((x) => x.toggleAttribute('data-activo', x.dataset.id === op.dataset.valor));
+      // El botón muestra lo elegido (punto, texto y cifra)
+      boton.querySelector('.sel-valor')!.innerHTML = [...op.children].filter((x) => !x.classList.contains('sh-ok')).map((x) => x.outerHTML.replace('sh-texto', 'sel-texto')).join('');
+      cerrar();
+    });
+  });
+</script>
+
+<style>
+  :global(html:not(.js)) .selector { display: none; }
+  .selector { margin: 0 0 14px; }
+  .sel-boton {
+    width: 100%; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 12px 6px 16px; border-radius: 14px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text); text-align: left; cursor: pointer; transition: border-color .15s;
+  }
+  .sel-boton:hover { border-color: var(--accent); }
+  .sel-boton > :global(svg) { flex: none; color: var(--muted); }
+  .sel-et { flex: none; font-size: .8rem; font-weight: 600; color: var(--muted); }
+  .sel-valor { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .sel-valor :global(.sel-texto) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sel-n, .sel-valor :global(.sel-n) { flex: none; font-size: .78rem; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; padding: 1px 8px; border-radius: 999px; background: var(--chip); }
+  .selector :global(.dot) { width: 9px; height: 9px; }
+
+  .sel-hoja {
+    width: min(440px, calc(100vw - 32px)); max-height: min(80dvh, 640px); padding: 0; border: 1px solid var(--border); border-radius: 18px;
+    background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgb(0 0 0 / .25); overflow: hidden;
+  }
+  .sel-hoja[open] { display: flex; flex-direction: column; animation: sh-aparecer .16s ease-out; }
+  .sel-hoja::backdrop { background: rgb(20 22 28 / .5); }
+  @keyframes sh-aparecer { from { opacity: 0; transform: translateY(8px); } }
+  .sh-cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 12px 8px 20px; }
+  .sh-cab h2 { margin: 0; font-size: 1.05rem; }
+  .sh-cerrar { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; }
+  .sh-cerrar:hover { background: var(--chip); color: var(--text); }
+  .sh-lista { list-style: none; margin: 0; padding: 0 8px 12px; overflow-y: auto; }
+  .sh-op {
+    width: 100%; display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 6px 12px; border: 0; border-radius: 12px;
+    background: none; color: var(--text); font-weight: 550; text-align: left; cursor: pointer;
+  }
+  .sh-op:hover { background: var(--chip); }
+  .sh-texto { flex: 1; min-width: 0; }
+  .sh-op :global(.sh-ok) { flex: none; color: var(--accent-text); visibility: hidden; }
+  .sh-op[aria-pressed='true'] { background: var(--accent-soft); color: var(--accent-text); font-weight: 700; }
+  .sh-op[aria-pressed='true'] :global(.sh-ok) { visibility: visible; }
+  @media (max-width: 720px) {
+    .sel-hoja { width: 100vw; max-width: 100vw; margin: auto 0 0; border-radius: 18px 18px 0 0; border-bottom: 0; }
+    .sel-hoja[open] { animation: sh-subir .2s ease-out; }
+    @keyframes sh-subir { from { transform: translateY(40px); opacity: .4; } }
+    .sh-cab { padding-top: 22px; }
+    .sh-lista { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+  }
+  @media (prefers-reduced-motion: reduce) { .sel-hoja[open] { animation: none; } }
+</style>
