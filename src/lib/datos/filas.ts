@@ -6,6 +6,7 @@ import { diputados, votacionesPleno, grupos, slug, temasDe } from '../data';
 import type { Diputado } from '../types';
 import { TABLAS, SEP_LISTA, type Celda, type DefTabla } from './tablas';
 import { votoMayoritario } from './derivados';
+import { resumenInversiones } from '../inversiones';
 
 const SITIO = 'https://congresoabierto.org';
 const nombreGrupo = new Map(grupos.map((g) => [g.corto, g.nombre]));
@@ -19,6 +20,7 @@ type Registro = Record<string, Celda>;
 
 function diputadoRegistro(d: Diputado): Registro {
   const fz = d.finanzas, pa = d.participacion, dd = d.deudas;
+  const inv = resumenInversiones(fz?.valores?.filas ?? []);
   return {
     id: d.codParlamentario, nombre: d.nombre, apellidos: d.apellidos, genero: d.genero,
     grupo: d.grupoCorto, grupo_nombre: nombreGrupo.get(d.grupoCorto) ?? d.grupo, partido: d.partido, circunscripcion: d.circunscripcion,
@@ -28,6 +30,8 @@ function diputadoRegistro(d: Diputado): Registro {
     propiedades: d.patrimonio.propiedades, viviendas: d.patrimonio.viviendas, vehiculos: d.patrimonio.vehiculos,
     rentas_declaradas: fz ? redondea(fz.rentas?.total ?? 0) : null, rentas_al_menos: fz ? !!fz.rentas?.totalIncompleto : null,
     depositos: fz ? redondea(fz.depositos?.total ?? 0) : null, depositos_al_menos: fz ? !!fz.depositos?.totalIncompleto : null,
+    valores_declarados: fz ? redondea(fz.valores?.total ?? 0) : null, valores_al_menos: fz ? !!fz.valores?.totalIncompleto : null,
+    acciones: fz ? inv.acciones : null, fondos_inversion: fz ? inv.fondos : null,
     deuda_pendiente: dd ? redondea(dd.principal?.totalPendiente ?? 0) : null, deuda_al_menos: dd ? !!dd.principal?.totalIncompleto : null,
     votaciones_en_escano: pa?.enEscano ?? null, votos_si: pa?.si ?? null, votos_no: pa?.no ?? null, votos_abstencion: pa?.abstencion ?? null, no_vota: pa?.noVota ?? null,
     votos_distintos_del_grupo: pa?.distintoGrupo ?? null,

@@ -223,6 +223,22 @@ const es = {
       "nombre": "Depósitos: al menos",
       "descripcion": "Algún importe no se pudo leer: el total es un mínimo"
     },
+    "valores_declarados": {
+      "nombre": "Acciones, fondos y otros valores (€)",
+      "descripcion": "Valor total de la tabla «Deuda pública, obligaciones, acciones y participaciones» de la declaración de bienes"
+    },
+    "valores_al_menos": {
+      "nombre": "Valores: al menos",
+      "descripcion": "Algún importe no se pudo leer: el total es un mínimo"
+    },
+    "acciones": {
+      "nombre": "Acciones o participaciones (€)",
+      "descripcion": "Importes de las filas de esa tabla que mencionan acciones o participaciones (una fila que menciona acciones y fondos cuenta en las dos columnas)"
+    },
+    "fondos_inversion": {
+      "nombre": "Fondos de inversión (€)",
+      "descripcion": "Importes de las filas de esa tabla que mencionan fondos de inversión (sin planes de pensiones)"
+    },
     "deuda_pendiente": {
       "nombre": "Deuda pendiente (€)",
       "descripcion": "Saldo pendiente de los préstamos declarados"
@@ -657,6 +673,22 @@ export default area(es, {
         "nombre": "Dipòsits: com a mínim",
         "descripcion": "Algun import no s’ha pogut llegir: el total és un mínim"
       },
+      "valores_declarados": {
+        "nombre": "Accions, fons i altres valors (€)",
+        "descripcion": "Valor total de la taula «Deute públic, obligacions, accions i participacions» de la declaració de béns"
+      },
+      "valores_al_menos": {
+        "nombre": "Valors: com a mínim",
+        "descripcion": "Algun import no s’ha pogut llegir: el total és un mínim"
+      },
+      "acciones": {
+        "nombre": "Accions o participacions (€)",
+        "descripcion": "Imports de les files d’aquesta taula que esmenten accions o participacions (una fila que esmenta accions i fons compta a les dues columnes)"
+      },
+      "fondos_inversion": {
+        "nombre": "Fons d’inversió (€)",
+        "descripcion": "Imports de les files d’aquesta taula que esmenten fons d’inversió (sense plans de pensions)"
+      },
       "deuda_pendiente": {
         "nombre": "Deute pendent (€)",
         "descripcion": "Saldo pendent dels préstecs declarats"
@@ -1088,6 +1120,22 @@ export default area(es, {
       "depositos_al_menos": {
         "nombre": "Gordailuak: gutxienez",
         "descripcion": "Zenbatekoren bat ezin izan da irakurri: gutxieneko bat da"
+      },
+      "valores_declarados": {
+        "nombre": "Akzioak, funtsak eta beste baloreak (€)",
+        "descripcion": "Ondasun-aitorpeneko «Zor publikoa, obligazioak, akzioak eta partaidetzak» taularen balio osoa"
+      },
+      "valores_al_menos": {
+        "nombre": "Baloreak: gutxienez",
+        "descripcion": "Zenbatekoren bat ezin izan da irakurri: guztizkoa gutxienekoa da"
+      },
+      "acciones": {
+        "nombre": "Akzioak edo partaidetzak (€)",
+        "descripcion": "Taula horretan akzioak edo partaidetzak aipatzen dituzten errenkaden zenbatekoak (akzioak eta funtsak aipatzen dituen errenkada bi zutabeetan zenbatzen da)"
+      },
+      "fondos_inversion": {
+        "nombre": "Inbertsio-funtsak (€)",
+        "descripcion": "Taula horretan inbertsio-funtsak aipatzen dituzten errenkaden zenbatekoak (pentsio-planik gabe)"
       },
       "deuda_pendiente": {
         "nombre": "Zor ordaintzeko (€)",
@@ -1521,6 +1569,22 @@ export default area(es, {
         "nombre": "Depósitos: polo menos",
         "descripcion": "Algún importe non se puido ler: o total é un mínimo"
       },
+      "valores_declarados": {
+        "nombre": "Accións, fondos e outros valores (€)",
+        "descripcion": "Valor total da táboa «Débeda pública, obrigas, accións e participacións» da declaración de bens"
+      },
+      "valores_al_menos": {
+        "nombre": "Valores: polo menos",
+        "descripcion": "Algún importe non se puido ler: o total é un mínimo"
+      },
+      "acciones": {
+        "nombre": "Accións ou participacións (€)",
+        "descripcion": "Importes das filas desa táboa que mencionan accións ou participacións (unha fila que menciona accións e fondos conta nas dúas columnas)"
+      },
+      "fondos_inversion": {
+        "nombre": "Fondos de investimento (€)",
+        "descripcion": "Importes das filas desa táboa que mencionan fondos de investimento (sen plans de pensións)"
+      },
       "deuda_pendiente": {
         "nombre": "Débeda pendente (€)",
         "descripcion": "Saldo pendente dos préstamos declarados"
@@ -1952,6 +2016,22 @@ export default area(es, {
       "depositos_al_menos": {
         "nombre": "Deposits: at least",
         "descripcion": "Some amount could not be read: the total is a minimum"
+      },
+      "valores_declarados": {
+        "nombre": "Shares, funds and other securities (€)",
+        "descripcion": "Total value of the «Public debt, bonds, shares and holdings» table of the asset declaration"
+      },
+      "valores_al_menos": {
+        "nombre": "Securities: at least",
+        "descripcion": "An amount could not be read: the total is a minimum"
+      },
+      "acciones": {
+        "nombre": "Shares or holdings (€)",
+        "descripcion": "Amounts of the rows in that table that mention shares or holdings (a row mentioning shares and funds counts in both columns)"
+      },
+      "fondos_inversion": {
+        "nombre": "Investment funds (€)",
+        "descripcion": "Amounts of the rows in that table that mention investment funds (excluding pension plans)"
       },
       "deuda_pendiente": {
         "nombre": "Outstanding debt (€)",
