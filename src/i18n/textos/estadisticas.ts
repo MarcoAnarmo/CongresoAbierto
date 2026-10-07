@@ -2,7 +2,7 @@ import { area } from '..';
 
 /** Página Estadísticas (src/lib/estadisticas.ts). Siempre totales, nunca medias. */
 const es = {
-  "pestanas": {"aria": "Apartados de las estadísticas", "votos": "Votos", "perfil": "Perfil", "dinero": "Dinero"},
+  "pestanas": {"aria": "Apartados de las estadísticas", "votos": "Votos", "perfil": "Perfil", "dinero": "Dinero", "empresas": "Empresas"},
   "cifras": {"votaciones": "votaciones del Pleno analizadas", "mujeres": "mujeres entre los 350 diputados", "distintos": "diputados votaron alguna vez distinto de su grupo", "alquiler": "diputados declaran rentas de alquileres"},
   "verCifras": "Pulsa una fila para ver todas sus cifras.",
   "matriz": "Porcentaje de votaciones en que coincidieron los dos grupos (fila y columna).",
@@ -94,6 +94,107 @@ const es = {
     "verLista": "Ver quiénes son",
     "nota": "Conceptos de renta que mencionan alquiler, arrendamiento o rendimientos del capital inmobiliario, tal como los escribe cada diputado (viviendas, locales, plazas de garaje…). No cuenta dividendos ni intereses."
   },
+  "deGrupo": "{n} de {de}",
+  "rentasGrupo": {
+    "titulo": "Quién declara rentas, por grupo",
+    "intro": "Diputados de cada grupo que declaran alguna renta del año anterior (sin el sueldo del Congreso), de los que tienen declaración publicada.",
+    "con": "Declaran rentas",
+    "sin": "No declaran ninguna",
+    "nota": "Cuenta quien declara alguna renta mayor que cero o algún importe ilegible. Solo los diputados con declaración de bienes publicada."
+  },
+  "masRentas": {
+    "titulo": "Las rentas más altas declaradas",
+    "intro": "Total de rentas del año anterior a su declaración de bienes, sin el sueldo del Congreso.",
+    "alMenos": "al menos {x}",
+    "nota": "Suma de los importes de la tabla de rentas tal como los escribe cada diputado: trabajo, dividendos, intereses, alquileres y otras. Si algún importe es ilegible, la cifra es un mínimo («al menos»)."
+  },
+  "tiposRenta": {
+    "titulo": "Qué tipo de rentas declaran",
+    "intro": "Diputados que declaran alguna renta de cada tipo. Una persona cuenta en cada tipo que declara.",
+    "tipos": {
+      "salariales": "Trabajo (salarios)",
+      "dividendos": "Dividendos",
+      "intereses": "Intereses",
+      "otras": "Otras rentas (alquileres, actividades…)"
+    }
+  },
+  "inversiones": {
+    "titulo": "Acciones y fondos de inversión",
+    "intro": "Diputados que declaran acciones o participaciones y fondos de inversión, según cómo describe cada uno lo que tiene.",
+    "acciones": [
+      "{n} diputado declara acciones o participaciones",
+      "{n} diputados declaran acciones o participaciones"
+    ],
+    "fondos": [
+      "{n} diputado declara fondos de inversión",
+      "{n} diputados declaran fondos de inversión"
+    ],
+    "euros": "{x} en total",
+    "porGrupoAcciones": "Acciones o participaciones, por grupo",
+    "porGrupoFondos": "Fondos de inversión, por grupo",
+    "nota": "Tabla oficial «Deuda pública, obligaciones, acciones y participaciones» de la declaración de bienes. Se clasifica por las palabras de cada fila: si menciona acciones y fondos, cuenta en los dos; los planes de pensiones no cuentan como fondos; si no lo dice (por ejemplo, solo «TELEFONICA»), no se clasifica. Los euros son los importes legibles."
+  },
+  "masValores": {
+    "titulo": "Quién declara más en acciones, fondos y otros valores",
+    "intro": "Valor total de la tabla «Deuda pública, obligaciones, acciones y participaciones» de su declaración de bienes.",
+    "nota": "Suma de los importes de esa tabla tal como los escribe cada diputado (incluye deuda pública y otros valores). Si algún importe es ilegible, la cifra es un mínimo («al menos»)."
+  },
+  "accionesDe": {
+    "titulo": "De qué empresas declaran acciones más diputados",
+    "intro": "Empresas cuyas acciones o participaciones nombran más diputados en su declaración de bienes.",
+    "nota": "Solo cuentan las empresas que el diputado nombra; quien escribe solo «acciones» no se cuenta. Cada diputado cuenta una vez por empresa."
+  },
+  "empRelacion": {
+    "titulo": "Qué relación tienen con empresas privadas",
+    "intro": "Diputados que nombran empresas privadas en sus documentos oficiales, por tipo de relación. Una persona cuenta en cada tipo que tiene.",
+    "cifra": [
+      "{n} diputado nombra alguna empresa privada en sus documentos",
+      "{n} diputados nombran alguna empresa privada en sus documentos"
+    ],
+    "nota": "Participar no es ser dueño ni cobrar: tener acciones, haber trabajado en una empresa o tener una actividad autorizada son relaciones distintas. El tipo sale de la sección del documento o del artículo de la ley que cita el acuerdo del Congreso."
+  },
+  "empGrupo": {
+    "titulo": "Quién nombra empresas privadas, por grupo",
+    "intro": "Diputados de cada grupo que nombran alguna empresa privada en sus documentos oficiales, con cualquier relación.",
+    "con": "Nombran alguna",
+    "sin": "Ninguna"
+  },
+  "remuneracion": {
+    "titulo": "Qué dicen sus documentos sobre si cobran",
+    "intro": "Diputados con alguna relación con empresas o entidades (cargos, actividades, trabajos) en cada caso. Una persona cuenta en cada caso que aparece en sus documentos.",
+    "lista": "Quiénes tienen alguna relación con remuneración, según el documento",
+    "nota": "Solo cuenta lo que dice el texto del documento: cuando no lo dice, no cuenta como que cobra ni como que no. Algunos acuerdos hablan de cobros que ya terminaron; el texto literal está en la ficha de cada diputado. El sueldo del Congreso no se cuenta aquí."
+  },
+  "masEmpresas": {
+    "titulo": "Quién nombra más empresas",
+    "intro": "Empresas privadas distintas que nombran los documentos oficiales de cada diputado, con cualquier relación (acciones, trabajos anteriores, actividades…).",
+    "empresas": [
+      "{n} empresa",
+      "{n} empresas"
+    ]
+  },
+  "borme": {
+    "titulo": "Cargos en sociedades según el Registro Mercantil, por grupo",
+    "intro": "Diputados con algún acto inscrito en el BORME desde 2009 (nombramientos, ceses…) confirmado por otro documento oficial.",
+    "con": "Con cargos en el BORME",
+    "sin": "Sin cargos confirmados",
+    "nota": "El BORME no publica el DNI: solo cuentan las coincidencias de nombre confirmadas por otro documento oficial. El BORME tampoco dice si el cargo sigue vigente."
+  },
+  "ong": {
+    "titulo": "Aportaciones a fundaciones, ONG y asociaciones",
+    "intro": "Diputados que declaran cuotas o donativos a fundaciones, ONG y asociaciones en su declaración de intereses económicos.",
+    "cifra": [
+      "{n} diputado declara aportaciones a fundaciones, ONG o asociaciones",
+      "{n} diputados declaran aportaciones a fundaciones, ONG o asociaciones"
+    ],
+    "porGrupo": "Por grupo",
+    "mas": "A cuáles aportan más diputados",
+    "cargos": [
+      "Además, {n} diputado tiene un cargo o una actividad en alguna fundación o asociación.",
+      "Además, {n} diputados tienen un cargo o una actividad en alguna fundación o asociación."
+    ],
+    "nota": "Una aportación no es un cargo ni una participación en la entidad. No se cuentan las cuotas al propio partido. Cada diputado cuenta una vez por entidad."
+  },
   "perfil": {
     "titulo": "Mujeres y hombres en cada grupo",
     "mujeres": "Mujeres",
@@ -105,7 +206,7 @@ const es = {
 
 export default area(es, {
   ca: {
-    "pestanas": {"aria": "Apartats de les estadístiques", "votos": "Vots", "perfil": "Perfil", "dinero": "Diners"},
+    "pestanas": {"aria": "Apartats de les estadístiques", "votos": "Vots", "perfil": "Perfil", "dinero": "Diners", "empresas": "Empreses"},
     "cifras": {"votaciones": "votacions del Ple analitzades", "mujeres": "dones entre els 350 diputats", "distintos": "diputats han votat alguna vegada diferent del seu grup", "alquiler": "diputats declaren rendes de lloguers"},
     "verCifras": "Prem una fila per veure’n totes les xifres.",
     "matriz": "Percentatge de votacions en què els dos grups (fila i columna) van coincidir.",
@@ -197,6 +298,107 @@ export default area(es, {
       "verLista": "Veure qui són",
       "nota": "Conceptes de renda que esmenten lloguer, arrendament o rendiments del capital immobiliari, tal com els escriu cada diputat (habitatges, locals, places de garatge…). No compta dividends ni interessos."
     },
+    "deGrupo": "{n} de {de}",
+    "rentasGrupo": {
+      "titulo": "Qui declara rendes, per grup",
+      "intro": "Diputats de cada grup que declaren alguna renda de l’any anterior (sense el sou del Congrés), dels que tenen la declaració publicada.",
+      "con": "Declaren rendes",
+      "sin": "No en declaren cap",
+      "nota": "Compta qui declara alguna renda superior a zero o algun import il·legible. Només els diputats amb la declaració de béns publicada."
+    },
+    "masRentas": {
+      "titulo": "Les rendes més altes declarades",
+      "intro": "Total de rendes de l’any anterior a la declaració de béns, sense el sou del Congrés.",
+      "alMenos": "almenys {x}",
+      "nota": "Suma dels imports de la taula de rendes tal com els escriu cada diputat: treball, dividends, interessos, lloguers i altres. Si algun import és il·legible, la xifra és un mínim («almenys»)."
+    },
+    "tiposRenta": {
+      "titulo": "Quin tipus de rendes declaren",
+      "intro": "Diputats que declaren alguna renda de cada tipus. Una persona compta en cada tipus que declara.",
+      "tipos": {
+        "salariales": "Treball (salaris)",
+        "dividendos": "Dividends",
+        "intereses": "Interessos",
+        "otras": "Altres rendes (lloguers, activitats…)"
+      }
+    },
+    "inversiones": {
+      "titulo": "Accions i fons d’inversió",
+      "intro": "Diputats que declaren accions o participacions i fons d’inversió, segons com descriu cadascú el que té.",
+      "acciones": [
+        "{n} diputat declara accions o participacions",
+        "{n} diputats declaren accions o participacions"
+      ],
+      "fondos": [
+        "{n} diputat declara fons d’inversió",
+        "{n} diputats declaren fons d’inversió"
+      ],
+      "euros": "{x} en total",
+      "porGrupoAcciones": "Accions o participacions, per grup",
+      "porGrupoFondos": "Fons d’inversió, per grup",
+      "nota": "Taula oficial «Deute públic, obligacions, accions i participacions» de la declaració de béns. Es classifica per les paraules de cada fila: si esmenta accions i fons, compta en tots dos; els plans de pensions no compten com a fons; si no ho diu (per exemple, només «TELEFONICA»), no es classifica. Els euros són els imports llegibles."
+    },
+    "masValores": {
+      "titulo": "Qui declara més en accions, fons i altres valors",
+      "intro": "Valor total de la taula «Deute públic, obligacions, accions i participacions» de la declaració de béns.",
+      "nota": "Suma dels imports d’aquesta taula tal com els escriu cada diputat (inclou deute públic i altres valors). Si algun import és il·legible, la xifra és un mínim («almenys»)."
+    },
+    "accionesDe": {
+      "titulo": "De quines empreses declaren accions més diputats",
+      "intro": "Empreses de les quals més diputats esmenten accions o participacions a la declaració de béns.",
+      "nota": "Només compten les empreses que el diputat esmenta; qui escriu només «accions» no compta. Cada diputat compta una vegada per empresa."
+    },
+    "empRelacion": {
+      "titulo": "Quina relació tenen amb empreses privades",
+      "intro": "Diputats que esmenten empreses privades als seus documents oficials, per tipus de relació. Una persona compta en cada tipus que té.",
+      "cifra": [
+        "{n} diputat esmenta alguna empresa privada als seus documents",
+        "{n} diputats esmenten alguna empresa privada als seus documents"
+      ],
+      "nota": "Participar no és ser-ne propietari ni cobrar: tenir accions, haver treballat en una empresa o tenir una activitat autoritzada són relacions diferents. El tipus surt de la secció del document o de l’article de la llei que cita l’acord del Congrés."
+    },
+    "empGrupo": {
+      "titulo": "Qui esmenta empreses privades, per grup",
+      "intro": "Diputats de cada grup que esmenten alguna empresa privada als seus documents oficials, amb qualsevol relació.",
+      "con": "N’esmenten alguna",
+      "sin": "Cap"
+    },
+    "remuneracion": {
+      "titulo": "Què diuen els seus documents sobre si cobren",
+      "intro": "Diputats amb alguna relació amb empreses o entitats (càrrecs, activitats, feines) en cada cas. Una persona compta en cada cas que apareix als seus documents.",
+      "lista": "Qui té alguna relació amb remuneració, segons el document",
+      "nota": "Només compta el que diu el text del document: quan no ho diu, no compta com que cobra ni com que no. Alguns acords parlen de cobraments que ja han acabat; el text literal és a la fitxa de cada diputat. El sou del Congrés no es compta aquí."
+    },
+    "masEmpresas": {
+      "titulo": "Qui esmenta més empreses",
+      "intro": "Empreses privades diferents que esmenten els documents oficials de cada diputat, amb qualsevol relació (accions, feines anteriors, activitats…).",
+      "empresas": [
+        "{n} empresa",
+        "{n} empreses"
+      ]
+    },
+    "borme": {
+      "titulo": "Càrrecs en societats segons el Registre Mercantil, per grup",
+      "intro": "Diputats amb algun acte inscrit al BORME des del 2009 (nomenaments, cessaments…) confirmat per un altre document oficial.",
+      "con": "Amb càrrecs al BORME",
+      "sin": "Sense càrrecs confirmats",
+      "nota": "El BORME no publica el DNI: només compten les coincidències de nom confirmades per un altre document oficial. El BORME tampoc no diu si el càrrec continua vigent."
+    },
+    "ong": {
+      "titulo": "Aportacions a fundacions, ONG i associacions",
+      "intro": "Diputats que declaren quotes o donatius a fundacions, ONG i associacions a la declaració d’interessos econòmics.",
+      "cifra": [
+        "{n} diputat declara aportacions a fundacions, ONG o associacions",
+        "{n} diputats declaren aportacions a fundacions, ONG o associacions"
+      ],
+      "porGrupo": "Per grup",
+      "mas": "A quines aporten més diputats",
+      "cargos": [
+        "A més, {n} diputat té un càrrec o una activitat en alguna fundació o associació.",
+        "A més, {n} diputats tenen un càrrec o una activitat en alguna fundació o associació."
+      ],
+      "nota": "Una aportació no és un càrrec ni una participació en l’entitat. No es compten les quotes al propi partit. Cada diputat compta una vegada per entitat."
+    },
     "perfil": {
       "titulo": "Dones i homes a cada grup",
       "mujeres": "Dones",
@@ -206,7 +408,7 @@ export default area(es, {
     }
   },
   eu: {
-    "pestanas": {"aria": "Estatistiken atalak", "votos": "Botoak", "perfil": "Profila", "dinero": "Dirua"},
+    "pestanas": {"aria": "Estatistiken atalak", "votos": "Botoak", "perfil": "Profila", "dinero": "Dirua", "empresas": "Enpresak"},
     "cifras": {"votaciones": "Osoko bilkurako bozketa aztertuta", "mujeres": "emakume 350 diputatuen artean", "distintos": "diputatuk bozkatu dute noizbait beren taldeaz bestela", "alquiler": "diputatuk alokairuetatik errentak aitortzen dituzte"},
     "verCifras": "Sakatu errenkada bat zifrak ikusteko.",
     "matriz": "Bi taldeek (errenkada eta zutabea) bat egin zuten bozketen ehunekoa.",
@@ -298,6 +500,107 @@ export default area(es, {
       "verLista": "Ikusi nortzuk diren",
       "nota": "Alokairua, errentamendua edo higiezinen kapitalaren etekinak aipatzen dituzten errenta-kontzeptuak, diputatu bakoitzak idazten dituen bezala (etxebizitzak, lokalak, garaje-plazak…). Ez dira dibidenduak ezta interesak zenbatzen."
     },
+    "deGrupo": "{n} / {de}",
+    "rentasGrupo": {
+      "titulo": "Nork aitortzen ditu errentak, taldeka",
+      "intro": "Aurreko urteko errentaren bat aitortzen duten talde bakoitzeko diputatuak (Kongresuko soldata kanpo), aitorpena argitaratuta dutenen artean.",
+      "con": "Errentak aitortzen dituzte",
+      "sin": "Ez dute bat ere aitortzen",
+      "nota": "Zero baino errenta handiagoa edo zenbateko irakurtezinen bat aitortzen duena zenbatzen da. Ondasun-aitorpena argitaratuta duten diputatuak bakarrik."
+    },
+    "masRentas": {
+      "titulo": "Aitortutako errentarik handienak",
+      "intro": "Ondasun-aitorpenaren aurreko urteko errenten guztizkoa, Kongresuko soldata kanpo.",
+      "alMenos": "gutxienez {x}",
+      "nota": "Errenten taulako zenbatekoen batura, diputatu bakoitzak idazten dituen bezala: lana, dibidenduak, interesak, alokairuak eta beste batzuk. Zenbatekoren bat irakurtezina bada, zifra gutxienekoa da («gutxienez»)."
+    },
+    "tiposRenta": {
+      "titulo": "Zer errenta mota aitortzen dituzten",
+      "intro": "Mota bakoitzeko errentaren bat aitortzen duten diputatuak. Pertsona bat aitortzen duen mota bakoitzean zenbatzen da.",
+      "tipos": {
+        "salariales": "Lana (soldatak)",
+        "dividendos": "Dibidenduak",
+        "intereses": "Interesak",
+        "otras": "Beste errenta batzuk (alokairuak, jarduerak…)"
+      }
+    },
+    "inversiones": {
+      "titulo": "Akzioak eta inbertsio-funtsak",
+      "intro": "Akzioak edo partaidetzak eta inbertsio-funtsak aitortzen dituzten diputatuak, bakoitzak duena deskribatzen duen moduaren arabera.",
+      "acciones": [
+        "{n} diputatuk akzioak edo partaidetzak aitortzen ditu",
+        "{n} diputatuk akzioak edo partaidetzak aitortzen dituzte"
+      ],
+      "fondos": [
+        "{n} diputatuk inbertsio-funtsak aitortzen ditu",
+        "{n} diputatuk inbertsio-funtsak aitortzen dituzte"
+      ],
+      "euros": "{x} guztira",
+      "porGrupoAcciones": "Akzioak edo partaidetzak, taldeka",
+      "porGrupoFondos": "Inbertsio-funtsak, taldeka",
+      "nota": "Ondasun-aitorpeneko «Zor publikoa, obligazioak, akzioak eta partaidetzak» taula ofiziala. Errenkada bakoitzeko hitzen arabera sailkatzen da: akzioak eta funtsak aipatzen baditu, bietan zenbatzen da; pentsio-planak ez dira funtsak; ez badu esaten (adibidez, «TELEFONICA» bakarrik), ez da sailkatzen. Euroak zenbateko irakurgarriak dira."
+    },
+    "masValores": {
+      "titulo": "Nork aitortzen du gehien akzioetan, funtsetan eta beste baloreetan",
+      "intro": "Ondasun-aitorpeneko «Zor publikoa, obligazioak, akzioak eta partaidetzak» taularen balio osoa.",
+      "nota": "Taula horretako zenbatekoen batura, diputatu bakoitzak idazten dituen bezala (zor publikoa eta beste balore batzuk barne). Zenbatekoren bat irakurtezina bada, zifra gutxienekoa da («gutxienez»)."
+    },
+    "accionesDe": {
+      "titulo": "Zein enpresatako akzioak aitortzen dituzten diputatu gehienek",
+      "intro": "Diputatu gehienek ondasun-aitorpenean akzioak edo partaidetzak aipatzen dituzten enpresak.",
+      "nota": "Diputatuak aipatzen dituen enpresak bakarrik zenbatzen dira; «akzioak» bakarrik idazten duena ez da zenbatzen. Diputatu bakoitza behin zenbatzen da enpresa bakoitzeko."
+    },
+    "empRelacion": {
+      "titulo": "Zer harreman duten enpresa pribatuekin",
+      "intro": "Beren dokumentu ofizialetan enpresa pribatuak aipatzen dituzten diputatuak, harreman motaren arabera. Pertsona bat duen mota bakoitzean zenbatzen da.",
+      "cifra": [
+        "{n} diputatuk enpresa pribaturen bat aipatzen du bere dokumentuetan",
+        "{n} diputatuk enpresa pribaturen bat aipatzen dute beren dokumentuetan"
+      ],
+      "nota": "Parte hartzea ez da jabea izatea ez kobratzea: akzioak izatea, enpresa batean lan egin izana edo baimendutako jarduera bat izatea harreman desberdinak dira. Mota dokumentuaren ataletik edo Kongresuaren erabakiak aipatzen duen legearen artikulutik dator."
+    },
+    "empGrupo": {
+      "titulo": "Nork aipatzen ditu enpresa pribatuak, taldeka",
+      "intro": "Beren dokumentu ofizialetan enpresa pribaturen bat aipatzen duten talde bakoitzeko diputatuak, edozein harremanekin.",
+      "con": "Bat edo gehiago aipatzen dute",
+      "sin": "Bat ere ez"
+    },
+    "remuneracion": {
+      "titulo": "Zer diote beren dokumentuek kobratzen duten ala ez",
+      "intro": "Enpresa edo erakundeekin harremanen bat (karguak, jarduerak, lanak) duten diputatuak kasu bakoitzean. Pertsona bat bere dokumentuetan agertzen den kasu bakoitzean zenbatzen da.",
+      "lista": "Nork duen ordainsaria duen harremanen bat, dokumentuaren arabera",
+      "nota": "Dokumentuaren testuak dioena bakarrik zenbatzen da: esaten ez duenean, ez da zenbatzen kobratzen duela ez kobratzen ez duela. Erabaki batzuek amaitutako kobrantzak aipatzen dituzte; testu literala diputatu bakoitzaren fitxan dago. Kongresuko soldata ez da hemen zenbatzen."
+    },
+    "masEmpresas": {
+      "titulo": "Nork aipatzen ditu enpresa gehien",
+      "intro": "Diputatu bakoitzaren dokumentu ofizialek aipatzen dituzten enpresa pribatu desberdinak, edozein harremanekin (akzioak, aurreko lanak, jarduerak…).",
+      "empresas": [
+        "{n} enpresa",
+        "{n} enpresa"
+      ]
+    },
+    "borme": {
+      "titulo": "Sozietateetako karguak Merkataritza Erregistroaren arabera, taldeka",
+      "intro": "2009az geroztik BORMEn inskribatutako egintzaren bat (izendapenak, kargu-uzteak…) duten diputatuak, beste dokumentu ofizial batek baieztatuta.",
+      "con": "BORMEn karguekin",
+      "sin": "Baieztatutako kargurik gabe",
+      "nota": "BORMEk ez du NANa argitaratzen: beste dokumentu ofizial batek baieztatutako izen-bat-etortzeak bakarrik zenbatzen dira. BORMEk ez du esaten kargua oraindik indarrean dagoen ere."
+    },
+    "ong": {
+      "titulo": "Fundazio, GKE eta elkarteei egindako ekarpenak",
+      "intro": "Interes ekonomikoen adierazpenean fundazio, GKE eta elkarteei kuotak edo dohaintzak aitortzen dizkieten diputatuak.",
+      "cifra": [
+        "{n} diputatuk fundazio, GKE edo elkarteei egindako ekarpenak aitortzen ditu",
+        "{n} diputatuk fundazio, GKE edo elkarteei egindako ekarpenak aitortzen dituzte"
+      ],
+      "porGrupo": "Taldeka",
+      "mas": "Zeini egiten dioten ekarpena diputatu gehienek",
+      "cargos": [
+        "Gainera, {n} diputatuk kargu edo jarduera bat du fundazio edo elkarteren batean.",
+        "Gainera, {n} diputatuk kargu edo jarduera bat dute fundazio edo elkarteren batean."
+      ],
+      "nota": "Ekarpen bat ez da kargu bat ezta erakundean parte hartzea ere. Norberaren alderdiari ordaindutako kuotak ez dira zenbatzen. Diputatu bakoitza behin zenbatzen da erakunde bakoitzeko."
+    },
     "perfil": {
       "titulo": "Emakumeak eta gizonak talde bakoitzean",
       "mujeres": "Emakumeak",
@@ -307,7 +610,7 @@ export default area(es, {
     }
   },
   gl: {
-    "pestanas": {"aria": "Apartados das estatísticas", "votos": "Votos", "perfil": "Perfil", "dinero": "Diñeiro"},
+    "pestanas": {"aria": "Apartados das estatísticas", "votos": "Votos", "perfil": "Perfil", "dinero": "Diñeiro", "empresas": "Empresas"},
     "cifras": {"votaciones": "votacións do Pleno analizadas", "mujeres": "mulleres entre os 350 deputados", "distintos": "deputados votaron algunha vez distinto do seu grupo", "alquiler": "deputados declaran rendas de alugueiros"},
     "verCifras": "Preme unha fila para ver todas as súas cifras.",
     "matriz": "Porcentaxe de votacións en que coincidiron os dous grupos (fila e columna).",
@@ -399,6 +702,107 @@ export default area(es, {
       "verLista": "Ver quen son",
       "nota": "Conceptos de renda que mencionan aluguer, arrendamento ou rendementos do capital inmobiliario, tal como os escribe cada deputado (vivendas, locais, prazas de garaxe…). Non conta dividendos nin xuros."
     },
+    "deGrupo": "{n} de {de}",
+    "rentasGrupo": {
+      "titulo": "Quen declara rendas, por grupo",
+      "intro": "Deputados de cada grupo que declaran algunha renda do ano anterior (sen o soldo do Congreso), dos que teñen declaración publicada.",
+      "con": "Declaran rendas",
+      "sin": "Non declaran ningunha",
+      "nota": "Conta quen declara algunha renda maior que cero ou algún importe ilexible. Só os deputados con declaración de bens publicada."
+    },
+    "masRentas": {
+      "titulo": "As rendas máis altas declaradas",
+      "intro": "Total de rendas do ano anterior á súa declaración de bens, sen o soldo do Congreso.",
+      "alMenos": "polo menos {x}",
+      "nota": "Suma dos importes da táboa de rendas tal e como os escribe cada deputado: traballo, dividendos, xuros, alugueiros e outras. Se algún importe é ilexible, a cifra é un mínimo («polo menos»)."
+    },
+    "tiposRenta": {
+      "titulo": "Que tipo de rendas declaran",
+      "intro": "Deputados que declaran algunha renda de cada tipo. Unha persoa conta en cada tipo que declara.",
+      "tipos": {
+        "salariales": "Traballo (salarios)",
+        "dividendos": "Dividendos",
+        "intereses": "Xuros",
+        "otras": "Outras rendas (alugueiros, actividades…)"
+      }
+    },
+    "inversiones": {
+      "titulo": "Accións e fondos de investimento",
+      "intro": "Deputados que declaran accións ou participacións e fondos de investimento, segundo como describe cada un o que ten.",
+      "acciones": [
+        "{n} deputado declara accións ou participacións",
+        "{n} deputados declaran accións ou participacións"
+      ],
+      "fondos": [
+        "{n} deputado declara fondos de investimento",
+        "{n} deputados declaran fondos de investimento"
+      ],
+      "euros": "{x} en total",
+      "porGrupoAcciones": "Accións ou participacións, por grupo",
+      "porGrupoFondos": "Fondos de investimento, por grupo",
+      "nota": "Táboa oficial «Débeda pública, obrigas, accións e participacións» da declaración de bens. Clasifícase polas palabras de cada fila: se menciona accións e fondos, conta nos dous; os plans de pensións non contan como fondos; se non o di (por exemplo, só «TELEFONICA»), non se clasifica. Os euros son os importes lexibles."
+    },
+    "masValores": {
+      "titulo": "Quen declara máis en accións, fondos e outros valores",
+      "intro": "Valor total da táboa «Débeda pública, obrigas, accións e participacións» da súa declaración de bens.",
+      "nota": "Suma dos importes desa táboa tal e como os escribe cada deputado (inclúe débeda pública e outros valores). Se algún importe é ilexible, a cifra é un mínimo («polo menos»)."
+    },
+    "accionesDe": {
+      "titulo": "De que empresas declaran accións máis deputados",
+      "intro": "Empresas das que máis deputados nomean accións ou participacións na súa declaración de bens.",
+      "nota": "Só contan as empresas que o deputado nomea; quen escribe só «accións» non conta. Cada deputado conta unha vez por empresa."
+    },
+    "empRelacion": {
+      "titulo": "Que relación teñen con empresas privadas",
+      "intro": "Deputados que nomean empresas privadas nos seus documentos oficiais, por tipo de relación. Unha persoa conta en cada tipo que ten.",
+      "cifra": [
+        "{n} deputado nomea algunha empresa privada nos seus documentos",
+        "{n} deputados nomean algunha empresa privada nos seus documentos"
+      ],
+      "nota": "Participar non é ser dono nin cobrar: ter accións, ter traballado nunha empresa ou ter unha actividade autorizada son relacións distintas. O tipo sae da sección do documento ou do artigo da lei que cita o acordo do Congreso."
+    },
+    "empGrupo": {
+      "titulo": "Quen nomea empresas privadas, por grupo",
+      "intro": "Deputados de cada grupo que nomean algunha empresa privada nos seus documentos oficiais, con calquera relación.",
+      "con": "Nomean algunha",
+      "sin": "Ningunha"
+    },
+    "remuneracion": {
+      "titulo": "Que din os seus documentos sobre se cobran",
+      "intro": "Deputados con algunha relación con empresas ou entidades (cargos, actividades, traballos) en cada caso. Unha persoa conta en cada caso que aparece nos seus documentos.",
+      "lista": "Quen ten algunha relación con remuneración, segundo o documento",
+      "nota": "Só conta o que di o texto do documento: cando non o di, non conta como que cobra nin como que non. Algúns acordos falan de cobros que xa remataron; o texto literal está na ficha de cada deputado. O soldo do Congreso non se conta aquí."
+    },
+    "masEmpresas": {
+      "titulo": "Quen nomea máis empresas",
+      "intro": "Empresas privadas distintas que nomean os documentos oficiais de cada deputado, con calquera relación (accións, traballos anteriores, actividades…).",
+      "empresas": [
+        "{n} empresa",
+        "{n} empresas"
+      ]
+    },
+    "borme": {
+      "titulo": "Cargos en sociedades segundo o Rexistro Mercantil, por grupo",
+      "intro": "Deputados con algún acto inscrito no BORME desde 2009 (nomeamentos, cesamentos…) confirmado por outro documento oficial.",
+      "con": "Con cargos no BORME",
+      "sin": "Sen cargos confirmados",
+      "nota": "O BORME non publica o DNI: só contan as coincidencias de nome confirmadas por outro documento oficial. O BORME tampouco di se o cargo segue vixente."
+    },
+    "ong": {
+      "titulo": "Achegas a fundacións, ONG e asociacións",
+      "intro": "Deputados que declaran cotas ou donativos a fundacións, ONG e asociacións na súa declaración de intereses económicos.",
+      "cifra": [
+        "{n} deputado declara achegas a fundacións, ONG ou asociacións",
+        "{n} deputados declaran achegas a fundacións, ONG ou asociacións"
+      ],
+      "porGrupo": "Por grupo",
+      "mas": "A cales achegan máis deputados",
+      "cargos": [
+        "Ademais, {n} deputado ten un cargo ou unha actividade nalgunha fundación ou asociación.",
+        "Ademais, {n} deputados teñen un cargo ou unha actividade nalgunha fundación ou asociación."
+      ],
+      "nota": "Unha achega non é un cargo nin unha participación na entidade. Non se contan as cotas ao propio partido. Cada deputado conta unha vez por entidade."
+    },
     "perfil": {
       "titulo": "Mulleres e homes en cada grupo",
       "mujeres": "Mulleres",
@@ -408,7 +812,7 @@ export default area(es, {
     }
   },
   en: {
-    "pestanas": {"aria": "Statistics sections", "votos": "Votes", "perfil": "Profile", "dinero": "Money"},
+    "pestanas": {"aria": "Statistics sections", "votos": "Votes", "perfil": "Profile", "dinero": "Money", "empresas": "Companies"},
     "cifras": {"votaciones": "plenary votes analysed", "mujeres": "women among the 350 MPs", "distintos": "MPs have voted differently from their group at least once", "alquiler": "MPs declare rental income"},
     "verCifras": "Select a row to see all its figures.",
     "matriz": "Percentage of votes in which both groups (row and column) voted the same way.",
@@ -499,6 +903,107 @@ export default area(es, {
       "porGrupo": "By group",
       "verLista": "See who they are",
       "nota": "Income items that mention rent, lease or income from real estate, as each deputy writes them (homes, premises, parking spaces…). Dividends and interest are not counted."
+    },
+    "deGrupo": "{n} of {de}",
+    "rentasGrupo": {
+      "titulo": "Who declares income, by group",
+      "intro": "Members of each group who declare some income from the previous year (excluding their Congress salary), out of those with a published declaration.",
+      "con": "Declare income",
+      "sin": "Declare none",
+      "nota": "Counts anyone who declares income above zero or an unreadable amount. Only members with a published asset declaration."
+    },
+    "masRentas": {
+      "titulo": "Highest declared income",
+      "intro": "Total income from the year before their asset declaration, excluding their Congress salary.",
+      "alMenos": "at least {x}",
+      "nota": "Sum of the amounts in the income table as each member writes them: employment, dividends, interest, rent and other. If an amount is unreadable, the figure is a minimum («at least»)."
+    },
+    "tiposRenta": {
+      "titulo": "What kind of income they declare",
+      "intro": "Members who declare some income of each kind. A person counts once in each kind they declare.",
+      "tipos": {
+        "salariales": "Employment (salaries)",
+        "dividendos": "Dividends",
+        "intereses": "Interest",
+        "otras": "Other income (rent, activities…)"
+      }
+    },
+    "inversiones": {
+      "titulo": "Shares and investment funds",
+      "intro": "Members who declare shares or holdings and investment funds, according to how each one describes what they own.",
+      "acciones": [
+        "{n} member declares shares or holdings",
+        "{n} members declare shares or holdings"
+      ],
+      "fondos": [
+        "{n} member declares investment funds",
+        "{n} members declare investment funds"
+      ],
+      "euros": "{x} in total",
+      "porGrupoAcciones": "Shares or holdings, by group",
+      "porGrupoFondos": "Investment funds, by group",
+      "nota": "Official table «Public debt, bonds, shares and holdings» of the asset declaration. Classified by the words in each row: if it mentions shares and funds, it counts in both; pension plans do not count as funds; if it does not say (e.g. just «TELEFONICA»), it is not classified. Euros are the readable amounts."
+    },
+    "masValores": {
+      "titulo": "Who declares most in shares, funds and other securities",
+      "intro": "Total value of the «Public debt, bonds, shares and holdings» table of their asset declaration.",
+      "nota": "Sum of the amounts in that table as each member writes them (includes public debt and other securities). If an amount is unreadable, the figure is a minimum («at least»)."
+    },
+    "accionesDe": {
+      "titulo": "Companies whose shares most members declare",
+      "intro": "Companies whose shares or holdings are named by most members in their asset declaration.",
+      "nota": "Only companies the member names count; someone who just writes «shares» is not counted. Each member counts once per company."
+    },
+    "empRelacion": {
+      "titulo": "How they are involved with private companies",
+      "intro": "Members who name private companies in their official documents, by type of involvement. A person counts once in each type they have.",
+      "cifra": [
+        "{n} member names a private company in their documents",
+        "{n} members name a private company in their documents"
+      ],
+      "nota": "Involvement does not mean ownership or being paid: holding shares, having worked at a company or having an authorised activity are different things. The type comes from the section of the document or the article of the law cited by the Congress decision."
+    },
+    "empGrupo": {
+      "titulo": "Who names private companies, by group",
+      "intro": "Members of each group who name a private company in their official documents, with any type of involvement.",
+      "con": "Name at least one",
+      "sin": "None"
+    },
+    "remuneracion": {
+      "titulo": "What their documents say about pay",
+      "intro": "Members with some involvement with companies or organisations (positions, activities, jobs) in each case. A person counts once in each case that appears in their documents.",
+      "lista": "Who has some paid involvement, according to the document",
+      "nota": "Only what the text of the document says counts: when it does not say, it counts neither as paid nor as unpaid. Some decisions mention payments that have already ended; the literal text is on each member’s page. The Congress salary is not counted here."
+    },
+    "masEmpresas": {
+      "titulo": "Who names the most companies",
+      "intro": "Distinct private companies named in each member’s official documents, with any type of involvement (shares, previous jobs, activities…).",
+      "empresas": [
+        "{n} company",
+        "{n} companies"
+      ]
+    },
+    "borme": {
+      "titulo": "Company positions in the Companies Register, by group",
+      "intro": "Members with an entry in the BORME since 2009 (appointments, resignations…) confirmed by another official document.",
+      "con": "With positions in the BORME",
+      "sin": "No confirmed positions",
+      "nota": "The BORME does not publish ID numbers: only name matches confirmed by another official document count. The BORME does not say whether the position is still held either."
+    },
+    "ong": {
+      "titulo": "Contributions to foundations, NGOs and associations",
+      "intro": "Members who declare membership fees or donations to foundations, NGOs and associations in their declaration of economic interests.",
+      "cifra": [
+        "{n} member declares contributions to foundations, NGOs or associations",
+        "{n} members declare contributions to foundations, NGOs or associations"
+      ],
+      "porGrupo": "By group",
+      "mas": "Which ones most members contribute to",
+      "cargos": [
+        "In addition, {n} member holds a position or activity in a foundation or association.",
+        "In addition, {n} members hold a position or activity in a foundation or association."
+      ],
+      "nota": "A contribution is not a position in or a stake in the organisation. Fees to their own party are not counted. Each member counts once per organisation."
     },
     "perfil": {
       "titulo": "Women and men in each group",

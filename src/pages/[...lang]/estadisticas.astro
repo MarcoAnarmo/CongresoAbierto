@@ -13,9 +13,14 @@ import Icono from '../../components/Icono.astro';
 import PestanasDatos from '../../components/PestanasDatos.astro';
 import Pestanas from '../../components/Pestanas.astro';
 import Tarjeta from '../../components/TarjetaEstadistica.astro';
+import DialogoCompartir from '../../components/DialogoCompartir.astro';
 import { diputados, votacionesPleno, grupos, colorGrupo, slug, TEMAS } from '../../lib/data';
 import type { NombreIcono } from '../../lib/iconos';
 import * as E from '../../lib/estadisticas';
+import * as D from '../../lib/estadisticas-dinero';
+import { rutaTarjeta, compartir } from '../../lib/tarjetas';
+import textosTarjetas from '../../i18n/textos/tarjetas';
+import textosCompartir from '../../i18n/textos/compartir';
 import { rutasIdioma, idiomaDe, enlace, formatos, f, pl } from '../../i18n';
 import comun from '../../i18n/textos/comun';
 import textos from '../../i18n/textos/estadisticas';
@@ -67,14 +72,61 @@ const etTramo = (i: number) => i === 0 ? t.rentas.ninguna
 const alquiler = E.conRentasDeAlquiler(diputados).sort((a, b) => G.indexOf(a.grupoCorto) - G.indexOf(b.grupoCorto) || a.apellidos.localeCompare(b.apellidos, 'es'));
 const alquilerGrupo = G.map((g) => ({ g, n: alquiler.filter((d) => d.grupoCorto === g).length })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n);
 
+// Dinero · rentas, acciones y fondos (src/lib/estadisticas-dinero.ts)
+/** Por grupo, de más a menos (a igualdad, en el orden de la Cámara). */
+const ordenN = <T extends { g: string; n: number }>(xs: T[]) => [...xs].sort((a, b) => b.n - a.n || G.indexOf(a.g) - G.indexOf(b.g));
+const rentasGrupo = ordenN(D.porGrupo(diputados, G, D.declaraRentas, D.conDeclaracion));
+const nRentas = rentasGrupo.reduce((a, x) => a + x.n, 0);
+const nConDecl = rentasGrupo.reduce((a, x) => a + x.de, 0);
+const topRentas = D.masRentas(diputados, 10);
+const tiposRenta = D.tiposDeRenta(diputados);
+const inv = D.totalesInversion(diputados);
+const accGrupo = ordenN(D.porGrupo(diputados, G, D.declaraAcciones, D.conDeclaracion));
+const fonGrupo = ordenN(D.porGrupo(diputados, G, D.declaraFondos, D.conDeclaracion));
+const topValores = D.masValores(diputados, 10);
+const accionesDe = D.masNombradas(diputados, (e, a) => e.tipo === 'empresa' && a.relacion === 'acciones', 10);
+const importe = (x: D.Importe) => (x.alMenos ? f(t.masRentas.alMenos, { x: eur(x.euros) }) : eur(x.euros));
+
+// Empresas · participación en empresas y entidades
+const tv = tc.vinculos;
+const nEmpresas = diputados.filter(D.conEmpresas).length;
+const relEmp = D.relacionesConEmpresas(diputados);
+const empGrupo = ordenN(D.porGrupo(diputados, G, D.conEmpresas));
+const rem = D.remuneracionDiputados(diputados);
+const pagados = D.conRemuneracion(diputados).sort((a, b) => G.indexOf(a.d.grupoCorto) - G.indexOf(b.d.grupoCorto) || a.d.apellidos.localeCompare(b.d.apellidos, 'es'));
+const topEmpresas = D.masEmpresas(diputados, 10);
+const bormeGrupo = ordenN(D.porGrupo(diputados, G, D.conBorme));
+const nBorme = bormeGrupo.reduce((a, x) => a + x.n, 0);
+const nOng = diputados.filter(D.aportaAOng).length;
+const ongGrupo = ordenN(D.porGrupo(diputados, G, D.aportaAOng, D.conIntereses));
+const ongMas = D.masNombradas(diputados, (e, a) => D.esOng(e.tipo) && a.relacion === 'aportacion', 10);
+const nCargoOng = diputados.filter(D.cargoEnOng).length;
+
+/** Fila de un grupo: cuántos cumplen y cuántos no, de los del grupo. */
+const CON = 'var(--accent)', SIN = 'var(--chip)';
+const tramosGrupo = (x: { n: number; de: number }, et: { con: string; sin: string }) => [
+  { valor: x.n, color: CON, corto: num(x.n), texto: `${et.con} ${num(x.n)}` },
+  { valor: x.de - x.n, color: SIN, tinta: 'var(--text)', corto: num(x.de - x.n), texto: `${et.sin} ${num(x.de - x.n)}` },
+];
+const deGrupo = (x: { n: number; de: number }) => f(t.deGrupo, { n: num(x.n), de: num(x.de) });
+
+// Tarjetas para compartir de las estadísticas (src/lib/tarjetas-estadisticas.ts)
+const tte = textosTarjetas[lang].estadisticas;
+const tarjeta = (id: 'rentas' | 'inversiones' | 'empresas' | 'ong', ancla: string) => {
+  const titulo = tte[id].titulo;
+  const c = compartir.estadistica(id, titulo, ancla, lang);
+  return { historia: rutaTarjeta.estadistica(id, 'historia', lang), horizontal: rutaTarjeta.estadistica(id, 'horizontal', lang), nombre: `congreso-abierto-${id}`, enlace: c.enlace, texto: c.texto, titulo, etiqueta: `${textosCompartir[lang].ui.dialogo}: ${titulo}` };
+};
+
 const dip = (n: number) => pl(n, tc.palabras.diputados, lang);
 const pct = (n: number, de: number) => (de ? `${Math.round((100 * n) / de)} %` : '—');
 
-type Pestana = 'votos' | 'perfil' | 'dinero';
+type Pestana = 'votos' | 'perfil' | 'dinero' | 'empresas';
 const PESTANAS: { id: Pestana; icono: NombreIcono }[] = [
   { id: 'votos', icono: 'votaciones' },
   { id: 'perfil', icono: 'fichas' },
   { id: 'dinero', icono: 'rentas' },
+  { id: 'empresas', icono: 'entidades' },
 ];
 const CIFRAS: { v: number; l: string; p: Pestana }[] = [
   { v: votacionesPleno.length, l: t.cifras.votaciones, p: 'votos' },
@@ -202,8 +254,93 @@ const CIFRAS: { v: number; l: string; p: Pestana }[] = [
         <ul role="list">{alquiler.map((d) => <li><a href={u(`/diputado/${slug(d)}#rentas`)}><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span>{d.nombreCompleto}</a> <span class="muted small">{d.grupoCorto} · {d.circunscripcion}</span></li>)}</ul>
       </details>
     </Tarjeta>
+
+    <Tarjeta id="rentas-grupo" titulo={t.rentasGrupo.titulo} intro={t.rentasGrupo.intro} como={t.rentasGrupo.nota} descargar={u('/datos?tabla=diputados')} compartir={tarjeta('rentas', 'rentas-grupo')}>
+      <p class="cifra-grande"><strong>{num(nRentas)}</strong> <span>{deGrupo({ n: nRentas, de: nConDecl }).replace(/^\S+\s/, '')}</span></p>
+      <p class="leyenda small"><span><span class="dot" style={`background:${CON}`}></span>{t.rentasGrupo.con}</span><span><span class="dot" style={`background:${SIN}`}></span>{t.rentasGrupo.sin}</span></p>
+      {rentasGrupo.map((x) => <BarraApilada etiqueta={x.g} punto={colorGrupo(x.g)} total={deGrupo(x)} tramos={tramosGrupo(x, t.rentasGrupo)} />)}
+    </Tarjeta>
+
+    <Tarjeta id="mas-rentas" titulo={t.masRentas.titulo} intro={t.masRentas.intro} como={t.masRentas.nota} descargar={u('/datos?tabla=diputados')} compartir={tarjeta('rentas', 'mas-rentas')}>
+      <Barras items={topRentas.map((x) => ({ etiqueta: `${x.d.nombreCompleto} (${x.d.grupoCorto})`, punto: colorGrupo(x.d.grupoCorto), href: u(`/diputado/${slug(x.d)}#rentas`), valor: x.euros, texto: importe(x) }))} />
+    </Tarjeta>
+
+    <Tarjeta id="tipos-renta" titulo={t.tiposRenta.titulo} intro={t.tiposRenta.intro} descargar={u('/datos?tabla=diputados')}>
+      <Barras max={nConDecl} items={D.TIPOS_RENTA.map((k) => ({ etiqueta: t.tiposRenta.tipos[k], valor: tiposRenta.get(k) ?? 0, texto: dip(tiposRenta.get(k) ?? 0) }))} />
+    </Tarjeta>
+
+    <Tarjeta id="acciones-fondos" titulo={t.inversiones.titulo} intro={t.inversiones.intro} como={t.inversiones.nota} descargar={u('/datos?tabla=diputados')} compartir={tarjeta('inversiones', 'acciones-fondos')} ancho>
+      <div class="dos">
+        <div>
+          <p class="cifra-grande"><strong>{num(inv.acciones)}</strong> <span>{pl(inv.acciones, t.inversiones.acciones, lang).replace(/^\S+\s/, '')} · {f(t.inversiones.euros, { x: eur(inv.eurosAcciones) })}</span></p>
+          <h3 class="sub">{t.inversiones.porGrupoAcciones}</h3>
+          {accGrupo.map((x) => <BarraApilada etiqueta={x.g} punto={colorGrupo(x.g)} total={deGrupo(x)} tramos={tramosGrupo(x, { con: t.inversiones.porGrupoAcciones, sin: t.rentasGrupo.sin })} />)}
+        </div>
+        <div>
+          <p class="cifra-grande"><strong>{num(inv.fondos)}</strong> <span>{pl(inv.fondos, t.inversiones.fondos, lang).replace(/^\S+\s/, '')} · {f(t.inversiones.euros, { x: eur(inv.eurosFondos) })}</span></p>
+          <h3 class="sub">{t.inversiones.porGrupoFondos}</h3>
+          {fonGrupo.map((x) => <BarraApilada etiqueta={x.g} punto={colorGrupo(x.g)} total={deGrupo(x)} tramos={tramosGrupo(x, { con: t.inversiones.porGrupoFondos, sin: t.rentasGrupo.sin })} />)}
+        </div>
+      </div>
+    </Tarjeta>
+
+    <Tarjeta id="mas-valores" titulo={t.masValores.titulo} intro={t.masValores.intro} como={t.masValores.nota} descargar={u('/datos?tabla=diputados')} compartir={tarjeta('inversiones', 'mas-valores')}>
+      <Barras items={topValores.map((x) => ({ etiqueta: `${x.d.nombreCompleto} (${x.d.grupoCorto})`, punto: colorGrupo(x.d.grupoCorto), href: u(`/diputado/${slug(x.d)}#inversiones`), valor: x.euros, texto: importe(x) }))} />
+    </Tarjeta>
+
+    <Tarjeta id="acciones-de" titulo={t.accionesDe.titulo} intro={t.accionesDe.intro} como={t.accionesDe.nota} descargar={u('/datos?tabla=entidades')} compartir={tarjeta('inversiones', 'acciones-de')}>
+      <Barras items={accionesDe.map((x) => ({ etiqueta: x.nombre, valor: x.n, texto: dip(x.n) }))} />
+    </Tarjeta>
   </div>
 
+  <!-- ===================== Empresas ===================== -->
+  <div class="panel panel-pestana" role="tabpanel" id="empresas" aria-labelledby="tab-empresas">
+    <h2 class="panel-tit">{t.pestanas.empresas}</h2>
+    <Tarjeta id="relacion-empresas" titulo={t.empRelacion.titulo} intro={t.empRelacion.intro} como={t.empRelacion.nota} descargar={u('/datos?tabla=entidades')} compartir={tarjeta('empresas', 'relacion-empresas')}>
+      <p class="cifra-grande"><strong>{num(nEmpresas)}</strong> <span>{pl(nEmpresas, t.empRelacion.cifra, lang).replace(/^\S+\s/, '')}</span></p>
+      <Barras max={nEmpresas} items={relEmp.map((x) => ({ etiqueta: tv.relaciones[x.relacion], valor: x.n, texto: dip(x.n), href: u(`/diputados?entidad=empresa&relacion=${x.relacion}`) }))} />
+    </Tarjeta>
+
+    <Tarjeta id="remuneracion" titulo={t.remuneracion.titulo} intro={t.remuneracion.intro} como={t.remuneracion.nota} descargar={u('/datos?tabla=entidades')} compartir={tarjeta('empresas', 'remuneracion')}>
+      <Barras items={D.REMUNERACIONES.map((k) => ({ etiqueta: tv.remuneracion[k], valor: rem.get(k) ?? 0, texto: dip(rem.get(k) ?? 0), color: k === 'si' ? 'var(--accent)' : 'var(--muted)' }))} />
+      <details class="lista-nombres" open>
+        <summary>{t.remuneracion.lista} · {num(pagados.length)}<Icono n="abajo" tam={18} /></summary>
+        <ul role="list">{pagados.map((x) => <li><a href={u(`/diputado/${slug(x.d)}#${x.entidades[0].tipo === 'empresa' ? 'empresas' : x.entidades[0].tipo === 'publica' ? 'publicas' : 'otras-entidades'}`)}><span class="dot" style={`background:${colorGrupo(x.d.grupoCorto)}`}></span>{x.d.nombreCompleto}</a> <span class="muted small">{x.d.grupoCorto} · {x.entidades.map((e) => `${e.nombre} (${tv.relaciones[e.relacion].toLowerCase()})`).join(', ')}</span></li>)}</ul>
+      </details>
+    </Tarjeta>
+
+    <Tarjeta id="empresas-grupo" titulo={t.empGrupo.titulo} intro={t.empGrupo.intro} descargar={u('/datos?tabla=entidades')}>
+      <p class="leyenda small"><span><span class="dot" style={`background:${CON}`}></span>{t.empGrupo.con}</span><span><span class="dot" style={`background:${SIN}`}></span>{t.empGrupo.sin}</span></p>
+      {empGrupo.map((x) => <BarraApilada etiqueta={x.g} punto={colorGrupo(x.g)} total={deGrupo(x)} tramos={tramosGrupo(x, t.empGrupo)} />)}
+    </Tarjeta>
+
+    <Tarjeta id="mas-empresas" titulo={t.masEmpresas.titulo} intro={t.masEmpresas.intro} descargar={u('/datos?tabla=entidades')}>
+      <Barras items={topEmpresas.map((x) => ({ etiqueta: `${x.d.nombreCompleto} (${x.d.grupoCorto})`, punto: colorGrupo(x.d.grupoCorto), href: u(`/diputado/${slug(x.d)}#empresas`), valor: x.n, texto: pl(x.n, t.masEmpresas.empresas, lang) }))} />
+    </Tarjeta>
+
+    <Tarjeta id="borme-grupo" titulo={t.borme.titulo} intro={t.borme.intro} como={t.borme.nota} descargar={u('/datos?tabla=borme')}>
+      <p class="cifra-grande"><strong>{num(nBorme)}</strong> <span>{dip(nBorme).replace(/^\S+\s/, '')}</span></p>
+      <p class="leyenda small"><span><span class="dot" style={`background:${CON}`}></span>{t.borme.con}</span><span><span class="dot" style={`background:${SIN}`}></span>{t.borme.sin}</span></p>
+      {bormeGrupo.map((x) => <BarraApilada etiqueta={x.g} punto={colorGrupo(x.g)} total={deGrupo(x)} tramos={tramosGrupo(x, t.borme)} />)}
+    </Tarjeta>
+
+    <Tarjeta id="ong" titulo={t.ong.titulo} intro={t.ong.intro} como={t.ong.nota} descargar={u('/datos?tabla=entidades')} compartir={tarjeta('ong', 'ong')} ancho>
+      <p class="cifra-grande"><strong>{num(nOng)}</strong> <span>{pl(nOng, t.ong.cifra, lang).replace(/^\S+\s/, '')}</span></p>
+      <div class="dos">
+        <div>
+          <h3 class="sub">{t.ong.mas}</h3>
+          <Barras items={ongMas.map((x) => ({ etiqueta: x.nombre, valor: x.n, texto: dip(x.n) }))} />
+        </div>
+        <div>
+          <h3 class="sub">{t.ong.porGrupo}</h3>
+          {ongGrupo.map((x) => <BarraApilada etiqueta={x.g} punto={colorGrupo(x.g)} total={deGrupo(x)} tramos={tramosGrupo(x, { con: t.ong.porGrupo, sin: t.rentasGrupo.sin })} />)}
+        </div>
+      </div>
+      <p class="nota small muted">{pl(nCargoOng, t.ong.cargos, lang)}</p>
+    </Tarjeta>
+  </div>
+
+  <DialogoCompartir />
   <HojaInfo />
 </Base>
 
@@ -243,6 +380,7 @@ const CIFRAS: { v: number; l: string; p: Pestana }[] = [
   .b-pie a:hover { text-decoration: underline; }
   .sub { font-size: .95rem; margin: 18px 0 10px; }
   .tres > div:first-child .sub { margin-top: 0; }
+  @media (min-width: 900px) { .dos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; } .dos .sub { margin-top: 4px; } }
   .nota { margin: 10px 0 0; }
   @media (min-width: 900px) { .tres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; } .tres .sub { margin-top: 0; } }
 

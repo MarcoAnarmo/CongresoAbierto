@@ -12,6 +12,7 @@ const es = {
     votacion: '{titulo} ({fecha}): {resultado} con {si} sí, {no} no y {abs} abstenciones. Qué votó cada diputado:',
     provincia: ['El diputado elegido por {provincia}: qué declaran, cuánto cobran y cómo votan.', 'Los {n} diputados elegidos por {provincia}: qué declaran, cuánto cobran y cómo votan.'],
     resumen: 'Los 350 diputados de la XV Legislatura: qué declaran, cuánto cobran y cómo votan, con sus datos oficiales.',
+    estadistica: '{titulo} Cifras de los 350 diputados con sus datos oficiales:',
   },
   /** Botones y ventana de compartir (servidor). */
   ui: {
@@ -56,6 +57,7 @@ export default area(es, {
       votacion: '{titulo} ({fecha}): {resultado} amb {si} sí, {no} no i {abs} abstencions. Què va votar cada diputat:',
       provincia: ['El diputat elegit per {provincia}: què declara, quant cobra i com vota.', 'Els {n} diputats elegits per {provincia}: què declaren, quant cobren i com voten.'],
       resumen: 'Els 350 diputats de la XV legislatura: què declaren, quant cobren i com voten, amb les dades oficials.',
+      estadistica: '{titulo} Xifres dels 350 diputats amb les seves dades oficials:',
     },
     ui: {
       /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */
@@ -97,6 +99,7 @@ export default area(es, {
       votacion: '{titulo} ({fecha}): {resultado}, {si} bai, {no} ez eta {abs} abstentziorekin. Zer bozkatu zuen diputatu bakoitzak:',
       provincia: ['{provincia} barrutian hautatutako diputatua: zer aitortzen duen, zenbat kobratzen duen eta nola bozkatzen duen.', '{provincia} barrutian hautatutako {n} diputatuak: zer aitortzen duten, zenbat kobratzen duten eta nola bozkatzen duten.'],
       resumen: 'XV. legegintzaldiko 350 diputatuak: zer aitortzen duten, zenbat kobratzen duten eta nola bozkatzen duten, datu ofizialekin.',
+      estadistica: '{titulo} 350 diputatuen zifrak, beren datu ofizialekin:',
     },
     ui: {
       /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */
@@ -137,6 +140,7 @@ export default area(es, {
       votacion: '{titulo} ({fecha}): {resultado} con {si} si, {no} non e {abs} abstencións. Que votou cada deputado:',
       provincia: ['O deputado elixido por {provincia}: que declara, canto cobra e como vota.', 'Os {n} deputados elixidos por {provincia}: que declaran, canto cobran e como votan.'],
       resumen: 'Os 350 deputados da XV Lexislatura: que declaran, canto cobran e como votan, cos seus datos oficiais.',
+      estadistica: '{titulo} Cifras dos 350 deputados cos seus datos oficiais:',
     },
     ui: {
       /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */
@@ -177,6 +181,7 @@ export default area(es, {
       votacion: '{titulo} ({fecha}): {resultado} with {si} yes, {no} no and {abs} abstentions. How each deputy voted:',
       provincia: ['The deputy elected for {provincia}: what they declare, what they earn and how they vote.', 'The {n} deputies elected for {provincia}: what they declare, what they earn and how they vote.'],
       resumen: 'The 350 deputies of the 15th term: what they declare, what they earn and how they vote, with their official data.',
+      estadistica: '{titulo} Figures for the 350 members from their official data:',
     },
     ui: {
       /** Enlace a la galería de tarjetas, al pie de la ventana de compartir. */

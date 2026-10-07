@@ -69,6 +69,7 @@ export const TABLAS: DefTabla[] = [
       c('formacion', 'lista'), c('tipo_formacion', 'texto'),
       c('retribucion_mensual', 'decimal', true), c('propiedades', 'entero', true), c('viviendas', 'entero', true), c('vehiculos', 'entero'),
       c('rentas_declaradas', 'decimal'), c('rentas_al_menos', 'booleano'), c('depositos', 'decimal'), c('depositos_al_menos', 'booleano'),
+      c('valores_declarados', 'decimal'), c('valores_al_menos', 'booleano'), c('acciones', 'decimal'), c('fondos_inversion', 'decimal'),
       c('deuda_pendiente', 'decimal'), c('deuda_al_menos', 'booleano'),
       c('votaciones_en_escano', 'entero'), c('votos_si', 'entero'), c('votos_no', 'entero'), c('votos_abstencion', 'entero'), c('no_vota', 'entero'),
       c('votos_distintos_del_grupo', 'entero'),
