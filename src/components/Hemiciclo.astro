@@ -127,6 +127,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   import { deslizarParaCerrar } from '../scripts/hoja';
   import { TRAMOS, tramo } from '../lib/hemiciclo';
   import { precargar } from '../scripts/precarga';
+  import { escalaHtml as escalaLey } from '../scripts/leyenda';
   import { textos, f, locale, localeNum, fmtFechaCorta, prefijo } from '../i18n/cliente';
   type Tx = {
     diputados: [string, string]; viviendas: string; propiedades: string; tramoViviendas: string; tramoPropiedades: string; sinDatosAria: string; sd: string;
@@ -172,10 +173,11 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   // Cada elemento de la leyenda es un botón: al pulsarlo se resaltan solo los escaños de ese color
   const item = (color: string, texto: string, clave: string, borde = false) =>
     `<button type="button" class="pill filtro" data-f="${clave}" aria-pressed="false"><span class="dot${borde ? ' vacio' : ''}" style="background:${color}"></span>${texto}</button>`;
-  /** Escala ordenada de menos a más: una barra de tramos con su número debajo */
-  const escalaHtml = (etiquetas: readonly string[], aria: string, cuenta: number[], sinDatos: number) =>
-    `<div class="escala">${escala.map((c, i) => `<button type="button" class="tramo filtro" data-f="${i}" aria-pressed="false" aria-label="${f(aria, { tramo: etiquetas[i], n: cuenta[i] })}"><i style="background:${c}"></i><span>${etiquetas[i]}</span></button>`).join('')}` +
-    (sinDatos ? `<button type="button" class="tramo filtro sd" data-f="-1" aria-pressed="false" aria-label="${f(tx.sinDatosAria, { n: sinDatos })}"><i></i><span>${tx.sd}</span></button>` : '') + '</div>';
+  /** Escala ordenada de menos a más (src/scripts/leyenda.ts) */
+  const escalaHtml = (etiquetas: readonly string[], aria: string, cuenta: number[], sinDatos: number) => escalaLey({
+    colores: escala, etiquetas, aria: (i) => f(aria, { tramo: etiquetas[i], n: cuenta[i] }),
+    sinDatos: sinDatos ? { aria: f(tx.sinDatosAria, { n: sinDatos }), texto: tx.sd } : null,
+  });
   const rellenar = (c: SVGCircleElement, color: string | null) => { c.style.fill = color ?? 'transparent'; c.classList.toggle('vacio', color === null); };
 
   function pintar(m: string) {
@@ -408,17 +410,7 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   .leyenda :global(.pill.filtro:hover) { border-color: var(--accent); }
   .leyenda :global(.pill.filtro[aria-pressed='true']) { border-color: var(--text); box-shadow: inset 0 0 0 1px var(--text); font-weight: 650; }
   .leyenda.filtrando :global(.filtro[aria-pressed='false']) { opacity: .5; }
-  /* Escala de menos a más: tramos seguidos, como una regla */
-  .leyenda :global(.escala) { display: flex; gap: 3px; width: 100%; max-width: 440px; }
-  .leyenda :global(.tramo) { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-height: 44px; padding: 6px 0 2px; border: 0; background: none; border-radius: 8px; font-size: .8rem; line-height: 1.2; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .leyenda :global(.tramo i) { display: block; height: 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgb(127 127 127 / .3); transition: box-shadow .15s; }
-  .leyenda :global(.tramo:first-child i) { border-radius: 7px 3px 3px 7px; }
-  .leyenda :global(.tramo:nth-child(6) i) { border-radius: 3px 7px 7px 3px; }
-  .leyenda :global(.tramo.sd) { flex: .8 1 0; margin-left: 8px; }
-  .leyenda :global(.tramo.sd i) { box-shadow: none; border: 1.5px dashed var(--muted); border-radius: 7px; }
-  .leyenda :global(.tramo:hover span) { color: var(--accent-text); }
-  .leyenda :global(.tramo[aria-pressed='true'] i) { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--text); }
-  .leyenda :global(.tramo[aria-pressed='true'] span) { color: var(--text); font-weight: 700; }
+  /* La escala de menos a más (.escala, .tramo) está en global.css: la comparte el mapa por provincias */
   .nota { margin-top: 8px; }
   /* Móvil: el hemiciclo justo debajo de los modos para que se vea entero al entrar;
      el selector de votaciones y las explicaciones van debajo */

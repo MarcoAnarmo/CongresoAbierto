@@ -66,7 +66,7 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
           ? <button type="button" class="casilla" data-ab={p.abrev} data-escanos={p.escanos} data-propiedades={p.conDatos ? p.propiedades : ''} data-viviendas={p.conDatos ? p.viviendas : ''} aria-label={f(t.casillaAria, { provincia: p.legible, diputados: pl(p.escanos, c.palabras.diputados, lang) })} title={p.legible}>{p.abrev}</button>
           : <span class="hueco" aria-hidden="true"></span>)}
       </div>
-      <div class="leyenda small" id="mapa-leyenda" aria-hidden="true"></div>
+      <div class="leyenda small" id="mapa-leyenda" role="group" aria-label={t.leyendaAria}></div>
     </div>
 
     <div class="panel card" id="mapa-panel" aria-live="polite">
@@ -80,9 +80,12 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
 
 <script>
   import { textos, f, pl, prefijo } from '../i18n/cliente';
+  import { escalaHtml } from '../scripts/leyenda';
+  import { tramo } from '../lib/hemiciclo';
   type Tx = {
     escanosMas: string; masDe: string; leyendaEscanos: string; leyendaPropiedades: string; leyendaViviendas: string;
     propiedadesDip: [string, string]; viviendasDip: [string, string]; elegidos: [string, string]; declaradas: [string, string]; errorCp: string; cpSinProvincia: string;
+    tramoAria: string; sinDatosAria: string;
   };
   const tx = textos<Tx>('mapa');
   /** Singular o plural con la cifra tal cual (como en la lista de cada provincia). */
@@ -109,16 +112,32 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   function pintar(m: keyof typeof modos) {
     botones.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mmodo === m)));
     const t = modos[m];
+    const cuenta = escala.map(() => 0);
+    let sinDatos = 0;
     casillas.forEach((c) => {
-      const v = t.valor(c);
-      const i = v === null ? -1 : (t.cortes.findIndex((x) => v <= x) + 1 || t.cortes.length + 1) - 1;
+      const i = tramo(t.valor(c), t.cortes);
       c.style.background = i < 0 ? 'transparent' : escala[i];
       c.classList.toggle('oscura', i >= 3);
+      c.dataset.k = String(i);
+      if (i < 0) sinDatos++; else cuenta[i]++;
     });
-    leyenda.innerHTML = ({ escanos: tx.leyendaEscanos, propiedades: tx.leyendaPropiedades, viviendas: tx.leyendaViviendas })[m]
-      + escala.map((c, i) => `<span class="pill"><span class="dot" style="background:${c}"></span>${t.etiquetas[i]}</span>`).join(' ');
+    // Leyenda como en el hemiciclo: cada tramo es un botón que resalta solo las provincias de ese color
+    leyenda.innerHTML = `<span class="ley-tit">${({ escanos: tx.leyendaEscanos, propiedades: tx.leyendaPropiedades, viviendas: tx.leyendaViviendas })[m]}</span>`
+      + escalaHtml({ colores: escala, etiquetas: t.etiquetas, aria: (i) => f(tx.tramoAria, { tramo: t.etiquetas[i], n: cuenta[i] }), sinDatos: sinDatos ? { aria: f(tx.sinDatosAria, { n: sinDatos }), texto: '—' } : null });
+    filtrar(null);
     if (actual) mostrar(actual, false);
   }
+  let filtro: string | null = null;
+  function filtrar(f: string | null) {
+    filtro = f;
+    casillas.forEach((c) => c.classList.toggle('atenuada', f !== null && c.dataset.k !== f));
+    leyenda.classList.toggle('filtrando', f !== null);
+    leyenda.querySelectorAll<HTMLButtonElement>('.tramo').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.f === f)));
+  }
+  leyenda.addEventListener('click', (e) => {
+    const b = (e.target as Element).closest<HTMLButtonElement>('.tramo');
+    if (b) filtrar(filtro === b.dataset.f ? null : b.dataset.f!);
+  });
 
   function mostrar(p: Prov, enfocar = true) {
     actual = p;
@@ -167,7 +186,12 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   .casilla.oscura { color: var(--bg); }
   .casilla:hover { transform: scale(1.08); box-shadow: 0 0 0 2px var(--accent); }
   .casilla[aria-pressed='true'] { box-shadow: 0 0 0 3px var(--accent); }
-  .leyenda { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; color: var(--muted); }
+  .leyenda { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; color: var(--muted); max-width: 560px; }
+  .leyenda :global(.ley-tit) { font-weight: 600; }
+  .leyenda :global(.escala) { max-width: none; }
+  /* Filtro de la leyenda: las provincias de otros tramos se apagan */
+  .casilla.atenuada { opacity: .18; }
+  .casilla { transition: transform .12s, box-shadow .12s, opacity .15s; }
   /* El panel se rellena desde el script: sus estilos van en :global() */
   .panel :global(h3) { margin: 0; font-size: 1.15rem; }
   .panel :global(h3 a) { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
@@ -181,5 +205,4 @@ for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLUMNAS; c++) celdas.push(p
   .panel :global(.quien strong) { font-size: .95rem; }
   .panel :global(.cifra) { white-space: nowrap; color: var(--muted); display: flex; flex-direction: column; align-items: flex-end; line-height: 1.3; }
   .panel :global(.cifra strong) { color: var(--text); }
-  .leyenda :global(.pill) { font-size: .78rem; }
 </style>
