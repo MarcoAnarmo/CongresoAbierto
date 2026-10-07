@@ -1,11 +1,14 @@
 ---
 /** Ventana emergente de compartir: una por página, la abren los BotonCompartir con sus datos. */
 import BotonesTarjeta from './BotonesTarjeta.astro';
-import { idiomaDeUrl } from '../i18n';
+import Icono from './Icono.astro';
+import { idiomaDeUrl, enlace, sinIdioma } from '../i18n';
 import comun from '../i18n/textos/comun';
 import textosCompartir from '../i18n/textos/compartir';
 const lang = idiomaDeUrl(Astro.url.pathname);
 const t = textosCompartir[lang].ui;
+// Al pie, enlace a la galería de tarjetas (salvo en la propia galería)
+const enGaleria = sinIdioma(Astro.url.pathname).replace(/\/$/, '') === '/tarjetas';
 ---
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-compartir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -17,6 +20,11 @@ const t = textosCompartir[lang].ui;
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
   </button>
   <BotonesTarjeta historia="" horizontal="" nombre="" enlace="/" texto="" vista titulo={t.dialogo} />
+  {!enGaleria && (
+    <a class="mas-tarjetas" href={enlace('/tarjetas', lang)}>
+      <span class="mt-ico" aria-hidden="true"><Icono n="imagen" tam={18} /></span><span>{t.masTarjetas}</span><Icono n="derecha" tam={18} />
+    </a>
+  )}
 </dialog>
 
 <script>
@@ -76,6 +84,14 @@ const t = textosCompartir[lang].ui;
   .dlg-compartir[open] { animation: aparecer .16s ease-out; }
   @keyframes aparecer { from { opacity: 0; transform: translateY(8px); } }
   .dlg-compartir :global(.compartir.con-vista) { margin: 0; border: 0; padding: 22px 56px 22px 22px; }
+  /* Enlace a la galería de tarjetas, al pie */
+  .mas-tarjetas {
+    display: flex; align-items: center; gap: 10px; margin: 0 22px 18px; padding: 10px 12px; border-radius: 12px;
+    background: var(--accent-soft); color: var(--accent-text); font-weight: 650; text-decoration: none; transition: box-shadow .15s;
+  }
+  .mas-tarjetas:hover { color: var(--accent-text); box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .mas-tarjetas > span:nth-child(2) { flex: 1; }
+  .mt-ico { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 10px; background: var(--surface); }
   .cerrar {
     position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; display: grid; place-items: center;
     border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer;
@@ -88,5 +104,7 @@ const t = textosCompartir[lang].ui;
     @keyframes subir { from { transform: translateY(40px); opacity: .4; } }
     .dlg-compartir :global(.compartir.con-vista) { padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
     .dlg-compartir :global(.c-titulo) { padding-right: 40px; }
+    .dlg-compartir :global(.compartir.con-vista) { padding-bottom: 12px; }
+    .mas-tarjetas { margin: 0 16px calc(16px + env(safe-area-inset-bottom)); }
   }
 </style>
