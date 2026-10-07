@@ -8,3 +8,17 @@
 
 /og/*
   Cache-Control: public, max-age=86400
+
+# Imágenes de las tarjetas y sus miniaturas (no la página /tarjetas/): cambian solo cuando se actualizan los datos
+/tarjetas/historia/*
+  Cache-Control: public, max-age=86400
+/tarjetas/horizontal/*
+  Cache-Control: public, max-age=86400
+/tarjetas/mini/*
+  Cache-Control: public, max-age=86400
+/:lang/tarjetas/historia/*
+  Cache-Control: public, max-age=86400
+/:lang/tarjetas/horizontal/*
+  Cache-Control: public, max-age=86400
+/:lang/tarjetas/mini/*
+  Cache-Control: public, max-age=86400

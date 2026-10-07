@@ -516,6 +516,8 @@ export const rutaTarjeta = {
   provincia: (id: string, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/provincia/${id}.png`,
   resumen: (f: Formato, lang: Idioma = 'es', modo: ModoHemiciclo = 'grupo') => `${prefijo(lang)}/tarjetas/${f}/resumen${modo === 'grupo' ? '' : `-${modo}`}.png`,
   pagina: (id: string, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/horizontal/pagina/${id}.png`,
+  /** Miniatura WebP de una tarjeta vertical, para verla en la galería (la completa solo se baja al compartir). */
+  mini: (tipo: 'resumen' | 'votacion' | 'provincia', id: string, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/mini/${tipo}/${id}.webp`,
 };
 
 /* ---------- Texto y enlace para compartir ---------- */
