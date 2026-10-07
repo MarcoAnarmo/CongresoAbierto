@@ -18,6 +18,7 @@ const es = {
   secciones: {
     principio: 'Principio',
     fuentes: 'Fuentes oficiales',
+    revision: 'Cómo se han obtenido y comprobado los datos',
     perfil: 'Formación y trayectoria',
     propiedades: 'Propiedades y viviendas',
     vehiculos: 'Vehículos',
@@ -27,7 +28,6 @@ const es = {
     intereses: 'Trabajos anteriores e intereses',
     entidades: 'Empresas y entidades',
     borme: 'Registro Mercantil (BORME)',
-    revision: 'Cómo se han copiado los datos',
     retribuciones: 'Retribuciones',
     votaciones: 'Votaciones',
     participacion: 'Sus votos en el Pleno',
@@ -45,6 +45,8 @@ const es = {
 <li><strong>Votaciones:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">datos abiertos de votaciones</a> del Congreso, con el texto oficial de cada expediente.</li>
 <li><strong>Normas:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decretos-leyes y acuerdos de convalidación o derogación).</li>
 <li><strong>Retribuciones:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a>, importes de 2026.</li>
+<li><strong>Empresas y entidades:</strong> además, los acuerdos de la Comisión del Estatuto de los Diputados sobre sus actividades, publicados en el <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Boletín Oficial de las Cortes Generales (serie D)</a>.</li>
+<li><strong>Cargos en sociedades:</strong> <a href="https://www.boe.es/datosabiertos/">datos abiertos del BORME</a> (Boletín Oficial del Registro Mercantil), desde 2009.</li>
 </ul>
 <p><strong>Grupo y candidatura.</strong> El Congreso registra dos datos distintos: la candidatura con la que cada diputado fue elegido en las elecciones y el grupo parlamentario al que pertenece en la fecha de consulta. Pueden no coincidir: quien deja su grupo pasa al Grupo Mixto aunque fuera elegido en otra lista. El hemiciclo ordena por ese grupo parlamentario; cuando la candidatura es distinta, se indica entre paréntesis.</p>`,
     perfil: `<p>Salen de la <em>Ficha personal</em> de cada diputado en <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, un texto que redacta el propio diputado. Se copia literalmente, línea a línea, y solo se separa en dos bloques:</p>
@@ -110,7 +112,37 @@ const es = {
 <li>Un cargo en el BORME no indica si se cobraba ni si sigue vigente: muestra la fecha de cada acto publicado. El BORME empieza en 2009; lo anterior no está.</li>
 </ul>
 <p>El código que lo hace es público: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (búsqueda) y <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (confirmación). Las coincidencias sin confirmar no se suben al repositorio, porque en su mayoría son de otras personas.</p>`,
-    revision: `<p>Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila (las deudas, con dos transcripciones independientes cuyas diferencias se resuelven mirando el PDF), incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura no confirmada llevan un aviso (*) y un enlace al PDF para comprobarlo. Las rentas, cuentas, acciones y declaraciones de intereses se han transcrito del PDF y comparado con una lectura automática (OCR) independiente: cada importe o palabra que no coincide se ha vuelto a mirar en el original ampliado.</p>`,
+    revision: `<p>Todo lo que hay en esta web sale de documentos oficiales que cualquiera puede abrir. Aquí se explica, fuente a fuente, en qué formato publica cada institución sus datos, cómo se han pasado a la web y cómo se ha comprobado que lo publicado coincide con el original.</p>
+<h3>La regla: solo se publica lo que se puede comprobar</h3>
+<ul>
+<li><strong>Se publica</strong> lo que está escrito en un documento oficial y se ha comprobado contra él. Cada dato enlaza a su documento, para que cualquiera pueda verificarlo.</li>
+<li><strong>Se publica con aviso</strong> («Lectura no confirmada») lo que sí está en el documento pero tiene alguna lectura que no se ha podido confirmar al 100 %, por ejemplo una cifra borrosa en un escaneo. El aviso enlaza al PDF y pide ayuda para confirmarlo.</li>
+<li><strong>No se publica</strong> lo que ningún documento oficial confirma, aunque parezca probable. Por ejemplo, una persona del Registro Mercantil que se llama igual que un diputado, si no hay otro documento que demuestre que es la misma persona. Tampoco se publican nombres de particulares, números de cuenta, NIF ni matrículas.</li>
+<li><strong>No se interpreta.</strong> Los textos se copian literalmente, con sus erratas, y las cifras son sumas de lo declarado: nunca medias ni estimaciones. Si algo no coincide con el documento oficial, prevalece el documento oficial.</li>
+</ul>
+<h3>De dónde sale cada dato y cómo se ha comprobado</h3>
+<ul>
+<li><strong>Diputados, grupos, cargos, formación y trayectoria.</strong> <em>Formato:</em> páginas y buscador de congreso.es. <em>Cómo se extrae:</em> unos programas copian los campos tal cual. <em>Comprobación:</em> no hay transcripción; el texto es el oficial. El tipo de universidad (pública o privada) es el del registro oficial de universidades (RUCT).</li>
+<li><strong>Declaraciones de bienes y rentas</strong> ({pdfs} documentos). <em>Formato:</em> PDF escaneados, es decir, imágenes sin un texto que un ordenador pueda leer. <em>Cómo se extrae:</em> cada página se ha transcrito con ayuda de un modelo de lenguaje con visión (inteligencia artificial), siguiendo unas instrucciones públicas: copiar literalmente, no adivinar nunca y marcar con «?» lo que no se lea bien. <em>Comprobación:</em>
+<ul>
+<li>inmuebles y vehículos: una segunda revisión completa e independiente, fila a fila;</li>
+<li>deudas: dos transcripciones independientes, y cada diferencia se resuelve mirando el PDF;</li>
+<li>rentas, cuentas y acciones: cada cifra y cada palabra se compara con una lectura automática independiente (OCR), y todo lo que no coincide se vuelve a mirar en el PDF ampliado.</li>
+</ul></li>
+<li><strong>Declaraciones de intereses económicos.</strong> <em>Formato:</em> PDF escaneados. Mismo método y misma comprobación que las rentas.</li>
+<li><strong>Registro de Intereses - Actividades</strong> y <strong>acuerdos de la Comisión del Estatuto</strong> (Boletín Oficial de las Cortes Generales, serie D). <em>Formato:</em> PDF con texto. <em>Cómo se extrae:</em> un programa copia el texto literal de cada apartado, sin inteligencia artificial. <em>Comprobación:</em> es el texto del propio PDF. Cada acuerdo se asigna a un diputado solo si su nombre coincide exactamente con el de la lista oficial; los de quienes ya no tienen escaño no se usan.</li>
+<li><strong>Votaciones.</strong> <em>Formato:</em> datos abiertos del Congreso (JSON) con el voto de cada diputado. <em>Cómo se extrae:</em> con programas, sin inteligencia artificial. Los temas se asignan por palabras del título oficial, con una lista pública.</li>
+<li><strong>Retribuciones.</strong> Importes oficiales que publica el Congreso.</li>
+<li><strong>Empresas y entidades.</strong> <em>Formato:</em> los textos de los documentos anteriores. <em>Cómo se extrae:</em> un modelo de lenguaje ha señalado en cada texto los nombres de empresas, administraciones, fundaciones y otras entidades. <em>Comprobación:</em> un programa verifica que cada nombre aparece letra a letra en su texto oficial; si no aparece, se descarta. Nunca se recogen nombres de particulares. Los nombres distintos de una misma entidad se agrupan con una lista pública.</li>
+<li><strong>Registro Mercantil (BORME).</strong> <em>Formato:</em> datos abiertos del BOE (XML), unos 9,6 millones de actos desde 2009. <em>Cómo se extrae:</em> un programa busca el nombre completo exacto de cada diputado, sin inteligencia artificial. <em>Comprobación:</em> como el BORME no publica el DNI, una coincidencia solo se publica si otro documento oficial la confirma (ver <a href="#borme">Registro Mercantil</a>). De 662 casos en los que una empresa tiene un cargo con el mismo nombre que un diputado, se publican 77; los otros 585 no, porque no se pueden confirmar.</li>
+</ul>
+<h3>Qué ha hecho la inteligencia artificial y qué no</h3>
+<ul>
+<li><strong>Ha ayudado a</strong> transcribir los PDF escaneados, que no tienen texto; a localizar los nombres de entidades en textos libres; a traducir la web a otras lenguas; y a programar.</li>
+<li><strong>No decide qué se publica.</strong> Todo lo que transcribe o señala se comprueba contra el documento oficial con otro método: una segunda lectura, un OCR independiente o una comprobación automática de que el texto es literal. Lo que no se puede comprobar se marca con un aviso o no se publica.</li>
+<li><strong>No resume, no interpreta y no clasifica a nadie.</strong> Las cifras las calcula el código a partir de lo transcrito, y los textos oficiales se muestran tal cual, en castellano.</li>
+</ul>
+<p>El código, los datos transcritos y las instrucciones de transcripción son públicos en <a href="https://github.com/MarcoAnarmo/CongresoAbierto">GitHub</a>, para que cualquiera pueda repetir el proceso o encontrar un error.</p>`,
     retribuciones: `<p>Se muestran los importes mensuales oficiales de 2026 que corresponden a cada diputado durante su mandato, según su circunscripción y sus cargos:</p>
 <ul>
 <li>Asignación constitucional, igual para todos: {asignacion}.</li>
@@ -147,6 +179,7 @@ export default area(es, {
     secciones: {
       principio: 'Principi',
       fuentes: 'Fonts oficials',
+      revision: 'Com s’han obtingut i comprovat les dades',
       perfil: 'Formació i trajectòria',
       propiedades: 'Propietats i habitatges',
       vehiculos: 'Vehicles',
@@ -156,7 +189,6 @@ export default area(es, {
       intereses: 'Feines anteriors i interessos',
       entidades: 'Empreses i entitats',
       borme: 'Registre Mercantil (BORME)',
-      revision: 'Com s’han copiat les dades',
       retribuciones: 'Retribucions',
       votaciones: 'Votacions',
       participacion: 'Els seus vots al Ple',
@@ -174,6 +206,8 @@ export default area(es, {
 <li><strong>Votacions:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">dades obertes de votacions</a> del Congrés, amb el text oficial de cada expedient.</li>
 <li><strong>Normes:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decrets llei i acords de convalidació o derogació).</li>
 <li><strong>Retribucions:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a>, imports del 2026.</li>
+<li><strong>Empreses i entitats:</strong> a més, els acords de la Comissió de l’Estatut dels Diputats sobre les seves activitats, publicats al <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Butlletí Oficial de les Corts Generals (sèrie D)</a>.</li>
+<li><strong>Càrrecs en societats:</strong> <a href="https://www.boe.es/datosabiertos/">dades obertes del BORME</a> (Butlletí Oficial del Registre Mercantil), des del 2009.</li>
 </ul>
 <p><strong>Grup i candidatura.</strong> El Congrés registra dues dades diferents: la candidatura amb què cada diputat va ser elegit a les eleccions i el grup parlamentari al qual pertany en la data de consulta. Poden no coincidir: qui deixa el seu grup passa al Grupo Mixto encara que hagués estat elegit en una altra llista. L’hemicicle ordena per aquest grup parlamentari; quan la candidatura és diferent, s’indica entre parèntesis.</p>`,
       perfil: `<p>Surten de la <em>Ficha personal</em> (fitxa personal) de cada diputat a <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, un text que redacta el mateix diputat. Es copia literalment, línia a línia, i només se separa en dos blocs:</p>
@@ -239,7 +273,37 @@ export default area(es, {
 <li>Un càrrec al BORME no indica si es cobrava ni si continua vigent: mostra la data de cada acte publicat. El BORME comença el 2009; el que és anterior no hi és.</li>
 </ul>
 <p>El codi que ho fa és públic: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (cerca) i <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (confirmació). Les coincidències sense confirmar no es pugen al repositori, perquè la majoria són d’altres persones.</p>`,
-      revision: `<p>Les declaracions es publiquen com a PDF escanejats, sense dades estructurades. Cadascuna s’ha copiat a mà a partir del PDF i després s’ha revisat una segona vegada, fila a fila (els deutes, amb dues transcripcions independents les diferències de les quals es resolen mirant el PDF), incloses les observacions de la pàgina 4 i la seva possible continuació. Les fitxes amb alguna lectura no confirmada porten un avís (*) i un enllaç al PDF per comprovar-ho. Les rendes, comptes, accions i declaracions d’interessos s’han transcrit del PDF i s’han comparat amb una lectura automàtica (OCR) independent: cada import o paraula que no coincideix s’ha tornat a mirar a l’original ampliat.</p>`,
+      revision: `<p>Tot el que hi ha en aquest web surt de documents oficials que qualsevol pot obrir. Aquí s’explica, font a font, en quin format publica cada institució les seves dades, com s’han passat al web i com s’ha comprovat que el que es publica coincideix amb l’original.</p>
+<h3>La regla: només es publica el que es pot comprovar</h3>
+<ul>
+<li><strong>Es publica</strong> el que és escrit en un document oficial i s’ha comprovat amb aquest document. Cada dada enllaça al seu document, perquè qualsevol la pugui verificar.</li>
+<li><strong>Es publica amb avís</strong> («Lectura no confirmada») el que sí que és al document però té alguna lectura que no s’ha pogut confirmar al 100 %, per exemple una xifra borrosa en un escaneig. L’avís enllaça al PDF i demana ajuda per confirmar-ho.</li>
+<li><strong>No es publica</strong> el que cap document oficial confirma, encara que sembli probable. Per exemple, una persona del Registre Mercantil que es diu igual que un diputat, si no hi ha cap altre document que demostri que és la mateixa persona. Tampoc es publiquen noms de particulars, números de compte, NIF ni matrícules.</li>
+<li><strong>No s’interpreta.</strong> Els textos es copien literalment, amb les seves errades, i les xifres són sumes del que s’ha declarat: mai mitjanes ni estimacions. Si alguna cosa no coincideix amb el document oficial, preval el document oficial.</li>
+</ul>
+<h3>D’on surt cada dada i com s’ha comprovat</h3>
+<ul>
+<li><strong>Diputats, grups, càrrecs, formació i trajectòria.</strong> <em>Format:</em> pàgines i cercador de congreso.es. <em>Com s’extreu:</em> uns programes copien els camps tal com són. <em>Comprovació:</em> no hi ha transcripció; el text és l’oficial. El tipus d’universitat (pública o privada) és el del registre oficial d’universitats (RUCT).</li>
+<li><strong>Declaracions de béns i rendes</strong> ({pdfs} documents). <em>Format:</em> PDF escanejats, és a dir, imatges sense un text que un ordinador pugui llegir. <em>Com s’extreu:</em> cada pàgina s’ha transcrit amb l’ajuda d’un model de llenguatge amb visió (intel·ligència artificial), seguint unes instruccions públiques: copiar literalment, no endevinar mai i marcar amb «?» el que no es llegeixi bé. <em>Comprovació:</em>
+<ul>
+<li>immobles i vehicles: una segona revisió completa i independent, fila a fila;</li>
+<li>deutes: dues transcripcions independents, i cada diferència es resol mirant el PDF;</li>
+<li>rendes, comptes i accions: cada xifra i cada paraula es compara amb una lectura automàtica independent (OCR), i tot el que no coincideix es torna a mirar al PDF ampliat.</li>
+</ul></li>
+<li><strong>Declaracions d’interessos econòmics.</strong> <em>Format:</em> PDF escanejats. Mateix mètode i mateixa comprovació que les rendes.</li>
+<li><strong>Registre d’Interessos - Activitats</strong> i <strong>acords de la Comissió de l’Estatut</strong> (Butlletí Oficial de les Corts Generals, sèrie D). <em>Format:</em> PDF amb text. <em>Com s’extreu:</em> un programa copia el text literal de cada apartat, sense intel·ligència artificial. <em>Comprovació:</em> és el text del mateix PDF. Cada acord s’assigna a un diputat només si el seu nom coincideix exactament amb el de la llista oficial; els de qui ja no té escó no es fan servir.</li>
+<li><strong>Votacions.</strong> <em>Format:</em> dades obertes del Congrés (JSON) amb el vot de cada diputat. <em>Com s’extreu:</em> amb programes, sense intel·ligència artificial. Els temes s’assignen per paraules del títol oficial, amb una llista pública.</li>
+<li><strong>Retribucions.</strong> Imports oficials que publica el Congrés.</li>
+<li><strong>Empreses i entitats.</strong> <em>Format:</em> els textos dels documents anteriors. <em>Com s’extreu:</em> un model de llenguatge ha assenyalat en cada text els noms d’empreses, administracions, fundacions i altres entitats. <em>Comprovació:</em> un programa verifica que cada nom apareix lletra per lletra al seu text oficial; si no hi apareix, es descarta. Mai no es recullen noms de particulars. Els noms diferents d’una mateixa entitat s’agrupen amb una llista pública.</li>
+<li><strong>Registre Mercantil (BORME).</strong> <em>Format:</em> dades obertes del BOE (XML), uns 9,6 milions d’actes des del 2009. <em>Com s’extreu:</em> un programa busca el nom complet exacte de cada diputat, sense intel·ligència artificial. <em>Comprovació:</em> com que el BORME no publica el DNI, una coincidència només es publica si un altre document oficial la confirma (vegeu <a href="#borme">Registre Mercantil</a>). De 662 casos en què una empresa té un càrrec amb el mateix nom que un diputat, se’n publiquen 77; els altres 585 no, perquè no es poden confirmar.</li>
+</ul>
+<h3>Què ha fet la intel·ligència artificial i què no</h3>
+<ul>
+<li><strong>Ha ajudat a</strong> transcriure els PDF escanejats, que no tenen text; a localitzar els noms d’entitats en textos lliures; a traduir el web a altres llengües; i a programar.</li>
+<li><strong>No decideix què es publica.</strong> Tot el que transcriu o assenyala es comprova amb el document oficial amb un altre mètode: una segona lectura, un OCR independent o una comprovació automàtica que el text és literal. El que no es pot comprovar es marca amb un avís o no es publica.</li>
+<li><strong>No resumeix, no interpreta i no classifica ningú.</strong> Les xifres les calcula el codi a partir del que s’ha transcrit, i els textos oficials es mostren tal com són, en castellà.</li>
+</ul>
+<p>El codi, les dades transcrites i les instruccions de transcripció són públics a <a href="https://github.com/MarcoAnarmo/CongresoAbierto">GitHub</a>, perquè qualsevol pugui repetir el procés o trobar-hi un error.</p>`,
       retribuciones: `<p>Es mostren els imports mensuals oficials del 2026 que corresponen a cada diputat durant el seu mandat, segons la seva circumscripció i els seus càrrecs:</p>
 <ul>
 <li>Assignació constitucional, igual per a tothom: {asignacion}.</li>
@@ -274,6 +338,7 @@ export default area(es, {
     secciones: {
       principio: 'Printzipioa',
       fuentes: 'Iturri ofizialak',
+      revision: 'Nola lortu eta egiaztatu diren datuak',
       perfil: 'Prestakuntza eta ibilbidea',
       propiedades: 'Jabetzak eta etxebizitzak',
       vehiculos: 'Ibilgailuak',
@@ -283,7 +348,6 @@ export default area(es, {
       intereses: 'Aurreko lanak eta interesak',
       entidades: 'Enpresak eta erakundeak',
       borme: 'Merkataritza Erregistroa (BORME)',
-      revision: 'Nola kopiatu diren datuak',
       retribuciones: 'Ordainsariak',
       votaciones: 'Bozketak',
       participacion: 'Haren botoak Osoko Bilkuran',
@@ -301,6 +365,8 @@ export default area(es, {
 <li><strong>Bozketak:</strong> Kongresuaren <a href="https://www.congreso.es/es/opendata/votaciones">bozketen datu irekiak</a>, espediente bakoitzaren testu ofizialarekin.</li>
 <li><strong>Arauak:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (lege-dekretuak eta baliozkotze- edo indargabetze-erabakiak).</li>
 <li><strong>Ordainsariak:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a>, 2026ko zenbatekoak.</li>
+<li><strong>Enpresak eta erakundeak:</strong> gainera, Diputatuen Estatutuaren Batzordeak haien jarduerei buruz hartutako erabakiak, <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Gorte Nagusien Aldizkari Ofizialean (D seriea)</a> argitaratuak.</li>
+<li><strong>Karguak sozietateetan:</strong> <a href="https://www.boe.es/datosabiertos/">BORMEren datu irekiak</a> (Merkataritza Erregistroko Aldizkari Ofiziala), 2009tik.</li>
 </ul>
 <p><strong>Taldea eta hautagaitza.</strong> Kongresuak bi datu desberdin erregistratzen ditu: diputatu bakoitza hauteskundeetan zein hautagaitzarekin hautatu zuten, eta kontsulta-datan zein talde parlamentariotakoa den. Baliteke bat ez etortzea: bere taldea uzten duena Grupo Mixtora pasatzen da, beste zerrenda batean hautatua izan bazen ere. Hemizikloak talde parlamentario horren arabera ordenatzen ditu diputatuak; hautagaitza desberdina denean, parentesi artean adierazten da.</p>`,
       perfil: `<p>Diputatu bakoitzak <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a> webgunean duen <em>Ficha personal</em> delakotik (fitxa pertsonala) ateratzen dira; diputatuak berak idazten duen testua da. Hitzez hitz kopiatzen da, lerroz lerro, eta bi multzotan bereizten da soilik:</p>
@@ -366,7 +432,37 @@ export default area(es, {
 <li>BORMEko kargu batek ez du adierazten ordaintzen zen edo indarrean jarraitzen duen: argitaratutako egintza bakoitzaren data erakusten du. BORME 2009an hasten da; aurrekoa ez dago.</li>
 </ul>
 <p>Hori egiten duen kodea publikoa da: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (bilaketa) eta <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (baieztapena). Baieztatu gabeko kointzidentziak ez dira biltegira igotzen, gehienak beste pertsona batzuenak direlako.</p>`,
-      revision: `<p>Aitorpenak PDF eskaneatu gisa argitaratzen dira, datu egituraturik gabe. Bakoitza eskuz kopiatu da PDFtik abiatuta, eta gero bigarren aldiz berrikusi da, errenkadaz errenkada (zorrak, bi transkripzio independenterekin, eta haien arteko aldeak PDFa begiratuta ebazten dira), 4. orriko oharrak eta haien balizko jarraipena barne. Irakurketa berretsi gaberen bat duten fitxek abisu bat (*) eta PDFrako esteka bat dute, egiaztatu ahal izateko. Errentak, kontuak, akzioak eta interesen aitorpenak PDFtik transkribatu dira, eta irakurketa automatiko (OCR) independente batekin alderatu: bat ez datorren zenbateko edo hitz bakoitza berriro begiratu da jatorrizkoan, handituta.</p>`,
+      revision: `<p>Webgune honetako guztia edonork ireki ditzakeen dokumentu ofizialetatik dator. Hemen azaltzen da, iturriz iturri, erakunde bakoitzak zer formatutan argitaratzen dituen bere datuak, nola ekarri diren webgunera eta nola egiaztatu den argitaratutakoa jatorrizkoarekin bat datorrela.</p>
+<h3>Araua: egiaztatu daitekeena bakarrik argitaratzen da</h3>
+<ul>
+<li><strong>Argitaratzen da</strong> dokumentu ofizial batean idatzita dagoena eta harekin egiaztatu dena. Datu bakoitzak bere dokumentura eramaten du, edonork egiazta dezan.</li>
+<li><strong>Abisuarekin argitaratzen da</strong> («Irakurketa berretsi gabea») dokumentuan badagoena baina % 100ean berretsi ezin izan den irakurketaren bat duena, adibidez eskaneatze batean lausotuta dagoen zifra bat. Abisuak PDFra eramaten du eta hura berresteko laguntza eskatzen du.</li>
+<li><strong>Ez da argitaratzen</strong> inongo dokumentu ofizialek berresten ez duena, nahiz eta litekeena iruditu. Adibidez, Merkataritza Erregistroko pertsona bat, diputatu baten izen bera duena, pertsona bera dela frogatzen duen beste dokumenturik ez badago. Ez dira argitaratzen partikularren izenak, kontu-zenbakiak, IFZ edo matrikulak ere.</li>
+<li><strong>Ez da interpretatzen.</strong> Testuak hitzez hitz kopiatzen dira, akatsak barne, eta zifrak adierazitakoaren baturak dira: inoiz ez batez bestekoak edo kalkulu estimatuak. Zerbait dokumentu ofizialarekin bat ez badator, dokumentu ofizialak du lehentasuna.</li>
+</ul>
+<h3>Nondik datorren datu bakoitza eta nola egiaztatu den</h3>
+<ul>
+<li><strong>Diputatuak, taldeak, karguak, prestakuntza eta ibilbidea.</strong> <em>Formatua:</em> congreso.es-eko orriak eta bilatzailea. <em>Nola ateratzen den:</em> programa batzuek eremuak dauden bezala kopiatzen dituzte. <em>Egiaztapena:</em> ez dago transkripziorik; testua ofiziala da. Unibertsitate mota (publikoa edo pribatua) unibertsitateen erregistro ofizialetik (RUCT) hartzen da.</li>
+<li><strong>Ondasunen eta errenten adierazpenak</strong> ({pdfs} dokumentu). <em>Formatua:</em> PDF eskaneatuak, hau da, ordenagailu batek irakur dezakeen testurik gabeko irudiak. <em>Nola ateratzen den:</em> orri bakoitza ikusmena duen hizkuntza-eredu baten laguntzaz (adimen artifiziala) transkribatu da, jarraibide publiko batzuei jarraituz: hitzez hitz kopiatu, inoiz ez asmatu eta ondo irakurtzen ez dena «?» ikurrarekin markatu. <em>Egiaztapena:</em>
+<ul>
+<li>higiezinak eta ibilgailuak: bigarren berrikuspen oso eta independente bat, errenkadaz errenkada;</li>
+<li>zorrak: bi transkripzio independente, eta alde bakoitza PDFa begiratuta ebazten da;</li>
+<li>errentak, kontuak eta akzioak: zifra eta hitz bakoitza irakurketa automatiko independente batekin (OCR) alderatzen da, eta bat ez datorren guztia berriro begiratzen da PDF handituan.</li>
+</ul></li>
+<li><strong>Interes ekonomikoen adierazpenak.</strong> <em>Formatua:</em> PDF eskaneatuak. Errenten metodo eta egiaztapen bera.</li>
+<li><strong>Interesen Erregistroa - Jarduerak</strong> eta <strong>Estatutuaren Batzordearen erabakiak</strong> (Gorte Nagusien Aldizkari Ofiziala, D seriea). <em>Formatua:</em> testua duten PDFak. <em>Nola ateratzen den:</em> programa batek atal bakoitzaren testu literala kopiatzen du, adimen artifizialik gabe. <em>Egiaztapena:</em> PDFaren beraren testua da. Erabaki bakoitza diputatu bati esleitzen zaio haren izena zerrenda ofizialekoarekin zehatz-mehatz bat datorrenean bakarrik; eserlekurik ez dutenenak ez dira erabiltzen.</li>
+<li><strong>Bozketak.</strong> <em>Formatua:</em> Kongresuaren datu irekiak (JSON), diputatu bakoitzaren botoarekin. <em>Nola ateratzen den:</em> programekin, adimen artifizialik gabe. Gaiak titulu ofizialeko hitzen arabera esleitzen dira, zerrenda publiko batekin.</li>
+<li><strong>Ordainsariak.</strong> Kongresuak argitaratzen dituen zenbateko ofizialak.</li>
+<li><strong>Enpresak eta erakundeak.</strong> <em>Formatua:</em> aurreko dokumentuetako testuak. <em>Nola ateratzen den:</em> hizkuntza-eredu batek testu bakoitzean enpresen, administrazioen, fundazioen eta beste erakunde batzuen izenak seinalatu ditu. <em>Egiaztapena:</em> programa batek egiaztatzen du izen bakoitza letraz letra agertzen dela bere testu ofizialean; agertzen ez bada, baztertu egiten da. Ez da inoiz partikularren izenik jasotzen. Erakunde beraren izen desberdinak zerrenda publiko batekin elkartzen dira.</li>
+<li><strong>Merkataritza Erregistroa (BORME).</strong> <em>Formatua:</em> BOEren datu irekiak (XML), 9,6 milioi egintza inguru 2009tik. <em>Nola ateratzen den:</em> programa batek diputatu bakoitzaren izen osoa bilatzen du, zehatz-mehatz, adimen artifizialik gabe. <em>Egiaztapena:</em> BORMEk NANa argitaratzen ez duenez, kointzidentzia bat beste dokumentu ofizial batek berresten duenean bakarrik argitaratzen da (ikus <a href="#borme">Merkataritza Erregistroa</a>). Enpresa batean diputatu baten izen bera duen kargu bat agertzen den 662 kasuetatik 77 argitaratzen dira; beste 585ak ez, ezin direlako berretsi.</li>
+</ul>
+<h3>Zer egin duen adimen artifizialak eta zer ez</h3>
+<ul>
+<li><strong>Lagundu du</strong> testurik ez duten PDF eskaneatuak transkribatzen, testu libreetan erakundeen izenak aurkitzen, webgunea beste hizkuntza batzuetara itzultzen eta programatzen.</li>
+<li><strong>Ez du erabakitzen zer argitaratzen den.</strong> Transkribatzen edo seinalatzen duen guztia dokumentu ofizialarekin egiaztatzen da beste metodo batekin: bigarren irakurketa bat, OCR independente bat edo testua literala dela egiaztatzen duen azterketa automatiko bat. Egiaztatu ezin dena abisu batekin markatzen da edo ez da argitaratzen.</li>
+<li><strong>Ez du laburtzen, ez du interpretatzen eta ez du inor sailkatzen.</strong> Zifrak kodeak kalkulatzen ditu transkribatutakotik abiatuta, eta testu ofizialak dauden bezala erakusten dira, gaztelaniaz.</li>
+</ul>
+<p>Kodea, transkribatutako datuak eta transkripzio-jarraibideak publikoak dira <a href="https://github.com/MarcoAnarmo/CongresoAbierto">GitHub</a>-en, edonork prozesua errepika dezan edo akatsen bat aurki dezan.</p>`,
       retribuciones: `<p>Diputatu bakoitzari bere agintaldian dagozkion 2026ko hileko zenbateko ofizialak erakusten dira, haren barrutiaren eta karguen arabera:</p>
 <ul>
 <li>Konstituzio-esleipena (asignación constitucional), guztientzat berdina: {asignacion}.</li>
@@ -401,6 +497,7 @@ export default area(es, {
     secciones: {
       principio: 'Principio',
       fuentes: 'Fontes oficiais',
+      revision: 'Como se obtiveron e comprobaron os datos',
       perfil: 'Formación e traxectoria',
       propiedades: 'Propiedades e vivendas',
       vehiculos: 'Vehículos',
@@ -410,7 +507,6 @@ export default area(es, {
       intereses: 'Traballos anteriores e intereses',
       entidades: 'Empresas e entidades',
       borme: 'Rexistro Mercantil (BORME)',
-      revision: 'Como se copiaron os datos',
       retribuciones: 'Retribucións',
       votaciones: 'Votacións',
       participacion: 'Os seus votos no Pleno',
@@ -428,6 +524,8 @@ export default area(es, {
 <li><strong>Votacións:</strong> <a href="https://www.congreso.es/es/opendata/votaciones">datos abertos de votacións</a> do Congreso, co texto oficial de cada expediente.</li>
 <li><strong>Normas:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (decretos leis e acordos de convalidación ou derrogación).</li>
 <li><strong>Retribucións:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a>, importes de 2026.</li>
+<li><strong>Empresas e entidades:</strong> ademais, os acordos da Comisión do Estatuto dos Deputados sobre as súas actividades, publicados no <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Boletín Oficial das Cortes Xerais (serie D)</a>.</li>
+<li><strong>Cargos en sociedades:</strong> <a href="https://www.boe.es/datosabiertos/">datos abertos do BORME</a> (Boletín Oficial do Rexistro Mercantil), desde 2009.</li>
 </ul>
 <p><strong>Grupo e candidatura.</strong> O Congreso rexistra dous datos distintos: a candidatura coa que cada deputado foi elixido nas eleccións e o grupo parlamentario ao que pertence na data de consulta. Poden non coincidir: quen deixa o seu grupo pasa ao Grupo Mixto aínda que fose elixido noutra lista. O hemiciclo ordena por ese grupo parlamentario; cando a candidatura é distinta, indícase entre parénteses.</p>`,
       perfil: `<p>Saen da <em>Ficha personal</em> de cada deputado en <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, un texto que redacta o propio deputado. Cópiase literalmente, liña a liña, e só se separa en dous bloques:</p>
@@ -493,7 +591,37 @@ export default area(es, {
 <li>Un cargo no BORME non indica se se cobraba nin se segue vixente: mostra a data de cada acto publicado. O BORME comeza en 2009; o anterior non está.</li>
 </ul>
 <p>O código que o fai é público: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (busca) e <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (confirmación). As coincidencias sen confirmar non se soben ao repositorio, porque na súa maioría son doutras persoas.</p>`,
-      revision: `<p>As declaracións publícanse como PDF escaneados, sen datos estruturados. Cada unha copiouse a man a partir do PDF e despois revisouse unha segunda vez, fila a fila (as débedas, con dúas transcricións independentes cuxas diferenzas se resolven mirando o PDF), incluídas as observacións da páxina 4 e a súa posible continuación. As fichas con algunha lectura non confirmada levan un aviso (*) e unha ligazón ao PDF para comprobalo. As rendas, contas, accións e declaracións de intereses transcribíronse do PDF e comparáronse cunha lectura automática (OCR) independente: cada importe ou palabra que non coincide volveuse mirar no orixinal ampliado.</p>`,
+      revision: `<p>Todo o que hai nesta web sae de documentos oficiais que calquera pode abrir. Aquí explícase, fonte a fonte, en que formato publica cada institución os seus datos, como se pasaron á web e como se comprobou que o publicado coincide co orixinal.</p>
+<h3>A regra: só se publica o que se pode comprobar</h3>
+<ul>
+<li><strong>Publícase</strong> o que está escrito nun documento oficial e se comprobou contra el. Cada dato leva ao seu documento, para que calquera o poida verificar.</li>
+<li><strong>Publícase con aviso</strong> («Lectura non confirmada») o que si está no documento pero ten algunha lectura que non se puido confirmar ao 100 %, por exemplo unha cifra borrosa nun escaneo. O aviso leva ao PDF e pide axuda para confirmalo.</li>
+<li><strong>Non se publica</strong> o que ningún documento oficial confirma, aínda que pareza probable. Por exemplo, unha persoa do Rexistro Mercantil que se chama igual ca un deputado, se non hai outro documento que demostre que é a mesma persoa. Tampouco se publican nomes de particulares, números de conta, NIF nin matrículas.</li>
+<li><strong>Non se interpreta.</strong> Os textos cópianse literalmente, coas súas erratas, e as cifras son sumas do declarado: nunca medias nin estimacións. Se algo non coincide co documento oficial, prevalece o documento oficial.</li>
+</ul>
+<h3>De onde sae cada dato e como se comprobou</h3>
+<ul>
+<li><strong>Deputados, grupos, cargos, formación e traxectoria.</strong> <em>Formato:</em> páxinas e buscador de congreso.es. <em>Como se extrae:</em> uns programas copian os campos tal cal. <em>Comprobación:</em> non hai transcrición; o texto é o oficial. O tipo de universidade (pública ou privada) é o do rexistro oficial de universidades (RUCT).</li>
+<li><strong>Declaracións de bens e rendas</strong> ({pdfs} documentos). <em>Formato:</em> PDF escaneados, é dicir, imaxes sen un texto que un ordenador poida ler. <em>Como se extrae:</em> cada páxina transcribiuse coa axuda dun modelo de linguaxe con visión (intelixencia artificial), seguindo unhas instrucións públicas: copiar literalmente, non adiviñar nunca e marcar con «?» o que non se lea ben. <em>Comprobación:</em>
+<ul>
+<li>inmobles e vehículos: unha segunda revisión completa e independente, fila a fila;</li>
+<li>débedas: dúas transcricións independentes, e cada diferenza resólvese mirando o PDF;</li>
+<li>rendas, contas e accións: cada cifra e cada palabra compárase cunha lectura automática independente (OCR), e todo o que non coincide vólvese mirar no PDF ampliado.</li>
+</ul></li>
+<li><strong>Declaracións de intereses económicos.</strong> <em>Formato:</em> PDF escaneados. Mesmo método e mesma comprobación que as rendas.</li>
+<li><strong>Rexistro de Intereses - Actividades</strong> e <strong>acordos da Comisión do Estatuto</strong> (Boletín Oficial das Cortes Xerais, serie D). <em>Formato:</em> PDF con texto. <em>Como se extrae:</em> un programa copia o texto literal de cada apartado, sen intelixencia artificial. <em>Comprobación:</em> é o texto do propio PDF. Cada acordo asígnase a un deputado só se o seu nome coincide exactamente co da lista oficial; os de quen xa non ten escano non se usan.</li>
+<li><strong>Votacións.</strong> <em>Formato:</em> datos abertos do Congreso (JSON) co voto de cada deputado. <em>Como se extrae:</em> con programas, sen intelixencia artificial. Os temas asígnanse por palabras do título oficial, cunha lista pública.</li>
+<li><strong>Retribucións.</strong> Importes oficiais que publica o Congreso.</li>
+<li><strong>Empresas e entidades.</strong> <em>Formato:</em> os textos dos documentos anteriores. <em>Como se extrae:</em> un modelo de linguaxe sinalou en cada texto os nomes de empresas, administracións, fundacións e outras entidades. <em>Comprobación:</em> un programa verifica que cada nome aparece letra a letra no seu texto oficial; se non aparece, descártase. Nunca se recollen nomes de particulares. Os nomes distintos dunha mesma entidade agrúpanse cunha lista pública.</li>
+<li><strong>Rexistro Mercantil (BORME).</strong> <em>Formato:</em> datos abertos do BOE (XML), uns 9,6 millóns de actos desde 2009. <em>Como se extrae:</em> un programa busca o nome completo exacto de cada deputado, sen intelixencia artificial. <em>Comprobación:</em> como o BORME non publica o DNI, unha coincidencia só se publica se outro documento oficial a confirma (ver <a href="#borme">Rexistro Mercantil</a>). De 662 casos nos que unha empresa ten un cargo co mesmo nome ca un deputado, publícanse 77; os outros 585 non, porque non se poden confirmar.</li>
+</ul>
+<h3>Que fixo a intelixencia artificial e que non</h3>
+<ul>
+<li><strong>Axudou a</strong> transcribir os PDF escaneados, que non teñen texto; a localizar os nomes de entidades en textos libres; a traducir a web a outras linguas; e a programar.</li>
+<li><strong>Non decide que se publica.</strong> Todo o que transcribe ou sinala compróbase contra o documento oficial con outro método: unha segunda lectura, un OCR independente ou unha comprobación automática de que o texto é literal. O que non se pode comprobar márcase cun aviso ou non se publica.</li>
+<li><strong>Non resume, non interpreta e non clasifica a ninguén.</strong> As cifras calcúlaas o código a partir do transcrito, e os textos oficiais móstranse tal cal, en castelán.</li>
+</ul>
+<p>O código, os datos transcritos e as instrucións de transcrición son públicos en <a href="https://github.com/MarcoAnarmo/CongresoAbierto">GitHub</a>, para que calquera poida repetir o proceso ou atopar un erro.</p>`,
       retribuciones: `<p>Móstranse os importes mensuais oficiais de 2026 que lle corresponden a cada deputado durante o seu mandato, segundo a súa circunscrición e os seus cargos:</p>
 <ul>
 <li>Asignación constitucional, igual para todos: {asignacion}.</li>
@@ -528,6 +656,7 @@ export default area(es, {
     secciones: {
       principio: 'Principle',
       fuentes: 'Official sources',
+      revision: 'How the data were obtained and checked',
       perfil: 'Education and career',
       propiedades: 'Property and homes',
       vehiculos: 'Vehicles',
@@ -537,7 +666,6 @@ export default area(es, {
       intereses: 'Previous jobs and interests',
       entidades: 'Companies and organisations',
       borme: 'Companies Register (BORME)',
-      revision: 'How the data were copied',
       retribuciones: 'Pay',
       votaciones: 'Votes',
       participacion: 'Their votes in plenary',
@@ -555,6 +683,8 @@ export default area(es, {
 <li><strong>Votes:</strong> the Congress’s <a href="https://www.congreso.es/es/opendata/votaciones">open voting data</a>, with the official text of each item.</li>
 <li><strong>Legislation:</strong> <a href="https://www.boe.es">Boletín Oficial del Estado</a> (Spain’s official gazette: decree-laws and decisions to ratify or repeal them).</li>
 <li><strong>Pay:</strong> <a href="{fuenteRetribuciones}">Régimen económico y ayudas de los miembros de la Cámara</a> (pay and allowances of members of the Chamber), 2026 amounts.</li>
+<li><strong>Companies and organisations:</strong> also the decisions of the Committee on Members’ Status on their activities, published in the <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Official Gazette of the Cortes Generales (series D)</a>.</li>
+<li><strong>Company positions:</strong> <a href="https://www.boe.es/datosabiertos/">BORME open data</a> (Official Gazette of the Companies Register), since 2009.</li>
 </ul>
 <p><strong>Group and electoral list.</strong> The Congress records two different things: the electoral list (candidatura) on which each deputy was elected and the parliamentary group they belong to on the date of consultation. They may differ: anyone who leaves their group moves to the Grupo Mixto (mixed group), even if they were elected on another list. The chamber chart is ordered by parliamentary group; where the electoral list is different, it is shown in brackets.</p>`,
       perfil: `<p>These come from each deputy’s <em>Ficha personal</em> (personal profile) on <a href="https://www.congreso.es/es/busqueda-de-diputados">congreso.es</a>, a text written by the deputy themselves. It is copied word for word, line by line, and only split into two blocks:</p>
@@ -620,7 +750,37 @@ export default area(es, {
 <li>A BORME position does not show whether it was paid or is still current: it shows the date of each published act. The BORME starts in 2009; earlier acts are not included.</li>
 </ul>
 <p>The code is public: <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/browser/borme.js">scripts/browser/borme.js</a> (search) and <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/scripts/borme-clasificar.py">scripts/borme-clasificar.py</a> (confirmation). Unconfirmed matches are not uploaded to the repository, because most of them belong to other people.</p>`,
-      revision: `<p>The declarations are published as scanned PDFs, with no structured data. Each one has been copied by hand from the PDF and then checked a second time, row by row (debts with two independent transcriptions, whose differences are resolved by looking at the PDF), including the remarks on page 4 and any continuation. Profiles with an unconfirmed reading carry a notice (*) and a link to the PDF so it can be checked. Income, accounts, shares and declarations of interests have been transcribed from the PDF and compared with an independent automatic reading (OCR): every amount or word that did not match has been checked again in the enlarged original.</p>`,
+      revision: `<p>Everything on this site comes from official documents that anyone can open. This section explains, source by source, the format in which each institution publishes its data, how it was brought into the site and how it was checked that what is published matches the original.</p>
+<h3>The rule: only what can be checked is published</h3>
+<ul>
+<li><strong>Published:</strong> what is written in an official document and has been checked against it. Every data point links to its document so anyone can verify it.</li>
+<li><strong>Published with a notice</strong> (“Unconfirmed reading”): what is in the document but includes a reading that could not be confirmed 100%, for example a blurred figure in a scan. The notice links to the PDF and asks for help to confirm it.</li>
+<li><strong>Not published:</strong> anything no official document confirms, however likely it seems. For example, a person in the Companies Register with the same name as a member, unless another document shows it is the same person. Names of private individuals, account numbers, tax IDs and number plates are not published either.</li>
+<li><strong>No interpretation.</strong> Texts are copied word for word, typos included, and figures are sums of what was declared: never averages or estimates. If anything does not match the official document, the official document prevails.</li>
+</ul>
+<h3>Where each data point comes from and how it was checked</h3>
+<ul>
+<li><strong>Members, groups, positions, education and career.</strong> <em>Format:</em> congreso.es pages and search engine. <em>How it is extracted:</em> scripts copy the fields as they are. <em>Check:</em> there is no transcription; the text is the official one. The type of university (public or private) is taken from the official register of universities (RUCT).</li>
+<li><strong>Declarations of assets and income</strong> ({pdfs} documents). <em>Format:</em> scanned PDFs, that is, images without text a computer can read. <em>How it is extracted:</em> each page was transcribed with the help of a vision-capable language model (artificial intelligence), following public instructions: copy word for word, never guess and mark with “?” anything that cannot be read clearly. <em>Check:</em>
+<ul>
+<li>property and vehicles: a second complete, independent review, row by row;</li>
+<li>debts: two independent transcriptions, with every difference resolved by looking at the PDF;</li>
+<li>income, accounts and shares: every figure and word is compared with an independent automatic reading (OCR), and anything that does not match is checked again in the enlarged PDF.</li>
+</ul></li>
+<li><strong>Declarations of economic interests.</strong> <em>Format:</em> scanned PDFs. Same method and same checks as income.</li>
+<li><strong>Register of Interests - Activities</strong> and <strong>decisions of the Committee on Members’ Status</strong> (Official Gazette of the Cortes Generales, series D). <em>Format:</em> PDFs with text. <em>How it is extracted:</em> a script copies the literal text of each section, without artificial intelligence. <em>Check:</em> it is the PDF’s own text. Each decision is assigned to a member only if the name exactly matches the official list; those of people who no longer hold a seat are not used.</li>
+<li><strong>Votes.</strong> <em>Format:</em> Congress open data (JSON) with each member’s vote. <em>How it is extracted:</em> with scripts, without artificial intelligence. Topics are assigned from words in the official title, using a public list.</li>
+<li><strong>Pay.</strong> Official amounts published by Congress.</li>
+<li><strong>Companies and organisations.</strong> <em>Format:</em> the texts of the documents above. <em>How it is extracted:</em> a language model marked the names of companies, public bodies, foundations and other organisations in each text. <em>Check:</em> a script verifies that every name appears letter for letter in its official text; if it does not, it is discarded. Names of private individuals are never collected. Different names for the same organisation are grouped using a public list.</li>
+<li><strong>Companies Register (BORME).</strong> <em>Format:</em> Official State Gazette open data (XML), about 9.6 million acts since 2009. <em>How it is extracted:</em> a script searches for each member’s exact full name, without artificial intelligence. <em>Check:</em> since the BORME does not publish ID numbers, a match is only published if another official document confirms it (see <a href="#borme">Companies Register</a>). Of 662 cases in which a company has a position held by someone with a member’s name, 77 are published; the other 585 are not, because they cannot be confirmed.</li>
+</ul>
+<h3>What artificial intelligence did and did not do</h3>
+<ul>
+<li><strong>It helped</strong> to transcribe the scanned PDFs, which have no text; to find the names of organisations in free text; to translate the site into other languages; and to write code.</li>
+<li><strong>It does not decide what is published.</strong> Everything it transcribes or marks is checked against the official document by another method: a second reading, an independent OCR or an automatic check that the text is literal. Anything that cannot be checked is flagged with a notice or not published.</li>
+<li><strong>It does not summarise, interpret or classify anyone.</strong> Figures are calculated by code from the transcriptions, and official texts are shown as they are, in Spanish.</li>
+</ul>
+<p>The code, the transcribed data and the transcription instructions are public on <a href="https://github.com/MarcoAnarmo/CongresoAbierto">GitHub</a>, so anyone can repeat the process or spot a mistake.</p>`,
       retribuciones: `<p>This shows the official 2026 monthly amounts that correspond to each deputy during their term of office, according to their constituency and positions:</p>
 <ul>
 <li>Constitutional allowance (asignación constitucional), the same for everyone: {asignacion}.</li>

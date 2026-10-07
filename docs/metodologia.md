@@ -15,6 +15,25 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 | Fotos | Foto oficial de cada ficha | `scripts/browser/fotos.js` + `scripts/fotos.ts` |
 | Textos votados | BOE (decretos-leyes), BOCG (proposiciones) y Diario de Sesiones | Enlaces y extractos literales en `data/manual/votaciones-clave.json` |
 | Retribuciones | https://www.congreso.es/es/cem/regecodip (2026) | `scripts/retribuciones.ts` |
+| Acuerdos de compatibilidad | BOCG, serie D (PDF con texto) | `scripts/extraer-compatibilidad.py` |
+| Empresas y entidades | Textos de los documentos anteriores | `scripts/vinculos-textos.ts` + extracción con LLM comprobada (`data/raw/vinculos/entidades.jsonl`) + `scripts/vinculos.ts` |
+| Cargos en sociedades | BORME, Sección A (XML de datos abiertos del BOE) | `scripts/browser/borme.js` + `scripts/borme-clasificar.py` |
+
+## Proceso y verificación
+
+Regla: solo se publica lo que se puede comprobar en un documento oficial. Lo que está en el documento pero tiene una lectura no confirmada al 100 % se publica con el aviso «Lectura no confirmada». Lo que ningún documento oficial confirma no se publica.
+
+| Fuente | Formato original | Extracción | Comprobación |
+|---|---|---|---|
+| Buscador y fichas de congreso.es | HTML / JSON | Scripts en el navegador (`scripts/browser/`) | Copia literal de campos oficiales |
+| Declaraciones de bienes y rentas | PDF escaneado (imagen) | Transcripción con un modelo de lenguaje con visión siguiendo `data/raw/*/INSTRUCCIONES.md` (literal, sin adivinar, «?» en lo dudoso) | Bienes: segunda revisión completa e independiente. Deudas: dos transcripciones independientes, diferencias resueltas con el PDF. Rentas, cuentas y acciones: comparación con OCR independiente (tesseract, spa) y revisión en el PDF ampliado de todo desacuerdo |
+| Declaraciones de intereses económicos | PDF escaneado | Igual que las rentas | Igual que las rentas |
+| Registro de Intereses - Actividades y acuerdos de compatibilidad (BOCG D) | PDF con texto | `pdftotext` + scripts, sin LLM | Texto del propio PDF; acuerdos asignados solo por nombre exacto |
+| Votaciones | JSON de datos abiertos | Scripts, sin LLM | Datos oficiales; temas por palabras (`data/manual/temas.json`) |
+| Empresas y entidades | Textos anteriores | Un LLM señala los nombres de entidades (tipo y relación) | `esLiteral()`: cada nombre debe aparecer letra a letra en su texto oficial o se descarta; sin particulares; uniones en `data/manual/entidades.json` |
+| BORME | XML de datos abiertos del BOE (9,6 M de actos desde 2009) | Búsqueda exacta del nombre completo, sin LLM | Solo se publica si otro documento oficial lo confirma (empresa declarada, empresa pública de una administración donde declara un cargo, o sociedad con su nombre en su provincia). 77 de 662 casos publicados; el resto queda fuera del repositorio |
+
+El LLM ayuda a transcribir PDF escaneados, a localizar nombres en textos libres, a traducir la web y a programar. No decide qué se publica: todo lo que produce se comprueba con otro método contra el documento oficial.
 
 ## Formación y trayectoria
 
@@ -34,7 +53,7 @@ La versión legible está en la propia web (`/metodologia`, fichero `src/pages/m
 
 ### Control de calidad
 
-1. Primera transcripción literal de las 429 declaraciones (últimas y anteriores) por lectura visual del PDF.
+1. Primera transcripción literal de las 429 declaraciones (últimas y anteriores) a partir de la imagen del PDF, con un modelo de lenguaje con visión.
 2. Segunda revisión completa e independiente de las 429, fila a fila, incluidas las OBSERVACIONES de la página 4 y su posible continuación en la página 5. Resultado en `data/raw/patrimonio/revisado.jsonl`.
 3. Solo se excluye un bien cuando una declaración oficial posterior comunica su venta o baja; cada exclusión está en `data/manual/correcciones.json` con su motivo y se muestra en la ficha.
 4. No se publican matrículas (el propio formulario oficial pide no indicarlas).
@@ -75,3 +94,15 @@ Se muestran solo importes mensuales oficiales: asignación + complementos por ca
 Formato compacto en `data/raw/votaciones/votaciones-compactas.txt`: voto mayoritario de cada grupo + excepciones por diputado. `-` indica que esa persona aún no era diputada en la fecha de la votación. El hemiciclo es ilustrativo (ordenado por grupos), no el plano real de escaños.
 
 Para cada votación se muestran los documentos oficiales (texto de la iniciativa, publicación del resultado, Diario de Sesiones, PDF y JSON de la votación) y su contenido: títulos de los artículos o extractos literales del texto oficial. En las proposiciones no de ley votadas con una enmienda transaccional se muestra el texto efectivamente votado. Las votaciones por llamamiento cuyo voto nominal aún no está en datos abiertos aparecen como pendientes (`data/manual/votaciones-pendientes.json`).
+
+## Empresas y entidades
+
+- `scripts/vinculos-textos.ts` reúne los textos oficiales de cada diputado (registro de actividades, acuerdos de compatibilidad, todas las declaraciones de intereses económicos, valores y sociedades de la declaración de bienes y trayectoria de la ficha) en `data/raw/vinculos/textos.jsonl`.
+- `data/raw/vinculos/entidades.jsonl`: entidades de cada texto (nombre literal, tipo y relación). Las extrajo un LLM con las reglas de la sección «Proceso y verificación»; `scripts/vinculos.ts` descarta cualquier nombre que no sea literal.
+- `data/manual/entidades.json`: nombres que son la misma entidad, exclusiones y tipos corregidos a mano.
+
+## Registro Mercantil (BORME)
+
+- `scripts/browser/borme.js` (en una pestaña de boe.es): recorre el sumario de cada día desde 2009 y el XML de la Sección A de cada provincia, y guarda los actos donde aparece el nombre completo de un diputado.
+- `scripts/borme-clasificar.py`: confirma cada coincidencia con otro documento oficial (`declarada`, `cargo-publico`, `apellido`) → `data/raw/borme/vinculos-borme.jsonl`. El resto va a `data/raw/borme/pendientes.json`, que no se publica ni se sube (`.gitignore`) porque la mayoría son homónimos.
+- `data/raw/borme/rareza.json` (frecuencia de nombres y apellidos del INE) solo sirve para revisar los pendientes.
