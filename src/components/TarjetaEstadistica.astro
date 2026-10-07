@@ -1,10 +1,12 @@
 ---
 /**
  * Caja de una estadística: título, una línea de explicación y, arriba a la derecha, «Cómo se calcula» (ⓘ, abre
- * HojaInfo) y «Descargar estos datos» (↓, lleva a Datos con los filtros puestos). El gráfico va en el contenido
+ * HojaInfo), «Descargar estos datos» (↓, lleva a Datos con los filtros puestos) y, si tiene tarjeta, «Compartir»
+ * (abre DialogoCompartir, que tiene que estar en la página). El gráfico va en el contenido
  * y los enlaces secundarios en el hueco `pie`. Sin JavaScript, «Cómo se calcula» se ve como desplegable.
  */
 import Icono from './Icono.astro';
+import BotonCompartir, { type TarjetaCompartir } from './BotonCompartir.astro';
 import { idiomaDeUrl } from '../i18n';
 import textos from '../i18n/textos/estadisticas';
 interface Props {
@@ -17,8 +19,10 @@ interface Props {
   descargar?: string;
   /** Ocupa todo el ancho en el ordenador (en el móvil todas lo ocupan). */
   ancho?: boolean;
+  /** Tarjeta para compartir esta estadística. */
+  compartir?: TarjetaCompartir;
 }
-const { id, titulo, intro, como, descargar, ancho = false } = Astro.props;
+const { id, titulo, intro, como, descargar, ancho = false, compartir } = Astro.props;
 const t = textos[idiomaDeUrl(Astro.url.pathname)];
 ---
 <section class:list={['est', { ancho }]} id={id} aria-labelledby={`h-${id}`}>
@@ -29,6 +33,7 @@ const t = textos[idiomaDeUrl(Astro.url.pathname)];
     </div>
     <div class="est-acc">
       {como && <button class="ico-btn b-info" type="button" data-info={`como-${id}`} data-info-titulo={t.fuente} aria-label={`${t.fuente}: ${titulo}`} title={t.fuente}><Icono n="info" tam={19} /></button>}
+      {compartir && <BotonCompartir tarjeta={compartir} class="b-compartir" />}
       {descargar && <a class="ico-btn" href={descargar} aria-label={`${t.descargar}: ${titulo}`} title={t.descargar}><Icono n="descarga" tam={19} /></a>}
     </div>
   </header>
@@ -58,6 +63,8 @@ const t = textos[idiomaDeUrl(Astro.url.pathname)];
   }
   .ico-btn:hover { background: var(--chip); color: var(--accent-text); }
   :global(html:not(.js)) .b-info { display: none; }
+  .est-acc :global(.b-compartir) { width: 40px; height: 40px; border-color: transparent; background: none; color: var(--muted); }
+  .est-acc :global(.b-compartir:hover) { background: var(--chip); color: var(--accent-text); border-color: transparent; }
   :global(html.js) .como { display: none; }
   .est-pie { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
   .est-pie :global(a) { color: var(--accent-text); font-weight: 600; text-decoration: none; }
