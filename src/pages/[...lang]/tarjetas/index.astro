@@ -81,7 +81,7 @@ const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="
       {MODOS.map((m) => (
         <li>
           <a class="tarjeta" {...datos(r.resumen('historia', lang, m), r.resumen('horizontal', lang, m), `congreso-abierto${m === 'grupo' ? '' : `-${m}`}`, compartir.resumen(lang), t.modos[m])}>
-            <img src={url(r.resumen('historia', lang, m))} alt={t.altResumen} width="270" height="480" loading="lazy" decoding="async" />
+            <img src={url(r.mini('resumen', m, lang))} alt={t.altResumen} width="270" height="480" loading="lazy" decoding="async" />
             <span class="t-pie"><strong>{t.modos[m]}</strong></span>
           </a>
         </li>
@@ -95,7 +95,7 @@ const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="
       {vots.map((v) => (
         <li>
           <a class="tarjeta" {...datos(r.votacion(v, 'historia', lang), r.votacion(v, 'horizontal', lang), `congreso-abierto-${v.id}`, compartir.votacion(v, lang), temaCorto(v.tema))}>
-            <img src={url(r.votacion(v, 'historia', lang))} alt={f(t.altVotacion, { tema: temaCorto(v.tema), fecha: fmtFecha(v.fecha), resultado: resultados[v.resultado] ?? v.resultado })} width="270" height="480" loading="lazy" decoding="async" />
+            <img src={url(r.mini('votacion', v.id, lang))} alt={f(t.altVotacion, { tema: temaCorto(v.tema), fecha: fmtFecha(v.fecha), resultado: resultados[v.resultado] ?? v.resultado })} width="270" height="480" loading="lazy" decoding="async" />
             <span class="t-pie">
               <strong>{temaCorto(v.tema)}</strong>
               <span class="t-meta"><span class:list={['res', favorable(v.resultado)]}>{resultados[v.resultado] ?? v.resultado}</span>{fmtFecha(v.fecha)}</span>
@@ -112,7 +112,7 @@ const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="
     <div class="elige" data-elige="prov">
       <figure class="muestra">
         <button type="button" class="m-img" tabindex="-1" aria-hidden="true">
-          <img src={url(r.provincia(provIni.id, 'historia', lang))} alt={f(t.altProvincia, { provincia: provIni.legible })} width="270" height="480" loading="lazy" decoding="async" />
+          <img src={url(r.mini('provincia', provIni.id, lang))} alt={f(t.altProvincia, { provincia: provIni.legible })} width="270" height="480" loading="lazy" decoding="async" />
         </button>
         <figcaption>
           <strong class="m-nombre">{provIni.legible}</strong>
@@ -131,7 +131,7 @@ const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="
           {circunscripciones.map((c) => (
             <li data-n={norm(c.legible)}>
               <a class="fila" href={url(r.provincia(c.id, 'historia', lang))} aria-current={c.id === provIni.id ? 'true' : undefined}
-                data-t-historia={url(r.provincia(c.id, 'historia', lang))} data-t-horizontal={url(r.provincia(c.id, 'horizontal', lang))}
+                data-t-historia={url(r.provincia(c.id, 'historia', lang))} data-t-mini={url(r.mini('provincia', c.id, lang))} data-t-horizontal={url(r.provincia(c.id, 'horizontal', lang))}
                 data-t-nombre={`congreso-abierto-${c.id}`} data-t-enlace={compartir.provincia(c.id, lang).enlace} data-t-ct={compartir.provincia(c.id, lang).texto}
                 data-t-titulo={c.legible} data-t-sub={dip(nDip(c.nombre))} data-t-alt={f(t.altProvincia, { provincia: c.legible })}>
                 <span class="f-nombre">{c.legible}<span class="f-sub">{dip(nDip(c.nombre))}</span></span><Icono n="derecha" tam={18} class="f-ir" />
@@ -193,8 +193,8 @@ const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="
     const img = raiz.querySelector<HTMLImageElement>('.muestra img')!;
     const boton = raiz.querySelector<HTMLButtonElement>('.m-compartir')!;
     raiz.querySelector('.m-img')!.addEventListener('click', () => boton.click());
-    return (d: { historia: string; titulo: string; sub: string; alt: string; datos: Record<string, string> }) => {
-      img.src = d.historia;
+    return (d: { imagen: string; titulo: string; sub: string; alt: string; datos: Record<string, string> }) => {
+      img.src = d.imagen;
       img.alt = d.alt;
       raiz.querySelector('.m-nombre')!.textContent = d.titulo;
       raiz.querySelector('.m-sub')!.textContent = d.sub;
@@ -228,7 +228,7 @@ const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="
     a.setAttribute('aria-current', 'true');
     marcar(provLista, a);
     mostrarProv({
-      historia: x.tHistoria!, titulo: x.tTitulo!, sub: x.tSub!, alt: x.tAlt!,
+      imagen: x.tMini!, titulo: x.tTitulo!, sub: x.tSub!, alt: x.tAlt!,
       datos: { compartir: x.tNombre!, historia: x.tHistoria!, horizontal: x.tHorizontal!, nombre: x.tNombre!, enlace: x.tEnlace!, ct: x.tCt!, titulo: x.tTitulo! },
     });
   });
@@ -277,7 +277,7 @@ const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="
     b.setAttribute('aria-current', 'true');
     marcar(lista, b);
     const historia = `${prefijo()}/tarjetas/historia/diputado/${s}.png`;
-    mostrarDip({ historia, titulo: n, sub: `${g} · ${p}`, alt: n, datos: { compartir: s, cn: n, ct: texto } });
+    mostrarDip({ imagen: historia, titulo: n, sub: `${g} · ${p}`, alt: n, datos: { compartir: s, cn: n, ct: texto } });
   });
   let espera = 0;
   dipFiltro.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(pintar, 120); });

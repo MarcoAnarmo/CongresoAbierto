@@ -1,0 +1,78 @@
+---
+/**
+ * Ventana de filtros (Diputados, Votaciones): centrada en el ordenador; en el móvil, hoja que sube desde abajo y se
+ * cierra deslizándola. La página mete sus selectores en `.df-cuerpo` (con sus <label>, que aquí se ven como título de
+ * cada filtro) y decide qué hacen «Quitar filtros» y «Ver resultados». Se abre con cualquier botón que tenga
+ * aria-controls={id}; al cerrarse, el foco vuelve a ese botón.
+ */
+import Icono from './Icono.astro';
+import { idiomaDeUrl } from '../i18n';
+import comun from '../i18n/textos/comun';
+interface Props { id: string; titulo: string; quitar: { id: string; texto: string }; ver: { id: string; texto: string } }
+const { id, titulo, quitar, ver } = Astro.props;
+const cerrar = comun[idiomaDeUrl(Astro.url.pathname)].palabras.cerrar;
+---
+<dialog class="dlg-filtros" id={id} aria-labelledby={`${id}-t`} data-hoja-filtros>
+  <div class="df-cab">
+    <h2 id={`${id}-t`}>{titulo}</h2>
+    <button class="df-cerrar" type="button" aria-label={cerrar} title={cerrar}><Icono n="cerrar" /></button>
+  </div>
+  <div class="df-cuerpo" tabindex="-1" autofocus></div>
+  <div class="df-pie">
+    <button class="btn" type="button" id={quitar.id}>{quitar.texto}</button>
+    <button class="btn primario df-ver" type="button" id={ver.id}>{ver.texto}</button>
+  </div>
+</dialog>
+
+<script>
+  import { deslizarParaCerrar } from '../scripts/hoja';
+  document.querySelectorAll<HTMLDialogElement>('dialog[data-hoja-filtros]').forEach((dlg) => {
+    const raiz = document.documentElement;
+    let origen: HTMLElement | null = null;
+    const cerrar = () => dlg.close();
+    document.querySelectorAll<HTMLElement>(`[aria-controls="${dlg.id}"]`).forEach((b) => b.addEventListener('click', () => {
+      origen = b;
+      raiz.classList.add('dlg-abierto');
+      dlg.showModal();
+    }));
+    dlg.addEventListener('close', () => { raiz.classList.remove('dlg-abierto'); origen?.focus(); });
+    dlg.querySelector('.df-cerrar')!.addEventListener('click', cerrar);
+    dlg.querySelector('.df-ver')!.addEventListener('click', cerrar);
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) cerrar(); });
+    deslizarParaCerrar(dlg, { cerrar });
+  });
+</script>
+
+<style>
+  .dlg-filtros {
+    width: min(460px, calc(100vw - 32px)); padding: 0; max-height: min(85dvh, 680px); border: 1px solid var(--border); border-radius: 18px;
+    background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgb(0 0 0 / .25);
+  }
+  .dlg-filtros[open] { display: flex; flex-direction: column; animation: df-aparecer .18s ease-out; }
+  .dlg-filtros::backdrop { background: rgb(20 22 28 / .55); }
+  @keyframes df-aparecer { from { opacity: 0; transform: translateY(8px); } }
+  .df-cab { position: relative; display: flex; align-items: center; gap: 12px; padding: 16px 8px 8px 20px; }
+  .df-cab h2 { flex: 1; margin: 0; font-size: 1.15rem; }
+  .df-cerrar { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+  .df-cerrar:hover { background: var(--chip); color: var(--text); }
+  .df-cuerpo { overflow-y: auto; padding: 4px 20px 16px; }
+  .df-cuerpo:focus { outline: none; }
+  /* Los selectores que mete la página: uno debajo de otro, cada uno con su título (su <label>, oculto fuera de aquí) */
+  .df-cuerpo :global(.filtros-mas) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .df-cuerpo :global(.sr-only) {
+    position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal;
+    margin-top: 10px; font-size: .875rem; font-weight: 600; color: var(--muted);
+  }
+  .df-cuerpo :global(select) { width: 100%; max-width: none; }
+  .df-pie { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 12px 20px 16px; border-top: 1px solid var(--border); }
+  :global(html.dlg-abierto), :global(html.dlg-abierto body) { overflow: hidden; }
+  @media (max-width: 720px) {
+    .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: 90dvh; border-bottom: 0; border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
+    .dlg-filtros[open] { animation: df-subir .22s ease-out; }
+    @keyframes df-subir { from { transform: translateY(48px); opacity: .5; } }
+    .df-cab { padding: 22px 8px 8px 16px; }
+    .df-cuerpo { padding: 4px 16px 12px; }
+    .df-pie { padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); }
+  }
+  @media (prefers-reduced-motion: reduce) { .dlg-filtros[open] { animation: none; } }
+</style>

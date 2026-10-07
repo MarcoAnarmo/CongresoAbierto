@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Icono from '../../components/Icono.astro';
 import { votacionesPleno, pendientes, grupos, url, TEMAS } from '../../lib/data';
 import DialogoCompartir from '../../components/DialogoCompartir.astro';
+import HojaFiltros from '../../components/HojaFiltros.astro';
 import TarjetasVotacion from '../../components/TarjetasVotacion.astro';
 import { aItem, itemPendiente, ordenar, listaHtml, filaHtml, TIPOS, type ItemVotacion, type TextosLista } from '../../lib/votaciones';
 import { rutasIdioma, idiomaDe, enlace, formatos, f, pl, LOCALE } from '../../i18n';
@@ -87,17 +88,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
     <p><strong>{tv.modoTitulo}</strong><span>{tv.modoTexto}</span></p>
     <button class="btn ma-listo" type="button" id="v-modo-listo">{tv.listo}</button>
   </div>
-  <dialog class="dlg-filtros" id="v-dlg-filtros" aria-labelledby="v-dlg-filtros-t">
-    <div class="df-cab">
-      <h2 id="v-dlg-filtros-t">{t.filtros.titulo}</h2>
-      <button class="df-cerrar" type="button" aria-label={c.palabras.cerrar}><Icono n="cerrar" /></button>
-    </div>
-    <div class="df-cuerpo" id="v-df-cuerpo" tabindex="-1" autofocus></div>
-    <div class="df-pie">
-      <button class="btn" type="button" id="v-quitar">{t.filtros.quitar}</button>
-      <button class="btn primario" type="button" id="v-ver">{t.filtros.ver}</button>
-    </div>
-  </dialog>
+  <HojaFiltros id="v-dlg-filtros" titulo={t.filtros.titulo} quitar={{ id: 'v-quitar', texto: t.filtros.quitar }} ver={{ id: 'v-ver', texto: t.filtros.ver }} />
 
   <!-- Todas: más recientes primero, agrupadas por día -->
   <div id="vista-todas">
@@ -167,6 +158,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   colores: Object.fromEntries(grupos.map((g) => [g.corto, g.color])),
   // Mientras llega el índice completo, la página funciona con las votaciones de la primera carga y las clave
   inicial: [...todas.slice(0, PRIMERAS), ...clave.filter((i) => todas.indexOf(i) >= PRIMERAS)],
+  total: todas.length,
 })} />
 
 <script>
@@ -179,7 +171,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   interface Contenido { etiqueta: string; items: string[]; fuente: { titulo: string; url: string } }
   interface Extra { contenido: Contenido[]; documentos: { titulo: string; url: string; tipo?: string }[]; expediente?: string; expedienteUrl?: string; estado?: string }
   const cfg = JSON.parse(document.getElementById('v-datos')!.textContent!) as {
-    base: string; primeras: number; extra: Record<string, Extra>; temas: Record<string, string>; temasT: Record<string, string>; colores: Record<string, string>; inicial: ItemVotacion[];
+    base: string; primeras: number; total: number; extra: Record<string, Extra>; temas: Record<string, string>; temasT: Record<string, string>; colores: Record<string, string>; inicial: ItemVotacion[];
   };
   const t = textos<(typeof T)['es']['cliente'] & { lista: TextosLista }>('votaciones');
   const tx = t.lista;
@@ -210,6 +202,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
     vista = v;
     botonesVista.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === v)));
     VISTAS.forEach((x) => { $(`vista-${x}`).hidden = x !== v; });
+    if (v === 'calendario') cargarIndice();
     $('v-filtros').hidden = v === 'clave';
     cuenta.hidden = v !== 'todas';
     const u = new URL(location.href);
@@ -259,15 +252,16 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
     const porDia: Record<string, number> = {};
     fs.forEach((i) => { porDia[i.f] = (porDia[i.f] ?? 0) + 1; });
     lista.innerHTML = listaHtml(fs.slice(0, mostradas), base, tx, porDia);
-    mas.hidden = !completo || fs.length <= mostradas;
-    mas.textContent = f(t.verMas, { n: fmt(fs.length - mostradas) });
+    // Sin el índice completo (aún no se ha pedido) se ofrece igualmente ver más: al pulsar, se descarga
+    mas.hidden = completo ? fs.length <= mostradas : fs.length < mostradas;
+    mas.textContent = f(t.verMas, { n: fmt((completo ? fs.length : cfg.total) - mostradas) });
     if (completo) cuenta.textContent = pl(fs.length, t.cuenta);
     vacio.hidden = fs.length > 0;
   }
-  mas.addEventListener('click', () => { mostradas += PAGINA; pintarTodas(); });
+  mas.addEventListener('click', () => { mostradas += PAGINA; if (!completo) cargarIndice(); pintarTodas(); });
   // Al llegar al final de la lista se cargan más solas
   if ('IntersectionObserver' in window) {
-    new IntersectionObserver((es) => { if (es[0].isIntersecting && !mas.hidden && vista === 'todas') { mostradas += PAGINA; pintarTodas(); } }, { rootMargin: '400px' }).observe(mas);
+    new IntersectionObserver((es) => { if (es[0].isIntersecting && !mas.hidden && vista === 'todas') { mostradas += PAGINA; if (!completo) cargarIndice(); pintarTodas(); } }, { rootMargin: '400px' }).observe(mas);
   }
 
   // ---------- Calendario ----------
@@ -331,6 +325,8 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   }
   // Buscar espera a que se deje de teclear un momento y pinta en el siguiente fotograma
   let espera = 0;
+  // Buscar o filtrar necesita todas las votaciones: el índice se descarga al empezar
+  texto.addEventListener('focus', () => cargarIndice(), { once: true });
   texto.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(() => requestAnimationFrame(() => { mostradas = cfg.primeras; aplicar(); }), 180); });
   texto.addEventListener('keydown', (e) => { if (e.key === 'Enter') { clearTimeout(espera); mostradas = cfg.primeras; aplicar(); texto.blur(); } });
   // El navegador puede recordar los filtros al volver a la página: siempre se empieza con todos los temas
@@ -341,19 +337,14 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   });
   [selTema, selTipo, selRes].forEach((s) => s.addEventListener('change', () => { mostradas = cfg.primeras; aplicar(); }));
 
-  // ---------- Filtros en una ventana (en el móvil, hoja que sube desde abajo), como en Diputados ----------
+  // ---------- Filtros en una ventana (components/HojaFiltros.astro), como en Diputados ----------
   const mqMovil = matchMedia('(max-width: 720px)');
   const dlgF = $<HTMLDialogElement>('v-dlg-filtros');
   const abrirF = $<HTMLButtonElement>('v-abrir-filtros');
   // Sin JavaScript los selectores están en la fila; con JavaScript pasan a la ventana
-  $('v-df-cuerpo').append($('v-filtros-mas'));
-  abrirF.addEventListener('click', () => { document.documentElement.classList.add('dlg-abierto'); dlgF.showModal(); });
-  dlgF.addEventListener('close', () => { document.documentElement.classList.remove('dlg-abierto'); abrirF.focus(); });
-  dlgF.querySelector('.df-cerrar')!.addEventListener('click', () => dlgF.close());
-  dlgF.addEventListener('click', (e) => { if (e.target === dlgF) dlgF.close(); });
-  $('v-ver').addEventListener('click', () => dlgF.close());
+  dlgF.querySelector('.df-cuerpo')!.append($('v-filtros-mas'));
+  abrirF.addEventListener('click', () => cargarIndice());
   $('v-quitar').addEventListener('click', () => { selTema.value = ''; selTipo.value = ''; selRes.value = ''; mostradas = cfg.primeras; aplicar(); });
-  deslizarParaCerrar(dlgF, { cerrar: () => dlgF.close() });
 
   // ---------- Ventana de detalle ----------
   const dlg = $<HTMLDialogElement>('dlg-voto');
@@ -463,15 +454,25 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   const pedida = params.get('v');
   let volverAFicha = false;
   try { volverAFicha = !!pedida && new URL(document.referrer).origin === location.origin && new URL(document.referrer).pathname.includes('/diputado/') && history.length > 1; } catch {}
+  /*
+   * Índice completo (/datos/votaciones.json, ~170 KB comprimido): no se descarga al abrir la página, sino cuando hace
+   * falta: al buscar, filtrar, ver más, abrir el calendario o una votación (o una comparación) que no está en la
+   * primera carga. Quien solo mira las más recientes no lo descarga.
+   */
+  let cargandoIndice: Promise<void> | null = null;
+  function cargarIndice() {
+    return (cargandoIndice ??= fetch(`${baseDatos()}/datos/votaciones.json`).then((r) => r.json()).then((xs: ItemVotacion[]) => {
+      todas = xs; completo = true; indexar(); cache.clear(); ultimo.clave = ''; prepararBusqueda();
+      prepararMeses();
+      aplicar();
+      tarjetas.pintarBarra();
+      if (pedida && !dlg.open && !abierta) abrir(pedida, false);
+    }).catch(() => { cargandoIndice = null; cuenta.textContent = t.errorIndice; }));
+  }
   prepararMeses();
   ponerVista(vista);
-  if (pedida) abrir(pedida, false);
-  fetch(`${baseDatos()}/datos/votaciones.json`).then((r) => r.json()).then((xs: ItemVotacion[]) => {
-    todas = xs; completo = true; indexar(); cache.clear(); ultimo.clave = ''; prepararBusqueda();
-    prepararMeses();
-    aplicar();
-    if (pedida && !dlg.open) abrir(pedida, false);
-  }).catch(() => { cuenta.textContent = t.errorIndice; });
+  const abierta = pedida ? abrir(pedida, false) : false;
+  if ((pedida && !abierta) || temaPedido || tarjetas.seleccion().some((id) => !porId.has(id))) cargarIndice();
 </script>
 
 <style>
@@ -486,7 +487,9 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   .filtros[hidden] { display: none; }
   .filtros input { flex: 1 1 0; min-width: 0; }
   .filtros-mas { display: flex; flex-wrap: wrap; gap: 8px; }
-  .filtros-mas select { max-width: 260px; }
+  :global(html:not(.js)) .filtros-mas select { max-width: 260px; }
+  /* Con JavaScript no se pintan en la fila mientras el script los pasa a la ventana: así la página no salta al cargar */
+  :global(html.js) .filtros > .filtros-mas { display: none; }
   .boton-filtrar { display: inline-flex; align-items: center; gap: 8px; }
   :global(html:not(.js)) .boton-filtrar { display: none; }
   .n-filtros { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent-strong); color: #fff; font-size: .75rem; }
@@ -584,23 +587,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   .glosario { margin-top: 2rem; }
   .glosario summary { cursor: pointer; font-weight: 650; }
 
-  /* Ventana de filtros: centrada en el ordenador; en el móvil, hoja que sube desde abajo */
-  .dlg-filtros { width: min(460px, calc(100vw - 32px)); padding: 0; max-height: min(85dvh, 640px); border: 1px solid var(--border); border-radius: 18px; background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgb(0 0 0 / .25); }
-  .dlg-filtros[open] { display: flex; flex-direction: column; animation: aparecer .18s ease-out; }
-  @media (max-width: 720px) {
-    .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: 90dvh; border-bottom: 0; border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
-    .dlg-filtros[open] { animation: subir .22s ease-out; }
-  }
-  .dlg-filtros::backdrop { background: rgb(20 22 28 / .55); }
-  @keyframes subir { from { transform: translateY(48px); opacity: .5; } }
-  .df-cab { position: relative; display: flex; align-items: center; gap: 12px; padding: 20px 8px 8px 16px; }
-  .df-cab h2 { flex: 1; margin: 0; font-size: 1.15rem; }
-  .df-cerrar { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
-  .df-cuerpo { overflow-y: auto; padding: 8px 16px 16px; }
-  .df-cuerpo:focus { outline: none; }
-  .df-cuerpo :global(.filtros-mas) { display: grid; gap: 10px; }
-  .df-cuerpo :global(.filtros-mas select) { max-width: none; width: 100%; }
-  .df-pie { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }
+  /* La ventana de filtros (y sus estilos) está en components/HojaFiltros.astro */
 
   /* Ventana de detalle: centrada en el ordenador; en el móvil, hoja que sube desde abajo */
   .dlg-voto {
@@ -610,6 +597,7 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   .dlg-voto[open] { display: flex; flex-direction: column; animation: aparecer .18s ease-out; }
   .dlg-voto::backdrop { background: rgb(20 22 28 / .55); }
   @keyframes aparecer { from { opacity: 0; transform: translateY(10px); } }
+  @keyframes subir { from { transform: translateY(48px); opacity: .5; } }
   .d-cab { display: flex; align-items: center; gap: 12px; padding: 16px 14px 14px 22px; background: var(--surface); border-bottom: 1px solid var(--border); }
   .d-ico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); flex: none; }
   .d-cab h2 { flex: 1; min-width: 0; margin: 0; font-size: 1.1rem; }
