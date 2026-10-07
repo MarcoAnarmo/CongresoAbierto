@@ -11,6 +11,7 @@ import { rutaTarjeta, rotulo } from '../../../lib/tarjetas';
 import TablaPrestamos from '../../../components/TablaPrestamos.astro';
 import AvisoDudoso from '../../../components/AvisoDudoso.astro';
 import Icono from '../../../components/Icono.astro';
+import { TIPOS_ENTIDAD } from '../../../lib/vinculos';
 import { conIdiomas, enlace, formatos, f, pl, LOCALE, type Idioma } from '../../../i18n';
 import comun from '../../../i18n/textos/comun';
 import textos, { textoEvento, detalleEvento } from '../../../i18n/textos/ficha';
@@ -97,6 +98,11 @@ const tInv = !fz ? { valor: '—', sub: t.tes.sinDeclaracion }
 const act = d.actividades;
 const inter = d.intereses;
 const nTrab = inter?.trabajos.length ?? 0;
+// Empresas y entidades que nombran sus documentos oficiales, agrupadas por tipo
+const vin = d.vinculos;
+const nEnt = vin?.entidades.length ?? 0;
+const nEmpresas = vin?.porTipo.empresa ?? 0;
+const tiposVin = TIPOS_ENTIDAD.filter((k) => vin?.porTipo[k]).map((k) => ({ k, ents: vin!.entidades.filter((e) => e.tipo === k) }));
 // Sus votos en todas las votaciones del Pleno
 const pa = d.participacion;
 const votoEmitido = pa ? pa.si + pa.no + pa.abstencion : 0;
@@ -125,6 +131,11 @@ const teselas: Tesela[] = [
     sub: sinDeclaracion ? t.tes.sinDeclaracion : p.vehiculos === 0 ? t.tes.noVehiculos : t.tes.vehiculosDeclarados[p.vehiculos === 1 ? 0 : 1],
   },
   { id: 'retribucion', icono: 'sueldo', titulo: t.tes.retribucion, valor: fmtEur(d.retribucion.totalMensual), sub: t.tes.alMes },
+  {
+    grupo: t.grupos.vinculos, id: 'entidades', icono: 'entidades', titulo: t.tes.entidades, corto: t.tes.entidadesCorto,
+    valor: String(nEnt), sub: nEnt ? t.tes.entidadesSub[nEnt === 1 ? 0 : 1] + (nEmpresas ? ' · ' : '') : t.tes.sinEntidades,
+    acento: nEmpresas ? pl(nEmpresas, t.tes.empresas, lang) : undefined,
+  },
   ...(pa ? [{
     grupo: t.grupos.congreso, id: 'participacion', icono: 'votaciones' as const, titulo: t.tes.participacion, corto: t.tes.participacionCorto,
     valor: fmtNum(votoEmitido), sub: f(t.tes.conEscano, { n: fmtNum(pa.enEscano) }),
@@ -413,6 +424,40 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
         {t.ret.noIncluye}
       </p>
       <p class="fuente"><Icono n="info" tam={16} /><span><a href={u('/metodologia#retribuciones')}>{t.comun.comoSeCalcula}</a></span></p>
+    </div>
+  </section>
+
+  <section class="seccion" id="entidades" aria-labelledby="h-entidades">
+    <h2 id="h-entidades"><span class="s-ico"><Icono n="entidades" /></span>{t.ent.titulo}</h2>
+    <div class="s-cuerpo">
+      {nEnt === 0 ? <p>{t.ent.ninguna}</p> : (
+        <>
+          <p class="small muted">{g(t.ent.intro)}</p>
+          {tiposVin.map(({ k, ents }) => (
+            <>
+              <h3>{t.ent.tipos[k]} <span class="muted n-tipo">{fmtNum(ents.length)}</span></h3>
+              <ul class="entidades">{ents.map((e) => (
+                <li>
+                  <details class="ent">
+                    <summary>
+                      <span class="ent-nombre">{e.nombre}</span>
+                      <span class="ent-rol">{[e.apariciones.find((a) => a.rol)?.rol, pl(new Set(e.apariciones.map((a) => a.url)).size, t.ent.documentos, lang)].filter(Boolean).join(' · ')}</span>
+                    </summary>
+                    <ul class="ent-apar">{e.apariciones.map((a) => (
+                      <li>
+                        <a href={a.url} rel="noopener" class="ent-doc">{t.ent.fuentes[a.fuente]}{a.fecha && <span class="muted"> · {fmtFecha(a.fecha)}</span>} ↗</a>
+                        {a.periodo && <span class="small muted"> · {f(t.ent.periodo, { p: a.periodo })}</span>}
+                        <blockquote class="ent-lit" lang="es">{a.texto}</blockquote>
+                      </li>
+                    ))}</ul>
+                  </details>
+                </li>
+              ))}</ul>
+            </>
+          ))}
+        </>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{t.ent.fuente}<a href={u('/metodologia#entidades')}>{t.comun.comoSeObtiene}</a> · {t.ent.avisar}<a href={enlaceError(d.nombreCompleto)} rel="noopener">{t.cab.avisarError}</a></span></p>
     </div>
   </section>
 
@@ -711,6 +756,20 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   .lista-simple { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
   .lista-simple li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
   .lista-simple li:last-child { border-bottom: 0; }
+  /* Empresas y entidades: cada una se despliega con los documentos que la nombran y su texto literal */
+  .n-tipo { font-weight: 400; font-size: .85em; }
+  .entidades { list-style: none; margin: 0 0 8px; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .entidades > li { border-bottom: 1px solid var(--border); }
+  .entidades > li:last-child { border-bottom: 0; }
+  .ent summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 12px 40px 12px 16px; min-height: 44px; cursor: pointer; list-style: none; position: relative; }
+  .ent summary::-webkit-details-marker { display: none; }
+  .ent summary::after { content: ''; position: absolute; right: 18px; top: 50%; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-70%) rotate(45deg); transition: transform .15s; }
+  .ent[open] summary::after { transform: translateY(-30%) rotate(-135deg); }
+  .ent-nombre { font-weight: 600; overflow-wrap: anywhere; }
+  .ent-rol { font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+  .ent-apar { list-style: none; margin: 0; padding: 0 16px 12px; display: grid; gap: 10px; }
+  .ent-doc { font-size: .88rem; font-weight: 600; }
+  .ent-lit { margin: 4px 0 0; padding: 6px 10px; border-left: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); font-size: .88rem; line-height: 1.5; color: var(--text); background: var(--bg); border-radius: 0 6px 6px 0; overflow-wrap: anywhere; }
   .lista-docs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
   .lista-docs a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); text-decoration: none; }
   .lista-docs a:hover { border-color: var(--accent); }
