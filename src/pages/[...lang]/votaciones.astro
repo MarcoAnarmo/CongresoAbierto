@@ -341,13 +341,12 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   });
   [selTema, selTipo, selRes].forEach((s) => s.addEventListener('change', () => { mostradas = cfg.primeras; aplicar(); }));
 
-  // ---------- Filtros en una hoja (móvil), como en Diputados ----------
+  // ---------- Filtros en una ventana (en el móvil, hoja que sube desde abajo), como en Diputados ----------
   const mqMovil = matchMedia('(max-width: 720px)');
   const dlgF = $<HTMLDialogElement>('v-dlg-filtros');
   const abrirF = $<HTMLButtonElement>('v-abrir-filtros');
-  const filtrosMas = $('v-filtros-mas');
-  const colocar = () => { if (mqMovil.matches) $('v-df-cuerpo').append(filtrosMas); else { if (dlgF.open) dlgF.close(); abrirF.after(filtrosMas); } };
-  colocar(); mqMovil.addEventListener?.('change', colocar);
+  // Sin JavaScript los selectores están en la fila; con JavaScript pasan a la ventana
+  $('v-df-cuerpo').append($('v-filtros-mas'));
   abrirF.addEventListener('click', () => { document.documentElement.classList.add('dlg-abierto'); dlgF.showModal(); });
   dlgF.addEventListener('close', () => { document.documentElement.classList.remove('dlg-abierto'); abrirF.focus(); });
   dlgF.querySelector('.df-cerrar')!.addEventListener('click', () => dlgF.close());
@@ -485,10 +484,11 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   /* Buscador y filtros (en el móvil, los filtros van en una hoja) */
   .filtros { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin-bottom: 8px; }
   .filtros[hidden] { display: none; }
-  .filtros input { flex: 1 1 260px; min-width: 0; }
+  .filtros input { flex: 1 1 0; min-width: 0; }
   .filtros-mas { display: flex; flex-wrap: wrap; gap: 8px; }
   .filtros-mas select { max-width: 260px; }
-  .boton-filtrar { display: none; align-items: center; gap: 8px; }
+  .boton-filtrar { display: inline-flex; align-items: center; gap: 8px; }
+  :global(html:not(.js)) .boton-filtrar { display: none; }
   .n-filtros { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent-strong); color: #fff; font-size: .75rem; }
   .n-filtros[hidden] { display: none; }
   .cuenta { flex-basis: 100%; margin: 0; }
@@ -508,10 +508,15 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
 
   /* Lista: días y filas */
   .v-lista { display: grid; gap: 18px; margin-top: 8px; }
-  .v-lista :global(.v-dia h3) { position: sticky; top: var(--tope, 0px); z-index: 2; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0; padding: 8px 2px; font-size: .95rem; background: var(--bg); }
-  .v-lista :global(.v-dia h3 span) { color: var(--muted); font-weight: 500; font-size: .82rem; white-space: nowrap; }
+  /* Fecha de cada día: se queda arriba al bajar, sobre la franja desenfocada de toda la web (global.css) */
+  .v-lista :global(.v-dia h3) {
+    position: sticky; top: calc(var(--tope, 0px) + 6px); z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    margin: 0 -10px 4px; padding: 8px 10px 8px 12px; border-radius: 14px; font-size: .95rem;
+    background: var(--franja-fondo); -webkit-backdrop-filter: var(--franja-filtro); backdrop-filter: var(--franja-filtro);
+  }
+  .v-lista :global(.v-dia h3 span) { flex: none; padding: 2px 10px; border-radius: 999px; background: var(--chip); color: var(--muted); font-weight: 600; font-size: .76rem; white-space: nowrap; }
   .v-lista > :global(*) { min-width: 0; }
-  .v-lista :global(.v-dia h3) { flex-wrap: wrap; row-gap: 0; }
+  .v-lista :global(.v-dia h3 time) { min-width: 0; line-height: 1.3; }
   :global(.v-filas) { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   :global(.v-filas.sueltas) { margin-top: 8px; }
   :global(.vf + .vf) { border-top: 1px solid var(--border); }
@@ -579,9 +584,13 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   .glosario { margin-top: 2rem; }
   .glosario summary { cursor: pointer; font-weight: 650; }
 
-  /* Hoja de filtros (móvil) */
-  .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; padding: 0; max-height: 90dvh; border: 1px solid var(--border); border-bottom: 0; border-radius: 20px 20px 0 0; background: var(--surface); color: var(--text); box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
-  .dlg-filtros[open] { display: flex; flex-direction: column; animation: subir .22s ease-out; }
+  /* Ventana de filtros: centrada en el ordenador; en el móvil, hoja que sube desde abajo */
+  .dlg-filtros { width: min(460px, calc(100vw - 32px)); padding: 0; max-height: min(85dvh, 640px); border: 1px solid var(--border); border-radius: 18px; background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgb(0 0 0 / .25); }
+  .dlg-filtros[open] { display: flex; flex-direction: column; animation: aparecer .18s ease-out; }
+  @media (max-width: 720px) {
+    .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: 90dvh; border-bottom: 0; border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
+    .dlg-filtros[open] { animation: subir .22s ease-out; }
+  }
   .dlg-filtros::backdrop { background: rgb(20 22 28 / .55); }
   @keyframes subir { from { transform: translateY(48px); opacity: .5; } }
   .df-cab { position: relative; display: flex; align-items: center; gap: 12px; padding: 20px 8px 8px 16px; }
@@ -654,14 +663,12 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
     .vista-barra .segmentado .btn { flex-direction: column; gap: 2px; font-size: .82rem; min-height: 54px; padding: 6px 4px; }
     .segmentado .largo { display: none; }
     .segmentado .corto { display: inline; }
-    .boton-filtrar { display: inline-flex; }
     .b-modo { width: 44px; padding: 0; justify-content: center; }
     .b-modo span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .modo-aviso { align-items: flex-start; }
-    .filtros input { flex: 1 1 0; }
-    #v-filtros > .filtros-mas { display: none; }
     :global(.vf-a) { padding: 11px 40px 12px 14px; }
-    .v-lista :global(.v-dia h3) { font-size: .88rem; }
+    .v-lista :global(.v-dia h3) { font-size: .84rem; gap: 8px; letter-spacing: -.01em; }
+    .v-lista :global(.v-dia h3 span) { font-size: .7rem; padding: 1px 8px; }
     .calendario { max-width: none; padding: 10px 10px 12px; }
     .cal-rejilla { grid-template-columns: minmax(0, 1fr); gap: 12px; }
     .cal-rejilla .calendario { position: static; }
