@@ -515,9 +515,10 @@ export const rutaTarjeta = {
   votacion: (v: VotacionClave, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/votacion/${v.id}.png`,
   provincia: (id: string, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/provincia/${id}.png`,
   resumen: (f: Formato, lang: Idioma = 'es', modo: ModoHemiciclo = 'grupo') => `${prefijo(lang)}/tarjetas/${f}/resumen${modo === 'grupo' ? '' : `-${modo}`}.png`,
+  estadistica: (id: string, f: Formato, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/${f}/estadistica/${id}.png`,
   pagina: (id: string, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/horizontal/pagina/${id}.png`,
   /** Miniatura WebP de una tarjeta vertical, para verla en la galería (la completa solo se baja al compartir). */
-  mini: (tipo: 'resumen' | 'votacion' | 'provincia', id: string, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/mini/${tipo}/${id}.webp`,
+  mini: (tipo: 'resumen' | 'votacion' | 'provincia' | 'estadistica', id: string, lang: Idioma = 'es') => `${prefijo(lang)}/tarjetas/mini/${tipo}/${id}.webp`,
 };
 
 /* ---------- Texto y enlace para compartir ---------- */
@@ -552,6 +553,11 @@ export const compartir = {
     const k = diputados.filter((d) => d.circunscripcion === c.nombre).length;
     return { enlace: pagina(`/provincia/${c.id}`, lang), texto: llamada(lang) + pl(k, textosCompartir[lang].mensaje.provincia, lang, { provincia: c.legible }) };
   },
+  /** Estadística de Estadísticas (rentas, acciones y fondos, empresas, ONG): título de su tarjeta y enlace a su caja. */
+  estadistica: (id: string, titulo: string, ancla: string, lang: Idioma = 'es') => ({
+    enlace: pagina(`/estadisticas#${ancla}`, lang),
+    texto: f(textosCompartir[lang].mensaje.estadistica, { titulo }),
+  }),
   resumen: (lang: Idioma = 'es') => ({
     enlace: pagina('/', lang),
     texto: `${antesDeElecciones() ? `${comun[lang].elecciones.texto}. ` : ''}${textosCompartir[lang].mensaje.resumen}`,

@@ -63,6 +63,15 @@ const es = {
     leyenda: { propiedades: 'Propiedades declaradas por cada diputado', viviendas: 'Viviendas declaradas por cada diputado' },
   },
   /** Vista previa de enlaces de cada página (1200×630). */
+  /** Tarjetas de estadísticas (rentas, acciones y fondos, empresas, ONG). */
+  estadisticas: {
+    rentas: { etiqueta: 'Rentas declaradas', titulo: '¿Quién declara más rentas?', sub: 'Rentas del año anterior a su declaración de bienes, sin el sueldo del Congreso', grupos: 'Diputados que declaran rentas, por grupo' },
+    inversiones: { etiqueta: 'Acciones y fondos', titulo: '¿Cuántos diputados tienen acciones y fondos?', acciones: 'declaran acciones o participaciones', fondos: 'declaran fondos de inversión', top: 'Las acciones que más diputados declaran', grupos: 'Declaran acciones, por grupo' },
+    empresas: { etiqueta: 'Empresas y entidades', titulo: '¿Qué relación tienen con empresas privadas?', cifra: 'diputados nombran alguna empresa privada en sus documentos oficiales', relacion: 'Por tipo de relación (diputados)', rem: 'Qué dicen sus documentos sobre si cobran de empresas o entidades', borme: 'tienen cargos en sociedades según el BORME', aviso: 'Participar no es ser dueño ni cobrar' },
+    ong: { etiqueta: 'Fundaciones y ONG', titulo: '¿A qué ONG aportan los diputados?', cifra: 'diputados declaran cuotas o donativos a fundaciones, ONG o asociaciones', top: 'A cuáles aportan más diputados', grupos: 'Por grupo' },
+    remCorto: { si: 'Con remuneración', complemento: 'Solo complemento por antigüedad', dietas: 'Solo dietas o gastos', no: 'Sin remuneración' },
+    deGrupo: '{n} de {de}',
+  },
   paginas: {
     inicio: { titulo: 'Prepárate para votar', subtitulo: 'Qué declaran tener, cuánto cobran y cómo votan los 350 diputados del Congreso', llamada: 'Míralo escaño a escaño' },
     diputados: { titulo: 'Los 350 diputados', subtitulo: 'Quiénes son, qué declaran tener y cuánto cobran, con sus documentos oficiales', llamada: 'Busca a los de tu provincia' },
@@ -133,6 +142,15 @@ export default area(es, {
       llamada: 'Mira-ho escó a escó',
       leyenda: { propiedades: 'Propietats declarades per cada diputat', viviendas: 'Habitatges declarats per cada diputat' },
     },
+    /** Tarjetas de estadísticas (rentas, acciones y fondos, empresas, ONG). */
+    estadisticas: {
+      rentas: { etiqueta: 'Rendes declarades', titulo: 'Qui declara més rendes?', sub: 'Rendes de l’any anterior a la declaració de béns, sense el sou del Congrés', grupos: 'Diputats que declaren rendes, per grup' },
+      inversiones: { etiqueta: 'Accions i fons', titulo: 'Quants diputats tenen accions i fons?', acciones: 'declaren accions o participacions', fondos: 'declaren fons d’inversió', top: 'Les accions que declaren més diputats', grupos: 'Declaren accions, per grup' },
+      empresas: { etiqueta: 'Empreses i entitats', titulo: 'Quina relació tenen amb empreses privades?', cifra: 'diputats esmenten alguna empresa privada als seus documents oficials', relacion: 'Per tipus de relació (diputats)', rem: 'Què diuen els seus documents sobre si cobren d’empreses o entitats', borme: 'tenen càrrecs en societats segons el BORME', aviso: 'Participar no és ser-ne propietari ni cobrar' },
+      ong: { etiqueta: 'Fundacions i ONG', titulo: 'A quines ONG aporten els diputats?', cifra: 'diputats declaren quotes o donatius a fundacions, ONG o associacions', top: 'A quines aporten més diputats', grupos: 'Per grup' },
+      remCorto: { si: 'Amb remuneració', complemento: 'Només complement d’antiguitat', dietas: 'Només dietes o despeses', no: 'Sense remuneració' },
+      deGrupo: '{n} de {de}',
+    },
     paginas: {
       inicio: { titulo: 'Prepara’t per votar', subtitulo: 'Què declaren tenir, quant cobren i com voten els 350 diputats del Congrés', llamada: 'Mira-ho escó a escó' },
       diputados: { titulo: 'Els 350 diputats', subtitulo: 'Qui són, què declaren tenir i quant cobren, amb els documents oficials', llamada: 'Busca els teus diputats' },
@@ -198,6 +216,15 @@ export default area(es, {
       llamada: 'Ikusi eserlekuz eserleku',
       leyenda: { propiedades: 'Diputatu bakoitzak aitortutako jabetzak', viviendas: 'Diputatu bakoitzak aitortutako etxebizitzak' },
     },
+    /** Tarjetas de estadísticas (rentas, acciones y fondos, empresas, ONG). */
+    estadisticas: {
+      rentas: { etiqueta: 'Aitortutako errentak', titulo: 'Nork aitortzen ditu errenta handienak?', sub: 'Ondasun-aitorpenaren aurreko urteko errentak, Kongresuko soldata kanpo', grupos: 'Errentak aitortzen dituzten diputatuak, taldeka' },
+      inversiones: { etiqueta: 'Akzioak eta funtsak', titulo: 'Zenbat diputatuk dituzte akzioak eta funtsak?', acciones: 'akzioak edo partaidetzak aitortzen dituzte', fondos: 'inbertsio-funtsak aitortzen dituzte', top: 'Diputatu gehienek aitortzen dituzten akzioak', grupos: 'Akzioak aitortzen dituzte, taldeka' },
+      empresas: { etiqueta: 'Enpresak eta erakundeak', titulo: 'Zer harreman dute enpresa pribatuekin?', cifra: 'diputatuk enpresa pribaturen bat aipatzen dute beren dokumentu ofizialetan', relacion: 'Harreman motaren arabera (diputatuak)', rem: 'Zer diote beren dokumentuek enpresa edo erakundeetatik kobratzen duten ala ez', borme: 'diputatuk sozietateetan karguak dituzte BORMEren arabera', aviso: 'Parte hartzea ez da jabea izatea ez kobratzea' },
+      ong: { etiqueta: 'Fundazioak eta GKEak', titulo: 'Zein GKEri egiten diete ekarpena diputatuek?', cifra: 'diputatuk fundazio, GKE edo elkarteei kuotak edo dohaintzak aitortzen dizkiete', top: 'Zeini egiten dioten ekarpena diputatu gehienek', grupos: 'Taldeka' },
+      remCorto: { si: 'Ordainsariarekin', complemento: 'Antzinatasun-osagarria bakarrik', dietas: 'Dietak edo gastuak bakarrik', no: 'Ordainsaririk gabe' },
+      deGrupo: '{n} / {de}',
+    },
     paginas: {
       inicio: { titulo: 'Prestatu bozkatzeko', subtitulo: 'Kongresuko 350 diputatuek zer aitortzen duten, zenbat kobratzen duten eta nola bozkatzen duten', llamada: 'Ikusi eserlekuz eserleku' },
       diputados: { titulo: '350 diputatuak', subtitulo: 'Nor diren, zer aitortzen duten eta zenbat kobratzen duten, dokumentu ofizialekin', llamada: 'Bilatu zure barrutikoak' },
@@ -262,6 +289,15 @@ export default area(es, {
       llamada: 'Mírao escano a escano',
       leyenda: { propiedades: 'Propiedades declaradas por cada deputado', viviendas: 'Vivendas declaradas por cada deputado' },
     },
+    /** Tarjetas de estadísticas (rentas, acciones y fondos, empresas, ONG). */
+    estadisticas: {
+      rentas: { etiqueta: 'Rendas declaradas', titulo: 'Quen declara máis rendas?', sub: 'Rendas do ano anterior á súa declaración de bens, sen o soldo do Congreso', grupos: 'Deputados que declaran rendas, por grupo' },
+      inversiones: { etiqueta: 'Accións e fondos', titulo: 'Cantos deputados teñen accións e fondos?', acciones: 'declaran accións ou participacións', fondos: 'declaran fondos de investimento', top: 'As accións que máis deputados declaran', grupos: 'Declaran accións, por grupo' },
+      empresas: { etiqueta: 'Empresas e entidades', titulo: 'Que relación teñen con empresas privadas?', cifra: 'deputados nomean algunha empresa privada nos seus documentos oficiais', relacion: 'Por tipo de relación (deputados)', rem: 'Que din os seus documentos sobre se cobran de empresas ou entidades', borme: 'teñen cargos en sociedades segundo o BORME', aviso: 'Participar non é ser dono nin cobrar' },
+      ong: { etiqueta: 'Fundacións e ONG', titulo: 'A que ONG achegan os deputados?', cifra: 'deputados declaran cotas ou donativos a fundacións, ONG ou asociacións', top: 'A cales achegan máis deputados', grupos: 'Por grupo' },
+      remCorto: { si: 'Con remuneración', complemento: 'Só complemento por antigüidade', dietas: 'Só dietas ou gastos', no: 'Sen remuneración' },
+      deGrupo: '{n} de {de}',
+    },
     paginas: {
       inicio: { titulo: 'Prepárate para votar', subtitulo: 'Que declaran ter, canto cobran e como votan os 350 deputados do Congreso', llamada: 'Mírao escano a escano' },
       diputados: { titulo: 'Os 350 deputados', subtitulo: 'Quen son, que declaran ter e canto cobran, cos seus documentos oficiais', llamada: 'Busca os teus deputados' },
@@ -325,6 +361,15 @@ export default area(es, {
       subtitulo: 'What the 350 deputies in Congress declare they own, what they earn and how they vote',
       llamada: 'See it seat by seat',
       leyenda: { propiedades: 'Properties declared by each deputy', viviendas: 'Homes declared by each deputy' },
+    },
+    /** Tarjetas de estadísticas (rentas, acciones y fondos, empresas, ONG). */
+    estadisticas: {
+      rentas: { etiqueta: 'Declared income', titulo: 'Who declares the most income?', sub: 'Income from the year before their asset declaration, excluding their Congress salary', grupos: 'Members who declare income, by group' },
+      inversiones: { etiqueta: 'Shares and funds', titulo: 'How many members hold shares and funds?', acciones: 'declare shares or holdings', fondos: 'declare investment funds', top: 'Shares declared by the most members', grupos: 'Declare shares, by group' },
+      empresas: { etiqueta: 'Companies and organisations', titulo: 'How are they involved with private companies?', cifra: 'members name a private company in their official documents', relacion: 'By type of involvement (members)', rem: 'What their documents say about being paid by companies or organisations', borme: 'hold company positions according to the BORME', aviso: 'Involvement does not mean ownership or pay' },
+      ong: { etiqueta: 'Foundations and NGOs', titulo: 'Which NGOs do members contribute to?', cifra: 'members declare fees or donations to foundations, NGOs or associations', top: 'Which ones most members contribute to', grupos: 'By group' },
+      remCorto: { si: 'Paid', complemento: 'Only a seniority supplement', dietas: 'Only allowances or expenses', no: 'Unpaid' },
+      deGrupo: '{n} of {de}',
     },
     paginas: {
       inicio: { titulo: 'Get ready to vote', subtitulo: 'What the 350 deputies in Congress declare they own, what they earn and how they vote', llamada: 'See it seat by seat' },

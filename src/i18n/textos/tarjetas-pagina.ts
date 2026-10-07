@@ -4,7 +4,7 @@ import { area } from '..';
 const es = {
   "masPropiedades": "Con más propiedades declaradas",
   "ejemplo": "Toca una de la lista para ver su tarjeta.",
-  "categorias": {"aria": "Tipos de tarjeta", "resumen": "Resumen", "votaciones": "Votaciones", "provincias": "Provincias", "diputados": "Diputados"},
+  "categorias": {"aria": "Tipos de tarjeta", "resumen": "Resumen", "votaciones": "Votaciones", "provincias": "Provincias", "diputados": "Diputados", "estadisticas": "Estadísticas"},
   "modos": {"grupo": "Por grupo", "propiedades": "Propiedades declaradas", "viviendas": "Viviendas declaradas"},
   "crear": {"titulo": "Crea tu propia tarjeta", "texto": "De cualquier votación del Pleno, o junta hasta 7 para comparar qué votó cada grupo.", "boton": "Crear"},
   "buscarProvincia": "Busca tu provincia",
@@ -33,7 +33,7 @@ export default area(es, {
   ca: {
     "masPropiedades": "Amb més propietats declarades",
     "ejemplo": "Toca’n una de la llista per veure’n la targeta.",
-    "categorias": {"aria": "Tipus de targeta", "resumen": "Resum", "votaciones": "Votacions", "provincias": "Províncies", "diputados": "Diputats"},
+    "categorias": {"aria": "Tipus de targeta", "resumen": "Resum", "votaciones": "Votacions", "provincias": "Províncies", "diputados": "Diputats", "estadisticas": "Estadístiques"},
     "modos": {"grupo": "Per grup", "propiedades": "Propietats declarades", "viviendas": "Habitatges declarats"},
     "crear": {"titulo": "Crea la teva pròpia targeta", "texto": "De qualsevol votació del Ple, o ajunta’n fins a 7 per comparar què va votar cada grup.", "boton": "Crear"},
     "buscarProvincia": "Cerca la teva circumscripció",
@@ -58,7 +58,7 @@ export default area(es, {
   eu: {
     "masPropiedades": "Jabetza gehien aitortu dituztenak",
     "ejemplo": "Sakatu zerrendako bat haren txartela ikusteko.",
-    "categorias": {"aria": "Txartel motak", "resumen": "Laburpena", "votaciones": "Bozketak", "provincias": "Probintziak", "diputados": "Diputatuak"},
+    "categorias": {"aria": "Txartel motak", "resumen": "Laburpena", "votaciones": "Bozketak", "provincias": "Probintziak", "diputados": "Diputatuak", "estadisticas": "Estatistikak"},
     "modos": {"grupo": "Taldeka", "propiedades": "Aitortutako jabetzak", "viviendas": "Aitortutako etxebizitzak"},
     "crear": {"titulo": "Sortu zure txartela", "texto": "Osoko bilkurako edozein bozketarena, edo bildu 7 arte talde bakoitzak zer bozkatu zuen alderatzeko.", "boton": "Sortu"},
     "buscarProvincia": "Bilatu zure probintzia",
@@ -83,7 +83,7 @@ export default area(es, {
   gl: {
     "masPropiedades": "Con máis propiedades declaradas",
     "ejemplo": "Toca unha da lista para ver a súa tarxeta.",
-    "categorias": {"aria": "Tipos de tarxeta", "resumen": "Resumo", "votaciones": "Votacións", "provincias": "Provincias", "diputados": "Deputados"},
+    "categorias": {"aria": "Tipos de tarxeta", "resumen": "Resumo", "votaciones": "Votacións", "provincias": "Provincias", "diputados": "Deputados", "estadisticas": "Estatísticas"},
     "modos": {"grupo": "Por grupo", "propiedades": "Propiedades declaradas", "viviendas": "Vivendas declaradas"},
     "crear": {"titulo": "Crea a túa propia tarxeta", "texto": "De calquera votación do Pleno, ou xunta ata 7 para comparar que votou cada grupo.", "boton": "Crear"},
     "buscarProvincia": "Busca a túa provincia",
@@ -108,7 +108,7 @@ export default area(es, {
   en: {
     "masPropiedades": "Most declared properties",
     "ejemplo": "Tap one on the list to see its card.",
-    "categorias": {"aria": "Card types", "resumen": "Overview", "votaciones": "Votes", "provincias": "Provinces", "diputados": "MPs"},
+    "categorias": {"aria": "Card types", "resumen": "Overview", "votaciones": "Votes", "provincias": "Provinces", "diputados": "MPs", "estadisticas": "Statistics"},
     "modos": {"grupo": "By group", "propiedades": "Declared properties", "viviendas": "Declared homes"},
     "crear": {"titulo": "Make your own card", "texto": "From any plenary vote, or put up to 7 together to compare how each group voted.", "boton": "Create"},
     "buscarProvincia": "Find your province",

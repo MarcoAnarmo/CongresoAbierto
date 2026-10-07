@@ -1,6 +1,6 @@
 ---
 /**
- * Galería de tarjetas para compartir, por tipos (pestañas): resumen, votaciones, provincias y diputados.
+ * Galería de tarjetas para compartir, por tipos (pestañas): resumen, estadísticas, votaciones, provincias y diputados.
  * Al tocar una tarjeta se abre la ventana de compartir (DialogoCompartir, una sola por página) con la tarjeta grande,
  * los botones de redes y las descargas vertical y horizontal. Las imágenes solo se cargan al ver su pestaña.
  * Provincias y diputados: una tarjeta de muestra y, al lado, la lista con buscador; al elegir uno, la muestra cambia
@@ -16,6 +16,8 @@ import Pestanas from '../../../components/Pestanas.astro';
 import { votaciones, diputados, url, grupos, circunscripciones, slug } from '../../../lib/data';
 import { nombreLegible } from '../../../lib/provincias';
 import { rutaTarjeta, temaCorto, compartir, type ModoHemiciclo } from '../../../lib/tarjetas';
+import { ESTADISTICAS } from '../../../lib/tarjetas-estadisticas';
+import textosTarjetas from '../../../i18n/textos/tarjetas';
 import { favorable } from '../../../lib/votaciones';
 import { rutasIdioma, idiomaDe, enlace, formatos, f, pl, prefijo } from '../../../i18n';
 import textos from '../../../i18n/textos/tarjetas-pagina';
@@ -36,6 +38,9 @@ const dip = (n: number) => pl(n, tc.palabras.diputados, lang);
 
 const vots = [...votaciones].sort((a, b) => b.fecha.localeCompare(a.fecha));
 const MODOS: ModoHemiciclo[] = ['grupo', 'propiedades', 'viviendas'];
+// Estadísticas: cada tarjeta enlaza a su caja en Estadísticas
+const tte = textosTarjetas[lang].estadisticas;
+const ANCLA = { rentas: 'mas-rentas', inversiones: 'acciones-fondos', empresas: 'relacion-empresas', ong: 'ong' } as const;
 // Datos de cada tarjeta para la ventana de compartir (los lee DialogoCompartir de los atributos data-*)
 const datos = (historia: string, horizontal: string, nombre: string, c: { enlace: string; texto: string }, titulo: string) => ({
   href: url(historia), 'data-compartir': nombre, 'data-historia': url(historia), 'data-horizontal': url(horizontal),
@@ -57,6 +62,7 @@ const config = {
 };
 const PESTANAS = [
   { id: 'resumen', texto: t.categorias.resumen, icono: 'hemiciclo' as const },
+  { id: 'estadisticas', texto: t.categorias.estadisticas, icono: 'estadisticas' as const },
   { id: 'votaciones', texto: t.categorias.votaciones, icono: 'votaciones' as const },
   { id: 'provincias', texto: t.categorias.provincias, icono: 'mapa' as const },
   { id: 'diputados', texto: t.categorias.diputados, icono: 'fichas' as const },
@@ -83,6 +89,20 @@ const icoCompartir = '<svg width="18" height="18" aria-hidden="true"><use href="
           <a class="tarjeta" {...datos(r.resumen('historia', lang, m), r.resumen('horizontal', lang, m), `congreso-abierto${m === 'grupo' ? '' : `-${m}`}`, compartir.resumen(lang), t.modos[m])}>
             <img src={url(r.mini('resumen', m, lang))} alt={t.altResumen} width="270" height="480" loading="lazy" decoding="async" />
             <span class="t-pie"><strong>{t.modos[m]}</strong></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="panel-pestana" id="estadisticas" role="tabpanel" aria-labelledby="tab-estadisticas">
+    <h2 class="panel-tit">{t.categorias.estadisticas}</h2>
+    <ul class="galeria" role="list">
+      {ESTADISTICAS.map((id) => (
+        <li>
+          <a class="tarjeta" {...datos(r.estadistica(id, 'historia', lang), r.estadistica(id, 'horizontal', lang), `congreso-abierto-${id}`, compartir.estadistica(id, tte[id].titulo, ANCLA[id], lang), tte[id].titulo)}>
+            <img src={url(r.mini('estadistica', id, lang))} alt={tte[id].titulo} width="270" height="480" loading="lazy" decoding="async" />
+            <span class="t-pie"><strong>{tte[id].titulo}</strong><span class="t-meta">{tte[id].etiqueta}</span></span>
           </a>
         </li>
       ))}
