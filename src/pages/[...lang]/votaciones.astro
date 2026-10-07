@@ -8,6 +8,7 @@ import { aItem, itemPendiente, ordenar, listaHtml, filaHtml, TIPOS, type ItemVot
 import { rutasIdioma, idiomaDe, enlace, formatos, f, pl, LOCALE } from '../../i18n';
 import comun from '../../i18n/textos/comun';
 import textos from '../../i18n/textos/votaciones';
+import textosTarjetaVotacion from '../../i18n/textos/tarjeta-votacion';
 
 export const getStaticPaths = rutasIdioma;
 const lang = idiomaDe(Astro.params.lang);
@@ -19,7 +20,9 @@ const { fecha: fmtFecha, num: fmtNum } = formatos(lang);
 const base = url('');
 const pre = enlace('', lang);
 // Textos de las filas: resultados oficiales (comun) y propios de la web, tipos e idioma de las fechas
-const tx: TextosLista = { ...t.cliente.lista, locale: LOCALE[lang], resultados: { ...c.resultado, ...t.cliente.lista.resultados } };
+const tv = textosTarjetaVotacion[lang];
+// Con «comparar», cada fila lleva el botón ＋ para añadirla a una tarjeta (solo se ve en el modo «Crear tarjeta»)
+const tx: TextosLista = { ...t.cliente.lista, locale: LOCALE[lang], resultados: { ...c.resultado, ...t.cliente.lista.resultados }, comparar: tv.comparar };
 const nombreTema = (id: string, nombre: string) => c.temas[id] ?? nombre;
 // Iniciales de los días de la semana (de lunes a domingo), sin punto final
 const semana = Array.from({ length: 7 }, (_, d) => new Date(Date.UTC(2024, 0, 1 + d, 12)).toLocaleDateString(LOCALE[lang], { weekday: t.calendario.semana === 'short' ? 'short' : 'narrow', timeZone: 'UTC' }).replace(/\.$/, ''));
@@ -76,7 +79,13 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
         <option value="no">{t.filtros.no}</option>
       </select>
     </div>
+    <button class="btn b-modo" type="button" id="v-modo-boton" aria-pressed="false" aria-controls="v-modo" title={tv.crear}><Icono n="imagen" tam={19} /><span>{tv.crear}</span></button>
     <p class="small muted cuenta" id="v-cuenta" aria-live="polite">{pl(todas.length, t.cliente.cuenta, lang)}</p>
+  </div>
+  <div class="modo-aviso" id="v-modo" role="region" aria-label={tv.modoTitulo} hidden>
+    <span class="ma-ico" aria-hidden="true"><Icono n="imagen" tam={22} /></span>
+    <p><strong>{tv.modoTitulo}</strong><span>{tv.modoTexto}</span></p>
+    <button class="btn ma-listo" type="button" id="v-modo-listo">{tv.listo}</button>
   </div>
   <dialog class="dlg-filtros" id="v-dlg-filtros" aria-labelledby="v-dlg-filtros-t">
     <div class="df-cab">
@@ -389,6 +398,19 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   const textoCompartir = (i: ItemVotacion) => textoCompartirVotacion(i, t.compartirTexto, tx, fechaLarga);
   // Tarjeta de cualquier votación y comparación de varias (el dibujo se descarga solo al pulsar)
   const tarjetas = iniciarTarjetasVotacion({ buscar: (id) => porId.get(id), prefijo: base, textoCompartir });
+  // Modo «Crear tarjeta» (?crear=1, p. ej. desde la página Tarjetas): cada fila lleva ＋ para añadirla a la comparación
+  const botonModo = $<HTMLButtonElement>('v-modo-boton'), avisoModo = $('v-modo');
+  function modoTarjeta(si: boolean) {
+    document.documentElement.classList.toggle('modo-tarjeta', si);
+    botonModo.setAttribute('aria-pressed', String(si));
+    avisoModo.hidden = !si;
+    const u = new URL(location.href);
+    if (si) u.searchParams.set('crear', '1'); else u.searchParams.delete('crear');
+    if (u.href !== location.href) history.replaceState(history.state, '', u);
+  }
+  botonModo.addEventListener('click', () => modoTarjeta(botonModo.getAttribute('aria-pressed') !== 'true'));
+  $('v-modo-listo').addEventListener('click', () => modoTarjeta(false));
+  if (params.has('crear') || tarjetas.seleccion().length) modoTarjeta(true);
   function abrir(id: string, empujar: boolean) {
     const i = porId.get(id);
     if (!i) return false;
@@ -470,6 +492,18 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
   .n-filtros { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent-strong); color: #fff; font-size: .75rem; }
   .n-filtros[hidden] { display: none; }
   .cuenta { flex-basis: 100%; margin: 0; }
+  /* Modo «Crear tarjeta»: botón junto a los filtros y aviso con lo que hay que hacer */
+  .b-modo { display: inline-flex; align-items: center; gap: 8px; }
+  .b-modo[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
+  .modo-aviso {
+    display: flex; align-items: center; gap: 12px; margin: 4px 0 14px; padding: 12px 12px 12px 14px; border-radius: 16px;
+    background: var(--accent-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  .modo-aviso[hidden] { display: none; }
+  .ma-ico { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 12px; background: var(--surface); color: var(--accent-text); }
+  .modo-aviso p { flex: 1; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; line-height: 1.35; font-size: .9rem; }
+  .modo-aviso p span { color: var(--muted); }
+  .ma-listo { flex: none; }
   .cuenta[hidden] { display: none; }
 
   /* Lista: días y filas */
@@ -621,6 +655,9 @@ const conFecha = (i: ItemVotacion) => filaHtml(i, pre, tx).replace(`<span class=
     .segmentado .largo { display: none; }
     .segmentado .corto { display: inline; }
     .boton-filtrar { display: inline-flex; }
+    .b-modo { width: 44px; padding: 0; justify-content: center; }
+    .b-modo span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .modo-aviso { align-items: flex-start; }
     .filtros input { flex: 1 1 0; }
     #v-filtros > .filtros-mas { display: none; }
     :global(.vf-a) { padding: 11px 40px 12px 14px; }

@@ -33,6 +33,20 @@ const cfg = {
   :global(.d-tarjetas .btn) { flex: 1 1 0; min-width: 0; justify-content: center; display: inline-flex; align-items: center; padding: 8px; white-space: nowrap; }
   :global(.d-comparar[aria-pressed='true']) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
   :global(.d-crear[aria-busy='true']) { opacity: .6; }
+  /* Botón ＋ de cada fila de las listas: solo en el modo «Crear tarjeta» o con votaciones elegidas */
+  :global(.vf-comp) { display: none; }
+  :global(html.modo-tarjeta .vf), :global(html.con-comparar .vf) { display: flex; align-items: center; }
+  :global(html.modo-tarjeta .vf-a), :global(html.con-comparar .vf-a) { flex: 1; min-width: 0; }
+  :global(html.modo-tarjeta .vf-comp), :global(html.con-comparar .vf-comp) {
+    flex: none; display: grid; place-items: center; width: 42px; height: 42px; margin: 0 10px 0 2px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: var(--surface); color: var(--accent-text); cursor: pointer; transition: background-color .15s, border-color .15s, transform .12s;
+  }
+  :global(.vf-comp:hover) { border-color: var(--accent); }
+  :global(.vf-comp:active) { transform: scale(.92); }
+  :global(.vf-comp .vc-ok) { display: none; }
+  :global(html .vf-comp[aria-pressed='true']) { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+  :global(.vf-comp[aria-pressed='true'] .vc-mas) { display: none; }
+  :global(.vf-comp[aria-pressed='true'] .vc-ok) { display: block; }
   /* Barra de comparación, fija abajo (en el móvil, encima del menú) */
   .barra-comparar {
     position: fixed; z-index: 25; left: 50%; transform: translateX(-50%); bottom: 16px; width: min(560px, calc(100% - 24px));

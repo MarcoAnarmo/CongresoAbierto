@@ -5,6 +5,9 @@ import { area } from '..';
  * Los títulos oficiales y los nombres de los grupos no se traducen.
  */
 const es = {
+  "modoTitulo": "Crea tu tarjeta",
+  "modoTexto": "Pulsa ＋ en las votaciones que quieras comparar (hasta 7) o abre una para crear solo su tarjeta. También funciona en el calendario.",
+  "listo": "Listo",
   // Botones y avisos de la página
   crear: 'Crear tarjeta',
   creando: 'Creando la tarjeta…',
@@ -39,6 +42,9 @@ const es = {
 
 export default area(es, {
   ca: {
+    "modoTitulo": "Crea la teva targeta",
+    "modoTexto": "Prem ＋ a les votacions que vulguis comparar (fins a 7) o obre’n una per crear-ne només la targeta. També funciona al calendari.",
+    "listo": "Fet",
     crear: 'Crear targeta', creando: 'Creant la targeta…', error: 'No s’ha pogut crear la targeta. Torna-ho a provar.',
     comparar: 'Comparar', quitarComparar: 'Treure de la comparació', enComparacion: 'A la comparació',
     barra: ['{n} votació per comparar', '{n} votacions per comparar'], crearComparacion: 'Crear targeta', vaciar: 'Buidar',
@@ -54,6 +60,9 @@ export default area(es, {
     textoComparacion: 'Què va votar cada grup en {n} votacions del Congrés, amb dades oficials.', tituloDialogoComparacion: 'Comparació de votacions',
   },
   eu: {
+    "modoTitulo": "Sortu zure txartela",
+    "modoTexto": "Sakatu ＋ alderatu nahi dituzun bozketetan (7 arte) edo ireki bat haren txartela bakarrik sortzeko. Egutegian ere badabil.",
+    "listo": "Eginda",
     crear: 'Sortu txartela', creando: 'Txartela sortzen…', error: 'Ezin izan da txartela sortu. Saiatu berriro.',
     comparar: 'Alderatu', quitarComparar: 'Kendu alderaketatik', enComparacion: 'Alderaketan',
     barra: ['{n} bozketa alderatzeko', '{n} bozketa alderatzeko'], crearComparacion: 'Sortu txartela', vaciar: 'Hustu',
@@ -69,6 +78,9 @@ export default area(es, {
     textoComparacion: 'Talde bakoitzak zer bozkatu zuen Kongresuko {n} bozketatan, datu ofizialekin.', tituloDialogoComparacion: 'Bozketen alderaketa',
   },
   gl: {
+    "modoTitulo": "Crea a túa tarxeta",
+    "modoTexto": "Preme ＋ nas votacións que queiras comparar (ata 7) ou abre unha para crear só a súa tarxeta. Tamén funciona no calendario.",
+    "listo": "Feito",
     crear: 'Crear tarxeta', creando: 'Creando a tarxeta…', error: 'Non se puido crear a tarxeta. Téntao de novo.',
     comparar: 'Comparar', quitarComparar: 'Quitar da comparación', enComparacion: 'Na comparación',
     barra: ['{n} votación para comparar', '{n} votacións para comparar'], crearComparacion: 'Crear tarxeta', vaciar: 'Baleirar',
@@ -84,6 +96,9 @@ export default area(es, {
     textoComparacion: 'Que votou cada grupo en {n} votacións do Congreso, con datos oficiais.', tituloDialogoComparacion: 'Comparación de votacións',
   },
   en: {
+    "modoTitulo": "Make your card",
+    "modoTexto": "Press ＋ on the votes you want to compare (up to 7), or open one to create just its card. It also works in the calendar.",
+    "listo": "Done",
     crear: 'Create card', creando: 'Creating the card…', error: 'The card could not be created. Please try again.',
     comparar: 'Compare', quitarComparar: 'Remove from comparison', enComparacion: 'In the comparison',
     barra: ['{n} vote to compare', '{n} votes to compare'], crearComparacion: 'Create card', vaciar: 'Clear',

@@ -40,11 +40,34 @@ export function iniciarTarjetasVotacion(o: { buscar: (id: string) => ItemVotacio
   }
   function marcar(b: HTMLButtonElement) {
     const dentro = seleccion.includes(b.dataset.comparar!);
+    // Solo si cambia: las filas se marcan al aparecer (MutationObserver) y cambiar el texto sin necesidad lo volvería a avisar
+    if (b.getAttribute('aria-pressed') === String(dentro) && b.dataset.marcado) return;
+    b.dataset.marcado = '1';
     b.setAttribute('aria-pressed', String(dentro));
     b.querySelector('span')!.textContent = dentro ? tx.enComparacion : tx.comparar;
     b.title = dentro ? tx.quitarComparar : tx.comparar;
   }
   barra.querySelector('.vc-vaciar')!.addEventListener('click', () => { seleccion = []; guardar(); pintarBarra(); });
+  /** Añade o quita una votación de la comparación (avisa si ya hay el máximo). */
+  function alternar(id: string, avisoEl: HTMLElement | null = aviso) {
+    if (seleccion.includes(id)) seleccion = seleccion.filter((x) => x !== id);
+    else if (seleccion.length >= MAX_COMPARAR) { if (avisoEl) avisoEl.textContent = f(tx.maximo, { n: MAX_COMPARAR }); return; }
+    else seleccion = [...seleccion, id];
+    if (avisoEl && avisoEl !== aviso) avisoEl.textContent = '';
+    guardar();
+    pintarBarra();
+  }
+  // Botones ＋ de las filas de las listas (se pintan una y otra vez: un solo escuchador para todos)
+  document.addEventListener('click', (e) => {
+    const b = (e.target as Element).closest<HTMLButtonElement>('.vf-comp[data-comparar]');
+    if (b) alternar(b.dataset.comparar!);
+  });
+  // Las filas nuevas llegan sin marcar: se marcan al aparecer
+  let pendiente = 0;
+  new MutationObserver(() => {
+    if (pendiente) return;
+    pendiente = requestAnimationFrame(() => { pendiente = 0; document.querySelectorAll<HTMLButtonElement>('.vf-comp[data-comparar]').forEach(marcar); });
+  }).observe(document.querySelector('main') ?? document.body, { childList: true, subtree: true });
   /** Crea la tarjeta que compara `ids` (de la más antigua a la más reciente, como se leen) y abre la ventana de compartir. */
   function comparar(ids: string[], boton: HTMLButtonElement, avisoEl: HTMLElement) {
     const items = ids.map(o.buscar).filter((x): x is ItemVotacion => !!x)
@@ -110,15 +133,7 @@ export function iniciarTarjetasVotacion(o: { buscar: (id: string) => ItemVotacio
       }));
       raiz.querySelectorAll<HTMLButtonElement>('[data-comparar]').forEach((b) => {
         marcar(b);
-        b.addEventListener('click', () => {
-          const id = b.dataset.comparar!;
-          if (seleccion.includes(id)) seleccion = seleccion.filter((x) => x !== id);
-          else if (seleccion.length >= MAX_COMPARAR) { if (avisoEl) avisoEl.textContent = f(tx.maximo, { n: MAX_COMPARAR }); return; }
-          else seleccion = [...seleccion, id];
-          if (avisoEl) avisoEl.textContent = '';
-          guardar();
-          pintarBarra();
-        });
+        b.addEventListener('click', () => alternar(b.dataset.comparar!, avisoEl));
       });
     },
   };
