@@ -15,6 +15,8 @@ export const TRAZOS = {
   actividades: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18"/>',
   trabajos: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
   entidades: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="5.5" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.3 10.8 15.7 6.7M8.3 13.2l7.4 4.1"/>',
+  empresa: '<path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M16 9h2a2 2 0 0 1 2 2v10"/><path d="M2.5 21h19M8 7h4M8 11h4M8 15h4"/>',
+  publica: '<path d="M3 9.5 12 4l9 5.5"/><path d="M3 9.5h18M2.5 21h19M4 18h16M6.5 10v8M10.5 10v8M13.5 10v8M17.5 10v8"/>',
   registro: '<path d="M4 21V8l8-5 8 5v13"/><path d="M2.5 21h19M8 21v-6h8v6M9 10.5h6"/>',
   documento: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
   aviso: '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/>',

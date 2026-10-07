@@ -11,7 +11,7 @@ import { rutaTarjeta, rotulo } from '../../../lib/tarjetas';
 import TablaPrestamos from '../../../components/TablaPrestamos.astro';
 import AvisoDudoso from '../../../components/AvisoDudoso.astro';
 import Icono from '../../../components/Icono.astro';
-import { TIPOS_ENTIDAD } from '../../../lib/vinculos';
+import { TIPOS_ENTIDAD, type TipoEntidad, type VinculoEntidad } from '../../../lib/vinculos';
 import { conIdiomas, enlace, formatos, f, pl, LOCALE, type Idioma } from '../../../i18n';
 import comun from '../../../i18n/textos/comun';
 import textos, { textoEvento, detalleEvento } from '../../../i18n/textos/ficha';
@@ -100,12 +100,38 @@ const inter = d.intereses;
 const nTrab = inter?.trabajos.length ?? 0;
 // Empresas y entidades que nombran sus documentos oficiales, agrupadas por tipo
 const vin = d.vinculos;
-const nEnt = vin?.entidades.length ?? 0;
-const nEmpresas = vin?.porTipo.empresa ?? 0;
 const bor = vin?.borme ?? [];
 const tv = tc.vinculos;
 const anio = (x: string) => x.slice(0, 4);
-const tiposVin = TIPOS_ENTIDAD.filter((k) => vin?.porTipo[k]).map((k) => ({ k, ents: vin!.entidades.filter((e) => e.tipo === k) }));
+/** Las entidades se reparten en tres cajitas por tipo; el Registro Mercantil es la cuarta. */
+const GRUPOS_ENT = [
+  { id: 'empresas', icono: 'empresa', tipos: ['empresa'] },
+  { id: 'publicas', icono: 'publica', tipos: ['publica'] },
+  { id: 'otras-entidades', icono: 'entidades', tipos: TIPOS_ENTIDAD.filter((k) => k !== 'empresa' && k !== 'publica') },
+] as const satisfies readonly { id: string; icono: NombreIcono; tipos: readonly TipoEntidad[] }[];
+/**
+ * Remuneración de una entidad: lo máximo que dice alguno de sus documentos (con remuneración, luego complemento por antigüedad,
+ * luego solo dietas o gastos, luego sin remuneración). Si ninguno lo dice, «no consta»: nunca se supone que cobra ni que no cobra.
+ */
+const ORDEN_REM = ['si', 'complemento', 'dietas', 'no'] as const;
+const remDe = (e: VinculoEntidad) => ORDEN_REM.find((r) => e.apariciones.some((a) => a.remuneracion === r)) ?? 'nc';
+const gruposEnt = GRUPOS_ENT.map((gr) => {
+  const ents = (vin?.entidades ?? []).filter((e) => (gr.tipos as readonly TipoEntidad[]).includes(e.tipo));
+  const rem = { si: 0, complemento: 0, dietas: 0, no: 0, nc: 0 };
+  for (const e of ents) rem[remDe(e)]++;
+  const porTipo = gr.tipos.filter((k) => ents.some((e) => e.tipo === k)).map((k) => ({ k, ents: ents.filter((e) => e.tipo === k) }));
+  return { ...gr, ents, rem, porTipo };
+});
+/** Texto de la cajita: cuántas entidades tienen remuneración, complemento o solo dietas según sus documentos. */
+const acentoRem = (n: number, rem: (typeof gruposEnt)[number]['rem']) => {
+  if (!n) return undefined;
+  const partes = [
+    rem.si && f(t.tes.remSi, { n: fmtNum(rem.si) }),
+    rem.complemento && f(t.tes.remComplemento, { n: fmtNum(rem.complemento) }),
+    rem.dietas && f(t.tes.remDietas, { n: fmtNum(rem.dietas) }),
+  ].filter(Boolean);
+  return partes.length ? partes.join(' · ') : t.tes.remNoConsta;
+};
 // Sus votos en todas las votaciones del Pleno
 const pa = d.participacion;
 const votoEmitido = pa ? pa.si + pa.no + pa.abstencion : 0;
@@ -134,11 +160,17 @@ const teselas: Tesela[] = [
     sub: sinDeclaracion ? t.tes.sinDeclaracion : p.vehiculos === 0 ? t.tes.noVehiculos : t.tes.vehiculosDeclarados[p.vehiculos === 1 ? 0 : 1],
   },
   { id: 'retribucion', icono: 'sueldo', titulo: t.tes.retribucion, valor: fmtEur(d.retribucion.totalMensual), sub: t.tes.alMes },
-  {
-    grupo: t.grupos.vinculos, id: 'entidades', icono: 'entidades', titulo: t.tes.entidades, corto: t.tes.entidadesCorto,
-    valor: String(nEnt), sub: nEnt ? t.tes.entidadesSub[nEnt === 1 ? 0 : 1] + (nEmpresas ? ' · ' : '') : t.tes.sinEntidades,
-    acento: nEmpresas ? pl(nEmpresas, t.tes.empresas, lang) : undefined,
-  },
+  ...gruposEnt.map((gr, i) => {
+    const n = gr.ents.length;
+    const subs = { empresas: t.tes.empresasSub, publicas: t.tes.publicasSub, 'otras-entidades': t.tes.entidadesSub }[gr.id];
+    const titulo = { empresas: t.tes.empresasT, publicas: t.tes.publicasT, 'otras-entidades': t.tes.otrasT }[gr.id];
+    const acento = acentoRem(n, gr.rem);
+    return {
+      grupo: i === 0 ? t.grupos.vinculos : undefined, id: gr.id, icono: gr.icono as NombreIcono, titulo,
+      corto: gr.id === 'otras-entidades' ? t.tes.otrasCorto : undefined,
+      valor: String(n), sub: n ? subs[n === 1 ? 0 : 1] + (acento ? ' · ' : '') : t.tes.sinEntidades, acento,
+    };
+  }),
   {
     id: 'borme', icono: 'registro', titulo: t.tes.borme, corto: t.tes.bormeCorto,
     valor: String(bor.length), sub: bor.length ? t.tes.bormeSub[bor.length === 1 ? 0 : 1] : t.tes.sinBorme,
@@ -222,7 +254,7 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   </nav>
   <p class="ver-todo-p"><button class="ver-todo" type="button" id="ver-todo" aria-controls="secciones" aria-expanded="false">{t.verTodo}</button></p>
 
-  <div class="secciones" id="secciones">
+  <div class="secciones" id="secciones" data-entidades={gruposEnt.find((x) => x.ents.length)?.id ?? 'empresas'}>
 
   <section class="seccion" id="propiedades" aria-labelledby="h-propiedades">
     <h2 id="h-propiedades"><span class="s-ico"><Icono n="propiedades" /></span>{t.prop.titulo}</h2>
@@ -434,15 +466,23 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
     </div>
   </section>
 
-  <section class="seccion" id="entidades" aria-labelledby="h-entidades">
-    <h2 id="h-entidades"><span class="s-ico"><Icono n="entidades" /></span>{t.ent.titulo}</h2>
+  {gruposEnt.map((gr) => (
+  <section class="seccion" id={gr.id} aria-labelledby={`h-${gr.id}`}>
+    <h2 id={`h-${gr.id}`}><span class="s-ico"><Icono n={gr.icono} /></span>{t.ent.titulos[gr.id]}</h2>
     <div class="s-cuerpo">
-      {nEnt === 0 ? <p>{t.ent.ninguna}</p> : (
+      {gr.ents.length === 0 ? <p>{t.ent.ningunas[gr.id]}</p> : (
         <>
           <p class="small muted">{g(t.ent.intro)}</p>
-          {tiposVin.map(({ k, ents }) => (
+          <div class="rem-resumen">
+            <h3>{t.ent.remTitulo}</h3>
+            <ul>{(['si', 'complemento', 'dietas', 'no', 'nc'] as const).filter((r) => gr.rem[r]).map((r) => (
+              <li class:list={[`rem-${r}`]}><span>{tv.remuneracion[r]}</span><strong>{fmtNum(gr.rem[r])}</strong></li>
+            ))}</ul>
+            <p class="small muted">{t.ent.remNota}</p>
+          </div>
+          {gr.porTipo.map(({ k, ents }) => (
             <>
-              <h3>{t.ent.tipos[k]} <span class="muted n-tipo">{fmtNum(ents.length)}</span></h3>
+              {gr.porTipo.length > 1 || gr.id === 'otras-entidades' ? <h3>{t.ent.tipos[k]} <span class="muted n-tipo">{fmtNum(ents.length)}</span></h3> : null}
               <ul class="entidades">{ents.map((e) => (
                 <li>
                   <details class="ent">
@@ -468,6 +508,7 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
       <p class="fuente"><Icono n="info" tam={16} /><span>{t.ent.fuente}<a href={u('/metodologia#entidades')}>{t.comun.comoSeObtiene}</a> · {t.ent.avisar}<a href={enlaceError(d.nombreCompleto)} rel="noopener">{t.cab.avisarError}</a></span></p>
     </div>
   </section>
+  ))}
 
   <section class="seccion" id="borme" aria-labelledby="h-borme">
     <h2 id="h-borme"><span class="s-ico"><Icono n="registro" /></span>{t.bor.titulo}</h2>
@@ -807,6 +848,12 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   .etq-rel, .etq-rem { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .78rem; line-height: 1.6; background: var(--chip); color: var(--text); }
   .etq-rem { background: transparent; box-shadow: inset 0 0 0 1px var(--border); color: var(--muted); }
   .etq-rem.rem-si { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent); color: var(--accent-text); }
+  .rem-resumen { margin: 12px 0 4px; padding: 12px 14px; border-radius: var(--radius); background: var(--bg); border: 1px solid var(--border); }
+  .rem-resumen h3 { margin: 0 0 6px; font-size: .9rem; }
+  .rem-resumen ul { list-style: none; margin: 0 0 6px; padding: 0; display: grid; gap: 2px; }
+  .rem-resumen li { display: flex; justify-content: space-between; gap: 12px; font-size: .9rem; }
+  .rem-resumen li.rem-si strong { color: var(--accent-text); }
+  .rem-resumen p { margin: 0; }
   .ent-lit { margin: 4px 0 0; padding: 6px 10px; border-left: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); font-size: .88rem; line-height: 1.5; color: var(--text); background: var(--bg); border-radius: 0 6px 6px 0; overflow-wrap: anywhere; }
   .bor-conf { display: flex; gap: 6px; align-items: flex-start; margin: 0 0 8px; color: var(--muted); }
   .bor-conf :global(.icono) { flex: none; margin-top: 2px; color: var(--accent-text); }
@@ -996,6 +1043,11 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   let empujado = false;
   let origen: HTMLElement | null = null;
   const completa = () => raiz.classList.contains('ficha-completa');
+  /** Sección del enlace (#deudas…). Los enlaces antiguos a #entidades abren la primera cajita de entidades con datos. */
+  const idDeHash = () => {
+    const h = location.hash.slice(1);
+    return h === 'entidades' ? (document.getElementById('secciones')!.dataset.entidades ?? '') : h;
+  };
 
   function abrir(id: string, empujar: boolean) {
     const sec = document.getElementById(id);
@@ -1023,7 +1075,7 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
   addEventListener('popstate', () => {
     if (dlg.open) { empujado = false; dlg.close(); return; }
-    const id = location.hash.slice(1);
+    const id = idDeHash();
     if (ids.includes(id) && !completa()) abrir(id, false);
   });
   document.querySelectorAll<HTMLAnchorElement>('.tesela[data-detalle]').forEach((a) => a.addEventListener('click', (e) => {
@@ -1047,6 +1099,6 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   pintarTodo();
 
   // Si se llega con un enlace a una sección (/diputado/…#deudas), se abre directamente
-  const inicial = location.hash.slice(1);
+  const inicial = idDeHash();
   if (ids.includes(inicial) && !completa()) abrir(inicial, false);
 </script>
