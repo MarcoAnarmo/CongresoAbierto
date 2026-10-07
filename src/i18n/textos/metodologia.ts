@@ -25,11 +25,13 @@ const es = {
     rentas: 'Rentas, cuentas y acciones',
     actividades: 'Cargos y actividades',
     intereses: 'Trabajos anteriores e intereses',
+    entidades: 'Empresas y entidades',
     revision: 'Cómo se han copiado los datos',
     retribuciones: 'Retribuciones',
     votaciones: 'Votaciones',
     participacion: 'Sus votos en el Pleno',
     temas: 'Temas de las votaciones',
+    avisoLegal: 'Uso de los datos y aviso legal',
     errores: '¿Has visto un error?',
   },
   html: {
@@ -83,6 +85,16 @@ const es = {
 </ul>`,
     actividades: `<p>Del <em>Registro de Intereses - Actividades</em>: cargos públicos, actividades públicas a las que ha renunciado, pensiones, docencia, cargos en partidos, colaboraciones, actividades privadas autorizadas y otras. Es lo que cada diputado declara y el Pleno del Congreso considera compatible con el escaño. El texto se extrae automáticamente del PDF oficial (tiene capa de texto) y se publica literalmente, con la fecha del acuerdo del Pleno. Si el Pleno aún no se ha pronunciado, el Congreso no publica el contenido y la ficha lo indica.</p>`,
     intereses: `<p>De las <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales): actividades de los cinco años anteriores al escaño que le dieron ingresos o pueden condicionar su actividad política (período, empleador, sector y descripción), donaciones y obsequios recibidos, fundaciones y asociaciones a las que contribuye y otros intereses. Se toma cada apartado de la declaración más reciente que lo rellena. El nombre de un particular (por ejemplo, un familiar como benefactor) se sustituye por «[nombre omitido]».</p>`,
+    entidades: `<p>Cada ficha lista las empresas, administraciones, fundaciones, asociaciones, partidos y otras entidades que nombran los documentos oficiales del diputado, con el texto literal y el enlace a cada documento:</p>
+<ul>
+<li>Los <strong>acuerdos de la Comisión del Estatuto de los Diputados</strong> sobre sus declaraciones de actividades, aprobados por el Pleno y publicados en el <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Boletín Oficial de las Cortes Generales (serie D)</a>: qué actividad declara, en qué empresa o entidad, y si el Congreso la declara compatible, la autoriza o toma conocimiento.</li>
+<li>El <em>Registro de Intereses - Actividades</em>.</li>
+<li>Todas sus <em>Declaraciones de Intereses Económicos</em> de la legislatura (no solo la más reciente): empleadores de los cinco años anteriores, donaciones y contribuciones.</li>
+<li>Las acciones, participaciones y sociedades de su declaración de bienes.</li>
+<li>La trayectoria de su ficha oficial en congreso.es.</li>
+</ul>
+<p>Los textos son libres, así que los nombres se han localizado con ayuda de un asistente de inteligencia artificial y con reglas estrictas: solo nombres que aparecen <strong>literalmente</strong> en el texto (una comprobación automática lo verifica uno a uno), nunca personas particulares y nunca referencias genéricas («una empresa privada»). Las variantes de un mismo nombre (mayúsculas, tildes, «S.A.» o «SA») se agrupan; las uniones hechas a mano están en <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a>. El tipo (empresa, sector público, fundación…) solo sirve para ordenar la lista.</p>
+<p><strong>Que una entidad aparezca no implica ninguna irregularidad ni conflicto de intereses:</strong> es lo que consta en esos documentos. Tampoco es una lista completa de sus relaciones, sino de lo que está por escrito en documentos oficiales.</p>`,
     revision: `<p>Las declaraciones se publican como PDF escaneados, sin datos estructurados. Cada una se ha copiado a mano a partir del PDF y después se ha revisado una segunda vez, fila a fila (las deudas, con dos transcripciones independientes cuyas diferencias se resuelven mirando el PDF), incluidas las observaciones de la página 4 y su posible continuación. Las fichas con alguna lectura no confirmada llevan un aviso (*) y un enlace al PDF para comprobarlo. Las rentas, cuentas, acciones y declaraciones de intereses se han transcrito del PDF y comparado con una lectura automática (OCR) independiente: cada importe o palabra que no coincide se ha vuelto a mirar en el original ampliado.</p>`,
     retribuciones: `<p>Se muestran los importes mensuales oficiales de 2026 que corresponden a cada diputado durante su mandato, según su circunscripción y sus cargos:</p>
 <ul>
@@ -97,6 +109,13 @@ const es = {
     temas: `<p>La página de votaciones recoge todas las votaciones del Pleno de la XV Legislatura publicadas en datos abiertos (desde septiembre de 2023). Las votaciones por llamamiento, como las investiduras, no tienen el voto de cada diputado en datos abiertos y no aparecen. Las <strong>votaciones clave</strong> llevan además documentos oficiales (BOE, BOCG, Diario de Sesiones) y extractos literales del texto, revisados a mano; las demás muestran el título oficial, los totales, el voto por grupo y el JSON y el PDF oficiales.</p>
 <p>El Congreso no clasifica sus votaciones por temas. Para poder filtrarlas, cada votación recibe uno o varios temas según las palabras que aparecen en su título oficial (por ejemplo, «alquiler» o «vivienda» → Vivienda). Es una ayuda para buscar, no una valoración: la lista completa de palabras está en <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> y cualquiera puede proponer cambios. Si una votación no encaja en ningún tema, aparece en «Otros».</p>
 <p>El resultado se calcula con los totales oficiales: mayoría simple (más síes que noes), salvo en la votación de conjunto de una ley orgánica, que necesita 176 votos a favor (art. 81 de la Constitución). En los decretos-leyes, «convalidado» o «derogado».</p>`,
+    avisoLegal: `<p>Congreso Abierto es un proyecto ciudadano, sin ánimo de lucro e independiente: no tiene relación con el Congreso de los Diputados, con el Gobierno ni con ningún partido.</p>
+<ul>
+<li><strong>Solo datos públicos.</strong> La web reúne y presenta información que publican instituciones oficiales (Congreso, Boletín Oficial de las Cortes Generales, Boletín Oficial del Estado) y que cualquiera puede consultar en su origen. Cada dato enlaza al documento del que sale. Si algo no coincide, prevalece el documento oficial.</li>
+<li><strong>Sin interpretaciones.</strong> Los textos se copian literalmente. La web no afirma que exista ningún conflicto de intereses ni ninguna irregularidad: muestra lo que dicen los documentos.</li>
+<li><strong>Datos personales.</strong> Solo se publican datos que las propias instituciones hacen públicos sobre los diputados por su cargo. Se omiten los nombres de particulares que no son el diputado, los números de cuenta, el NIF y las matrículas. Para pedir una corrección o ejercer tus derechos, escribe a <a href="mailto:ayuda@congresoabierto.org">ayuda@congresoabierto.org</a>.</li>
+<li><strong>Reutilización.</strong> Los datos descargables se publican con licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0</a> y el código con licencia MIT. Se ofrecen tal cual, sin garantías. Congreso Abierto no se hace responsable del uso que otras personas hagan de los datos ni de las conclusiones que saquen de ellos; quien los reutilice debe citar la fuente y respetar la ley, también la de protección de datos.</li>
+</ul>`,
     errores: `<p><a href="{error}" rel="noopener">Avisa del error en GitHub</a> con el diputado, el dato y el enlace al documento oficial (con la página). Solo se aceptan correcciones respaldadas por un documento oficial.</p>
 <p>El proyecto es público y cualquiera puede proponer cambios, sepa o no programar. En <a href="{colabora}">Colabora</a> se explica cómo.</p>`,
   },
@@ -120,11 +139,13 @@ export default area(es, {
       rentas: 'Rendes, comptes i accions',
       actividades: 'Càrrecs i activitats',
       intereses: 'Feines anteriors i interessos',
+      entidades: 'Empreses i entitats',
       revision: 'Com s’han copiat les dades',
       retribuciones: 'Retribucions',
       votaciones: 'Votacions',
       participacion: 'Els seus vots al Ple',
       temas: 'Temes de les votacions',
+      avisoLegal: 'Ús de les dades i avís legal',
       errores: 'Has vist un error?',
     },
     html: {
@@ -178,6 +199,16 @@ export default area(es, {
 </ul>`,
       actividades: `<p>Del <em>Registro de Intereses - Actividades</em>: càrrecs públics, activitats públiques a què ha renunciat, pensions, docència, càrrecs en partits, col·laboracions, activitats privades autoritzades i altres. És el que cada diputat declara i el Ple del Congrés considera compatible amb l’escó. El text s’extreu automàticament del PDF oficial (té capa de text) i es publica literalment, amb la data de l’acord del Ple. Si el Ple encara no s’hi ha pronunciat, el Congrés no en publica el contingut i la fitxa ho indica.</p>`,
       intereses: `<p>De les <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales): activitats dels cinc anys anteriors a l’escó que li van donar ingressos o que poden condicionar la seva activitat política (període, ocupador, sector i descripció), donacions i obsequis rebuts, fundacions i associacions a què contribueix i altres interessos. Cada apartat es pren de la declaració més recent que l’emplena. El nom d’un particular (per exemple, un familiar com a benefactor) se substitueix per «[nombre omitido]».</p>`,
+      entidades: `<p>Cada fitxa recull les empreses, administracions, fundacions, associacions, partits i altres entitats que esmenten els documents oficials del diputat, amb el text literal i l’enllaç a cada document:</p>
+<ul>
+<li>Els <strong>acords de la Comissió de l’Estatut dels Diputats</strong> sobre les seves declaracions d’activitats, aprovats pel Ple i publicats al <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Butlletí Oficial de les Corts Generals (sèrie D)</a>: quina activitat declara, en quina empresa o entitat, i si el Congrés la declara compatible, l’autoritza o en pren coneixement.</li>
+<li>El <em>Registro de Intereses - Actividades</em>.</li>
+<li>Totes les seves <em>Declaraciones de Intereses Económicos</em> de la legislatura (no només la més recent): ocupadors dels cinc anys anteriors, donacions i contribucions.</li>
+<li>Les accions, participacions i societats de la seva declaració de béns.</li>
+<li>La trajectòria de la seva fitxa oficial a congreso.es.</li>
+</ul>
+<p>Els textos són lliures, així que els noms s’han localitzat amb l’ajuda d’un assistent d’intel·ligència artificial i amb regles estrictes: només noms que apareixen <strong>literalment</strong> al text (una comprovació automàtica ho verifica un per un), mai persones particulars i mai referències genèriques («una empresa privada»). Les variants d’un mateix nom (majúscules, accents, «S.A.» o «SA») s’agrupen; les unions fetes a mà són a <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a>. El tipus (empresa, sector públic, fundació…) només serveix per ordenar la llista.</p>
+<p><strong>Que hi aparegui una entitat no implica cap irregularitat ni conflicte d’interessos:</strong> és el que consta en aquests documents. Tampoc no és una llista completa de les seves relacions, sinó del que és per escrit en documents oficials.</p>`,
       revision: `<p>Les declaracions es publiquen com a PDF escanejats, sense dades estructurades. Cadascuna s’ha copiat a mà a partir del PDF i després s’ha revisat una segona vegada, fila a fila (els deutes, amb dues transcripcions independents les diferències de les quals es resolen mirant el PDF), incloses les observacions de la pàgina 4 i la seva possible continuació. Les fitxes amb alguna lectura no confirmada porten un avís (*) i un enllaç al PDF per comprovar-ho. Les rendes, comptes, accions i declaracions d’interessos s’han transcrit del PDF i s’han comparat amb una lectura automàtica (OCR) independent: cada import o paraula que no coincideix s’ha tornat a mirar a l’original ampliat.</p>`,
       retribuciones: `<p>Es mostren els imports mensuals oficials del 2026 que corresponen a cada diputat durant el seu mandat, segons la seva circumscripció i els seus càrrecs:</p>
 <ul>
@@ -192,6 +223,13 @@ export default area(es, {
       temas: `<p>La pàgina de votacions recull totes les votacions del Ple de la XV legislatura publicades en dades obertes (des del setembre del 2023). Les votacions per crida, com les investidures, no tenen el vot de cada diputat en dades obertes i no hi apareixen. Les <strong>votacions clau</strong> inclouen, a més, documents oficials (BOE, BOCG, Diario de Sesiones) i extractes literals del text, revisats a mà; les altres mostren el títol oficial, els totals, el vot per grup i el JSON i el PDF oficials.</p>
 <p>El Congrés no classifica les seves votacions per temes. Per poder-les filtrar, cada votació rep un o diversos temes segons les paraules que apareixen en el seu títol oficial (per exemple, «alquiler» o «vivienda» → Habitatge). És una ajuda per cercar, no una valoració: la llista completa de paraules és a <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> i qualsevol persona hi pot proposar canvis. Si una votació no encaixa en cap tema, apareix a «Altres».</p>
 <p>El resultat es calcula amb els totals oficials: majoria simple (més sís que nos), excepte en la votació de conjunt d’una llei orgànica, que necessita 176 vots a favor (art. 81 de la Constitució). En els decrets llei, «convalidat» o «derogat».</p>`,
+      avisoLegal: `<p>Congreso Abierto és un projecte ciutadà, sense ànim de lucre i independent: no té relació amb el Congrés dels Diputats, amb el Govern ni amb cap partit.</p>
+<ul>
+<li><strong>Només dades públiques.</strong> El web reuneix i presenta informació que publiquen institucions oficials (Congrés, Butlletí Oficial de les Corts Generals, Butlletí Oficial de l’Estat) i que qualsevol pot consultar a l’origen. Cada dada enllaça al document d’on surt. Si alguna cosa no coincideix, preval el document oficial.</li>
+<li><strong>Sense interpretacions.</strong> Els textos es copien literalment. El web no afirma que hi hagi cap conflicte d’interessos ni cap irregularitat: mostra el que diuen els documents.</li>
+<li><strong>Dades personals.</strong> Només es publiquen dades que les mateixes institucions fan públiques sobre els diputats pel seu càrrec. S’ometen els noms de particulars que no són el diputat, els números de compte, el NIF i les matrícules. Per demanar una correcció o exercir els teus drets, escriu a <a href="mailto:ayuda@congresoabierto.org">ayuda@congresoabierto.org</a>.</li>
+<li><strong>Reutilització.</strong> Les dades descarregables es publiquen amb llicència <a href="https://creativecommons.org/licenses/by/4.0/deed.ca">CC BY 4.0</a> i el codi amb llicència MIT. S’ofereixen tal com són, sense garanties. Congreso Abierto no es fa responsable de l’ús que altres persones facin de les dades ni de les conclusions que en treguin; qui les reutilitzi ha de citar la font i respectar la llei, també la de protecció de dades.</li>
+</ul>`,
       errores: `<p><a href="{error}" rel="noopener">Avisa de l’error a GitHub</a> amb el diputat, la dada i l’enllaç al document oficial (amb la pàgina). Només s’accepten correccions avalades per un document oficial.</p>
 <p>El projecte és públic i qualsevol persona hi pot proposar canvis, en sàpiga o no de programar. A <a href="{colabora}">Col·labora</a> s’explica com.</p>`,
     },
@@ -213,11 +251,13 @@ export default area(es, {
       rentas: 'Errentak, kontuak eta akzioak',
       actividades: 'Karguak eta jarduerak',
       intereses: 'Aurreko lanak eta interesak',
+      entidades: 'Enpresak eta erakundeak',
       revision: 'Nola kopiatu diren datuak',
       retribuciones: 'Ordainsariak',
       votaciones: 'Bozketak',
       participacion: 'Haren botoak Osoko Bilkuran',
       temas: 'Bozketen gaiak',
+      avisoLegal: 'Datuen erabilera eta lege-oharra',
       errores: 'Akatsen bat ikusi duzu?',
     },
     html: {
@@ -271,6 +311,16 @@ export default area(es, {
 </ul>`,
       actividades: `<p><em>Registro de Intereses - Actividades</em> delakotik: kargu publikoak, uko egin dien jarduera publikoak, pentsioak, irakaskuntza, alderdietako karguak, lankidetzak, baimendutako jarduera pribatuak eta bestelakoak. Diputatu bakoitzak aitortzen duena da, eta Kongresuko Osoko Bilkurak eserlekuarekin bateragarritzat jotzen duena. Testua PDF ofizialetik automatikoki ateratzen da (testu-geruza du) eta hitzez hitz argitaratzen da, Osoko Bilkuraren erabakiaren datarekin. Osoko Bilkurak oraindik erabakirik hartu ez badu, Kongresuak ez du edukia argitaratzen, eta fitxak hala adierazten du.</p>`,
       intereses: `<p><em>Declaraciones de Intereses Económicos</em> delakoetatik (Código de Conducta de las Cortes Generales): eserlekua lortu aurreko bost urteetako jarduerak, diru-sarrerak eman zizkiotenak edo haren jarduera politikoa baldintza dezaketenak (aldia, enplegatzailea, sektorea eta deskribapena), jasotako dohaintzak eta opariak, ekarpenak egiten dizkien fundazioak eta elkarteak, eta beste interes batzuk. Atal bakoitza hura betetzen duen aitorpen berrienetik hartzen da. Partikular baten izena (adibidez, onuragile gisa ageri den senide batena) «[nombre omitido]» testuarekin ordezten da.</p>`,
+      entidades: `<p>Fitxa bakoitzak diputatuaren dokumentu ofizialek aipatzen dituzten enpresak, administrazioak, fundazioak, elkarteak, alderdiak eta beste erakunde batzuk biltzen ditu, testu literalarekin eta dokumentu bakoitzerako estekarekin:</p>
+<ul>
+<li><strong>Diputatuen Estatutuaren Batzordearen erabakiak</strong> haren jardueren adierazpenei buruz, Osoko Bilkurak onartuak eta <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Gorte Nagusien Aldizkari Ofizialean (D seriea)</a> argitaratuak: zer jarduera adierazten duen, zer enpresa edo erakundetan, eta Kongresuak bateragarritzat jotzen duen, baimentzen duen edo jakinaren gainean geratzen den.</li>
+<li><em>Registro de Intereses - Actividades</em> delakoa.</li>
+<li>Legegintzaldiko <em>Declaraciones de Intereses Económicos</em> guztiak (ez bakarrik berriena): aurreko bost urteetako enplegatzaileak, dohaintzak eta ekarpenak.</li>
+<li>Ondasunen adierazpeneko akzioak, partaidetzak eta sozietateak.</li>
+<li>congreso.es-eko fitxa ofizialeko ibilbidea.</li>
+</ul>
+<p>Testuak libreak direnez, izenak adimen artifizialeko laguntzaile baten laguntzaz eta arau zorrotzekin aurkitu dira: testuan <strong>hitzez hitz</strong> agertzen diren izenak bakarrik (egiaztapen automatiko batek banan-banan egiaztatzen du), inoiz ez partikularrak eta inoiz ez aipamen orokorrak («enpresa pribatu bat»). Izen beraren aldaerak (maiuskulak, azentuak, «S.A.» edo «SA») elkartu egiten dira; eskuz egindako elkarketak <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a> fitxategian daude. Mota (enpresa, sektore publikoa, fundazioa…) zerrenda ordenatzeko baino ez da.</p>
+<p><strong>Erakunde bat agertzeak ez du esan nahi irregulartasunik edo interes-gatazkarik dagoenik:</strong> dokumentu horietan jasota dagoena da. Ez da haren harreman guztien zerrenda ere, dokumentu ofizialetan idatzita dagoenarena baizik.</p>`,
       revision: `<p>Aitorpenak PDF eskaneatu gisa argitaratzen dira, datu egituraturik gabe. Bakoitza eskuz kopiatu da PDFtik abiatuta, eta gero bigarren aldiz berrikusi da, errenkadaz errenkada (zorrak, bi transkripzio independenterekin, eta haien arteko aldeak PDFa begiratuta ebazten dira), 4. orriko oharrak eta haien balizko jarraipena barne. Irakurketa berretsi gaberen bat duten fitxek abisu bat (*) eta PDFrako esteka bat dute, egiaztatu ahal izateko. Errentak, kontuak, akzioak eta interesen aitorpenak PDFtik transkribatu dira, eta irakurketa automatiko (OCR) independente batekin alderatu: bat ez datorren zenbateko edo hitz bakoitza berriro begiratu da jatorrizkoan, handituta.</p>`,
       retribuciones: `<p>Diputatu bakoitzari bere agintaldian dagozkion 2026ko hileko zenbateko ofizialak erakusten dira, haren barrutiaren eta karguen arabera:</p>
 <ul>
@@ -285,6 +335,13 @@ export default area(es, {
       temas: `<p>Bozketen orriak datu irekietan argitaratutako XV. legegintzaldiko Osoko Bilkuraren bozketa guztiak biltzen ditu (2023ko irailetik aurrera). Deiketa bidezko bozketek, inbestidurek adibidez, ez dute diputatu bakoitzaren botoa datu irekietan, eta ez dira agertzen. <strong>Funtsezko bozketek</strong> dokumentu ofizialak (BOE, BOCG, Diario de Sesiones) eta testuaren pasarte literalak ere badituzte, eskuz berrikusiak; gainerakoek titulu ofiziala, guztizkoak, taldekako botoa eta JSON eta PDF ofizialak erakusten dituzte.</p>
 <p>Kongresuak ez ditu bere bozketak gaika sailkatzen. Iragazi ahal izateko, bozketa bakoitzari gai bat edo gehiago esleitzen zaizkio, bere titulu ofizialean agertzen diren hitzen arabera (adibidez, «alquiler» (alokairua) edo «vivienda» (etxebizitza) → Etxebizitza). Bilatzeko laguntza bat da, ez balorazio bat: hitzen zerrenda osoa <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> fitxategian dago, eta edonork proposa ditzake aldaketak. Bozketa bat inongo gaitan sartzen ez bada, «Besteak» atalean agertzen da.</p>
 <p>Emaitza guztizko ofizialekin kalkulatzen da: gehiengo soila (baiezko gehiago ezezkoak baino), lege organiko baten osotasunaren gaineko bozketan izan ezik, horrek 176 aldeko boto behar baititu (Konstituzioaren 81. art.). Lege-dekretuetan, «baliozkotua» edo «indargabetua».</p>`,
+      avisoLegal: `<p>Congreso Abierto herritarren proiektu bat da, irabazi-asmorik gabea eta independentea: ez du zerikusirik Diputatuen Kongresuarekin, Gobernuarekin ezta inongo alderdirekin ere.</p>
+<ul>
+<li><strong>Datu publikoak bakarrik.</strong> Webguneak erakunde ofizialek (Kongresua, Gorte Nagusien Aldizkari Ofiziala, Estatuko Aldizkari Ofiziala) argitaratzen duten eta edonork jatorrian kontsulta dezakeen informazioa biltzen eta aurkezten du. Datu bakoitzak bere jatorrizko dokumentura eramaten du. Zerbait bat ez badator, dokumentu ofizialak du lehentasuna.</li>
+<li><strong>Interpretaziorik gabe.</strong> Testuak hitzez hitz kopiatzen dira. Webguneak ez du baieztatzen interes-gatazkarik edo irregulartasunik dagoenik: dokumentuek diotena erakusten du.</li>
+<li><strong>Datu pertsonalak.</strong> Erakundeek beraiek diputatuei buruz karguagatik argitaratzen dituzten datuak bakarrik argitaratzen dira. Diputatua ez diren partikularren izenak, kontu-zenbakiak, IFZ eta matrikulak ez dira argitaratzen. Zuzenketa bat eskatzeko edo zure eskubideak erabiltzeko, idatzi <a href="mailto:ayuda@congresoabierto.org">ayuda@congresoabierto.org</a> helbidera.</li>
+<li><strong>Berrerabilera.</strong> Deskarga daitezkeen datuak <a href="https://creativecommons.org/licenses/by/4.0/deed.eu">CC BY 4.0</a> lizentziarekin argitaratzen dira, eta kodea MIT lizentziarekin. Dauden bezala eskaintzen dira, bermerik gabe. Congreso Abierto ez da arduratzen beste pertsona batzuek datuei ematen dieten erabileraz ezta ateratzen dituzten ondorioez ere; berrerabiltzen dituenak iturria aipatu eta legea errespetatu behar du, baita datuen babesari buruzkoa ere.</li>
+</ul>`,
       errores: `<p><a href="{error}" rel="noopener">Jakinarazi akatsa GitHub-en</a>, diputatua, datua eta dokumentu ofizialerako esteka (orrialdearekin) adierazita. Dokumentu ofizial batek babestutako zuzenketak baino ez dira onartzen.</p>
 <p>Proiektua publikoa da, eta edonork proposa ditzake aldaketak, programatzen jakin ala ez. <a href="{colabora}">Lagundu</a> atalean azaltzen da nola.</p>`,
     },
@@ -306,11 +363,13 @@ export default area(es, {
       rentas: 'Rendas, contas e accións',
       actividades: 'Cargos e actividades',
       intereses: 'Traballos anteriores e intereses',
+      entidades: 'Empresas e entidades',
       revision: 'Como se copiaron os datos',
       retribuciones: 'Retribucións',
       votaciones: 'Votacións',
       participacion: 'Os seus votos no Pleno',
       temas: 'Temas das votacións',
+      avisoLegal: 'Uso dos datos e aviso legal',
       errores: 'Viches un erro?',
     },
     html: {
@@ -364,6 +423,16 @@ export default area(es, {
 </ul>`,
       actividades: `<p>Do <em>Registro de Intereses - Actividades</em>: cargos públicos, actividades públicas ás que renunciou, pensións, docencia, cargos en partidos, colaboracións, actividades privadas autorizadas e outras. É o que cada deputado declara e o Pleno do Congreso considera compatible co escano. O texto extráese automaticamente do PDF oficial (ten capa de texto) e publícase literalmente, coa data do acordo do Pleno. Se o Pleno aínda non se pronunciou, o Congreso non publica o contido e a ficha indícao.</p>`,
       intereses: `<p>Das <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales): actividades dos cinco anos anteriores ao escano que lle deron ingresos ou poden condicionar a súa actividade política (período, empregador, sector e descrición), doazóns e agasallos recibidos, fundacións e asociacións ás que contribúe e outros intereses. Tómase cada apartado da declaración máis recente que o enche. O nome dun particular (por exemplo, un familiar como benfeitor) substitúese por «[nombre omitido]».</p>`,
+      entidades: `<p>Cada ficha recolle as empresas, administracións, fundacións, asociacións, partidos e outras entidades que nomean os documentos oficiais do deputado, co texto literal e a ligazón a cada documento:</p>
+<ul>
+<li>Os <strong>acordos da Comisión do Estatuto dos Deputados</strong> sobre as súas declaracións de actividades, aprobados polo Pleno e publicados no <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Boletín Oficial das Cortes Xerais (serie D)</a>: que actividade declara, en que empresa ou entidade, e se o Congreso a declara compatible, a autoriza ou toma coñecemento.</li>
+<li>O <em>Registro de Intereses - Actividades</em>.</li>
+<li>Todas as súas <em>Declaraciones de Intereses Económicos</em> da lexislatura (non só a máis recente): empregadores dos cinco anos anteriores, doazóns e contribucións.</li>
+<li>As accións, participacións e sociedades da súa declaración de bens.</li>
+<li>A traxectoria da súa ficha oficial en congreso.es.</li>
+</ul>
+<p>Os textos son libres, así que os nomes localizáronse coa axuda dun asistente de intelixencia artificial e con regras estritas: só nomes que aparecen <strong>literalmente</strong> no texto (unha comprobación automática verifícao un a un), nunca persoas particulares e nunca referencias xenéricas («unha empresa privada»). As variantes dun mesmo nome (maiúsculas, tiles, «S.A.» ou «SA») agrúpanse; as unións feitas a man están en <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a>. O tipo (empresa, sector público, fundación…) só serve para ordenar a lista.</p>
+<p><strong>Que apareza unha entidade non implica ningunha irregularidade nin conflito de intereses:</strong> é o que consta nesos documentos. Tampouco é unha lista completa das súas relacións, senón do que está por escrito en documentos oficiais.</p>`,
       revision: `<p>As declaracións publícanse como PDF escaneados, sen datos estruturados. Cada unha copiouse a man a partir do PDF e despois revisouse unha segunda vez, fila a fila (as débedas, con dúas transcricións independentes cuxas diferenzas se resolven mirando o PDF), incluídas as observacións da páxina 4 e a súa posible continuación. As fichas con algunha lectura non confirmada levan un aviso (*) e unha ligazón ao PDF para comprobalo. As rendas, contas, accións e declaracións de intereses transcribíronse do PDF e comparáronse cunha lectura automática (OCR) independente: cada importe ou palabra que non coincide volveuse mirar no orixinal ampliado.</p>`,
       retribuciones: `<p>Móstranse os importes mensuais oficiais de 2026 que lle corresponden a cada deputado durante o seu mandato, segundo a súa circunscrición e os seus cargos:</p>
 <ul>
@@ -378,6 +447,13 @@ export default area(es, {
       temas: `<p>A páxina de votacións recolle todas as votacións do Pleno da XV Lexislatura publicadas en datos abertos (desde setembro de 2023). As votacións por chamamento, como as investiduras, non teñen o voto de cada deputado en datos abertos e non aparecen. As <strong>votacións clave</strong> levan ademais documentos oficiais (BOE, BOCG, Diario de Sesiones) e extractos literais do texto, revisados a man; as demais mostran o título oficial, os totais, o voto por grupo e o JSON e o PDF oficiais.</p>
 <p>O Congreso non clasifica as súas votacións por temas. Para poder filtralas, cada votación recibe un ou varios temas segundo as palabras que aparecen no seu título oficial (por exemplo, «alquiler» ou «vivienda» → Vivenda). É unha axuda para buscar, non unha valoración: a lista completa de palabras está en <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> e calquera pode propoñer cambios. Se unha votación non encaixa en ningún tema, aparece en «Outros».</p>
 <p>O resultado calcúlase cos totais oficiais: maioría simple (máis votos a favor ca en contra), agás na votación de conxunto dunha lei orgánica, que precisa 176 votos a favor (art. 81 da Constitución). Nos decretos leis, «convalidado» ou «derrogado».</p>`,
+      avisoLegal: `<p>Congreso Abierto é un proxecto cidadán, sen ánimo de lucro e independente: non ten relación co Congreso dos Deputados, co Goberno nin con ningún partido.</p>
+<ul>
+<li><strong>Só datos públicos.</strong> A web reúne e presenta información que publican institucións oficiais (Congreso, Boletín Oficial das Cortes Xerais, Boletín Oficial do Estado) e que calquera pode consultar na súa orixe. Cada dato leva ao documento do que sae. Se algo non coincide, prevalece o documento oficial.</li>
+<li><strong>Sen interpretacións.</strong> Os textos cópianse literalmente. A web non afirma que exista ningún conflito de intereses nin ningunha irregularidade: mostra o que din os documentos.</li>
+<li><strong>Datos persoais.</strong> Só se publican datos que as propias institucións fan públicos sobre os deputados polo seu cargo. Omítense os nomes de particulares que non son o deputado, os números de conta, o NIF e as matrículas. Para pedir unha corrección ou exercer os teus dereitos, escribe a <a href="mailto:ayuda@congresoabierto.org">ayuda@congresoabierto.org</a>.</li>
+<li><strong>Reutilización.</strong> Os datos descargables publícanse con licenza <a href="https://creativecommons.org/licenses/by/4.0/deed.gl">CC BY 4.0</a> e o código con licenza MIT. Ofrécense tal cal, sen garantías. Congreso Abierto non se fai responsable do uso que outras persoas fagan dos datos nin das conclusións que tiren deles; quen os reutilice debe citar a fonte e respectar a lei, tamén a de protección de datos.</li>
+</ul>`,
       errores: `<p><a href="{error}" rel="noopener">Avisa do erro en GitHub</a> co deputado, o dato e a ligazón ao documento oficial (coa páxina). Só se aceptan correccións respaldadas por un documento oficial.</p>
 <p>O proxecto é público e calquera pode propoñer cambios, saiba ou non programar. En <a href="{colabora}">Colabora</a> explícase como.</p>`,
     },
@@ -399,11 +475,13 @@ export default area(es, {
       rentas: 'Income, accounts and shares',
       actividades: 'Positions and activities',
       intereses: 'Previous jobs and interests',
+      entidades: 'Companies and organisations',
       revision: 'How the data were copied',
       retribuciones: 'Pay',
       votaciones: 'Votes',
       participacion: 'Their votes in plenary',
       temas: 'Vote topics',
+      avisoLegal: 'Use of the data and legal notice',
       errores: 'Spotted a mistake?',
     },
     html: {
@@ -457,6 +535,16 @@ export default area(es, {
 </ul>`,
       actividades: `<p>From the <em>Registro de Intereses - Actividades</em>: public offices, public activities they have given up, pensions, teaching, party positions, collaborations, authorised private activities and others. This is what each deputy declares and what the plenary of the Congress considers compatible with their seat. The text is extracted automatically from the official PDF (it has a text layer) and published word for word, with the date of the plenary decision. If the plenary has not yet ruled, the Congress does not publish the content and the profile says so.</p>`,
       intereses: `<p>From the <em>Declaraciones de Intereses Económicos</em> (Código de Conducta de las Cortes Generales, the code of conduct of the Spanish Parliament): activities in the five years before taking their seat that gave them income or could influence their political activity (period, employer, sector and description), donations and gifts received, foundations and associations they contribute to, and other interests. Each section is taken from the most recent declaration that fills it in. The name of a private individual (for example, a relative named as a benefactor) is replaced with “[nombre omitido]”.</p>`,
+      entidades: `<p>Each profile lists the companies, public bodies, foundations, associations, parties and other organisations named in the member’s official documents, with the original text and a link to each document:</p>
+<ul>
+<li>The <strong>decisions of the Committee on Members’ Status</strong> on their declarations of activities, approved by the plenary and published in the <a href="https://www.congreso.es/es/cem/dictamenes_actividades_xvleg">Official Gazette of the Cortes Generales (series D)</a>: which activity they declare, in which company or organisation, and whether Congress declares it compatible, authorises it or takes note of it.</li>
+<li>The <em>Registro de Intereses - Actividades</em> (register of interests).</li>
+<li>All their <em>Declaraciones de Intereses Económicos</em> (economic interests) in this term, not just the latest: employers in the previous five years, donations and contributions.</li>
+<li>The shares, holdings and companies in their declaration of assets.</li>
+<li>The career section of their official profile on congreso.es.</li>
+</ul>
+<p>These are free texts, so the names were located with the help of an artificial intelligence assistant under strict rules: only names that appear <strong>word for word</strong> in the text (an automatic check verifies each one), never private individuals and never generic references (“a private company”). Variants of the same name (capitals, accents, “S.A.” or “SA”) are grouped; manual merges are listed in <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/entidades.json">data/manual/entidades.json</a>. The type (company, public sector, foundation…) is only used to sort the list.</p>
+<p><strong>An organisation appearing here does not imply any wrongdoing or conflict of interest:</strong> it is what those documents state. Nor is it a complete list of their relationships, only of what is written in official documents.</p>`,
       revision: `<p>The declarations are published as scanned PDFs, with no structured data. Each one has been copied by hand from the PDF and then checked a second time, row by row (debts with two independent transcriptions, whose differences are resolved by looking at the PDF), including the remarks on page 4 and any continuation. Profiles with an unconfirmed reading carry a notice (*) and a link to the PDF so it can be checked. Income, accounts, shares and declarations of interests have been transcribed from the PDF and compared with an independent automatic reading (OCR): every amount or word that did not match has been checked again in the enlarged original.</p>`,
       retribuciones: `<p>This shows the official 2026 monthly amounts that correspond to each deputy during their term of office, according to their constituency and positions:</p>
 <ul>
@@ -471,6 +559,13 @@ export default area(es, {
       temas: `<p>The votes page includes all plenary votes in the 15th term published in the open data (since September 2023). Roll-call votes, such as investiture votes, do not have each deputy’s vote in the open data and do not appear. <strong>Key votes</strong> also include official documents (BOE, BOCG, Diario de Sesiones) and verbatim extracts of the text, checked by hand; the others show the official title, the totals, the vote by group and the official JSON and PDF.</p>
 <p>The Congress does not classify its votes by topic. To make them filterable, each vote is given one or more topics based on the words in its official title (for example, “alquiler” [rent] or “vivienda” [housing] → Housing). It is a search aid, not a judgement: the full list of words is in <a href="https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/data/manual/temas.json">data/manual/temas.json</a> and anyone can suggest changes. If a vote does not fit any topic, it appears under “Other”.</p>
 <p>The result is calculated from the official totals: simple majority (more yes than no votes), except in the vote on an organic law as a whole, which needs 176 votes in favour (art. 81 of the Constitution). For decree-laws, “ratified” or “repealed”.</p>`,
+      avisoLegal: `<p>Congreso Abierto is an independent, non-profit citizen project. It has no connection with the Congress of Deputies, the Government or any party.</p>
+<ul>
+<li><strong>Public data only.</strong> The site gathers and presents information published by official institutions (Congress, the Official Gazette of the Cortes Generales, the Official State Gazette) that anyone can check at the source. Every data point links to the document it comes from. If something does not match, the official document prevails.</li>
+<li><strong>No interpretation.</strong> Texts are copied word for word. The site does not claim that any conflict of interest or wrongdoing exists: it shows what the documents say.</li>
+<li><strong>Personal data.</strong> Only data that the institutions themselves publish about members in their official capacity is shown. Names of private individuals other than the member, account numbers, tax IDs and number plates are omitted. To request a correction or exercise your rights, write to <a href="mailto:ayuda@congresoabierto.org">ayuda@congresoabierto.org</a>.</li>
+<li><strong>Reuse.</strong> Downloadable data is published under a <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> licence and the code under the MIT licence. It is provided as is, without warranty. Congreso Abierto is not responsible for how others use the data or for the conclusions they draw from it; anyone reusing it must credit the source and comply with the law, including data protection law.</li>
+</ul>`,
       errores: `<p><a href="{error}" rel="noopener">Report the mistake on GitHub</a> with the deputy, the data point and the link to the official document (with the page number). Only corrections backed by an official document are accepted.</p>
 <p>The project is public and anyone can suggest changes, whether or not they can code. <a href="{colabora}">Contribute</a> explains how.</p>`,
     },
