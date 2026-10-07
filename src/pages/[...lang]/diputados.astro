@@ -5,6 +5,7 @@ import MapaProvincias from '../../components/MapaProvincias.astro';
 import type { Diputado } from '../../lib/types';
 import BotonCompartir from '../../components/BotonCompartir.astro';
 import DialogoCompartir from '../../components/DialogoCompartir.astro';
+import HojaFiltros from '../../components/HojaFiltros.astro';
 import Icono from '../../components/Icono.astro';
 import { rutasIdioma, idiomaDe, enlace, formatos, f, pl } from '../../i18n';
 import textos from '../../i18n/textos/diputados';
@@ -42,7 +43,7 @@ const conAviso = (d: Diputado) => !!(d.deudas?.principal?.aviso || d.deudas?.ant
 const sinTildes = (s: string) => quitarTildes(s).toLowerCase();
 const busca = (d: Diputado) => sinTildes([d.nombreCompleto, d.circunscripcion, d.partido, d.grupoCorto, grupos.find((g) => g.corto === d.grupoCorto)?.nombre ?? '', ...d.cargos, ...(d.perfil?.formacion.map((x) => x.texto) ?? []), ...(d.perfil?.trayectoria ?? [])].join(' '));
 const datos = (d: Diputado) => ({
-  'data-n': d.apellidos, 'data-busca': busca(d), 'data-g': d.grupoCorto, 'data-c': d.circunscripcion, 'data-f': d.perfil?.tipoFormacion ?? 'sin-datos',
+  'data-id': slug(d), 'data-n': d.apellidos, 'data-busca': busca(d), 'data-g': d.grupoCorto, 'data-c': d.circunscripcion, 'data-f': d.perfil?.tipoFormacion ?? 'sin-datos',
   'data-pr': d.patrimonio.propiedades ?? -1, 'data-v': d.patrimonio.viviendas ?? -1, 'data-co': d.patrimonio.vehiculos ?? -1, 'data-r': d.retribucion.totalMensual, 'data-l': nLeg(d),
 });
 const c = t.col;
@@ -105,17 +106,7 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
     </div>
     <span class="small muted cuenta" id="f-cuenta" aria-live="polite"></span>
   </div>
-  <dialog class="dlg-filtros" id="dlg-filtros" aria-labelledby="dlg-filtros-t">
-    <div class="df-cab">
-      <h2 id="dlg-filtros-t">{t.filtros.titulo}</h2>
-      <button class="df-cerrar" type="button" aria-label={palabras.cerrar}><Icono n="cerrar" /></button>
-    </div>
-    <div class="df-cuerpo" id="df-cuerpo" tabindex="-1" autofocus></div>
-    <div class="df-pie">
-      <button class="btn" type="button" id="quitar-filtros">{t.filtros.quitar}</button>
-      <button class="btn primario" type="button" id="ver-resultados">{t.filtros.verResultados}</button>
-    </div>
-  </dialog>
+  <HojaFiltros id="dlg-filtros" titulo={t.filtros.titulo} quitar={{ id: 'quitar-filtros', texto: t.filtros.quitar }} ver={{ id: 'ver-resultados', texto: t.filtros.verResultados }} />
 
   <ul class="tarjetas" id="tarjetas">
     {alfabetico.map((d) => (
@@ -149,6 +140,9 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
 
   <div id="vista-tabla" hidden>
   <div class="table-scroll card" style="padding:0">
+    <!-- La tabla (350 filas) se crea al abrir su vista: así la página carga con menos nodos. Sus filas toman los datos
+         de filtro y orden de las fichas (data-id), para no repetirlos en el HTML -->
+    <template id="plantilla-tabla">
     <table id="tabla-ranking">
       <caption class="sr-only">{t.tabla.caption}</caption>
       <thead>
@@ -164,7 +158,7 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
       </thead>
       <tbody>
         {filas.map((d, i) => (
-          <tr {...datos(d)}>
+          <tr data-id={slug(d)}>
             <td class="num muted pos">{i + 1}</td>
             <td class="quien">
               <a href={u(`/diputado/${slug(d)}`)}>{d.nombreCompleto}</a>{(d.patrimonio.revisar || conAviso(d)) && <span title={t.tabla.avisoTitulo} class="aviso">*</span>}
@@ -179,6 +173,7 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
         ))}
       </tbody>
     </table>
+    </template>
   </div>
   <p class="small muted">
     <span class="aviso">*</span> {t.tabla.aviso}{' '}
@@ -257,15 +252,15 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
 </Base>
 
 <script>
-  import { deslizarParaCerrar } from '../../scripts/hoja';
   import { textos, pl, locale } from '../../i18n/cliente';
   const t = textos<{ cuenta: string[]; ver: string[]; filtrarActivos: string[]; filtrarYOrdenar: string }>('diputados');
   const loc = locale();
-  const tabla = document.getElementById('tabla-ranking') as HTMLTableElement;
-  const cuerpo = tabla.tBodies[0];
-  const filas = [...cuerpo.rows];
   const lista = document.getElementById('tarjetas') as HTMLUListElement;
   const tarjetas = [...lista.children] as HTMLLIElement[];
+  // La tabla de patrimonio se crea al abrir su vista (crearTabla)
+  let tabla: HTMLTableElement | null = null;
+  let cuerpo: HTMLTableSectionElement | null = null;
+  let filas: HTMLTableRowElement[] = [];
   const vistaTabla = document.getElementById('vista-tabla')!;
   const vistaGrupos = document.getElementById('vista-grupos')!;
   const vistaMapa = document.getElementById('vista-mapa')!;
@@ -296,13 +291,44 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
     return desc ? -r : r;
   };
   // Cada palabra de la búsqueda tiene que aparecer (en cualquier orden): «pp sevilla», «abogada icade»…
-  const textoBusca = new Map<HTMLElement, string>([...filas, ...tarjetas].map((f) => [f, f.dataset.busca ?? '']));
+  const textoBusca = new Map<HTMLElement, string>(tarjetas.map((f) => [f, f.dataset.busca ?? '']));
+  const fichaDe = new Map(tarjetas.map((f) => [f.dataset.id!, f]));
+  /** Crea la tabla desde su plantilla la primera vez que se ve; cada fila copia los datos de su ficha. */
+  function crearTabla() {
+    if (tabla) return;
+    const tpl = document.getElementById('plantilla-tabla') as HTMLTemplateElement;
+    tpl.replaceWith(tpl.content.cloneNode(true));
+    tabla = document.getElementById('tabla-ranking') as HTMLTableElement;
+    cuerpo = tabla.tBodies[0];
+    filas = [...cuerpo.rows];
+    for (const f of filas) {
+      const ficha = fichaDe.get(f.dataset.id!)!;
+      const { id: _id, busca, ...resto } = ficha.dataset;
+      Object.assign(f.dataset, resto);
+      textoBusca.set(f, busca ?? '');
+    }
+    tabla.querySelectorAll<HTMLButtonElement>('button.orden').forEach((b) => b.addEventListener('click', () => {
+      const k = b.dataset.k!;
+      desc = k === clave ? !desc : k !== 'n';
+      clave = k; marcar(); aplicar();
+    }));
+    // Móvil: cada fila de la tabla enseña la cifra por la que se ordena; el botón despliega las cuatro
+    cuerpo.addEventListener('click', (e) => {
+      const t = e.target as Element;
+      if (t.closest('a')) return;
+      const fila = t.closest('tr');
+      const boton = fila?.querySelector<HTMLButtonElement>('.desplegar');
+      if (!fila || !boton || getComputedStyle(boton).display === 'none') return;
+      const abierta = fila.classList.toggle('abierta');
+      boton.setAttribute('aria-expanded', String(abierta));
+    });
+  }
   /** Reordena las filas y las fichas (solo cuando cambia el orden o la vista: mover nodos es lo que más cuesta). */
   // Solo se reordena la lista que se ve y solo si su orden cambia: cambiar de vista no mueve 700 nodos cada vez
   const ordenHecho = { tabla: '', tarjetas: '' };
   function ordenar() {
     const k = `${clave}:${desc}`;
-    if (vista === 'tabla' && ordenHecho.tabla !== k) { ordenHecho.tabla = k; filas.sort(comparar); cuerpo.append(...filas); }
+    if (vista === 'tabla' && cuerpo && ordenHecho.tabla !== k) { ordenHecho.tabla = k; filas.sort(comparar); cuerpo.append(...filas); }
     if (vista === 'tarjetas' && ordenHecho.tarjetas !== k) { ordenHecho.tarjetas = k; tarjetas.sort(comparar); lista.append(...tarjetas); }
   }
   function aplicar(reordenar = true) {
@@ -326,14 +352,17 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
     try { localStorage.setItem('diputados', JSON.stringify({ g: grupo.value, f: form.value, ordenes, vista })); } catch {}
   }
   function marcar() {
-    tabla.querySelectorAll('thead th').forEach((th) => th.removeAttribute('aria-sort'));
-    tabla.querySelector(`button.orden[data-k="${clave}"]`)?.closest('th')?.setAttribute('aria-sort', desc ? 'descending' : 'ascending');
-    tabla.dataset.clave = clave;
+    if (tabla) {
+      tabla.querySelectorAll('thead th').forEach((th) => th.removeAttribute('aria-sort'));
+      tabla.querySelector(`button.orden[data-k="${clave}"]`)?.closest('th')?.setAttribute('aria-sort', desc ? 'descending' : 'ascending');
+      tabla.dataset.clave = clave;
+    }
     lista.dataset.clave = clave;
     orden.value = clave;
   }
   function verVista(v: string) {
     if (!VISTAS.includes(v)) v = 'tarjetas';
+    if (v === 'tabla') crearTabla();
     vista = v; vistaTabla.hidden = v !== 'tabla'; lista.hidden = v !== 'tarjetas'; vistaGrupos.hidden = v !== 'grupos'; vistaMapa.hidden = v !== 'mapa';
     // Los filtros y el orden solo tienen sentido en las dos listas (fichas y tabla)
     filtros.hidden = !ordenes[v]; notaFormacion.hidden = v !== 'tarjetas';
@@ -345,37 +374,16 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
     history.replaceState(null, '', u);
   }
   orden.addEventListener('change', () => { clave = orden.value; desc = clave !== 'n'; marcar(); aplicar(); });
-  tabla.querySelectorAll<HTMLButtonElement>('button.orden').forEach((b) => b.addEventListener('click', () => {
-    const k = b.dataset.k!;
-    desc = k === clave ? !desc : k !== 'n';
-    clave = k; marcar(); aplicar();
-  }));
   botonesVista.forEach((b) => b.addEventListener('click', () => { verVista(b.dataset.vista!); marcar(); aplicar(); }));
   // La búsqueda espera a que se deje de escribir un momento y no reordena la lista: así no se traba al teclear
   let espera = 0;
   texto.addEventListener('input', () => { clearTimeout(espera); espera = window.setTimeout(() => requestAnimationFrame(() => aplicar(false)), 140); });
 
-  // Los selectores van en una ventana («Filtrar»; en el móvil, hoja que sube desde abajo), como en Votaciones.
+  // Los selectores van en la ventana de filtros (components/HojaFiltros.astro), como en Votaciones.
   // Sin JavaScript se quedan en la fila del buscador.
-  document.getElementById('df-cuerpo')!.appendChild(filtrosMas);
-  abrirFiltros.addEventListener('click', () => { document.documentElement.classList.add('dlg-abierto'); dlgFiltros.showModal(); });
-  dlgFiltros.addEventListener('close', () => { document.documentElement.classList.remove('dlg-abierto'); abrirFiltros.focus(); });
-  dlgFiltros.querySelector('.df-cerrar')!.addEventListener('click', () => dlgFiltros.close());
-  deslizarParaCerrar(dlgFiltros, { cerrar: () => dlgFiltros.close() });
-  dlgFiltros.addEventListener('click', (e) => { if (e.target === dlgFiltros) dlgFiltros.close(); });
-  verResultados.addEventListener('click', () => dlgFiltros.close());
+  dlgFiltros.querySelector('.df-cuerpo')!.appendChild(filtrosMas);
   document.getElementById('quitar-filtros')!.addEventListener('click', () => { grupo.value = ''; prov.value = ''; form.value = ''; aplicar(false); });
 
-  // Móvil: cada fila de la tabla enseña la cifra por la que se ordena; el botón despliega las cuatro
-  cuerpo.addEventListener('click', (e) => {
-    const t = e.target as Element;
-    if (t.closest('a')) return;
-    const fila = t.closest('tr');
-    const boton = fila?.querySelector<HTMLButtonElement>('.desplegar');
-    if (!fila || !boton || getComputedStyle(boton).display === 'none') return;
-    const abierta = fila.classList.toggle('abierta');
-    boton.setAttribute('aria-expanded', String(abierta));
-  });
   [grupo, prov, form].forEach((e) => e.addEventListener('change', () => aplicar(false)));
   try {
     const s = JSON.parse(localStorage.getItem('diputados') ?? 'null');
@@ -418,6 +426,8 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
   .filtros-mas { display: contents; }
   .boton-filtrar { display: inline-flex; align-items: center; gap: 6px; flex: none; }
   :global(html:not(.js)) .boton-filtrar { display: none; }
+  /* Con JavaScript no se pintan en la fila mientras el script los pasa a la ventana: así la página no salta al cargar */
+  :global(html.js) .filtros > .filtros-mas { display: none; }
   .n-filtros { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent-strong); color: #fff; font-size: .75rem; font-weight: 700; }
   .n-filtros[hidden] { display: none; }
   @media (max-width: 720px) {
@@ -426,29 +436,7 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
     .filtros .cuenta { grid-column: 1 / -1; margin: 2px 0 0; }
     .filtros .filtros-mas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; grid-column: 1 / -1; }
   }
-  /* Ventana de filtros: centrada en el ordenador; en el móvil, hoja que sube desde abajo */
-  .dlg-filtros { width: min(460px, calc(100vw - 32px)); padding: 0; max-height: min(85dvh, 680px); border: 1px solid var(--border); border-radius: 18px; background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgb(0 0 0 / .25); }
-  .dlg-filtros[open] { display: flex; flex-direction: column; animation: aparecer-f .18s ease-out; }
-  @keyframes aparecer-f { from { opacity: 0; transform: translateY(8px); } }
-  .df-cab::before { display: none; }
-  @media (max-width: 720px) {
-    .dlg-filtros { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: 90dvh; border-bottom: 0; border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgb(0 0 0 / .2); }
-    .dlg-filtros[open] { animation: subir .22s ease-out; }
-    .df-cab::before { display: block; }
-  }
-  .dlg-filtros::backdrop { background: rgb(20 22 28 / .55); }
-  @keyframes subir { from { transform: translateY(48px); opacity: .5; } }
-  .df-cab { position: relative; display: flex; align-items: center; gap: 12px; padding: 20px 8px 8px 16px; }
-  .df-cab::before { content: ''; position: absolute; top: 7px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: var(--border); }
-  .df-cab h2 { flex: 1; margin: 0; font-size: 1.15rem; }
-  .df-cerrar { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
-  .df-cuerpo:focus { outline: none; }
-  .df-cuerpo { overflow-y: auto; padding: 4px 16px 12px; }
-  .df-cuerpo .filtros-mas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
-  .df-cuerpo .sr-only { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; margin-top: 10px; font-size: .875rem; font-weight: 600; color: var(--muted); }
-  .df-cuerpo select { width: 100%; }
-  .df-pie { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }
-  :global(html.dlg-abierto), :global(html.dlg-abierto body) { overflow: hidden; }
+  /* La ventana de filtros (y sus estilos) está en components/HojaFiltros.astro */
   .vista-barra { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 4px 0 12px; }
   .cuenta { margin-left: auto; white-space: nowrap; }
   .cifras-congreso { margin: 0 0 14px; }
