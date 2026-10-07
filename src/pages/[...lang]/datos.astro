@@ -101,6 +101,7 @@ const pasoDe = (n: number) => f(t.pasoDe, { n, total: TOTAL_PASOS });
         </div>
         <p class="small muted nota-tabla" data-nota-tabla="votos" hidden>{t.nota_votos}</p>
         <p class="small muted nota-tabla" data-nota-tabla="inmuebles" hidden>{t.nota_inmuebles}</p>
+        <p class="small muted nota-tabla" data-nota-tabla="entidades" hidden>{t.nota_entidades}</p>
       </section>
 
       <!-- 2. Filtros -->
@@ -211,7 +212,7 @@ const pasoDe = (n: number) => f(t.pasoDe, { n, total: TOTAL_PASOS });
         <h3>{t.licenciaTitulo}</h3>
         <p set:html={f(t.licencia, { licencia })} />
         <p class="cita"><q>{LICENCIA_DATOS.cita}</q></p>
-        <p class="small muted">{t.fuentes}</p>
+        <p class="small muted">{t.fuentes} <a href={u('/metodologia#avisoLegal')}>{t.avisoLegal}</a></p>
       </div>
     </div>
   </section>

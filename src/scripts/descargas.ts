@@ -142,6 +142,8 @@ const nombreValor = (fi: string, v: string) =>
   : v === 'true' ? cfg.tx.verdadero : v === 'false' ? cfg.tx.falso
   : fi === 'genero' ? (v === 'F' ? cfg.tx.mujer : v === 'M' ? cfg.tx.hombre : v)
   : fi === 'titular' ? (cfg.tx[v] ?? v)
+  : fi === 'tipo_entidad' ? (cfg.tx[`tipo_${v}`] ?? v)
+  : fi === 'fuente' ? (cfg.tx[`fuente_${v}`] ?? v)
   : v;
 
 /** Valores posibles de un filtro: de los datos cargados, en un orden útil (grupos como en el hemiciclo, temas como en la web). */

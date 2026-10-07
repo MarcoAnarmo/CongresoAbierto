@@ -7,6 +7,7 @@ import { area } from '..';
  */
 const es = {
   "licenciaTitulo": "Licencia y cómo citar",
+  "avisoLegal": "Uso de los datos y aviso legal",
   "secciones": {"perfil": "Perfil", "dinero": "Sueldo, bienes y deudas", "votos": "Votos", "fuentes": "Avisos y enlaces"},
   "descripciones": {"votaciones": {"id": "Identificador de la votación (sesión y número)", "no_vota": "Diputados que no votaron"}, "votos-grupo": {"si": "Diputados del grupo que votaron sí", "no": "Diputados del grupo que votaron no", "abstencion": "Diputados del grupo que se abstuvieron", "no_vota": "Diputados del grupo que no votaron"}},
   "columnasDe": "{n} columnas",
@@ -67,6 +68,21 @@ const es = {
   "aplicar": "Ver {n}",
   "nota_votos": "Solo diputados de la composición actual. El grupo es el actual.",
   "nota_inmuebles": "Una fila por línea de la declaración (una línea puede declarar varias unidades).",
+  "nota_entidades": "Que una entidad aparezca no implica ninguna irregularidad: es lo que consta en los documentos oficiales.",
+  "tipo_empresa": "Empresa",
+  "tipo_publica": "Sector público",
+  "tipo_fundacion": "Fundación",
+  "tipo_asociacion": "Asociación u ONG",
+  "tipo_partido": "Partido político",
+  "tipo_sindicato": "Sindicato",
+  "tipo_educacion": "Educación e investigación",
+  "tipo_colegio": "Colegio profesional",
+  "tipo_otra": "Otra",
+  "fuente_compatibilidad": "Acuerdo del Congreso (BOCG)",
+  "fuente_registro": "Registro de Intereses",
+  "fuente_intereses": "Declaración de intereses económicos",
+  "fuente_bienes": "Declaración de bienes",
+  "fuente_ficha": "Ficha oficial",
   "tablas": {
     "diputados": {
       "nombre": "Diputados",
@@ -75,6 +91,10 @@ const es = {
     "inmuebles": {
       "nombre": "Inmuebles",
       "descripcion": "Una fila por inmueble declarado"
+    },
+    "entidades": {
+      "nombre": "Empresas y entidades",
+      "descripcion": "Una fila por cada documento oficial que nombra una empresa o entidad junto a un diputado"
     },
     "votaciones": {
       "nombre": "Votaciones",
@@ -96,6 +116,8 @@ const es = {
     "genero": "Sexo",
     "es_vivienda": "Vivienda",
     "titular": "Titular",
+    "tipo_entidad": "Tipo de entidad",
+    "fuente": "Documento",
     "fechas": "Fechas",
     "temas": "Tema",
     "resultado": "Resultado",
@@ -286,6 +308,30 @@ const es = {
       "nombre": "Declaración",
       "descripcion": "PDF oficial"
     },
+    "entidad": {
+      "nombre": "Entidad",
+      "descripcion": "Nombre de la empresa o entidad, como aparece en el documento (variantes agrupadas)"
+    },
+    "tipo_entidad": {
+      "nombre": "Tipo de entidad",
+      "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio u otra"
+    },
+    "relacion": {
+      "nombre": "Relación",
+      "descripcion": "Cargo o actividad que dice el documento, resumido de su texto"
+    },
+    "fuente": {
+      "nombre": "Documento",
+      "descripcion": "compatibilidad (BOCG), registro (Registro de Intereses), intereses (declaración de intereses económicos), bienes (declaración de bienes) o ficha (ficha oficial)"
+    },
+    "texto": {
+      "nombre": "Texto literal",
+      "descripcion": "Texto del documento oficial donde aparece"
+    },
+    "url_documento": {
+      "nombre": "Documento (enlace)",
+      "descripcion": "PDF o página oficial"
+    },
     "fecha": {
       "nombre": "Fecha",
       "descripcion": "AAAA-MM-DD"
@@ -348,6 +394,7 @@ const es = {
 export default area(es, {
   ca: {
     "licenciaTitulo": "Llicència i com citar",
+    "avisoLegal": "Ús de les dades i avís legal",
     "secciones": {"perfil": "Perfil", "dinero": "Sou, béns i deutes", "votos": "Vots", "fuentes": "Avisos i enllaços"},
     "descripciones": {"votaciones": {"id": "Identificador de la votació (sessió i número)", "no_vota": "Diputats que no van votar"}, "votos-grupo": {"si": "Diputats del grup que van votar sí", "no": "Diputats del grup que van votar no", "abstencion": "Diputats del grup que es van abstenir", "no_vota": "Diputats del grup que no van votar"}},
     "columnasDe": "{n} columnes",
@@ -408,6 +455,21 @@ export default area(es, {
     "aplicar": "Veure {n}",
     "nota_votos": "Només diputats de la composició actual. El grup és l’actual.",
     "nota_inmuebles": "Una fila per línia de la declaració (una línia pot declarar diverses unitats).",
+    "nota_entidades": "Que hi aparegui una entitat no implica cap irregularitat: és el que consta als documents oficials.",
+    "tipo_empresa": "Empresa",
+    "tipo_publica": "Sector públic",
+    "tipo_fundacion": "Fundació",
+    "tipo_asociacion": "Associació o ONG",
+    "tipo_partido": "Partit polític",
+    "tipo_sindicato": "Sindicat",
+    "tipo_educacion": "Educació i recerca",
+    "tipo_colegio": "Col·legi professional",
+    "tipo_otra": "Altra",
+    "fuente_compatibilidad": "Acord del Congrés (BOCG)",
+    "fuente_registro": "Registre d’Interessos",
+    "fuente_intereses": "Declaració d’interessos econòmics",
+    "fuente_bienes": "Declaració de béns",
+    "fuente_ficha": "Fitxa oficial",
     "tablas": {
       "diputados": {
         "nombre": "Diputats",
@@ -416,6 +478,10 @@ export default area(es, {
       "inmuebles": {
         "nombre": "Immobles",
         "descripcion": "Una fila per immoble declarat"
+      },
+      "entidades": {
+        "nombre": "Empreses i entitats",
+        "descripcion": "Una fila per cada document oficial que esmenta una empresa o entitat al costat d’un diputat"
       },
       "votaciones": {
         "nombre": "Votacions",
@@ -437,6 +503,8 @@ export default area(es, {
       "genero": "Sexe",
       "es_vivienda": "Habitatge",
       "titular": "Titular",
+      "tipo_entidad": "Tipus d’entitat",
+      "fuente": "Document",
       "fechas": "Dates",
       "temas": "Tema",
       "resultado": "Resultat",
@@ -627,6 +695,30 @@ export default area(es, {
         "nombre": "Declaració",
         "descripcion": "PDF oficial"
       },
+      "entidad": {
+        "nombre": "Entitat",
+        "descripcion": "Nom de l’empresa o entitat, tal com apareix al document (variants agrupades)"
+      },
+      "tipo_entidad": {
+        "nombre": "Tipus d’entitat",
+        "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio o otra"
+      },
+      "relacion": {
+        "nombre": "Relació",
+        "descripcion": "Càrrec o activitat que diu el document, resumit del seu text"
+      },
+      "fuente": {
+        "nombre": "Document",
+        "descripcion": "compatibilidad (BOCG), registro (Registre d’Interessos), intereses (declaració d’interessos econòmics), bienes (declaració de béns) o ficha (fitxa oficial)"
+      },
+      "texto": {
+        "nombre": "Text literal",
+        "descripcion": "Text del document oficial on apareix (en castellà)"
+      },
+      "url_documento": {
+        "nombre": "Document (enllaç)",
+        "descripcion": "PDF o pàgina oficial"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "AAAA-MM-DD"
@@ -687,6 +779,7 @@ export default area(es, {
   },
   eu: {
     "licenciaTitulo": "Lizentzia eta nola aipatu",
+    "avisoLegal": "Datuen erabilera eta lege-oharra",
     "secciones": {"perfil": "Profila", "dinero": "Soldata, ondasunak eta zorrak", "votos": "Botoak", "fuentes": "Oharrak eta estekak"},
     "descripciones": {"votaciones": {"id": "Bozketaren identifikatzailea (saioa eta zenbakia)", "no_vota": "Bozkatu ez zuten diputatuak"}, "votos-grupo": {"si": "Baiezkoa bozkatu zuten taldeko diputatuak", "no": "Ezezkoa bozkatu zuten taldeko diputatuak", "abstencion": "Abstenitu ziren taldeko diputatuak", "no_vota": "Bozkatu ez zuten taldeko diputatuak"}},
     "columnasDe": "{n} zutabe",
@@ -747,6 +840,21 @@ export default area(es, {
     "aplicar": "Ikusi {n}",
     "nota_votos": "Egungo osaerako diputatuak soilik. Taldea egungoa da.",
     "nota_inmuebles": "Errenkada bat aitorpeneko lerro bakoitzeko (lerro batek hainbat unitate izan ditzake).",
+    "nota_entidades": "Erakunde bat agertzeak ez du esan nahi irregulartasunik dagoenik: dokumentu ofizialetan jasotakoa da.",
+    "tipo_empresa": "Enpresa",
+    "tipo_publica": "Sektore publikoa",
+    "tipo_fundacion": "Fundazioa",
+    "tipo_asociacion": "Elkartea edo GKE",
+    "tipo_partido": "Alderdi politikoa",
+    "tipo_sindicato": "Sindikatua",
+    "tipo_educacion": "Hezkuntza eta ikerketa",
+    "tipo_colegio": "Elkargo profesionala",
+    "tipo_otra": "Bestelakoa",
+    "fuente_compatibilidad": "Kongresuaren erabakia (BOCG)",
+    "fuente_registro": "Interesen Erregistroa",
+    "fuente_intereses": "Interes ekonomikoen adierazpena",
+    "fuente_bienes": "Ondasunen adierazpena",
+    "fuente_ficha": "Fitxa ofiziala",
     "tablas": {
       "diputados": {
         "nombre": "Diputatuak",
@@ -755,6 +863,10 @@ export default area(es, {
       "inmuebles": {
         "nombre": "Higiezinak",
         "descripcion": "Errenkada bat aitortutako higiezin bakoitzeko"
+      },
+      "entidades": {
+        "nombre": "Enpresak eta erakundeak",
+        "descripcion": "Errenkada bat diputatu batekin batera enpresa edo erakunde bat aipatzen duen dokumentu ofizial bakoitzeko"
       },
       "votaciones": {
         "nombre": "Bozketak",
@@ -776,6 +888,8 @@ export default area(es, {
       "genero": "Sexua",
       "es_vivienda": "Etxebizitza",
       "titular": "Titularra",
+      "tipo_entidad": "Erakunde mota",
+      "fuente": "Dokumentua",
       "fechas": "Datak",
       "temas": "Gaia",
       "resultado": "Emaitza",
@@ -966,6 +1080,30 @@ export default area(es, {
         "nombre": "Aitorpena",
         "descripcion": "PDF ofiziala"
       },
+      "entidad": {
+        "nombre": "Erakundea",
+        "descripcion": "Enpresaren edo erakundearen izena, dokumentuan agertzen den bezala (aldaerak elkartuta)"
+      },
+      "tipo_entidad": {
+        "nombre": "Erakunde mota",
+        "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio edo otra"
+      },
+      "relacion": {
+        "nombre": "Harremana",
+        "descripcion": "Dokumentuak dioen kargua edo jarduera, bere testutik laburtua"
+      },
+      "fuente": {
+        "nombre": "Dokumentua",
+        "descripcion": "compatibilidad (BOCG), registro (Interesen Erregistroa), intereses (interes ekonomikoen adierazpena), bienes (ondasunen adierazpena) edo ficha (fitxa ofiziala)"
+      },
+      "texto": {
+        "nombre": "Testu literala",
+        "descripcion": "Agertzen den dokumentu ofizialaren testua (gaztelaniaz)"
+      },
+      "url_documento": {
+        "nombre": "Dokumentua (esteka)",
+        "descripcion": "PDF edo orri ofiziala"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "UUUU-HH-EE"
@@ -1026,6 +1164,7 @@ export default area(es, {
   },
   gl: {
     "licenciaTitulo": "Licenza e como citar",
+    "avisoLegal": "Uso dos datos e aviso legal",
     "secciones": {"perfil": "Perfil", "dinero": "Soldo, bens e débedas", "votos": "Votos", "fuentes": "Avisos e ligazóns"},
     "descripciones": {"votaciones": {"id": "Identificador da votación (sesión e número)", "no_vota": "Deputados que non votaron"}, "votos-grupo": {"si": "Deputados do grupo que votaron si", "no": "Deputados do grupo que votaron non", "abstencion": "Deputados do grupo que se abstiveron", "no_vota": "Deputados do grupo que non votaron"}},
     "columnasDe": "{n} columnas",
@@ -1086,6 +1225,21 @@ export default area(es, {
     "aplicar": "Ver {n}",
     "nota_votos": "Só deputados da composición actual. O grupo é o actual.",
     "nota_inmuebles": "Unha fila por liña da declaración (unha liña pode declarar varias unidades).",
+    "nota_entidades": "Que apareza unha entidade non implica ningunha irregularidade: é o que consta nos documentos oficiais.",
+    "tipo_empresa": "Empresa",
+    "tipo_publica": "Sector público",
+    "tipo_fundacion": "Fundación",
+    "tipo_asociacion": "Asociación ou ONG",
+    "tipo_partido": "Partido político",
+    "tipo_sindicato": "Sindicato",
+    "tipo_educacion": "Educación e investigación",
+    "tipo_colegio": "Colexio profesional",
+    "tipo_otra": "Outra",
+    "fuente_compatibilidad": "Acordo do Congreso (BOCG)",
+    "fuente_registro": "Rexistro de Intereses",
+    "fuente_intereses": "Declaración de intereses económicos",
+    "fuente_bienes": "Declaración de bens",
+    "fuente_ficha": "Ficha oficial",
     "tablas": {
       "diputados": {
         "nombre": "Deputados",
@@ -1094,6 +1248,10 @@ export default area(es, {
       "inmuebles": {
         "nombre": "Inmobles",
         "descripcion": "Unha fila por inmoble declarado"
+      },
+      "entidades": {
+        "nombre": "Empresas e entidades",
+        "descripcion": "Unha fila por cada documento oficial que nomea unha empresa ou entidade xunto a un deputado"
       },
       "votaciones": {
         "nombre": "Votacións",
@@ -1115,6 +1273,8 @@ export default area(es, {
       "genero": "Sexo",
       "es_vivienda": "Vivenda",
       "titular": "Titular",
+      "tipo_entidad": "Tipo de entidade",
+      "fuente": "Documento",
       "fechas": "Datas",
       "temas": "Tema",
       "resultado": "Resultado",
@@ -1305,6 +1465,30 @@ export default area(es, {
         "nombre": "Declaración",
         "descripcion": "PDF oficial"
       },
+      "entidad": {
+        "nombre": "Entidade",
+        "descripcion": "Nome da empresa ou entidade, tal como aparece no documento (variantes agrupadas)"
+      },
+      "tipo_entidad": {
+        "nombre": "Tipo de entidade",
+        "descripcion": "empresa, publica, fundacion, asociacion, partido, sindicato, educacion, colegio ou otra"
+      },
+      "relacion": {
+        "nombre": "Relación",
+        "descripcion": "Cargo ou actividade que di o documento, resumido do seu texto"
+      },
+      "fuente": {
+        "nombre": "Documento",
+        "descripcion": "compatibilidad (BOCG), registro (Rexistro de Intereses), intereses (declaración de intereses económicos), bienes (declaración de bens) ou ficha (ficha oficial)"
+      },
+      "texto": {
+        "nombre": "Texto literal",
+        "descripcion": "Texto do documento oficial onde aparece (en castelán)"
+      },
+      "url_documento": {
+        "nombre": "Documento (ligazón)",
+        "descripcion": "PDF ou páxina oficial"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "AAAA-MM-DD"
@@ -1365,6 +1549,7 @@ export default area(es, {
   },
   en: {
     "licenciaTitulo": "Licence and how to cite",
+    "avisoLegal": "Use of the data and legal notice",
     "secciones": {"perfil": "Profile", "dinero": "Pay, assets and debts", "votos": "Votes", "fuentes": "Warnings and links"},
     "descripciones": {"votaciones": {"id": "Vote identifier (sitting and number)", "no_vota": "MPs who did not vote"}, "votos-grupo": {"si": "MPs in the group who voted yes", "no": "MPs in the group who voted no", "abstencion": "MPs in the group who abstained", "no_vota": "MPs in the group who did not vote"}},
     "columnasDe": "{n} columns",
@@ -1425,6 +1610,21 @@ export default area(es, {
     "aplicar": "Show {n}",
     "nota_votos": "Current members only. The group is their current one.",
     "nota_inmuebles": "One row per line of the declaration (a line may declare several units).",
+    "nota_entidades": "An organisation appearing here does not imply any wrongdoing: it is what the official documents state.",
+    "tipo_empresa": "Company",
+    "tipo_publica": "Public sector",
+    "tipo_fundacion": "Foundation",
+    "tipo_asociacion": "Association or NGO",
+    "tipo_partido": "Political party",
+    "tipo_sindicato": "Trade union",
+    "tipo_educacion": "Education and research",
+    "tipo_colegio": "Professional association",
+    "tipo_otra": "Other",
+    "fuente_compatibilidad": "Congress decision (BOCG)",
+    "fuente_registro": "Register of Interests",
+    "fuente_intereses": "Economic interests declaration",
+    "fuente_bienes": "Assets declaration",
+    "fuente_ficha": "Official profile",
     "tablas": {
       "diputados": {
         "nombre": "Deputies",
@@ -1433,6 +1633,10 @@ export default area(es, {
       "inmuebles": {
         "nombre": "Properties",
         "descripcion": "One row per declared property"
+      },
+      "entidades": {
+        "nombre": "Companies and organisations",
+        "descripcion": "One row per official document that names a company or organisation together with a member"
       },
       "votaciones": {
         "nombre": "Votes",
@@ -1454,6 +1658,8 @@ export default area(es, {
       "genero": "Sex",
       "es_vivienda": "Home",
       "titular": "Holder",
+      "tipo_entidad": "Type of organisation",
+      "fuente": "Document",
       "fechas": "Dates",
       "temas": "Topic",
       "resultado": "Result",
@@ -1643,6 +1849,30 @@ export default area(es, {
       "url_declaracion": {
         "nombre": "Declaration",
         "descripcion": "Official PDF"
+      },
+      "entidad": {
+        "nombre": "Organisation",
+        "descripcion": "Name of the company or organisation as it appears in the document (variants grouped)"
+      },
+      "tipo_entidad": {
+        "nombre": "Type of organisation",
+        "descripcion": "empresa (company), publica (public sector), fundacion, asociacion, partido, sindicato, educacion, colegio or otra"
+      },
+      "relacion": {
+        "nombre": "Relationship",
+        "descripcion": "Position or activity stated in the document, summarised from its text"
+      },
+      "fuente": {
+        "nombre": "Document",
+        "descripcion": "compatibilidad (BOCG), registro (Register of Interests), intereses (economic interests), bienes (assets) or ficha (official profile)"
+      },
+      "texto": {
+        "nombre": "Original text",
+        "descripcion": "Text of the official document where it appears (in Spanish)"
+      },
+      "url_documento": {
+        "nombre": "Document (link)",
+        "descripcion": "Official PDF or page"
       },
       "fecha": {
         "nombre": "Date",
