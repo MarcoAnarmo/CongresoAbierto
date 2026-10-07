@@ -1,3 +1,6 @@
+# Cabeceras de Cloudflare Pages. HSTS se configura en el panel de Cloudflare (SSL/TLS → Edge Certificates), no aquí.
+
+# JS, CSS y fuentes de Astro: el nombre lleva un hash, así que no cambian nunca
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
@@ -5,20 +8,16 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
 
-/og/*
-  Cache-Control: public, max-age=86400
-
-# Imágenes de las tarjetas y sus miniaturas (no la página /tarjetas/): cambian solo cuando se actualizan los datos
-/tarjetas/historia/*
-  Cache-Control: public, max-age=86400
-/tarjetas/horizontal/*
-  Cache-Control: public, max-age=86400
-/tarjetas/mini/*
-  Cache-Control: public, max-age=86400
-/:lang/tarjetas/historia/*
-  Cache-Control: public, max-age=86400
-/:lang/tarjetas/horizontal/*
-  Cache-Control: public, max-age=86400
-/:lang/tarjetas/mini/*
-  Cache-Control: public, max-age=86400
+# Tarjetas para compartir: la URL no cambia entre builds, así que caché corta y se refresca en segundo plano
+/tarjetas/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+/ca/tarjetas/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+/eu/tarjetas/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+/gl/tarjetas/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+/en/tarjetas/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400

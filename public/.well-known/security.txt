@@ -1,0 +1,8 @@
+# Cómo avisar de un problema de seguridad o de un dato personal que no debería publicarse.
+# Renovar «Expires» antes de que caduque (como mucho, un año vista).
+Contact: mailto:ayuda@congresoabierto.org
+Contact: https://github.com/MarcoAnarmo/CongresoAbierto/security/advisories/new
+Expires: 2027-10-06T00:00:00.000Z
+Preferred-Languages: es, ca, eu, gl, en
+Canonical: https://congresoabierto.org/.well-known/security.txt
+Policy: https://github.com/MarcoAnarmo/CongresoAbierto/blob/main/SECURITY.md
