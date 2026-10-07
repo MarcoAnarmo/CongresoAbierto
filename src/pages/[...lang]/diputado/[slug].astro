@@ -102,6 +102,8 @@ const nTrab = inter?.trabajos.length ?? 0;
 const vin = d.vinculos;
 const nEnt = vin?.entidades.length ?? 0;
 const nEmpresas = vin?.porTipo.empresa ?? 0;
+const bor = vin?.borme ?? [];
+const anio = (x: string) => x.slice(0, 4);
 const tiposVin = TIPOS_ENTIDAD.filter((k) => vin?.porTipo[k]).map((k) => ({ k, ents: vin!.entidades.filter((e) => e.tipo === k) }));
 // Sus votos en todas las votaciones del Pleno
 const pa = d.participacion;
@@ -135,6 +137,10 @@ const teselas: Tesela[] = [
     grupo: t.grupos.vinculos, id: 'entidades', icono: 'entidades', titulo: t.tes.entidades, corto: t.tes.entidadesCorto,
     valor: String(nEnt), sub: nEnt ? t.tes.entidadesSub[nEnt === 1 ? 0 : 1] + (nEmpresas ? ' · ' : '') : t.tes.sinEntidades,
     acento: nEmpresas ? pl(nEmpresas, t.tes.empresas, lang) : undefined,
+  },
+  {
+    id: 'borme', icono: 'registro', titulo: t.tes.borme, corto: t.tes.bormeCorto,
+    valor: String(bor.length), sub: bor.length ? t.tes.bormeSub[bor.length === 1 ? 0 : 1] : t.tes.sinBorme,
   },
   ...(pa ? [{
     grupo: t.grupos.congreso, id: 'participacion', icono: 'votaciones' as const, titulo: t.tes.participacion, corto: t.tes.participacionCorto,
@@ -461,6 +467,32 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
     </div>
   </section>
 
+  <section class="seccion" id="borme" aria-labelledby="h-borme">
+    <h2 id="h-borme"><span class="s-ico"><Icono n="registro" /></span>{t.bor.titulo}</h2>
+    <div class="s-cuerpo">
+      <p class="small muted">{g(t.bor.intro)}</p>
+      {bor.length === 0 ? <p>{t.bor.ninguna}</p> : (
+        <ul class="entidades">{bor.map((e) => (
+          <li>
+            <details class="ent">
+              <summary>
+                <span class="ent-nombre">{e.nombre}</span>
+                <span class="ent-rol">{[[...new Set(e.actos.map((a) => a.cargo).filter(Boolean))].slice(0, 2).join(', '), anio(e.desde) === anio(e.hasta) ? anio(e.desde) : f(t.bor.periodo, { desde: anio(e.desde), hasta: anio(e.hasta) })].filter(Boolean).join(' · ')}</span>
+              </summary>
+              <div class="ent-apar">
+                <p class="small bor-conf"><Icono n="hecho" tam={16} /><span>{f(t.bor.confirmacion[e.confirmacion], { motivo: e.motivo })}</span></p>
+                <ul class="bor-actos">{e.actos.map((a) => (
+                  <li><a href={a.url} rel="noopener"><span class="bor-fecha">{fmtFecha(a.fecha)}</span><span lang="es">{[a.acto, a.cargo].filter(Boolean).join(' · ')}</span><span class="muted small">{f(t.bor.registro, { p: a.provincia })} ↗</span></a></li>
+                ))}</ul>
+              </div>
+            </details>
+          </li>
+        ))}</ul>
+      )}
+      <p class="fuente"><Icono n="info" tam={16} /><span>{t.bor.fuente}<a href={u('/metodologia#borme')}>{t.comun.comoSeObtiene}</a> · {t.ent.avisar}<a href={enlaceError(d.nombreCompleto)} rel="noopener">{t.cab.avisarError}</a></span></p>
+    </div>
+  </section>
+
   {pa && (
     <section class="seccion" id="participacion" aria-labelledby="h-participacion">
       <h2 id="h-participacion"><span class="s-ico"><Icono n="votaciones" /></span>{t.part.titulo}</h2>
@@ -770,6 +802,12 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   .ent-apar { list-style: none; margin: 0; padding: 0 16px 12px; display: grid; gap: 10px; }
   .ent-doc { font-size: .88rem; font-weight: 600; }
   .ent-lit { margin: 4px 0 0; padding: 6px 10px; border-left: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); font-size: .88rem; line-height: 1.5; color: var(--text); background: var(--bg); border-radius: 0 6px 6px 0; overflow-wrap: anywhere; }
+  .bor-conf { display: flex; gap: 6px; align-items: flex-start; margin: 0 0 8px; color: var(--muted); }
+  .bor-conf :global(.icono) { flex: none; margin-top: 2px; color: var(--accent-text); }
+  .bor-actos { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .bor-actos a { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; padding: 6px 10px; min-height: 40px; border-radius: 8px; background: var(--bg); text-decoration: none; font-size: .9rem; }
+  .bor-actos a:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+  .bor-fecha { font-weight: 600; font-variant-numeric: tabular-nums; }
   .lista-docs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
   .lista-docs a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); text-decoration: none; }
   .lista-docs a:hover { border-color: var(--accent); }
