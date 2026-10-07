@@ -1,4 +1,5 @@
 ---
+import Icono from './Icono.astro';
 import { diputados, votaciones, votacionesPleno, TEMAS, temasDe, grupos, colorGrupo, url, slug, etiquetaPartido } from '../lib/data';
 import { disponerPorGrupos } from '../lib/hemiciclo';
 import { idiomaDeUrl, enlace, formatos, f } from '../i18n';
@@ -63,9 +64,9 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
   <h2 id="hemi-h" class="sr-only">{c.nav.hemiciclo}</h2>
   <div class="controles">
     <div class="modos segmentado" role="group" aria-label={t.modosAria}>
-      <button class="btn" data-modo="grupo" aria-pressed="false"><span class="emoji" aria-hidden="true">🏛️</span>{t.modos.grupo}</button>
-      <button class="btn" data-modo="propiedades" aria-pressed="false"><span class="emoji" aria-hidden="true">🏢</span>{t.modos.propiedades}</button>
-      <button class="btn" data-modo="viviendas" aria-pressed="false"><span class="emoji" aria-hidden="true">🏠</span>{t.modos.viviendas}</button>
+      <button class="btn" data-modo="grupo" aria-pressed="false"><Icono n="hemiciclo" tam={18} />{t.modos.grupo}</button>
+      <button class="btn" data-modo="propiedades" aria-pressed="false"><Icono n="propiedades" tam={18} />{t.modos.propiedades}</button>
+      <button class="btn" data-modo="viviendas" aria-pressed="false"><Icono n="vivienda" tam={18} />{t.modos.viviendas}</button>
     </div>
     {votaciones.length > 0 && (
       <div class="selector">
@@ -373,9 +374,9 @@ const colores = Object.fromEntries(grupos.map((g) => [g.corto, g.color]));
     .selector select { min-width: 0; }
   }
   @media (max-width: 360px) { .modos .btn { padding: 8px 2px; font-size: .92rem; } }
-  /* Emoji delante de cada modo de la portada */
-  .modos .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-  .modos .emoji { font-size: 1.05em; line-height: 1; }
+  /* Icono delante de cada modo de la portada (los mismos que en el resto de la web) */
+  .modos .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+  .modos .btn :global(svg) { flex: none; }
   .desc { min-height: 3.2em; margin: .7rem 0 .2rem; }
   .desc :global(.texto) { color: var(--text); }
   .lienzo { position: relative; margin: 0 -8px; }
