@@ -75,13 +75,14 @@ button, select, input { font: inherit; color: inherit; }
 .btn.primario:hover { background: #9a3412; border-color: #9a3412; color: #fff; }
 /*
  * Control segmentado: el mismo en toda la web (modos del hemiciclo y del mapa, vistas de Diputados y Votaciones,
- * pestañas de Estadísticas y Tarjetas…). Cápsula blanca con borde y la opción elegida en oscuro.
+ * pestañas de Estadísticas y Tarjetas…). Cápsula blanca con borde, la opción elegida en el naranja de la web y,
+ * al pasar por encima, un naranja muy claro.
  * La elegida se marca con aria-pressed (botones), aria-selected (pestañas) o aria-current (enlaces).
  */
 .segmentado { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; box-shadow: 0 1px 2px rgb(0 0 0 / .04); }
 .segmentado .btn { border: 0; background: transparent; color: var(--muted); min-height: 40px; padding: 6px 16px; border-radius: 999px; font-weight: 600; text-decoration: none; }
-.segmentado .btn:hover { color: var(--text); background: var(--chip); border-color: transparent; }
-.segmentado .btn[aria-pressed='true'], .segmentado .btn[aria-selected='true'], .segmentado .btn[aria-current='page'] { background: var(--text); color: var(--surface); box-shadow: none; }
+.segmentado .btn:hover { color: var(--accent-text); background: var(--accent-soft); border-color: transparent; }
+.segmentado .btn[aria-pressed='true'], .segmentado .btn[aria-selected='true'], .segmentado .btn[aria-current='page'] { background: var(--accent-strong); color: #fff; box-shadow: 0 2px 8px -2px color-mix(in srgb, var(--accent-strong) 55%, transparent); }
 /* En el móvil los segmentados suelen ocupar todo el ancho, con el icono encima: esquinas menos redondas */
 @media (max-width: 720px) { .segmentado { border-radius: 18px; } .segmentado .btn { border-radius: 14px; } }
 /*
