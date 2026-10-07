@@ -69,6 +69,10 @@ const es = {
   "nota_votos": "Solo diputados de la composición actual. El grupo es el actual.",
   "nota_inmuebles": "Una fila por línea de la declaración (una línea puede declarar varias unidades).",
   "nota_entidades": "Que una entidad aparezca no implica ninguna irregularidad: es lo que consta en los documentos oficiales.",
+  "nota_borme": "Solo actos confirmados por otro documento oficial. El BORME no publica el DNI: las coincidencias de nombre sin confirmar no se incluyen.",
+  "conf_declarada": "En sus documentos",
+  "conf_cargo-publico": "Empresa pública de su cargo",
+  "conf_apellido": "Lleva su nombre",
   "tipo_empresa": "Empresa",
   "tipo_publica": "Sector público",
   "tipo_fundacion": "Fundación",
@@ -96,6 +100,10 @@ const es = {
       "nombre": "Empresas y entidades",
       "descripcion": "Una fila por cada documento oficial que nombra una empresa o entidad junto a un diputado"
     },
+    "borme": {
+      "nombre": "Cargos en el BORME",
+      "descripcion": "Una fila por cada acto del Registro Mercantil (nombramiento, cese…) a nombre de un diputado, confirmado por otro documento oficial"
+    },
     "votaciones": {
       "nombre": "Votaciones",
       "descripcion": "Una fila por votación del Pleno, con el resultado"
@@ -118,6 +126,7 @@ const es = {
     "titular": "Titular",
     "tipo_entidad": "Tipo de entidad",
     "fuente": "Documento",
+    "confirmacion": "Cómo se confirma",
     "fechas": "Fechas",
     "temas": "Tema",
     "resultado": "Resultado",
@@ -332,6 +341,34 @@ const es = {
       "nombre": "Documento (enlace)",
       "descripcion": "PDF o página oficial"
     },
+    "empresa": {
+      "nombre": "Sociedad",
+      "descripcion": "Nombre de la sociedad tal como lo publica el BORME"
+    },
+    "confirmacion": {
+      "nombre": "Cómo se confirma",
+      "descripcion": "declarada (la empresa está en sus documentos), cargo-publico (empresa pública de una administración en la que declara un cargo) o apellido (la sociedad lleva su nombre)"
+    },
+    "motivo": {
+      "nombre": "Documento que lo confirma",
+      "descripcion": "Entidad de sus documentos oficiales que confirma que es la misma persona"
+    },
+    "acto": {
+      "nombre": "Acto",
+      "descripcion": "Nombramientos, Ceses/Dimisiones, Revocaciones… tal como lo escribe el BORME"
+    },
+    "cargo": {
+      "nombre": "Cargo",
+      "descripcion": "Cargo con las abreviaturas del BORME"
+    },
+    "registro": {
+      "nombre": "Registro Mercantil",
+      "descripcion": "Provincia del registro donde se inscribe"
+    },
+    "url_borme": {
+      "nombre": "BORME (enlace)",
+      "descripcion": "Anuncio oficial en boe.es"
+    },
     "fecha": {
       "nombre": "Fecha",
       "descripcion": "AAAA-MM-DD"
@@ -456,6 +493,10 @@ export default area(es, {
     "nota_votos": "Només diputats de la composició actual. El grup és l’actual.",
     "nota_inmuebles": "Una fila per línia de la declaració (una línia pot declarar diverses unitats).",
     "nota_entidades": "Que hi aparegui una entitat no implica cap irregularitat: és el que consta als documents oficials.",
+    "nota_borme": "Només actes confirmats per un altre document oficial. El BORME no publica el DNI: les coincidències de nom sense confirmar no s’hi inclouen.",
+    "conf_declarada": "Als seus documents",
+    "conf_cargo-publico": "Empresa pública del seu càrrec",
+    "conf_apellido": "Porta el seu nom",
     "tipo_empresa": "Empresa",
     "tipo_publica": "Sector públic",
     "tipo_fundacion": "Fundació",
@@ -483,6 +524,10 @@ export default area(es, {
         "nombre": "Empreses i entitats",
         "descripcion": "Una fila per cada document oficial que esmenta una empresa o entitat al costat d’un diputat"
       },
+      "borme": {
+        "nombre": "Càrrecs al BORME",
+        "descripcion": "Una fila per cada acte del Registre Mercantil (nomenament, cessament…) a nom d’un diputat, confirmat per un altre document oficial"
+      },
       "votaciones": {
         "nombre": "Votacions",
         "descripcion": "Una fila per votació del Ple, amb el resultat"
@@ -505,6 +550,7 @@ export default area(es, {
       "titular": "Titular",
       "tipo_entidad": "Tipus d’entitat",
       "fuente": "Document",
+      "confirmacion": "Com es confirma",
       "fechas": "Dates",
       "temas": "Tema",
       "resultado": "Resultat",
@@ -719,6 +765,34 @@ export default area(es, {
         "nombre": "Document (enllaç)",
         "descripcion": "PDF o pàgina oficial"
       },
+      "empresa": {
+        "nombre": "Societat",
+        "descripcion": "Nom de la societat tal com el publica el BORME"
+      },
+      "confirmacion": {
+        "nombre": "Com es confirma",
+        "descripcion": "declarada (l’empresa és als seus documents), cargo-publico (empresa pública d’una administració en què declara un càrrec) o apellido (la societat porta el seu nom)"
+      },
+      "motivo": {
+        "nombre": "Document que ho confirma",
+        "descripcion": "Entitat dels seus documents oficials que confirma que és la mateixa persona"
+      },
+      "acto": {
+        "nombre": "Acte",
+        "descripcion": "Nomenaments, cessaments, revocacions… tal com ho escriu el BORME (en castellà)"
+      },
+      "cargo": {
+        "nombre": "Càrrec",
+        "descripcion": "Càrrec amb les abreviatures del BORME"
+      },
+      "registro": {
+        "nombre": "Registre Mercantil",
+        "descripcion": "Província del registre on s’inscriu"
+      },
+      "url_borme": {
+        "nombre": "BORME (enllaç)",
+        "descripcion": "Anunci oficial a boe.es"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "AAAA-MM-DD"
@@ -841,6 +915,10 @@ export default area(es, {
     "nota_votos": "Egungo osaerako diputatuak soilik. Taldea egungoa da.",
     "nota_inmuebles": "Errenkada bat aitorpeneko lerro bakoitzeko (lerro batek hainbat unitate izan ditzake).",
     "nota_entidades": "Erakunde bat agertzeak ez du esan nahi irregulartasunik dagoenik: dokumentu ofizialetan jasotakoa da.",
+    "nota_borme": "Beste dokumentu ofizial batek baieztatutako egintzak bakarrik. BORMEk ez du NANa argitaratzen: baieztatu gabeko izen-kointzidentziak ez dira sartzen.",
+    "conf_declarada": "Bere dokumentuetan",
+    "conf_cargo-publico": "Bere karguaren enpresa publikoa",
+    "conf_apellido": "Bere izena darama",
     "tipo_empresa": "Enpresa",
     "tipo_publica": "Sektore publikoa",
     "tipo_fundacion": "Fundazioa",
@@ -868,6 +946,10 @@ export default area(es, {
         "nombre": "Enpresak eta erakundeak",
         "descripcion": "Errenkada bat diputatu batekin batera enpresa edo erakunde bat aipatzen duen dokumentu ofizial bakoitzeko"
       },
+      "borme": {
+        "nombre": "Karguak BORMEn",
+        "descripcion": "Errenkada bat diputatu baten izenean dagoen Merkataritza Erregistroko egintza bakoitzeko (izendapena, kargu-uztea…), beste dokumentu ofizial batek baieztatua"
+      },
       "votaciones": {
         "nombre": "Bozketak",
         "descripcion": "Errenkada bat Osoko Bilkurako bozketa bakoitzeko, emaitzarekin"
@@ -890,6 +972,7 @@ export default area(es, {
       "titular": "Titularra",
       "tipo_entidad": "Erakunde mota",
       "fuente": "Dokumentua",
+      "confirmacion": "Nola baieztatzen den",
       "fechas": "Datak",
       "temas": "Gaia",
       "resultado": "Emaitza",
@@ -1104,6 +1187,34 @@ export default area(es, {
         "nombre": "Dokumentua (esteka)",
         "descripcion": "PDF edo orri ofiziala"
       },
+      "empresa": {
+        "nombre": "Sozietatea",
+        "descripcion": "Sozietatearen izena, BORMEk argitaratzen duen bezala"
+      },
+      "confirmacion": {
+        "nombre": "Nola baieztatzen den",
+        "descripcion": "declarada (enpresa bere dokumentuetan dago), cargo-publico (kargu bat adierazten duen administrazio baten enpresa publikoa) edo apellido (sozietateak bere izena darama)"
+      },
+      "motivo": {
+        "nombre": "Baieztatzen duen dokumentua",
+        "descripcion": "Pertsona bera dela baieztatzen duen bere dokumentu ofizialetako erakundea"
+      },
+      "acto": {
+        "nombre": "Egintza",
+        "descripcion": "Izendapenak, kargu-uzteak, ezeztapenak… BORMEk idazten duen bezala (gaztelaniaz)"
+      },
+      "cargo": {
+        "nombre": "Kargua",
+        "descripcion": "Kargua, BORMEren laburdurekin"
+      },
+      "registro": {
+        "nombre": "Merkataritza Erregistroa",
+        "descripcion": "Inskribatzen den erregistroaren probintzia"
+      },
+      "url_borme": {
+        "nombre": "BORME (esteka)",
+        "descripcion": "Iragarki ofiziala boe.es-en"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "UUUU-HH-EE"
@@ -1226,6 +1337,10 @@ export default area(es, {
     "nota_votos": "Só deputados da composición actual. O grupo é o actual.",
     "nota_inmuebles": "Unha fila por liña da declaración (unha liña pode declarar varias unidades).",
     "nota_entidades": "Que apareza unha entidade non implica ningunha irregularidade: é o que consta nos documentos oficiais.",
+    "nota_borme": "Só actos confirmados por outro documento oficial. O BORME non publica o DNI: as coincidencias de nome sen confirmar non se inclúen.",
+    "conf_declarada": "Nos seus documentos",
+    "conf_cargo-publico": "Empresa pública do seu cargo",
+    "conf_apellido": "Leva o seu nome",
     "tipo_empresa": "Empresa",
     "tipo_publica": "Sector público",
     "tipo_fundacion": "Fundación",
@@ -1253,6 +1368,10 @@ export default area(es, {
         "nombre": "Empresas e entidades",
         "descripcion": "Unha fila por cada documento oficial que nomea unha empresa ou entidade xunto a un deputado"
       },
+      "borme": {
+        "nombre": "Cargos no BORME",
+        "descripcion": "Unha fila por cada acto do Rexistro Mercantil (nomeamento, cesamento…) en nome dun deputado, confirmado por outro documento oficial"
+      },
       "votaciones": {
         "nombre": "Votacións",
         "descripcion": "Unha fila por votación do Pleno, co resultado"
@@ -1275,6 +1394,7 @@ export default area(es, {
       "titular": "Titular",
       "tipo_entidad": "Tipo de entidade",
       "fuente": "Documento",
+      "confirmacion": "Como se confirma",
       "fechas": "Datas",
       "temas": "Tema",
       "resultado": "Resultado",
@@ -1489,6 +1609,34 @@ export default area(es, {
         "nombre": "Documento (ligazón)",
         "descripcion": "PDF ou páxina oficial"
       },
+      "empresa": {
+        "nombre": "Sociedade",
+        "descripcion": "Nome da sociedade tal como o publica o BORME"
+      },
+      "confirmacion": {
+        "nombre": "Como se confirma",
+        "descripcion": "declarada (a empresa está nos seus documentos), cargo-publico (empresa pública dunha administración na que declara un cargo) ou apellido (a sociedade leva o seu nome)"
+      },
+      "motivo": {
+        "nombre": "Documento que o confirma",
+        "descripcion": "Entidade dos seus documentos oficiais que confirma que é a mesma persoa"
+      },
+      "acto": {
+        "nombre": "Acto",
+        "descripcion": "Nomeamentos, cesamentos, revogacións… tal como o escribe o BORME (en castelán)"
+      },
+      "cargo": {
+        "nombre": "Cargo",
+        "descripcion": "Cargo coas abreviaturas do BORME"
+      },
+      "registro": {
+        "nombre": "Rexistro Mercantil",
+        "descripcion": "Provincia do rexistro onde se inscribe"
+      },
+      "url_borme": {
+        "nombre": "BORME (ligazón)",
+        "descripcion": "Anuncio oficial en boe.es"
+      },
       "fecha": {
         "nombre": "Data",
         "descripcion": "AAAA-MM-DD"
@@ -1611,6 +1759,10 @@ export default area(es, {
     "nota_votos": "Current members only. The group is their current one.",
     "nota_inmuebles": "One row per line of the declaration (a line may declare several units).",
     "nota_entidades": "An organisation appearing here does not imply any wrongdoing: it is what the official documents state.",
+    "nota_borme": "Only acts confirmed by another official document. The BORME does not publish ID numbers: unconfirmed name matches are not included.",
+    "conf_declarada": "In their documents",
+    "conf_cargo-publico": "Public company of their position",
+    "conf_apellido": "Bears their name",
     "tipo_empresa": "Company",
     "tipo_publica": "Public sector",
     "tipo_fundacion": "Foundation",
@@ -1638,6 +1790,10 @@ export default area(es, {
         "nombre": "Companies and organisations",
         "descripcion": "One row per official document that names a company or organisation together with a member"
       },
+      "borme": {
+        "nombre": "BORME positions",
+        "descripcion": "One row per Companies Register act (appointment, resignation…) under a member’s name, confirmed by another official document"
+      },
       "votaciones": {
         "nombre": "Votes",
         "descripcion": "One row per plenary vote, with its result"
@@ -1660,6 +1816,7 @@ export default area(es, {
       "titular": "Holder",
       "tipo_entidad": "Type of organisation",
       "fuente": "Document",
+      "confirmacion": "How it is confirmed",
       "fechas": "Dates",
       "temas": "Topic",
       "resultado": "Result",
@@ -1873,6 +2030,34 @@ export default area(es, {
       "url_documento": {
         "nombre": "Document (link)",
         "descripcion": "Official PDF or page"
+      },
+      "empresa": {
+        "nombre": "Company",
+        "descripcion": "Company name as published in the BORME"
+      },
+      "confirmacion": {
+        "nombre": "How it is confirmed",
+        "descripcion": "declarada (the company is in their documents), cargo-publico (public company of an administration where they declare a position) or apellido (the company bears their name)"
+      },
+      "motivo": {
+        "nombre": "Confirming document",
+        "descripcion": "Organisation in their official documents that confirms it is the same person"
+      },
+      "acto": {
+        "nombre": "Act",
+        "descripcion": "Appointments, resignations, revocations… as written in the BORME (in Spanish)"
+      },
+      "cargo": {
+        "nombre": "Position",
+        "descripcion": "Position with the BORME’s abbreviations"
+      },
+      "registro": {
+        "nombre": "Companies Register",
+        "descripcion": "Province of the register where it is recorded"
+      },
+      "url_borme": {
+        "nombre": "BORME (link)",
+        "descripcion": "Official notice on boe.es"
       },
       "fecha": {
         "nombre": "Date",

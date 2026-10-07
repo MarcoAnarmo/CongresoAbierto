@@ -58,6 +58,17 @@ function* entidades(): Generator<Registro> {
   }
 }
 
+function* borme(): Generator<Registro> {
+  for (const d of diputados) {
+    const base = { diputado_id: d.codParlamentario, diputado: d.nombreCompleto, grupo: d.grupoCorto, circunscripcion: d.circunscripcion, url_congreso_abierto: `${SITIO}/diputado/${slug(d)}#borme` };
+    for (const e of d.vinculos?.borme ?? []) {
+      for (const a of e.actos) {
+        yield { ...base, empresa: e.nombre, confirmacion: e.confirmacion, motivo: e.motivo, fecha: a.fecha, acto: a.acto || null, cargo: a.cargo || null, registro: a.provincia, url_borme: a.url };
+      }
+    }
+  }
+}
+
 function* votaciones(): Generator<Registro> {
   for (const v of votacionesPleno) {
     yield {
@@ -79,6 +90,7 @@ const GENERADORES: Record<string, () => Iterable<Registro>> = {
   diputados: () => diputados.map(diputadoRegistro),
   inmuebles,
   entidades,
+  borme,
   votaciones,
   'votos-grupo': votosGrupo,
 };

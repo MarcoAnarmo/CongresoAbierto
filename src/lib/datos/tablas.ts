@@ -120,6 +120,21 @@ export const TABLAS: DefTabla[] = [
     ],
   },
   {
+    id: 'borme',
+    particion: 'unica',
+    csvFijo: true,
+    columnas: [
+      c('diputado_id', 'entero'), c('diputado', 'texto', true), c('grupo', 'texto', true), c('circunscripcion', 'texto'),
+      c('empresa', 'texto', true), c('confirmacion', 'texto', true), c('motivo', 'texto'), c('fecha', 'fecha', true), c('acto', 'texto', true),
+      c('cargo', 'texto', true), c('registro', 'texto'), c('url_borme', 'url', true), c('url_congreso_abierto', 'url'),
+    ],
+    filtros: [
+      { id: 'buscar', tipo: 'texto', columnas: ['diputado', 'empresa'] },
+      { id: 'grupo', tipo: 'valores', columna: 'grupo' },
+      { id: 'confirmacion', tipo: 'valores', columna: 'confirmacion' },
+    ],
+  },
+  {
     id: 'votaciones',
     particion: 'unica',
     csvFijo: true,

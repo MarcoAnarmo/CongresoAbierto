@@ -144,6 +144,7 @@ const nombreValor = (fi: string, v: string) =>
   : fi === 'titular' ? (cfg.tx[v] ?? v)
   : fi === 'tipo_entidad' ? (cfg.tx[`tipo_${v}`] ?? v)
   : fi === 'fuente' ? (cfg.tx[`fuente_${v}`] ?? v)
+  : fi === 'confirmacion' ? (cfg.tx[`conf_${v}`] ?? v)
   : v;
 
 /** Valores posibles de un filtro: de los datos cargados, en un orden útil (grupos como en el hemiciclo, temas como en la web). */
