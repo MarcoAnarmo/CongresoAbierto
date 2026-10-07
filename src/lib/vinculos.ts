@@ -45,8 +45,43 @@ export interface VinculoEntidad {
   apariciones: AparicionVinculo[];
 }
 
+/** Un acto inscrito en el BORME (Sección A) a nombre del diputado. */
+export interface ActoBorme {
+  fecha: string;
+  /** Identificador del anuncio del BORME (p. ej. BORME-A-2019-123-28). */
+  borme: string;
+  /** Registro mercantil (provincia) donde se inscribe. */
+  provincia: string;
+  /** Nombramientos, Ceses/Dimisiones, Revocaciones, Reelecciones… tal como lo escribe el BORME. */
+  acto: string;
+  /** Cargo tal como lo abrevia el BORME (Consejero, Adm. Unico, Apoderado…). */
+  cargo: string;
+  url: string;
+}
+
+/**
+ * Cómo se confirma que la persona del BORME es el diputado (el BORME no publica el DNI):
+ * 'declarada': la empresa aparece también en sus documentos oficiales;
+ * 'cargo-publico': empresa pública del mismo lugar o administración en la que declara un cargo;
+ * 'apellido': la empresa lleva su nombre y apellido y está inscrita en la provincia por la que es diputado.
+ */
+export type ConfirmacionBorme = 'declarada' | 'cargo-publico' | 'apellido';
+
+export interface EmpresaBorme {
+  /** Nombre de la sociedad tal como lo publica el BORME. */
+  nombre: string;
+  confirmacion: ConfirmacionBorme;
+  /** Entidad de sus documentos que lo confirma (o sus apellidos). */
+  motivo: string;
+  desde: string;
+  hasta: string;
+  actos: ActoBorme[];
+}
+
 export interface Vinculos {
   entidades: VinculoEntidad[];
+  /** Cargos en sociedades según el BORME, solo los confirmados por otro documento oficial. */
+  borme: EmpresaBorme[];
   /** Número de entidades por tipo. */
   porTipo: Partial<Record<TipoEntidad, number>>;
 }

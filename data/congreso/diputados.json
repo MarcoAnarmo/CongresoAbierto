@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generado": "2026-10-07T11:07:50.246Z",
+  "generado": "2026-10-07T13:52:50.108Z",
   "fuente": "Congreso de los Diputados (datos abiertos y fichas oficiales)",
   "legislatura": "XV"
  },
@@ -606,6 +606,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "asociacion": 2,
@@ -982,6 +983,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 1
     }
@@ -1594,6 +1596,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 1,
@@ -2233,6 +2236,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -2860,6 +2864,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 2,
@@ -3372,6 +3377,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 1,
      "partido": 1,
@@ -4358,6 +4364,115 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "REACTIVACIO BADALONA SA",
+      "confirmacion": "declarada",
+      "motivo": "Reactivació Badalona, S.A.",
+      "desde": "2015-11-10",
+      "hasta": "2024-12-27",
+      "actos": [
+       {
+        "fecha": "2015-11-10",
+        "borme": "BORME-A-2015-214-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-214-08"
+       },
+       {
+        "fecha": "2021-04-13",
+        "borme": "BORME-A-2021-68-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2021-68-08"
+       },
+       {
+        "fecha": "2021-06-25",
+        "borme": "BORME-A-2021-120-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2021-120-08"
+       },
+       {
+        "fecha": "2023-09-07",
+        "borme": "BORME-A-2023-171-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-171-08"
+       },
+       {
+        "fecha": "2024-12-27",
+        "borme": "BORME-A-2024-249-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-249-08"
+       }
+      ]
+     },
+     {
+      "nombre": "BADALONA CULTURA SL",
+      "confirmacion": "declarada",
+      "motivo": "Badalona Cultura, S.A.",
+      "desde": "2019-05-22",
+      "hasta": "2024-11-19",
+      "actos": [
+       {
+        "fecha": "2019-05-22",
+        "borme": "BORME-A-2019-95-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-95-08"
+       },
+       {
+        "fecha": "2021-03-01",
+        "borme": "BORME-A-2021-40-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2021-40-08"
+       },
+       {
+        "fecha": "2024-11-19",
+        "borme": "BORME-A-2024-223-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-223-08"
+       }
+      ]
+     },
+     {
+      "nombre": "BADALONA SERVEIS ASSISTENCIALS SA",
+      "confirmacion": "declarada",
+      "motivo": "Badalona Serveis Assistencials, S.A.",
+      "desde": "2023-08-28",
+      "hasta": "2023-12-27",
+      "actos": [
+       {
+        "fecha": "2023-08-28",
+        "borme": "BORME-A-2023-163-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-163-08"
+       },
+       {
+        "fecha": "2023-12-27",
+        "borme": "BORME-A-2023-244-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-244-08"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 1,
      "publica": 8,
@@ -4770,6 +4885,25 @@
         "fecha": "2024-01-23",
         "periodo": null,
         "url": "https://www.congreso.es/docacteco/leg15/000371/000371_001_e_0008922_20240123.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "EXPOBIKE SOLUTIONS SL",
+      "confirmacion": "declarada",
+      "motivo": "EXPOBIKE SOLUTIONS S.L",
+      "desde": "2018-05-31",
+      "hasta": "2018-05-31",
+      "actos": [
+       {
+        "fecha": "2018-05-31",
+        "borme": "BORME-A-2018-103-28",
+        "provincia": "MADRID",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2018-103-28"
        }
       ]
      }
@@ -5429,6 +5563,25 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "HISPALEX IURIS SL",
+      "confirmacion": "declarada",
+      "motivo": "HISPALEX IURIS",
+      "desde": "2015-01-30",
+      "hasta": "2015-01-30",
+      "actos": [
+       {
+        "fecha": "2015-01-30",
+        "borme": "BORME-A-2015-20-28",
+        "provincia": "MADRID",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-20-28"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 3,
      "publica": 1,
@@ -5957,6 +6110,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "asociacion": 1,
      "partido": 1,
@@ -7035,6 +7189,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 1,
@@ -7541,6 +7696,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "asociacion": 3,
@@ -8239,6 +8395,25 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "SETEP TOLEDO SL",
+      "confirmacion": "declarada",
+      "motivo": "SETEP TOLEDO, SL",
+      "desde": "2017-05-22",
+      "hasta": "2017-05-22",
+      "actos": [
+       {
+        "fecha": "2017-05-22",
+        "borme": "BORME-A-2017-94-45",
+        "provincia": "TOLEDO",
+        "acto": "Nombramientos",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2017-94-45"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "asociacion": 2,
@@ -8769,6 +8944,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -9219,6 +9395,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 1,
@@ -9864,6 +10041,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "asociacion": 1,
@@ -10520,6 +10698,42 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "AUTOLAVADOS HUESCA SL",
+      "confirmacion": "declarada",
+      "motivo": "AUTOLAVADOS HUESCA, S.L.",
+      "desde": "2010-08-09",
+      "hasta": "2010-08-09",
+      "actos": [
+       {
+        "fecha": "2010-08-09",
+        "borme": "BORME-A-2010-151-22",
+        "provincia": "HUESCA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2010-151-22"
+       }
+      ]
+     },
+     {
+      "nombre": "LUIS Y ALOS SL",
+      "confirmacion": "declarada",
+      "motivo": "LUIS Y ALOS, S.L.",
+      "desde": "2010-08-09",
+      "hasta": "2010-08-09",
+      "actos": [
+       {
+        "fecha": "2010-08-09",
+        "borme": "BORME-A-2010-151-22",
+        "provincia": "HUESCA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2010-151-22"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 2,
@@ -11030,6 +11244,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 1,
      "asociacion": 1,
@@ -11441,6 +11656,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "asociacion": 1,
@@ -12055,6 +12271,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 1,
@@ -12812,6 +13029,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -13384,6 +13602,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 5,
      "asociacion": 2,
@@ -14023,6 +14242,58 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "SOCIETAT MUNICIPAL BARCELONA GESTIO URBANISTICA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Barcelona",
+      "desde": "2012-03-06",
+      "hasta": "2016-01-18",
+      "actos": [
+       {
+        "fecha": "2012-03-06",
+        "borme": "BORME-A-2012-46-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-46-08"
+       },
+       {
+        "fecha": "2016-01-18",
+        "borme": "BORME-A-2016-10-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-10-08"
+       }
+      ]
+     },
+     {
+      "nombre": "BARCELONA D'INFRAESTRUCTURES MUNICIPALS SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Barcelona",
+      "desde": "2014-08-04",
+      "hasta": "2015-09-01",
+      "actos": [
+       {
+        "fecha": "2014-08-04",
+        "borme": "BORME-A-2014-146-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-146-08"
+       },
+       {
+        "fecha": "2015-09-01",
+        "borme": "BORME-A-2015-166-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-166-08"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -14626,6 +14897,25 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "PIZZERIA AMESTOY, SL",
+      "confirmacion": "declarada",
+      "motivo": "Pizzeria Amestoy, S.L.",
+      "desde": "2014-07-22",
+      "hasta": "2014-07-22",
+      "actos": [
+       {
+        "fecha": "2014-07-22",
+        "borme": "BORME-A-2014-137-39",
+        "provincia": "CANTABRIA",
+        "acto": "Nombramientos",
+        "cargo": "Apoderado",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-137-39"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 1,
@@ -15053,6 +15343,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "otra": 1
@@ -15685,6 +15976,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -16287,6 +16579,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "asociacion": 1,
@@ -16876,6 +17169,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "LARES DEL NORTE SL",
+      "confirmacion": "declarada",
+      "motivo": "LARES DEL NORTE, S.L.",
+      "desde": "2015-10-19",
+      "hasta": "2023-08-04",
+      "actos": [
+       {
+        "fecha": "2015-10-19",
+        "borme": "BORME-A-2015-199-33",
+        "provincia": "ASTURIAS",
+        "acto": "Nombramientos",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-199-33"
+       },
+       {
+        "fecha": "2023-08-04",
+        "borme": "BORME-A-2023-148-33",
+        "provincia": "ASTURIAS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-148-33"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 1,
@@ -17420,6 +17740,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "partido": 1,
@@ -18005,6 +18326,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 1,
@@ -18428,6 +18750,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -18805,6 +19128,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 1
@@ -19239,6 +19563,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 1
@@ -19722,6 +20047,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 3
@@ -20137,6 +20463,91 @@
         "fecha": "2023-08-16",
         "periodo": null,
         "url": "https://www.congreso.es/docacteco/leg15/000323/000323_001_e_0001351_20230816.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "BARCELONA DE SERVEIS MUNICIPALS SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Barcelona",
+      "desde": "2018-02-06",
+      "hasta": "2024-01-17",
+      "actos": [
+       {
+        "fecha": "2018-02-06",
+        "borme": "BORME-A-2018-26-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2018-26-08"
+       },
+       {
+        "fecha": "2019-09-13",
+        "borme": "BORME-A-2019-176-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-176-08"
+       },
+       {
+        "fecha": "2024-01-17",
+        "borme": "BORME-A-2024-12-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-12-08"
+       }
+      ]
+     },
+     {
+      "nombre": "BARCELONA D'INFRAESTRUCTURES MUNICIPALS SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Barcelona",
+      "desde": "2019-11-08",
+      "hasta": "2023-10-06",
+      "actos": [
+       {
+        "fecha": "2019-11-08",
+        "borme": "BORME-A-2019-215-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-215-08"
+       },
+       {
+        "fecha": "2023-10-06",
+        "borme": "BORME-A-2023-192-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-192-08"
+       }
+      ]
+     },
+     {
+      "nombre": "SOCIETAT MUNICIPAL BARCELONA GESTIO URBANISTICA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Barcelona",
+      "desde": "2016-01-18",
+      "hasta": "2019-07-26",
+      "actos": [
+       {
+        "fecha": "2016-01-18",
+        "borme": "BORME-A-2016-10-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-10-08"
+       },
+       {
+        "fecha": "2019-07-26",
+        "borme": "BORME-A-2019-142-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-142-08"
        }
       ]
      }
@@ -20721,6 +21132,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -21326,6 +21738,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -22021,6 +22434,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "SOCIEDAD DE GESTION MUNICIPAL TARAZONA SOCIEDAD LIMITADA",
+      "confirmacion": "cargo-publico",
+      "motivo": "AYUNTAMIENTO DE TARAZONA",
+      "desde": "2009-04-15",
+      "hasta": "2014-06-24",
+      "actos": [
+       {
+        "fecha": "2009-04-15",
+        "borme": "BORME-A-2009-70-50",
+        "provincia": "ZARAGOZA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2009-70-50"
+       },
+       {
+        "fecha": "2014-06-24",
+        "borme": "BORME-A-2014-117-50",
+        "provincia": "ZARAGOZA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-117-50"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 3,
      "fundacion": 1,
@@ -22585,6 +23025,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 3,
@@ -23142,6 +23583,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 1,
@@ -24006,6 +24448,50 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "RAFAEL BELMONTE GOMEZ ASESORES SLP",
+      "confirmacion": "declarada",
+      "motivo": "SOCIEDAD PROFESIONAL RAFAEL BELMONTE GÓMEZ ASESORES SLP",
+      "desde": "2020-02-24",
+      "hasta": "2024-01-04",
+      "actos": [
+       {
+        "fecha": "2020-02-24",
+        "borme": "BORME-A-2020-37-41",
+        "provincia": "SEVILLA",
+        "acto": "Nombramientos",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-37-41"
+       },
+       {
+        "fecha": "2024-01-04",
+        "borme": "BORME-A-2024-3-41",
+        "provincia": "SEVILLA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-3-41"
+       }
+      ]
+     },
+     {
+      "nombre": "ELITE LEGAL SA",
+      "confirmacion": "declarada",
+      "motivo": "ELITE LEGAL SL",
+      "desde": "2020-10-02",
+      "hasta": "2020-10-02",
+      "actos": [
+       {
+        "fecha": "2020-10-02",
+        "borme": "BORME-A-2020-192-41",
+        "provincia": "SEVILLA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-192-41"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 7,
      "publica": 1,
@@ -24621,6 +25107,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "asociacion": 1,
@@ -25232,6 +25719,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 8,
      "partido": 1
@@ -25805,6 +26293,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -26578,6 +27067,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 7,
@@ -27212,6 +27702,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "asociacion": 4,
      "partido": 6,
@@ -27754,6 +28245,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "partido": 1
@@ -28008,6 +28500,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5
     }
@@ -28515,6 +29008,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 1,
@@ -29128,6 +29622,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "asociacion": 2,
@@ -29709,6 +30204,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 4,
@@ -30311,6 +30807,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 3,
@@ -31041,6 +31538,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "HAKKARI PATRIMONIAL S.L",
+      "confirmacion": "declarada",
+      "motivo": "HAKKARI PATRIMONIAL SL",
+      "desde": "2017-12-15",
+      "hasta": "2021-04-15",
+      "actos": [
+       {
+        "fecha": "2017-12-15",
+        "borme": "BORME-A-2017-237-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "ADM.UNICO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2017-237-08"
+       },
+       {
+        "fecha": "2021-04-15",
+        "borme": "BORME-A-2021-70-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "ADM.UNICO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2021-70-08"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 5,
      "fundacion": 1,
@@ -31549,6 +32073,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 6,
@@ -32028,6 +32553,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 3,
@@ -32627,6 +33153,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "SERVEIS AMBIENTALS DEL VALLES ORIENTAL SA",
+      "confirmacion": "declarada",
+      "motivo": "SERVEIS AMBIENTALS DEL VALLÈS ORIENTAL",
+      "desde": "2024-03-14",
+      "hasta": "2025-05-13",
+      "actos": [
+       {
+        "fecha": "2024-03-14",
+        "borme": "BORME-A-2024-53-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-53-08"
+       },
+       {
+        "fecha": "2025-05-13",
+        "borme": "BORME-A-2025-89-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2025-89-08"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 7,
      "fundacion": 1,
@@ -33186,6 +33739,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 2
@@ -33721,6 +34275,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -34141,6 +34696,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 1
@@ -34758,6 +35314,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -35460,6 +36017,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 1,
@@ -35956,6 +36514,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -36669,6 +37228,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 5,
@@ -37144,6 +37704,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 4,
@@ -37882,6 +38443,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 6,
@@ -38401,6 +38963,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -38933,6 +39496,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 4,
      "educacion": 1
@@ -39448,6 +40012,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 1,
@@ -40053,6 +40618,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 6,
@@ -40689,6 +41255,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "publica": 2,
@@ -41882,6 +42449,33 @@
         "fecha": "2023-08-16",
         "periodo": "2021 - ACTUALIDAD 2019-2021",
         "url": "https://www.congreso.es/docacteco/leg15/000309/000309_001_e_0001308_20230816.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "GRUCOCA INMOBILIARIA SL",
+      "confirmacion": "declarada",
+      "motivo": "GRUCOCA INMOBILIARIA S.L.",
+      "desde": "2016-12-16",
+      "hasta": "2023-08-04",
+      "actos": [
+       {
+        "fecha": "2016-12-16",
+        "borme": "BORME-A-2016-238-28",
+        "provincia": "MADRID",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-238-28"
+       },
+       {
+        "fecha": "2023-08-04",
+        "borme": "BORME-A-2023-148-28",
+        "provincia": "MADRID",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-148-28"
        }
       ]
      }
@@ -43085,6 +43679,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 15,
      "fundacion": 1,
@@ -44013,6 +44608,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "INSTITUTO DE LIDERAZGO POLITICO SL",
+      "confirmacion": "declarada",
+      "motivo": "Instituto de Liderazgo Político S.L.",
+      "desde": "2023-02-09",
+      "hasta": "2023-03-30",
+      "actos": [
+       {
+        "fecha": "2023-02-09",
+        "borme": "BORME-A-2023-28-28",
+        "provincia": "MADRID",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-28-28"
+       },
+       {
+        "fecha": "2023-03-30",
+        "borme": "BORME-A-2023-62-28",
+        "provincia": "MADRID",
+        "acto": "Nombramientos",
+        "cargo": "Apoderado",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-62-28"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 3,
      "publica": 6,
@@ -44558,6 +45180,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 2
@@ -45111,6 +45734,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 2
@@ -45626,6 +46250,58 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=85&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "EMPRESA MUNICIPAL DE INICIATIVAS Y ACTIVIDADES EMPRESARIALES DE MALAGA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "AYTO MALAGA",
+      "desde": "2015-08-07",
+      "hasta": "2019-08-21",
+      "actos": [
+       {
+        "fecha": "2015-08-07",
+        "borme": "BORME-A-2015-149-29",
+        "provincia": "MÁLAGA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-149-29"
+       },
+       {
+        "fecha": "2019-08-21",
+        "borme": "BORME-A-2019-159-29",
+        "provincia": "MÁLAGA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-159-29"
+       }
+      ]
+     },
+     {
+      "nombre": "EMPRESA MUNICIPAL DE GESTION DE MEDIOS DE COMUNICACION DE MALAGA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "AYTO MALAGA",
+      "desde": "2014-09-15",
+      "hasta": "2015-09-08",
+      "actos": [
+       {
+        "fecha": "2014-09-15",
+        "borme": "BORME-A-2014-175-29",
+        "provincia": "MÁLAGA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-175-29"
+       },
+       {
+        "fecha": "2015-09-08",
+        "borme": "BORME-A-2015-171-29",
+        "provincia": "MÁLAGA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-171-29"
        }
       ]
      }
@@ -46278,6 +46954,49 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "INSULAR DE AGUAS DE LANZAROTE SOCIEDAD ANONIMA(R.M. PUERTO DE ARRECIFE)",
+      "confirmacion": "cargo-publico",
+      "motivo": "Cabildo de Lanzarote",
+      "desde": "2019-09-04",
+      "hasta": "2024-08-23",
+      "actos": [
+       {
+        "fecha": "2019-09-04",
+        "borme": "BORME-A-2019-169-35",
+        "provincia": "LAS PALMAS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-169-35"
+       },
+       {
+        "fecha": "2019-11-08",
+        "borme": "BORME-A-2019-215-35",
+        "provincia": "LAS PALMAS",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-215-35"
+       },
+       {
+        "fecha": "2020-01-22",
+        "borme": "BORME-A-2020-14-35",
+        "provincia": "LAS PALMAS",
+        "acto": "Nombramientos",
+        "cargo": "Con.Delegado",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-14-35"
+       },
+       {
+        "fecha": "2024-08-23",
+        "borme": "BORME-A-2024-162-35",
+        "provincia": "LAS PALMAS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Presidente",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-162-35"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 7,
      "partido": 2
@@ -46735,6 +47454,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 1
@@ -47279,6 +47999,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "partido": 1
@@ -47815,6 +48536,50 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "EMPRESA PROVINCIAL DE VIVIENDA, SUELO Y EQUIPAMIENTO DE HUELVA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Huelva",
+      "desde": "2014-08-29",
+      "hasta": "2014-08-29",
+      "actos": [
+       {
+        "fecha": "2014-08-29",
+        "borme": "BORME-A-2014-164-21",
+        "provincia": "HUELVA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-164-21"
+       }
+      ]
+     },
+     {
+      "nombre": "EMPRESA MUNICIPAL DE LA VIVIENDA DE HUELVA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Huelva",
+      "desde": "2011-08-22",
+      "hasta": "2014-05-22",
+      "actos": [
+       {
+        "fecha": "2011-08-22",
+        "borme": "BORME-A-2011-159-21",
+        "provincia": "HUELVA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-159-21"
+       },
+       {
+        "fecha": "2014-05-22",
+        "borme": "BORME-A-2014-95-21",
+        "provincia": "HUELVA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-95-21"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 3,
      "partido": 1,
@@ -48317,6 +49082,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 3,
@@ -48949,6 +49715,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 4,
@@ -49577,6 +50344,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "asociacion": 2
@@ -50304,6 +51072,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 5,
@@ -50888,6 +51657,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 5,
      "asociacion": 1,
@@ -51410,6 +52180,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -51970,6 +52741,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "fundacion": 1,
@@ -52385,6 +53157,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 1,
      "sindicato": 1
@@ -53079,6 +53852,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 6,
@@ -53674,6 +54448,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "EMPRESA MUNICIPAL PLAZA DE TOROS DE SANTANDER SOCIEDAD ANONIMA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Santander",
+      "desde": "2023-09-08",
+      "hasta": "2024-07-05",
+      "actos": [
+       {
+        "fecha": "2023-09-08",
+        "borme": "BORME-A-2023-172-39",
+        "provincia": "CANTABRIA",
+        "acto": "",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-172-39"
+       },
+       {
+        "fecha": "2024-07-05",
+        "borme": "BORME-A-2024-129-39",
+        "provincia": "CANTABRIA",
+        "acto": "",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-129-39"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 3,
      "asociacion": 1,
@@ -54245,6 +55046,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "publica": 1,
@@ -54799,6 +55601,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "partido": 1
@@ -55338,6 +56141,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -55719,6 +56523,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 1,
@@ -56484,6 +57289,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 6,
      "asociacion": 3,
@@ -57141,6 +57947,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -57583,6 +58390,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1
@@ -57996,6 +58804,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "partido": 2
@@ -58739,6 +59548,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 10,
      "asociacion": 2,
@@ -59175,6 +59985,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "asociacion": 1,
      "partido": 1,
@@ -59704,6 +60515,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 2,
@@ -60206,6 +61018,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1,
@@ -60641,6 +61454,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 1
     }
@@ -61912,6 +62726,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 1,
@@ -62451,6 +63266,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 1,
      "educacion": 1,
@@ -63221,6 +64037,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 7,
      "asociacion": 3,
@@ -63728,6 +64545,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 2,
@@ -64258,6 +65076,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "asociacion": 1,
@@ -64665,6 +65484,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1,
@@ -65358,6 +66178,58 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "EFRIASA SA",
+      "confirmacion": "declarada",
+      "motivo": "Efriasa S.A.",
+      "desde": "2019-01-10",
+      "hasta": "2022-04-26",
+      "actos": [
+       {
+        "fecha": "2019-01-10",
+        "borme": "BORME-A-2019-6-11",
+        "provincia": "CÁDIZ",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-6-11"
+       },
+       {
+        "fecha": "2020-02-05",
+        "borme": "BORME-A-2020-24-11",
+        "provincia": "CÁDIZ",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-24-11"
+       },
+       {
+        "fecha": "2022-04-26",
+        "borme": "BORME-A-2022-79-11",
+        "provincia": "CÁDIZ",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2022-79-11"
+       }
+      ]
+     },
+     {
+      "nombre": "CARVAJAL AGRICOLA SL",
+      "confirmacion": "declarada",
+      "motivo": "Carvajal Agrícola S.L.",
+      "desde": "2017-11-08",
+      "hasta": "2017-11-08",
+      "actos": [
+       {
+        "fecha": "2017-11-08",
+        "borme": "BORME-A-2017-213-11",
+        "provincia": "CÁDIZ",
+        "acto": "Socio único",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2017-213-11"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 3,
      "publica": 1,
@@ -65877,6 +66749,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 1,
@@ -66239,6 +67112,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2
     }
@@ -66738,6 +67612,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -67536,6 +68411,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "asociacion": 1,
@@ -68099,6 +68975,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -68745,6 +69622,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 6,
      "fundacion": 1,
@@ -69497,6 +70375,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "asociacion": 3,
@@ -70262,6 +71141,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 1,
      "asociacion": 1,
@@ -70843,6 +71723,33 @@
         "fecha": "2023-08-03",
         "periodo": null,
         "url": "https://www.congreso.es/docacteco/leg15/000094/000094_001_e_0000390_20230803.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "PERICIA ABOGADOS Y ECONOMISTAS SLP",
+      "confirmacion": "declarada",
+      "motivo": "pericia abogados y economistas, sl",
+      "desde": "2011-12-28",
+      "hasta": "2014-02-19",
+      "actos": [
+       {
+        "fecha": "2011-12-28",
+        "borme": "BORME-A-2011-245-29",
+        "provincia": "MÁLAGA",
+        "acto": "Nombramientos",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-245-29"
+       },
+       {
+        "fecha": "2014-02-19",
+        "borme": "BORME-A-2014-34-29",
+        "provincia": "MÁLAGA",
+        "acto": "Nombramientos",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-34-29"
        }
       ]
      }
@@ -71451,6 +72358,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -71986,6 +72894,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "educacion": 4
@@ -72652,6 +73561,41 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "INFRAESTRUCTURES DE LA GENERALITAT DE CATALUNYA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Generalitat de Catalunya",
+      "desde": "2018-12-19",
+      "hasta": "2022-11-29",
+      "actos": [
+       {
+        "fecha": "2018-12-19",
+        "borme": "BORME-A-2018-242-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2018-242-08"
+       },
+       {
+        "fecha": "2021-11-02",
+        "borme": "BORME-A-2021-210-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2021-210-08"
+       },
+       {
+        "fecha": "2022-11-29",
+        "borme": "BORME-A-2022-227-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2022-227-08"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 6,
@@ -73100,6 +74044,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 2,
@@ -73540,6 +74485,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 1,
      "otra": 2
@@ -74409,6 +75355,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 2,
@@ -74905,6 +75852,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 1,
@@ -75591,6 +76539,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 6,
      "fundacion": 1,
@@ -76061,6 +77010,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 2
@@ -76658,6 +77608,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "publica": 3,
@@ -77146,6 +78097,41 @@
         "fecha": "2023-08-04",
         "periodo": null,
         "url": "https://www.congreso.es/docacteco/leg15/000113/000113_001_e_0000477_20230804.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "MUGARDOS INVERSIONES SICAV SA",
+      "confirmacion": "declarada",
+      "motivo": "Mugardos S.A.",
+      "desde": "2012-07-24",
+      "hasta": "2019-05-03",
+      "actos": [
+       {
+        "fecha": "2012-07-24",
+        "borme": "BORME-A-2012-140-28",
+        "provincia": "MADRID",
+        "acto": "",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-140-28"
+       },
+       {
+        "fecha": "2017-07-27",
+        "borme": "BORME-A-2017-142-28",
+        "provincia": "MADRID",
+        "acto": "",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2017-142-28"
+       },
+       {
+        "fecha": "2019-05-03",
+        "borme": "BORME-A-2019-83-28",
+        "provincia": "MADRID",
+        "acto": "",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-83-28"
        }
       ]
      }
@@ -77873,6 +78859,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 5,
@@ -78474,6 +79461,58 @@
         "fecha": "2023-12-19",
         "periodo": null,
         "url": "https://www.congreso.es/docinte/registro_intereses_diputado_221.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "COPISTERIA TECNICA SA",
+      "confirmacion": "declarada",
+      "motivo": "Copisteria tecnica, S.A.",
+      "desde": "2012-12-24",
+      "hasta": "2020-08-12",
+      "actos": [
+       {
+        "fecha": "2012-12-24",
+        "borme": "BORME-A-2012-245-25",
+        "provincia": "LLEIDA",
+        "acto": "Reelecciones",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-245-25"
+       },
+       {
+        "fecha": "2020-08-12",
+        "borme": "BORME-A-2020-155-25",
+        "provincia": "LLEIDA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-155-25"
+       }
+      ]
+     },
+     {
+      "nombre": "ABIS SERVEIS I COMUNICACIO SL",
+      "confirmacion": "declarada",
+      "motivo": "Abis Serveis i Comunicacio, s.l.",
+      "desde": "2014-04-16",
+      "hasta": "2020-02-05",
+      "actos": [
+       {
+        "fecha": "2014-04-16",
+        "borme": "BORME-A-2014-74-25",
+        "provincia": "LLEIDA",
+        "acto": "Nombramientos",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-74-25"
+       },
+       {
+        "fecha": "2020-02-05",
+        "borme": "BORME-A-2020-24-25",
+        "provincia": "LLEIDA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-24-25"
        }
       ]
      }
@@ -79164,6 +80203,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 6,
      "partido": 3,
@@ -79671,6 +80711,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -80287,6 +81328,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "publica": 1,
@@ -80871,6 +81913,25 @@
         "fecha": "2023-08-10",
         "periodo": null,
         "url": "https://www.congreso.es/docacteco/leg15/000219/000219_001_e_0000939_20230810.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "ASKALON SALUD SL",
+      "confirmacion": "declarada",
+      "motivo": "ASKALON SL",
+      "desde": "2020-11-12",
+      "hasta": "2020-11-12",
+      "actos": [
+       {
+        "fecha": "2020-11-12",
+        "borme": "BORME-A-2020-218-45",
+        "provincia": "TOLEDO",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-218-45"
        }
       ]
      }
@@ -81462,6 +82523,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 5,
      "publica": 1,
@@ -81997,6 +83059,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 1,
@@ -82513,6 +83576,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "asociacion": 2,
@@ -83132,6 +84196,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 1,
@@ -83818,6 +84883,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "publica": 1,
@@ -84326,6 +85392,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "asociacion": 1,
      "partido": 1,
@@ -85019,6 +86086,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "asociacion": 5,
@@ -85457,6 +86525,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1,
@@ -86025,6 +87094,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -86793,6 +87863,41 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "ESTACIONAMIENTOS Y GARAJES MUNICIPALES DE BURGOS SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Burgos",
+      "desde": "2009-07-21",
+      "hasta": "2016-09-27",
+      "actos": [
+       {
+        "fecha": "2009-07-21",
+        "borme": "BORME-A-2009-136-09",
+        "provincia": "BURGOS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2009-136-09"
+       },
+       {
+        "fecha": "2011-12-22",
+        "borme": "BORME-A-2011-241-09",
+        "provincia": "BURGOS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-241-09"
+       },
+       {
+        "fecha": "2016-09-27",
+        "borme": "BORME-A-2016-185-09",
+        "provincia": "BURGOS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-185-09"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 1,
      "publica": 4,
@@ -87358,6 +88463,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "asociacion": 3,
@@ -87942,6 +89048,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 6,
@@ -88401,6 +89508,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1
@@ -88938,6 +90046,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 2,
@@ -89478,6 +90587,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "asociacion": 1,
@@ -90099,6 +91209,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 5,
@@ -90637,6 +91748,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -91198,6 +92310,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -91630,6 +92743,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 1,
      "asociacion": 1,
@@ -92161,6 +93275,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 2,
@@ -92732,6 +93847,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 1,
@@ -93188,6 +94304,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 3
@@ -93890,6 +95007,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 2,
@@ -94483,6 +95601,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "partido": 1,
@@ -95070,6 +96189,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -95454,6 +96574,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "asociacion": 2,
      "partido": 1
@@ -96079,6 +97200,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "FERROCARRIL METROPOLITA DE BARCELONA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Diputación de Barcelona",
+      "desde": "2020-11-26",
+      "hasta": "2023-09-05",
+      "actos": [
+       {
+        "fecha": "2020-11-26",
+        "borme": "BORME-A-2020-228-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-228-08"
+       },
+       {
+        "fecha": "2023-09-05",
+        "borme": "BORME-A-2023-169-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-169-08"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 4,
      "partido": 4,
@@ -96580,6 +97728,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -97089,6 +98238,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 1,
@@ -97617,6 +98767,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 2
@@ -98251,6 +99402,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "ECIJA COMARCA TELEVISION SOCIEDAD LIMITADA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Mancomunidad de Écija",
+      "desde": "2012-04-13",
+      "hasta": "2017-04-04",
+      "actos": [
+       {
+        "fecha": "2012-04-13",
+        "borme": "BORME-A-2012-71-41",
+        "provincia": "SEVILLA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-71-41"
+       },
+       {
+        "fecha": "2017-04-04",
+        "borme": "BORME-A-2017-65-41",
+        "provincia": "SEVILLA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2017-65-41"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 3,
      "asociacion": 2,
@@ -98722,6 +99900,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 3
@@ -99370,6 +100549,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -99850,6 +101030,41 @@
         "fecha": "2023-12-19",
         "periodo": null,
         "url": "https://www.congreso.es/docinte/registro_intereses_diputado_260.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "PROMOTORA PROVINCIAL DE VIVIENDAS DE CORDOBA SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Diputación Provincial de Córdoba",
+      "desde": "2009-06-24",
+      "hasta": "2016-03-14",
+      "actos": [
+       {
+        "fecha": "2009-06-24",
+        "borme": "BORME-A-2009-117-14",
+        "provincia": "CÓRDOBA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2009-117-14"
+       },
+       {
+        "fecha": "2012-01-18",
+        "borme": "BORME-A-2012-12-14",
+        "provincia": "CÓRDOBA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-12-14"
+       },
+       {
+        "fecha": "2016-03-14",
+        "borme": "BORME-A-2016-50-14",
+        "provincia": "CÓRDOBA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-50-14"
        }
       ]
      }
@@ -100421,6 +101636,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -101046,6 +102262,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 7,
      "fundacion": 1,
@@ -101651,6 +102868,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -101996,6 +103214,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1
@@ -102506,6 +103725,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "partido": 1
@@ -102878,6 +104098,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 1
     }
@@ -103474,6 +104695,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 6,
      "fundacion": 2,
@@ -103920,6 +105142,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1,
@@ -104611,6 +105834,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 2,
@@ -105256,6 +106480,58 @@
         "fecha": "2023-08-03",
         "periodo": null,
         "url": "https://www.congreso.es/docacteco/leg15/000055/000055_001_e_0000236_20230803.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "REUS SERVEIS MUNICIPALS SOCIEDAD ANONIMA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Reus",
+      "desde": "2015-09-22",
+      "hasta": "2023-08-09",
+      "actos": [
+       {
+        "fecha": "2015-09-22",
+        "borme": "BORME-A-2015-181-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-181-43"
+       },
+       {
+        "fecha": "2019-10-09",
+        "borme": "BORME-A-2019-194-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-194-43"
+       },
+       {
+        "fecha": "2023-08-09",
+        "borme": "BORME-A-2023-151-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-151-43"
+       }
+      ]
+     },
+     {
+      "nombre": "INNOVA GRUP D'EMPRESES MUNICIPALS DE REUS SOCIEDAD ANONIMA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Reus",
+      "desde": "2012-06-29",
+      "hasta": "2012-06-29",
+      "actos": [
+       {
+        "fecha": "2012-06-29",
+        "borme": "BORME-A-2012-123-43",
+        "provincia": "TARRAGONA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-123-43"
        }
       ]
      }
@@ -105909,6 +107185,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "asociacion": 3,
@@ -106569,6 +107846,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 7,
      "sindicato": 2,
@@ -107183,6 +108461,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "asociacion": 2,
@@ -107734,6 +109013,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 4,
@@ -108213,6 +109493,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -108706,6 +109987,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 1,
@@ -109361,6 +110643,41 @@
         "fecha": "2023-08-10",
         "periodo": null,
         "url": "https://www.congreso.es/docacteco/leg15/000209/000209_001_e_0000891_20230810.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "EMPRESA PUBLICA DE SERVICIOS DE QUART DE POBLET SOCIEDAD LIMITADA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Quart de Poblet",
+      "desde": "2017-08-10",
+      "hasta": "2026-02-05",
+      "actos": [
+       {
+        "fecha": "2017-08-10",
+        "borme": "BORME-A-2017-152-46",
+        "provincia": "VALENCIA/VALÈNCIA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2017-152-46"
+       },
+       {
+        "fecha": "2020-10-14",
+        "borme": "BORME-A-2020-199-46",
+        "provincia": "VALENCIA/VALÈNCIA",
+        "acto": "Reelecciones",
+        "cargo": "Presidente",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-199-46"
+       },
+       {
+        "fecha": "2026-02-05",
+        "borme": "BORME-A-2026-24-46",
+        "provincia": "VALENCIA/VALÈNCIA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2026-24-46"
        }
       ]
      }
@@ -110345,6 +111662,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 8,
      "fundacion": 1,
@@ -111086,6 +112404,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 4,
@@ -111720,6 +113039,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "fundacion": 1,
@@ -112137,6 +113457,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "asociacion": 1,
@@ -112534,6 +113855,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -113065,6 +114387,33 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=331&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "BARCELONA DE SERVEIS MUNICIPALS SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Barcelona",
+      "desde": "2015-08-27",
+      "hasta": "2019-09-13",
+      "actos": [
+       {
+        "fecha": "2015-08-27",
+        "borme": "BORME-A-2015-163-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-163-08"
+       },
+       {
+        "fecha": "2019-09-13",
+        "borme": "BORME-A-2019-176-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-176-08"
        }
       ]
      }
@@ -113727,6 +115076,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 5,
      "educacion": 1
@@ -114173,6 +115523,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1
@@ -114676,6 +116027,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -115330,6 +116682,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -115910,6 +117263,73 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "LOGROÑO DEPORTE SA",
+      "confirmacion": "declarada",
+      "motivo": "Logroño Deporte S.A.",
+      "desde": "2009-01-13",
+      "hasta": "2019-09-24",
+      "actos": [
+       {
+        "fecha": "2009-01-13",
+        "borme": "BORME-A-2009-7-26",
+        "provincia": "LA RIOJA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2009-7-26"
+       },
+       {
+        "fecha": "2009-01-13",
+        "borme": "BORME-A-2009-7-26",
+        "provincia": "LA RIOJA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2009-7-26"
+       },
+       {
+        "fecha": "2011-09-26",
+        "borme": "BORME-A-2011-183-26",
+        "provincia": "LA RIOJA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-183-26"
+       },
+       {
+        "fecha": "2012-05-10",
+        "borme": "BORME-A-2012-88-26",
+        "provincia": "LA RIOJA",
+        "acto": "Nombramientos",
+        "cargo": "Con.Delegado",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-88-26"
+       },
+       {
+        "fecha": "2015-06-09",
+        "borme": "BORME-A-2015-106-26",
+        "provincia": "LA RIOJA",
+        "acto": "Revocaciones",
+        "cargo": "Con.Delegado",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-106-26"
+       },
+       {
+        "fecha": "2015-11-25",
+        "borme": "BORME-A-2015-225-26",
+        "provincia": "LA RIOJA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-225-26"
+       },
+       {
+        "fecha": "2019-09-24",
+        "borme": "BORME-A-2019-183-26",
+        "provincia": "LA RIOJA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-183-26"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 4,
      "partido": 3,
@@ -116332,6 +117752,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "partido": 2
@@ -117058,6 +118479,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 1,
@@ -117604,6 +119026,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -118007,6 +119430,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -118461,6 +119885,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 2,
      "partido": 1
@@ -119070,6 +120495,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 1,
@@ -119570,6 +120996,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -120036,6 +121463,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 1,
@@ -120595,6 +122023,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 4,
@@ -121169,6 +122598,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 2
@@ -121700,6 +123130,33 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=361&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "EMPRESA PROVINCIAL DE VIVIENDA Y SUELO DE CADIZ SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Diputación Provincial de Cádiz",
+      "desde": "2015-12-03",
+      "hasta": "2019-11-18",
+      "actos": [
+       {
+        "fecha": "2015-12-03",
+        "borme": "BORME-A-2015-231-11",
+        "provincia": "CÁDIZ",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-231-11"
+       },
+       {
+        "fecha": "2019-11-18",
+        "borme": "BORME-A-2019-221-11",
+        "provincia": "CÁDIZ",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-221-11"
        }
       ]
      }
@@ -122566,6 +124023,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -123092,6 +124550,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 1,
@@ -123599,6 +125058,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 2
@@ -124110,6 +125570,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -124929,6 +126390,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "fundacion": 3,
@@ -125657,6 +127119,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "asociacion": 8,
@@ -126259,6 +127722,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 1,
@@ -126805,6 +128269,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "asociacion": 4,
      "partido": 1
@@ -127579,6 +129044,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "fundacion": 1,
@@ -128129,6 +129595,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 3,
@@ -128850,6 +130317,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "partido": 1,
@@ -131175,6 +132643,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 5,
      "publica": 12,
@@ -131726,6 +133195,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 1,
@@ -132497,6 +133967,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 1,
@@ -133027,6 +134498,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 1
@@ -133689,6 +135161,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 6,
      "asociacion": 1,
@@ -134167,6 +135640,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 3,
@@ -134731,6 +136205,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 1,
@@ -135298,6 +136773,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 1,
@@ -136133,6 +137609,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 5,
      "publica": 10,
@@ -136785,6 +138262,33 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=323&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "PANIAGUA NUÑEZ ASOCIADOS SL",
+      "confirmacion": "apellido",
+      "motivo": "paniagua nunez",
+      "desde": "2012-07-19",
+      "hasta": "2016-03-04",
+      "actos": [
+       {
+        "fecha": "2012-07-19",
+        "borme": "BORME-A-2012-137-34",
+        "provincia": "PALENCIA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-137-34"
+       },
+       {
+        "fecha": "2016-03-04",
+        "borme": "BORME-A-2016-44-34",
+        "provincia": "PALENCIA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Solid",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-44-34"
        }
       ]
      }
@@ -137599,6 +139103,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 6,
@@ -138015,6 +139520,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "partido": 1
@@ -138686,6 +140192,57 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "OLYMPIC MOLL SA",
+      "confirmacion": "declarada",
+      "motivo": "OLYMPIC MOLL,S.A.",
+      "desde": "2009-09-28",
+      "hasta": "2021-11-18",
+      "actos": [
+       {
+        "fecha": "2009-09-28",
+        "borme": "BORME-A-2009-185-28",
+        "provincia": "MADRID",
+        "acto": "Revocaciones",
+        "cargo": "Apoderado",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2009-185-28"
+       },
+       {
+        "fecha": "2014-01-27",
+        "borme": "BORME-A-2014-17-28",
+        "provincia": "MADRID",
+        "acto": "Revocaciones",
+        "cargo": "Apoderado",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-17-28"
+       },
+       {
+        "fecha": "2014-09-30",
+        "borme": "BORME-A-2014-186-28",
+        "provincia": "MADRID",
+        "acto": "Revocaciones",
+        "cargo": "Apo.Man.Soli",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-186-28"
+       },
+       {
+        "fecha": "2016-01-19",
+        "borme": "BORME-A-2016-11-28",
+        "provincia": "MADRID",
+        "acto": "Nombramientos",
+        "cargo": "Apo.Manc",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-11-28"
+       },
+       {
+        "fecha": "2021-11-18",
+        "borme": "BORME-A-2021-221-28",
+        "provincia": "MADRID",
+        "acto": "Revocaciones",
+        "cargo": "Apo.Manc",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2021-221-28"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 5,
@@ -139346,6 +140903,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 8,
      "partido": 1
@@ -139986,6 +141544,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 1,
      "educacion": 3,
@@ -140505,6 +142064,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 2,
      "sindicato": 1,
@@ -141198,6 +142758,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 1,
@@ -141651,6 +143212,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -142384,6 +143946,49 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "XESGALICIA SOCIEDAD GESTORA DE ENTIDADES DE INVERSION DE TIPO CERRADO SA(R.M. SANTIAGO DE COMPOSTELA)",
+      "confirmacion": "declarada",
+      "motivo": "XESGALICIA",
+      "desde": "2018-01-09",
+      "hasta": "2022-07-14",
+      "actos": [
+       {
+        "fecha": "2018-01-09",
+        "borme": "BORME-A-2018-6-15",
+        "provincia": "A CORUÑA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2018-6-15"
+       },
+       {
+        "fecha": "2020-10-21",
+        "borme": "BORME-A-2020-204-15",
+        "provincia": "A CORUÑA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-204-15"
+       },
+       {
+        "fecha": "2020-11-25",
+        "borme": "BORME-A-2020-227-15",
+        "provincia": "A CORUÑA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-227-15"
+       },
+       {
+        "fecha": "2022-07-14",
+        "borme": "BORME-A-2022-134-15",
+        "provincia": "A CORUÑA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2022-134-15"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 5,
@@ -143004,6 +144609,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 1,
@@ -143474,6 +145080,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "partido": 2
@@ -143931,6 +145538,41 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=88&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "LOS PINARES VIVERO MUNICIPAL DE TORREMOLINOS SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "AYUNTAMIENTO DE TORREMOLINOS",
+      "desde": "2022-02-02",
+      "hasta": "2023-11-27",
+      "actos": [
+       {
+        "fecha": "2022-02-02",
+        "borme": "BORME-A-2022-22-29",
+        "provincia": "MÁLAGA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2022-22-29"
+       },
+       {
+        "fecha": "2023-04-27",
+        "borme": "BORME-A-2023-80-29",
+        "provincia": "MÁLAGA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-80-29"
+       },
+       {
+        "fecha": "2023-11-27",
+        "borme": "BORME-A-2023-225-29",
+        "provincia": "MÁLAGA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-225-29"
        }
       ]
      }
@@ -144510,6 +146152,66 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=328&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "BARCELONA ACTIVA SA SOCIETAT PRIVADA MUNICIPAL",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Barcelona",
+      "desde": "2015-12-30",
+      "hasta": "2019-10-11",
+      "actos": [
+       {
+        "fecha": "2015-12-30",
+        "borme": "BORME-A-2015-248-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-248-08"
+       },
+       {
+        "fecha": "2019-10-11",
+        "borme": "BORME-A-2019-196-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-196-08"
+       }
+      ]
+     },
+     {
+      "nombre": "BARCELONA DE SERVEIS MUNICIPALS SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Barcelona",
+      "desde": "2015-08-27",
+      "hasta": "2019-09-13",
+      "actos": [
+       {
+        "fecha": "2015-08-27",
+        "borme": "BORME-A-2015-163-08",
+        "provincia": "BARCELONA",
+        "acto": "Nombramientos",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-163-08"
+       },
+       {
+        "fecha": "2016-08-12",
+        "borme": "BORME-A-2016-154-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "PRESIDENTE",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-154-08"
+       },
+       {
+        "fecha": "2019-09-13",
+        "borme": "BORME-A-2019-176-08",
+        "provincia": "BARCELONA",
+        "acto": "Revocaciones",
+        "cargo": "CONSEJERO",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-176-08"
        }
       ]
      }
@@ -145105,6 +146807,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 4
@@ -145683,6 +147386,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 3,
@@ -146093,6 +147797,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "asociacion": 1,
@@ -146573,6 +148278,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 2,
      "partido": 1
@@ -147117,6 +148823,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 6,
      "asociacion": 1,
@@ -147606,6 +149313,58 @@
         "fecha": "2023-12-19",
         "periodo": null,
         "url": "https://www.congreso.es/docinte/registro_intereses_diputado_90.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "SOCIEDAD MIXTA PARA LA PROMOCION DEL TURISMO DE VALLADOLID SL",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Valladolid",
+      "desde": "2015-07-29",
+      "hasta": "2023-08-14",
+      "actos": [
+       {
+        "fecha": "2015-07-29",
+        "borme": "BORME-A-2015-142-47",
+        "provincia": "VALLADOLID",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-142-47"
+       },
+       {
+        "fecha": "2020-01-16",
+        "borme": "BORME-A-2020-10-47",
+        "provincia": "VALLADOLID",
+        "acto": "Reelecciones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-10-47"
+       },
+       {
+        "fecha": "2023-08-14",
+        "borme": "BORME-A-2023-154-47",
+        "provincia": "VALLADOLID",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-154-47"
+       }
+      ]
+     },
+     {
+      "nombre": "SOCIEDAD MUNICIPAL DE SUELO Y VIVIENDA DE VALLADOLID SL",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Valladolid",
+      "desde": "2011-11-15",
+      "hasta": "2011-11-15",
+      "actos": [
+       {
+        "fecha": "2011-11-15",
+        "borme": "BORME-A-2011-216-47",
+        "provincia": "VALLADOLID",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-216-47"
        }
       ]
      }
@@ -148385,6 +150144,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -148964,6 +150724,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 2,
@@ -149606,6 +151367,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -150105,6 +151867,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -151239,6 +153002,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 13,
      "publica": 6,
@@ -151812,6 +153576,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "partido": 4
@@ -152287,6 +154052,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 3
     }
@@ -152916,6 +154682,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 1,
      "asociacion": 2,
@@ -153315,6 +155082,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1
@@ -153939,6 +155707,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 2,
@@ -154664,6 +156433,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "asociacion": 6,
@@ -155254,6 +157024,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "fundacion": 1,
@@ -155895,6 +157666,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 3,
@@ -156909,6 +158681,41 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "SERMOS GALIZA SA(R.M. SANTIAGO DE COMPOSTELA)",
+      "confirmacion": "declarada",
+      "motivo": "SERMOS GALIZA SA",
+      "desde": "2012-03-15",
+      "hasta": "2014-11-13",
+      "actos": [
+       {
+        "fecha": "2012-03-15",
+        "borme": "BORME-A-2012-53-15",
+        "provincia": "A CORUÑA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-53-15"
+       },
+       {
+        "fecha": "2012-09-26",
+        "borme": "BORME-A-2012-186-15",
+        "provincia": "A CORUÑA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Con.Delegado",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2012-186-15"
+       },
+       {
+        "fecha": "2014-11-13",
+        "borme": "BORME-A-2014-217-15",
+        "provincia": "A CORUÑA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2014-217-15"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 2,
@@ -157603,6 +159410,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 7,
      "partido": 1,
@@ -158166,6 +159974,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "asociacion": 1,
@@ -158752,6 +160561,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -159564,6 +161374,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 4,
@@ -160323,6 +162134,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "fundacion": 1,
@@ -161034,6 +162846,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "publica": 6,
@@ -161486,6 +163299,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2
@@ -162238,6 +164052,42 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "CENTRO PRIVADO DE EDUCACION INFANTIL GARABATO SOCIEDAD LIMITADA(R.M. LAS PALMAS)",
+      "confirmacion": "declarada",
+      "motivo": "Centro Privado de Educación Infantil Garabato SL",
+      "desde": "2023-09-28",
+      "hasta": "2023-09-28",
+      "actos": [
+       {
+        "fecha": "2023-09-28",
+        "borme": "BORME-A-2023-186-35",
+        "provincia": "LAS PALMAS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-186-35"
+       }
+      ]
+     },
+     {
+      "nombre": "FROSUA BLUE STAR SL(R.M. LAS PALMAS)",
+      "confirmacion": "declarada",
+      "motivo": "Frosua Blue Star SL",
+      "desde": "2020-01-09",
+      "hasta": "2020-01-09",
+      "actos": [
+       {
+        "fecha": "2020-01-09",
+        "borme": "BORME-A-2020-5-35",
+        "provincia": "LAS PALMAS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2020-5-35"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 6,
      "publica": 1,
@@ -162792,6 +164642,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 1,
@@ -163110,6 +164961,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 1
@@ -163628,6 +165480,25 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=140&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "EMPRESAS MUNICIPALES DE SEVILLA AIE",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Sevilla",
+      "desde": "2009-03-26",
+      "hasta": "2009-03-26",
+      "actos": [
+       {
+        "fecha": "2009-03-26",
+        "borme": "BORME-A-2009-58-41",
+        "provincia": "SEVILLA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2009-58-41"
        }
       ]
      }
@@ -164324,6 +166195,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "publica": 4,
@@ -164969,6 +166841,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 2,
@@ -165633,6 +167506,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "publica": 3,
@@ -166191,6 +168065,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 4,
@@ -166593,6 +168468,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 1,
@@ -167671,6 +169547,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 18,
      "publica": 1,
@@ -168169,6 +170046,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "asociacion": 2,
@@ -168811,6 +170689,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 2,
@@ -169478,6 +171357,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "fundacion": 1,
@@ -170306,6 +172186,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 9,
      "partido": 4,
@@ -170686,6 +172567,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 1
     }
@@ -171192,6 +173074,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 2
@@ -171748,6 +173631,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "partido": 1
@@ -172394,6 +174278,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 1,
@@ -173073,6 +174958,74 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=68&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "EMPRESA PROVINCIAL DE INFORMACION DE CADIZ SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Diputación Provincial de Cádiz",
+      "desde": "2015-12-23",
+      "hasta": "2022-11-23",
+      "actos": [
+       {
+        "fecha": "2015-12-23",
+        "borme": "BORME-A-2015-244-11",
+        "provincia": "CÁDIZ",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-244-11"
+       },
+       {
+        "fecha": "2019-11-20",
+        "borme": "BORME-A-2019-223-11",
+        "provincia": "CÁDIZ",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-223-11"
+       },
+       {
+        "fecha": "2022-11-23",
+        "borme": "BORME-A-2022-223-11",
+        "provincia": "CÁDIZ",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2022-223-11"
+       }
+      ]
+     },
+     {
+      "nombre": "EMPRESA MUNICIPAL DEL SUELO Y DE LA VIVIENDA DE SAN ROQUE SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de San Roque",
+      "desde": "2011-10-28",
+      "hasta": "2019-12-11",
+      "actos": [
+       {
+        "fecha": "2011-10-28",
+        "borme": "BORME-A-2011-206-11",
+        "provincia": "CÁDIZ",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-206-11"
+       },
+       {
+        "fecha": "2016-10-10",
+        "borme": "BORME-A-2016-194-11",
+        "provincia": "CÁDIZ",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-194-11"
+       },
+       {
+        "fecha": "2019-12-11",
+        "borme": "BORME-A-2019-236-11",
+        "provincia": "CÁDIZ",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-236-11"
        }
       ]
      }
@@ -173783,6 +175736,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 2,
@@ -174218,6 +176172,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 1,
@@ -174829,6 +176784,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "partido": 1
@@ -175548,6 +177504,57 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "EMPRESA MUNICIPAL DE INFRAESTRUCTURAS Y SERVICIOS DE ALBACETE SOCIEDAD ANONIMA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Albacete",
+      "desde": "2011-07-28",
+      "hasta": "2023-11-23",
+      "actos": [
+       {
+        "fecha": "2011-07-28",
+        "borme": "BORME-A-2011-143-02",
+        "provincia": "ALBACETE",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-143-02"
+       },
+       {
+        "fecha": "2015-07-28",
+        "borme": "BORME-A-2015-141-02",
+        "provincia": "ALBACETE",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-141-02"
+       },
+       {
+        "fecha": "2019-08-13",
+        "borme": "BORME-A-2019-154-02",
+        "provincia": "ALBACETE",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-154-02"
+       },
+       {
+        "fecha": "2021-11-04",
+        "borme": "BORME-A-2021-212-02",
+        "provincia": "ALBACETE",
+        "acto": "Nombramientos",
+        "cargo": "Presidente",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2021-212-02"
+       },
+       {
+        "fecha": "2023-11-23",
+        "borme": "BORME-A-2023-223-02",
+        "provincia": "ALBACETE",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-223-02"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -176080,6 +178087,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 2
     }
@@ -176707,6 +178715,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 3,
@@ -177651,6 +179660,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 3,
@@ -178178,6 +180188,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 1,
      "asociacion": 1,
@@ -178660,6 +180671,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 3
@@ -179504,6 +181516,25 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "SOCIEDAD DE ESTUDIOS JURIDICOS, JOSE MARIA SANCHEZ Y ABOGADOS ASOCIADOS SLP",
+      "confirmacion": "declarada",
+      "motivo": "Sociedad de estudios jurídicos José María Sánchez y abogados asociados, S.L.",
+      "desde": "2009-10-20",
+      "hasta": "2009-10-20",
+      "actos": [
+       {
+        "fecha": "2009-10-20",
+        "borme": "BORME-A-2009-200-28",
+        "provincia": "MADRID",
+        "acto": "Socio único",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2009-200-28"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -179991,6 +182022,42 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "BIO CARBUROS, SOCIEDAD LIMITADA(R.M. LAS PALMAS)",
+      "confirmacion": "declarada",
+      "motivo": "Bio Carburos S.L",
+      "desde": "2023-02-03",
+      "hasta": "2023-02-03",
+      "actos": [
+       {
+        "fecha": "2023-02-03",
+        "borme": "BORME-A-2023-24-35",
+        "provincia": "LAS PALMAS",
+        "acto": "Cambio de identidad del socio único",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-24-35"
+       }
+      ]
+     },
+     {
+      "nombre": "EXPLOTACION Y GESTION DE INVERSIONES SIGLO XXI, S.L.(R.M. LAS PALMAS)",
+      "confirmacion": "declarada",
+      "motivo": "EXPLOTACION Y GESTION DE INVERSIONES SIGLO XXI, SL",
+      "desde": "2013-12-05",
+      "hasta": "2013-12-05",
+      "actos": [
+       {
+        "fecha": "2013-12-05",
+        "borme": "BORME-A-2013-233-35",
+        "provincia": "LAS PALMAS",
+        "acto": "Socio único",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2013-233-35"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 3,
      "publica": 1
@@ -180452,6 +182519,33 @@
         "fecha": null,
         "periodo": null,
         "url": "https://www.congreso.es/es/busqueda-de-diputados?p_p_id=diputadomodule&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_diputadomodule_mostrarFicha=true&codParlamentario=217&idLegislatura=XV"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "EMPRESA MIXTA MUNICIPAL DE ABASTECIMIENTO Y SERVICIOS DE CALPE SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Calpe",
+      "desde": "2011-08-03",
+      "hasta": "2013-06-11",
+      "actos": [
+       {
+        "fecha": "2011-08-03",
+        "borme": "BORME-A-2011-147-03",
+        "provincia": "ALICANTE/ALACANT",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-147-03"
+       },
+       {
+        "fecha": "2013-06-11",
+        "borme": "BORME-A-2013-108-03",
+        "provincia": "ALICANTE/ALACANT",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2013-108-03"
        }
       ]
      }
@@ -181141,6 +183235,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -181564,6 +183659,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 2
     }
@@ -182385,6 +184481,66 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "INPRONOSA INVERSIONES, S.L.(R.M. A CORUÑA)",
+      "confirmacion": "declarada",
+      "motivo": "Inpronosa Inversiones, S.L.",
+      "desde": "2023-04-17",
+      "hasta": "2023-04-17",
+      "actos": [
+       {
+        "fecha": "2023-04-17",
+        "borme": "BORME-A-2023-72-15",
+        "provincia": "A CORUÑA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-72-15"
+       }
+      ]
+     },
+     {
+      "nombre": "REDES DE TELECOMUNICACION GALEGAS RETEGAL SA(R.M. SANTIAGO DE COMPOSTELA)",
+      "confirmacion": "declarada",
+      "motivo": "Retegal",
+      "desde": "2013-04-25",
+      "hasta": "2022-08-05",
+      "actos": [
+       {
+        "fecha": "2013-04-25",
+        "borme": "BORME-A-2013-78-15",
+        "provincia": "A CORUÑA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2013-78-15"
+       },
+       {
+        "fecha": "2015-11-20",
+        "borme": "BORME-A-2015-222-15",
+        "provincia": "A CORUÑA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2015-222-15"
+       },
+       {
+        "fecha": "2019-06-12",
+        "borme": "BORME-A-2019-110-15",
+        "provincia": "A CORUÑA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-110-15"
+       },
+       {
+        "fecha": "2022-08-05",
+        "borme": "BORME-A-2022-149-15",
+        "provincia": "A CORUÑA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2022-149-15"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 5,
@@ -182973,6 +185129,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 1,
@@ -183678,6 +185835,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 4,
      "publica": 3,
@@ -184183,6 +186341,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "asociacion": 1,
      "partido": 3
@@ -184865,6 +187024,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 1,
@@ -185543,6 +187703,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 1,
@@ -186083,6 +188244,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 2,
@@ -186577,6 +188739,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 2,
      "educacion": 2,
@@ -187255,6 +189418,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 4,
@@ -187860,6 +190024,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -188381,6 +190546,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "partido": 1,
@@ -188866,6 +191032,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 4,
      "publica": 3,
@@ -189484,6 +191651,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "publica": 3,
@@ -190010,6 +192178,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "partido": 2,
      "otra": 2
@@ -190433,6 +192602,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "partido": 2
@@ -191256,6 +193426,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 4,
      "publica": 1,
@@ -191918,6 +194089,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 1,
@@ -192494,6 +194666,49 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "EMPRESA FUNERARIA MUNICIPAL DE SOLLER SL(R.M. PALMA DE MALLORCA)",
+      "confirmacion": "cargo-publico",
+      "motivo": "AYUNTAMIENTO SÓLLER",
+      "desde": "2013-11-26",
+      "hasta": "2024-04-01",
+      "actos": [
+       {
+        "fecha": "2013-11-26",
+        "borme": "BORME-A-2013-226-07",
+        "provincia": "ILLES BALEARS",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2013-226-07"
+       },
+       {
+        "fecha": "2016-08-22",
+        "borme": "BORME-A-2016-159-07",
+        "provincia": "ILLES BALEARS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-159-07"
+       },
+       {
+        "fecha": "2022-02-16",
+        "borme": "BORME-A-2022-32-07",
+        "provincia": "ILLES BALEARS",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2022-32-07"
+       },
+       {
+        "fecha": "2024-04-01",
+        "borme": "BORME-A-2024-63-07",
+        "provincia": "ILLES BALEARS",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-63-07"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 6,
      "asociacion": 2,
@@ -192951,6 +195166,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 2,
      "partido": 2
@@ -193606,6 +195822,50 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "ALEJANDRO SOLER Y ASOCIADOS, ABOGADOS Y ASESORES SLP",
+      "confirmacion": "apellido",
+      "motivo": "soler",
+      "desde": "2013-10-31",
+      "hasta": "2018-08-24",
+      "actos": [
+       {
+        "fecha": "2013-10-31",
+        "borme": "BORME-A-2013-209-03",
+        "provincia": "ALICANTE/ALACANT",
+        "acto": "Socio único",
+        "cargo": "",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2013-209-03"
+       },
+       {
+        "fecha": "2018-08-24",
+        "borme": "BORME-A-2018-163-03",
+        "provincia": "ALICANTE/ALACANT",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Adm. Unico",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2018-163-03"
+       }
+      ]
+     },
+     {
+      "nombre": "PROMOCIONES E INICIATIVAS MUNICIPALES DE ELCHE SA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Elche",
+      "desde": "2011-09-05",
+      "hasta": "2011-09-05",
+      "actos": [
+       {
+        "fecha": "2011-09-05",
+        "borme": "BORME-A-2011-169-03",
+        "provincia": "ALICANTE/ALACANT",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-169-03"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 1,
      "publica": 5,
@@ -194065,6 +196325,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "asociacion": 1,
@@ -194627,6 +196888,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "SOCIEDAD DE GESTION TRIBUTARIA DEL AYUNTAMIENTO DE MAIRENA DEL ALJARAFE SL",
+      "confirmacion": "cargo-publico",
+      "motivo": "AYUNTAMIENTO MAIRENA DEL ALJARAFE",
+      "desde": "2011-11-18",
+      "hasta": "2017-03-07",
+      "actos": [
+       {
+        "fecha": "2011-11-18",
+        "borme": "BORME-A-2011-219-41",
+        "provincia": "SEVILLA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2011-219-41"
+       },
+       {
+        "fecha": "2017-03-07",
+        "borme": "BORME-A-2017-46-41",
+        "provincia": "SEVILLA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2017-46-41"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "empresa": 2,
      "publica": 2,
@@ -195125,6 +197413,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 2
@@ -195632,6 +197921,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "fundacion": 1,
@@ -196209,6 +198499,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -196778,6 +199069,33 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "RADIO MUNICIPAL DE BAILEN SOCIEDAD LIMITADA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Bailén",
+      "desde": "2016-10-11",
+      "hasta": "2017-02-08",
+      "actos": [
+       {
+        "fecha": "2016-10-11",
+        "borme": "BORME-A-2016-195-23",
+        "provincia": "JAÉN",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-195-23"
+       },
+       {
+        "fecha": "2017-02-08",
+        "borme": "BORME-A-2017-27-23",
+        "provincia": "JAÉN",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2017-27-23"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -197315,6 +199633,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "asociacion": 1,
@@ -197934,6 +200253,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 1,
      "partido": 1,
@@ -198518,6 +200838,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "fundacion": 1,
@@ -199202,6 +201523,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5
     }
@@ -199801,6 +202123,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "partido": 2
@@ -200494,6 +202817,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "partido": 1,
@@ -201043,6 +203367,33 @@
         "fecha": "2023-08-16",
         "periodo": null,
         "url": "https://www.congreso.es/docacteco/leg15/000335/000335_001_e_0001393_20230816.pdf"
+       }
+      ]
+     }
+    ],
+    "borme": [
+     {
+      "nombre": "GALICIA CALIDADE SA(R.M. SANTIAGO DE COMPOSTELA)",
+      "confirmacion": "declarada",
+      "motivo": "GALICIA CALIDADE",
+      "desde": "2019-04-12",
+      "hasta": "2022-10-27",
+      "actos": [
+       {
+        "fecha": "2019-04-12",
+        "borme": "BORME-A-2019-72-15",
+        "provincia": "A CORUÑA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-72-15"
+       },
+       {
+        "fecha": "2022-10-27",
+        "borme": "BORME-A-2022-206-15",
+        "provincia": "A CORUÑA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2022-206-15"
        }
       ]
      }
@@ -201669,6 +204020,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 1,
      "publica": 3,
@@ -202133,6 +204485,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3
     }
@@ -203002,6 +205355,156 @@
       ]
      }
     ],
+    "borme": [
+     {
+      "nombre": "EMPRESA MUNICIPAL DE MITJANS DE COMUNICACIO DE TARRAGONA SOCIEDAD ANONIMA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Tarragona",
+      "desde": "2016-07-13",
+      "hasta": "2025-11-17",
+      "actos": [
+       {
+        "fecha": "2016-07-13",
+        "borme": "BORME-A-2016-133-43",
+        "provincia": "TARRAGONA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-133-43"
+       },
+       {
+        "fecha": "2019-08-06",
+        "borme": "BORME-A-2019-149-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-149-43"
+       },
+       {
+        "fecha": "2023-09-05",
+        "borme": "BORME-A-2023-169-43",
+        "provincia": "TARRAGONA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-169-43"
+       },
+       {
+        "fecha": "2025-11-17",
+        "borme": "BORME-A-2025-219-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2025-219-43"
+       }
+      ]
+     },
+     {
+      "nombre": "EMPRESA MUNICIPAL DE TRANSPORTS PUBLICS DE TARRAGONA SOCIEDAD ANONIMA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Tarragona",
+      "desde": "2016-07-13",
+      "hasta": "2024-12-10",
+      "actos": [
+       {
+        "fecha": "2016-07-13",
+        "borme": "BORME-A-2016-133-43",
+        "provincia": "TARRAGONA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-133-43"
+       },
+       {
+        "fecha": "2019-08-07",
+        "borme": "BORME-A-2019-150-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-150-43"
+       },
+       {
+        "fecha": "2023-09-01",
+        "borme": "BORME-A-2023-167-43",
+        "provincia": "TARRAGONA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-167-43"
+       },
+       {
+        "fecha": "2024-12-10",
+        "borme": "BORME-A-2024-237-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-237-43"
+       }
+      ]
+     },
+     {
+      "nombre": "EMPRESA MUNICIPAL DE DESENVOLUPAMENT ECONOMIC DE TARRAGONA SOCIEDAD ANONIMA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Tarragona",
+      "desde": "2016-07-13",
+      "hasta": "2024-12-09",
+      "actos": [
+       {
+        "fecha": "2016-07-13",
+        "borme": "BORME-A-2016-133-43",
+        "provincia": "TARRAGONA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-133-43"
+       },
+       {
+        "fecha": "2019-08-08",
+        "borme": "BORME-A-2019-151-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-151-43"
+       },
+       {
+        "fecha": "2023-09-07",
+        "borme": "BORME-A-2023-171-43",
+        "provincia": "TARRAGONA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2023-171-43"
+       },
+       {
+        "fecha": "2024-12-09",
+        "borme": "BORME-A-2024-236-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2024-236-43"
+       }
+      ]
+     },
+     {
+      "nombre": "APARCAMENTS MUNICIPALS DE TARRAGONA SOCIETAT ANONIMA",
+      "confirmacion": "cargo-publico",
+      "motivo": "Ayuntamiento de Tarragona",
+      "desde": "2016-07-13",
+      "hasta": "2019-08-07",
+      "actos": [
+       {
+        "fecha": "2016-07-13",
+        "borme": "BORME-A-2016-133-43",
+        "provincia": "TARRAGONA",
+        "acto": "Nombramientos",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2016-133-43"
+       },
+       {
+        "fecha": "2019-08-07",
+        "borme": "BORME-A-2019-150-43",
+        "provincia": "TARRAGONA",
+        "acto": "Ceses/Dimisiones",
+        "cargo": "Consejero",
+        "url": "https://www.boe.es/diario_borme/txt.php?id=BORME-A-2019-150-43"
+       }
+      ]
+     }
+    ],
     "porTipo": {
      "publica": 11,
      "fundacion": 1,
@@ -203457,6 +205960,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "fundacion": 1,
@@ -204175,6 +206679,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 4,
      "fundacion": 1,
@@ -204763,6 +207268,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 3,
      "asociacion": 1,
@@ -205372,6 +207878,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 5,
      "partido": 3
@@ -205859,6 +208366,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 1,
      "partido": 2
@@ -206360,6 +208868,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "empresa": 3,
      "asociacion": 1,
@@ -206961,6 +209470,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "publica": 2,
      "fundacion": 1,
@@ -207539,6 +210049,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "asociacion": 4,
      "partido": 3,
@@ -207961,6 +210472,7 @@
       ]
      }
     ],
+    "borme": [],
     "porTipo": {
      "fundacion": 1,
      "asociacion": 2,

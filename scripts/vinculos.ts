@@ -4,11 +4,12 @@
  *   data/raw/vinculos/textos.jsonl    (textos oficiales de cada diputado con su fuente; scripts/vinculos-textos.ts)
  *   data/raw/vinculos/entidades.jsonl (entidades nombradas en cada texto: copia literal, tipo y relación)
  *   data/manual/entidades.json        (nombres que son la misma entidad, entidades excluidas y tipos corregidos)
+ *   data/raw/borme/vinculos-borme.jsonl (cargos en sociedades del BORME confirmados por otro documento; scripts/borme-clasificar.py)
  * Cada entidad lleva todas sus apariciones con el texto oficial y el enlace al documento.
  * Reglas en docs/metodologia.md («Empresas y entidades»).
  */
 import { readFileSync, existsSync } from 'node:fs';
-import { claveEntidad, esLiteral, slugEntidad, TIPOS_ENTIDAD, type AparicionVinculo, type EntidadExtraida, type TextoFuente, type TipoEntidad, type Vinculos, type VinculoEntidad } from '../src/lib/vinculos.ts';
+import { claveEntidad, esLiteral, slugEntidad, TIPOS_ENTIDAD, type AparicionVinculo, type ActoBorme, type ConfirmacionBorme, type EmpresaBorme, type EntidadExtraida, type TextoFuente, type TipoEntidad, type Vinculos, type VinculoEntidad } from '../src/lib/vinculos.ts';
 
 const leer = <T>(ruta: string): T[] => (existsSync(ruta) ? readFileSync(ruta, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l) as T) : []);
 
@@ -69,6 +70,16 @@ const nombreDe = (clave: string) =>
   [...variantes.get(clave)!.entries()].sort((a, b) => b[1] - a[1] || +(b[0] !== b[0].toUpperCase()) - +(a[0] !== a[0].toUpperCase()) || b[0].length - a[0].length)[0][0];
 const masFrecuente = <K>(m: Map<K, number>) => [...m.entries()].sort((a, b) => b[1] - a[1])[0][0];
 
+// Cargos en sociedades del BORME, solo los confirmados por otro documento oficial
+const borme = new Map<number, EmpresaBorme[]>();
+for (const x of leer<{ cod: number; empresa: string; nivel: ConfirmacionBorme; motivo: string; actos: ActoBorme[] }>('data/raw/borme/vinculos-borme.jsonl')) {
+  if (!borme.has(x.cod)) borme.set(x.cod, []);
+  const fechas = x.actos.map((a) => a.fecha).sort();
+  borme.get(x.cod)!.push({ nombre: x.empresa, confirmacion: x.nivel, motivo: x.motivo, desde: fechas[0], hasta: fechas[fechas.length - 1], actos: x.actos });
+}
+for (const xs of borme.values()) xs.sort((a, b) => b.hasta.localeCompare(a.hasta) || a.nombre.localeCompare(b.nombre, 'es'));
+
+for (const cod of borme.keys()) if (!grupos.has(cod)) grupos.set(cod, new Map());
 for (const [cod, g] of grupos) {
   const entidades: VinculoEntidad[] = [...g.entries()].map(([clave, x]) => ({
     slug: slugEntidad(nombreDe(clave)),
@@ -79,7 +90,7 @@ for (const [cod, g] of grupos) {
   entidades.sort((a, b) => TIPOS_ENTIDAD.indexOf(a.tipo) - TIPOS_ENTIDAD.indexOf(b.tipo) || a.nombre.localeCompare(b.nombre, 'es'));
   const porTipo: Vinculos['porTipo'] = {};
   for (const e of entidades) porTipo[e.tipo] = (porTipo[e.tipo] ?? 0) + 1;
-  porDiputado.set(cod, { entidades, porTipo });
+  porDiputado.set(cod, { entidades, borme: borme.get(cod) ?? [], porTipo });
 }
 
 export const construirVinculos = (cod: number): Vinculos | null => porDiputado.get(cod) ?? null;
