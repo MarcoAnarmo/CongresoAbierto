@@ -44,5 +44,5 @@ las etiquetas, explicaciones, botones y categorías propias de la web.
   vehicle; declaración de bienes → declaració de béns · ondasun-aitorpena · declaración de bens · asset declaration;
   retribución → retribució · ordainsaria · retribución · pay; legislatura → legislatura · legegintzaldia · lexislatura · term;
   ficha → fitxa · fitxa · ficha · profile; hemiciclo → hemicicle · hemizikloa · hemiciclo · chamber; tarjeta → targeta ·
-  txartela · tarxeta · card; circunscripción/provincia → circumscripció · barrutia · circunscrición · constituency;
-  «Lectura no confirmada» → «Lectura no confirmada» · «Irakurketa berretsi gabea» · «Lectura non confirmada» · «Unconfirmed reading».
+  txartela · tarxeta · card; circunscripción/provincia → circumscripció · probintzia · circunscrición · constituency;
+  «Lectura no confirmada» → «Lectura no confirmada» · «Berretsi gabeko irakurketa» · «Lectura non confirmada» · «Unconfirmed reading».

@@ -12,6 +12,7 @@ import TablaPrestamos from '../../../components/TablaPrestamos.astro';
 import AvisoDudoso from '../../../components/AvisoDudoso.astro';
 import Icono from '../../../components/Icono.astro';
 import { TIPOS_ENTIDAD, type TipoEntidad, type VinculoEntidad } from '../../../lib/vinculos';
+import { tipoCirc } from '../../../lib/provincias';
 import { conIdiomas, enlace, formatos, f, pl, LOCALE, type Idioma } from '../../../i18n';
 import comun from '../../../i18n/textos/comun';
 import textos, { textoEvento, detalleEvento } from '../../../i18n/textos/ficha';
@@ -178,7 +179,7 @@ const teselas: Tesela[] = [
   ...(pa ? [{
     grupo: t.grupos.congreso, id: 'participacion', icono: 'votaciones' as const, titulo: t.tes.participacion, corto: t.tes.participacionCorto,
     valor: fmtNum(votoEmitido), sub: f(t.tes.conEscano, { n: fmtNum(pa.enEscano) }),
-    acento: pa.distintoGrupo ? f(t.tes.distinto, { n: fmtNum(pa.distintoGrupo) }) : t.tes.siempre,
+    acento: pa.distintoGrupo ? pl(pa.distintoGrupo, t.tes.distinto, lang) : t.tes.siempre,
   }] : []),
   ...(votosDip.length ? [{ id: 'votaciones', icono: 'voto' as const, titulo: t.tes.votaciones, corto: t.tes.votacionesCorto, prefijo: t.tes.sobreVivienda, valor: '', sub: resumenVotos, votos: true }] : []),
   {
@@ -211,7 +212,7 @@ const bienesSeo = sinDeclaracion || p.propiedades === null
 const tituloSeo = `${f(t.seo.titulo, { nombre: d.nombreCompleto, grupo: d.grupoCorto })} · Congreso Abierto`;
 const descripcionSeo = f(t.seo.descripcion, { nombre: d.nombreCompleto, partido: d.partido, circ: d.circunscripcion, bienes: bienesSeo });
 const jsonLd = [
-  persona(d, rutaFicha, f(g(t.cab.diputadoPor), { circ: d.circunscripcion })),
+  persona(d, rutaFicha, f(g(t.cab.diputadoPor), { circ: d.circunscripcion, ...tipoCirc(d.circunscripcion) })),
   migas([[tc.nav.diputados, u('/diputados')], [circ.legible, u(`/provincia/${circ.id}`)], [d.nombreCompleto, rutaFicha]]),
 ];
 const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provincia, { provincia: circ.legible })}">${d.circunscripcion}</a>`;
@@ -225,7 +226,7 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
       <h1>{d.nombreCompleto}</h1>
       <p class="cab-grupo">
         <span class="pill"><span class="dot" style={`background:${colorGrupo(d.grupoCorto)}`}></span>{d.grupo.startsWith('GP ') ? f(t.cab.grupo, { nombre: d.grupo.slice(3) }) : d.grupo}</span>
-        <span class="muted"><Fragment set:html={f(g(t.cab.diputadoPor), { circ: enlaceCirc })} /><span class="solo-escritorio">{f(t.cab.desde, { fecha: fmtFecha(d.fechaAlta) })}</span></span>
+        <span class="muted"><Fragment set:html={f(g(t.cab.diputadoPor), { circ: enlaceCirc, ...tipoCirc(d.circunscripcion) })} /><span class="solo-escritorio">{f(t.cab.desde, { fecha: fmtFecha(d.fechaAlta) })}</span></span>
       </p>
       <p class="small muted cab-datos">
         {candidaturaDistinta(d) && <>{f(t.cab.candidatura, { partido: d.partido })}</>}
@@ -676,7 +677,7 @@ const enlaceCirc = `<a href="${u(`/provincia/${circ.id}`)}" title="${f(t.provinc
   <section class="seccion" id="trayectoria" aria-labelledby="h-trayectoria">
     <h2 id="h-trayectoria"><span class="s-ico"><Icono n="trayectoria" /></span>{t.tray.titulo}</h2>
     <div class="s-cuerpo">
-      <p class="small muted">{f(g(t.tray.desde), { circ: d.circunscripcion, fecha: fmtFecha(d.fechaAlta) })}{pf?.legislaturasTexto && ` · ${pf.legislaturasTexto}`}.</p>
+      <p class="small muted">{f(g(t.tray.desde), { circ: d.circunscripcion, ...tipoCirc(d.circunscripcion), fecha: fmtFecha(d.fechaAlta) })}{pf?.legislaturasTexto && ` · ${pf.legislaturasTexto}`}.</p>
       {d.cargos.length > 0 && (
         <>
           <h3>{t.tray.cargos}</h3>

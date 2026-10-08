@@ -20,8 +20,8 @@ export default area(es, {
   },
   eu: {
     leadLargo:
-      'Herritarrentzat lan egiten badute, herritarrek eskubidea dute haiek ondo ezagutzeko. Hemen dituzu XV. legegintzaldiko 350 diputatuak: nor diren, zer ikasi duten, zertan aritu diren, zenbat kobratzen duten, zer dutela aitortzen duten eurek eta nola bozkatzen duten. Datu ofizialak soilik, interpretaziorik gabe, bakoitza bere jatorrizko dokumentuaren estekarekin. Irizpide onez epai dezazun.',
-    leadCorto: 'Nor diren 350 diputatuak, zenbat kobratzen duten, zer dutela aitortzen duten eta nola bozkatzen duten. Datu ofizialak soilik.',
+      'Herritarrentzat lan egiten badute, herritarrek eskubidea dute haiek ondo ezagutzeko. Hemen dituzu XV. legegintzaldiko 350 diputatuak: nor diren, zer ikasi duten, zertan aritu diren, zenbat kobratzen duten, zer ondasun aitortzen dituzten haiek berek eta nola bozkatzen duten. Datu ofizialak soilik, interpretaziorik gabe, bakoitza bere jatorrizko dokumentuaren estekarekin. Irizpide onez epai dezazun.',
+    leadCorto: 'Nor diren 350 diputatuak, zenbat kobratzen duten, zer ondasun aitortzen dituzten eta nola bozkatzen duten. Datu ofizialak soilik.',
   },
   gl: {
     leadLargo:
