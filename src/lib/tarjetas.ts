@@ -1,6 +1,6 @@
 /** Contenido de cada tipo de tarjeta para redes. El dibujo común está en og.ts. */
 import { diputados, votaciones, votacionesPleno, temasDe, grupos, colorGrupo, slug, candidaturaDistinta, antesDeElecciones, circunscripciones } from './data';
-import { nombreLegible } from './provincias';
+import { nombreLegible, tipoCirc } from './provincias';
 import { fechaTexto } from '../i18n/fechas';
 import { disponerPorGrupos, TRAMOS, tramo } from './hemiciclo';
 import type { Diputado, VotacionClave, Voto } from './types';
@@ -111,7 +111,7 @@ export async function tarjetaDiputado(d: Diputado, formato: Formato, lang: Idiom
   const p = d.patrimonio;
   const foto = await fotoDataUri(d.fotoUrl);
   const color = colorGrupo(d.grupoCorto);
-  const cargo = f(td.cargo[d.genero === 'F' ? 1 : 0], { provincia: nombreLegible(d.circunscripcion) });
+  const cargo = f(td.cargo[d.genero === 'F' ? 1 : 0], { provincia: nombreLegible(d.circunscripcion), ...tipoCirc(d.circunscripcion) });
   const sinDecl = p.propiedades === null;
   const prop = sinDecl ? '—' : n(p.propiedades);
   const etProp = sinDecl ? td.sinDeclaracion : forma(p.propiedades, td.propiedades);
@@ -272,7 +272,7 @@ export async function tarjetaProvincia(id: string, formato: Formato, lang: Idiom
     cifra(conDatos.length ? fmtNum(prop) : '—', forma(prop, tp.propiedades), false, e),
     cifra(conDatos.length ? fmtNum(viv) : '—', forma(viv, tp.viviendas), false, e));
   const titulo = (tam: number) => h('div', { flexDirection: 'column', gap: 8 * e },
-    h('div', { fontSize: 28 * e, color: C.apagado }, tp.titulo),
+    h('div', { fontSize: 28 * e, color: C.apagado }, f(tp.titulo, tipoCirc(c.nombre))),
     h('div', { fontSize: tam, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 }, c.legible));
   if (formato === 'horizontal') return aPng(lienzo('horizontal', cabecera(), titulo(72), composicion, cifras, pie(1, lang)), 'horizontal');
 
@@ -551,7 +551,7 @@ export const compartir = {
   provincia: (id: string, lang: Idioma = 'es') => {
     const c = circunscripciones.find((x) => x.id === id)!;
     const k = diputados.filter((d) => d.circunscripcion === c.nombre).length;
-    return { enlace: pagina(`/provincia/${c.id}`, lang), texto: llamada(lang) + pl(k, textosCompartir[lang].mensaje.provincia, lang, { provincia: c.legible }) };
+    return { enlace: pagina(`/provincia/${c.id}`, lang), texto: llamada(lang) + pl(k, textosCompartir[lang].mensaje.provincia, lang, { provincia: c.legible, ...tipoCirc(c.nombre) }) };
   },
   /** Estadística de Estadísticas (rentas, acciones y fondos, empresas, ONG): título de su tarjeta y enlace a su caja. */
   estadistica: (id: string, titulo: string, ancla: string, lang: Idioma = 'es') => ({

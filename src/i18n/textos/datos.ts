@@ -917,12 +917,12 @@ export default area(es, {
     "pasoDe": "{n}. urratsa ({total}tik)",
     "tuDescarga": "Zure deskarga",
     "sinFiltros": "Iragazkirik gabe",
-    "quitarFiltro": "Kendu iragazkia: {nombre}",
+    "quitarFiltro": "Iragazkia kendu: {nombre}",
     "verPrevia": "Ikusi lehen errenkadak",
     "mas": "Datuak erabiltzeko beste modu batzuk",
     "listo": "Deskargatzeko prest",
     "filas": [
-      "{n} errenkada",
+      "errenkada {n}",
       "{n} errenkada"
     ],
     "titulo": "Datuak deskargatu",
@@ -949,7 +949,7 @@ export default area(es, {
     "hasta": "Noiz arte",
     "todos": "Guztiak",
     "buscar": "Izena edo hitza",
-    "quitarFiltros": "Kendu iragazkiak",
+    "quitarFiltros": "Iragazkiak kendu",
     "grande": "Errenkada asko dira: deskargak segundo batzuk iraun ditzake eta fitxategiak hainbat MB izango ditu.",
     "diccionario": "Zer esan nahi du zutabe bakoitzak",
     "completos": "Taula osoak",
@@ -982,8 +982,8 @@ export default area(es, {
     "tipo_otra": "Bestelakoa",
     "fuente_compatibilidad": "Kongresuaren erabakia (BOCG)",
     "fuente_registro": "Interesen Erregistroa",
-    "fuente_intereses": "Interes ekonomikoen adierazpena",
-    "fuente_bienes": "Ondasunen adierazpena",
+    "fuente_intereses": "Interes ekonomikoen aitorpena",
+    "fuente_bienes": "Ondasunen aitorpena",
     "fuente_ficha": "Fitxa ofiziala",
     "tablas": {
       "diputados": {
@@ -1018,7 +1018,7 @@ export default area(es, {
     "filtros": {
       "buscar": "Bilatu",
       "grupo": "Taldea",
-      "circunscripcion": "Barrutia",
+      "circunscripcion": "Probintzia",
       "genero": "Sexua",
       "es_vivienda": "Etxebizitza",
       "titular": "Titularra",
@@ -1062,15 +1062,15 @@ export default area(es, {
         "descripcion": "Zein hautagaitzarekin hautatu zuten"
       },
       "circunscripcion": {
-        "nombre": "Barrutia",
+        "nombre": "Probintzia",
         "descripcion": "Zein probintzia edo hiritan hautatu zuten"
       },
       "fecha_alta": {
-        "nombre": "Alta data",
+        "nombre": "Kargu-hartze data",
         "descripcion": "Eserlekua lortu zuen data"
       },
       "anio_nacimiento": {
-        "nombre": "Jaiotze urtea",
+        "nombre": "Jaiotze-urtea",
         "descripcion": "Fitxa ofizialaren arabera"
       },
       "legislaturas": {
@@ -1138,15 +1138,15 @@ export default area(es, {
         "descripcion": "Taula horretan inbertsio-funtsak aipatzen dituzten errenkaden zenbatekoak (pentsio-planik gabe)"
       },
       "deuda_pendiente": {
-        "nombre": "Zor ordaintzeko (€)",
-        "descripcion": "Aitortutako maileguen saldo ordaintzeko"
+        "nombre": "Ordaintzeke dagoen zorra (€)",
+        "descripcion": "Aitortutako maileguetan ordaintzeke dagoen saldoa"
       },
       "deuda_al_menos": {
         "nombre": "Zorra: gutxienez",
         "descripcion": "Zenbatekoren bat ezin izan da irakurri: gutxieneko bat da"
       },
       "votaciones_en_escano": {
-        "nombre": "Eserlekuarekin bozketak",
+        "nombre": "Eserlekua zuela egindako bozketak",
         "descripcion": "Eserlekua zuenean Osoko Bilkuran egindako bozketak"
       },
       "votos_si": {
@@ -1166,16 +1166,16 @@ export default area(es, {
         "descripcion": "Bozkatu ez zuen bozketak"
       },
       "votos_distintos_del_grupo": {
-        "nombre": "Taldetik bestelako botoak",
-        "descripcion": "Bere taldeko gehiengoaz bestela bozkatu zuen aldiz"
+        "nombre": "Taldetik desberdin emandako botoak",
+        "descripcion": "Bere taldeko gehiengotik desberdin bozkatu zuen aldiz"
       },
       "lectura_no_confirmada": {
-        "nombre": "Irakurketa berretsi gabea",
+        "nombre": "Berretsi gabeko irakurketa",
         "descripcion": "Daturen bat ezin izan da % 100ean berretsi: PDF ofizialean egiaztatu"
       },
       "url_ficha_oficial": {
         "nombre": "Fitxa ofiziala",
-        "descripcion": "Fitxa congreso.es-en"
+        "descripcion": "Fitxa congreso.es webgunean"
       },
       "url_declaracion_bienes": {
         "nombre": "Ondasunen aitorpena",
@@ -1214,7 +1214,7 @@ export default area(es, {
         "descripcion": "Higiezinaren probintzia, agertzen bada"
       },
       "anio_adquisicion": {
-        "nombre": "Eskuratze urtea",
+        "nombre": "Eskuratze-urtea",
         "descripcion": "Agertzen bada"
       },
       "derecho": {
@@ -1255,7 +1255,7 @@ export default area(es, {
       },
       "fuente": {
         "nombre": "Dokumentua",
-        "descripcion": "compatibilidad (BOCG), registro (Interesen Erregistroa), intereses (interes ekonomikoen adierazpena), bienes (ondasunen adierazpena) edo ficha (fitxa ofiziala)"
+        "descripcion": "compatibilidad (BOCG), registro (Interesen Erregistroa), intereses (interes ekonomikoen aitorpena), bienes (ondasunen aitorpena) edo ficha (fitxa ofiziala)"
       },
       "texto": {
         "nombre": "Testu literala",
@@ -1291,7 +1291,7 @@ export default area(es, {
       },
       "url_borme": {
         "nombre": "BORME (esteka)",
-        "descripcion": "Iragarki ofiziala boe.es-en"
+        "descripcion": "Iragarki ofiziala boe.es webgunean"
       },
       "fecha": {
         "nombre": "Data",
@@ -1323,7 +1323,7 @@ export default area(es, {
       },
       "no": {
         "nombre": "Ez",
-        "descripcion": "Aurkako botoak"
+        "descripcion": "Kontrako botoak"
       },
       "abstencion": {
         "nombre": "Abstentzioa",

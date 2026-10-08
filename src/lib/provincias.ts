@@ -66,3 +66,9 @@ export const PROVINCIAS: CasillaProvincia[] = [
 /** Nombre legible: «Coruña (A)» → «A Coruña», «Palmas (Las)» → «Las Palmas». */
 export const nombreLegible = (n: string) =>
   n === 'S/C Tenerife' ? 'Santa Cruz de Tenerife' : n.replace(/^(.+) \((.+)\)$/, '$2 $1');
+
+/** Ceuta y Melilla son ciudades autónomas, no provincias. Variables para los textos en euskera:
+ * «{circ} {probintziako} diputatua» → «Bizkaia probintziako diputatua» / «Ceuta hiriko diputatua». Los demás idiomas no las usan. */
+export const tipoCirc = (n: string) => (n === 'Ceuta' || n === 'Melilla'
+  ? { Probintzia: 'Hiri', probintziako: 'hiriko', probintzian: 'hirian' }
+  : { Probintzia: 'Probintzia', probintziako: 'probintziako', probintzian: 'probintzian' });

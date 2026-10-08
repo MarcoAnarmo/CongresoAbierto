@@ -10,7 +10,7 @@ import comun from './comun';
 const es = {
   descripcion: '{nombre} ({partido}, {circ}): rentas, cuentas, acciones, propiedades y deudas declaradas, trabajos anteriores, actividades y cómo vota.',
   /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
-  seo: { titulo: '{nombre} ({grupo}): patrimonio, propiedades y votos', descripcion: '{nombre} ({partido}, {circ}) declara {bienes}. Rentas, cuentas, deudas, trabajos anteriores y cómo vota en el Pleno.', bienes: '{propiedades} ({viviendas})', sinBienes: 'sin declaración de bienes publicada' },
+  seo: { titulo: '{nombre} ({grupo}): patrimonio, propiedades y votos', descripcion: '{nombre} ({partido}, {circ}) {bienes}. Rentas, cuentas, deudas, trabajos anteriores y cómo vota en el Pleno.', bienes: 'declara {propiedades} ({viviendas})', sinBienes: 'no tiene declaración de bienes publicada' },
   /** Enlace a la página de su provincia. */
   provincia: 'Diputados por {provincia}',
   cab: {
@@ -68,7 +68,7 @@ const es = {
     participacion: 'Sus votos en el Pleno',
     participacionCorto: 'Votos en el Pleno',
     conEscano: 'de {n} votaciones con escaño · ',
-    distinto: '{n} distinto de su grupo',
+    distinto: ['{n} distinto de su grupo', '{n} distintos de su grupo'],
     siempre: 'siempre con su grupo',
     votaciones: 'Votos sobre vivienda',
     votacionesCorto: 'Votos',
@@ -355,7 +355,7 @@ export default area(es, {
   ca: {
     descripcion: '{nombre} ({partido}, {circ}): rendes, comptes, accions, propietats i deutes declarats, feines anteriors, activitats i com vota.',
     /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
-    seo: { titulo: '{nombre} ({grupo}): patrimoni, propietats i vots', descripcion: '{nombre} ({partido}, {circ}) declara {bienes}. Rendes, comptes, deutes, feines anteriors i com vota al Ple.', bienes: '{propiedades} ({viviendas})', sinBienes: 'sense declaració de béns publicada' },
+    seo: { titulo: '{nombre} ({grupo}): patrimoni, propietats i vots', descripcion: '{nombre} ({partido}, {circ}) {bienes}. Rendes, comptes, deutes, feines anteriors i com vota al Ple.', bienes: 'declara {propiedades} ({viviendas})', sinBienes: 'no té declaració de béns publicada' },
     /** Enlace a la página de su provincia. */
     provincia: 'Diputats per {provincia}',
     cab: {
@@ -410,7 +410,7 @@ export default area(es, {
       participacion: 'Els seus vots al Ple',
       participacionCorto: 'Vots al Ple',
       conEscano: 'de {n} votacions amb escó · ',
-      distinto: '{n} diferent del seu grup',
+      distinto: ['{n} diferent del seu grup', '{n} diferents del seu grup'],
       siempre: 'sempre amb el seu grup',
       votaciones: 'Vots sobre habitatge',
       votacionesCorto: 'Vots',
@@ -684,14 +684,14 @@ export default area(es, {
     cab: {
       fotoAlt: '{nombre}: argazki ofiziala',
       grupo: '{nombre} taldea',
-      diputadoPor: ['{circ} barrutiko diputatua', '{circ} barrutiko diputatua'],
+      diputadoPor: ['{circ} {probintziako} diputatua', '{circ} {probintziako} diputatua'],
       desde: ' · kargu-hartzea: {fecha}',
       candidatura: 'Hautagaitza: {partido} · ',
       nacido: ['Jaiotze-urtea: {anio} · ', 'Jaiotze-urtea: {anio} · '],
       legislatura: ['XV. legegintzaldiko diputatua', 'XV. legegintzaldiko diputatua'],
       fichaOficial: 'Fitxa ofiziala congreso.es webgunean ↗',
-      avisarError: 'Jakinarazi fitxa honetako akats bat',
-      avisoGeneral: ['Fitxa honetako datuen batek irakurketa zalantzagarria du PDFan, edo ondasuna identifikatzen ez duen aldaketa jakinarazi bat. «Irakurketa berretsi gabea» markaz adierazita dago. Egiaztatu PDF ofizialean eta, akatsen bat ikusten baduzu, ', 'jakinarazi iezaguzu', '.'],
+      avisarError: 'Jakinarazi fitxaren akats bat',
+      avisoGeneral: ['Fitxa honetako datuen batek irakurketa zalantzagarria du PDFan, edo ondasuna identifikatzen ez duen aldaketa jakinarazi bat. «Berretsi gabeko irakurketa» markaz adierazita dago. Egiaztatu PDF ofizialean eta, akatsen bat ikusten baduzu, ', 'jakinarazi iezaguzu', '.'],
       resumenAria: '{nombre}: fitxaren laburpena',
     },
     grupos: { dinero: 'Dirua eta ondasunak', vinculos: 'Partaidetza enpresetan eta erakundeetan', congreso: 'Kongresuan', perfil: 'Profila' },
@@ -733,11 +733,11 @@ export default area(es, {
       participacion: 'Bere botoak Osoko Bilkuran',
       participacionCorto: 'Botoak Osoko Bilkuran',
       conEscano: 'eserlekua izanik egindako {n} bozketatik · ',
-      distinto: '{n} bere taldeak ez bezala',
+      distinto: ['{n} taldetik desberdin', '{n} taldetik desberdin'],
       siempre: 'beti bere taldearekin',
       votaciones: 'Etxebizitzari buruzko botoak',
       votacionesCorto: 'Botoak',
-      sobreVivienda: 'etxebizitzari buruz: ',
+      sobreVivienda: 'etxebizitzari dagokionez: ',
       actividades: 'Karguak eta jarduerak',
       actividadesCorto: 'Jarduerak',
       sinRegistro: 'erregistrorik argitaratu gabe',
@@ -774,7 +774,7 @@ export default area(es, {
       remNoConsta: 'dokumentu batek ere ez du esaten kobratzen duenik',
     },
     verTodo: 'Ikusi fitxa osoa orri bakarrean',
-    votos: { si: '{n} bai', no: '{n} ez', abs: '{n} abstentzio', nv: '{n} bozkatu gabe', sinEscano: ['{n} diputatu izan aurretik', '{n} diputatu izan aurretik'] },
+    votos: { si: '{n} bai', no: '{n} ez', abs: '{n} abstentzio', nv: '{n} bozkatu gabe', sinEscano: ['{n} eserlekurik gabe', '{n} eserlekurik gabe'] },
     sinEscano: ['Ez zen diputatua', 'Ez zen diputatua'],
     comun: {
       sinDeclaracion: 'Oraindik ez dago ondasun-aitorpenik argitaratuta.',
@@ -785,9 +785,9 @@ export default area(es, {
       sinValor: 'baliorik gabe',
       docPdf: (parcial, fecha) => `${parcial ? 'Aldaketa' : 'Aitorpena'}: ${fecha} (PDF) ↗`,
       decl: (parcial, fecha) => `${parcial ? 'aitorpen-aldaketa' : 'aitorpena'} (${fecha})`,
-      segun: 'Iturria: bere {decl}.',
+      segun: 'Bere {decl} iturri gisa.',
       todasVotaciones: 'Bozketa guztiak',
-      adquirido: 'erosketa: {anio}',
+      adquirido: 'eskuratzea: {anio}',
       pct: '% {n}',
     },
     prop: {
@@ -805,8 +805,8 @@ export default area(es, {
       vivienda: 'etxebizitza',
       porcentaje: 'Aitortutako ehunekoa',
       sinSituacion: 'Kokapena adierazi gabe',
-      urbano: 'Hiri-lurra',
-      rustico: 'Landa-lurra',
+      urbano: 'Hirikoa',
+      rustico: 'Landakoa',
       deSociedades: 'Parte hartzen duen sozietateen higiezinak',
       noSeSuman: 'Ez dira bere etxebizitza kopuruari gehitzen, sozietatearenak direlako, ez pertsonarenak.',
       notas: 'Jakinarazitako aldaketak eta oharrak ({n})',
@@ -823,7 +823,7 @@ export default area(es, {
       sinImporte: 'zenbatekorik gabe',
       sinTabla: 'Ez ditu errentak taulan zehazten.',
       irpf: 'Aurreko urtean ordaindutako PFEZ (kuota likidoa)',
-      incompleto: 'Zenbatekoren bat zuri dago edo ezin da zenbaki gisa irakurri, eta ez da batzen.',
+      incompleto: 'Zenbatekoren bat hutsik dago edo ezin da zenbaki gisa irakurri, eta ez da batzen.',
       pagina: '1. orria · {decl} (PDF) ↗',
     },
     cuentas: {
@@ -832,7 +832,7 @@ export default area(es, {
       intro: 'Bere gordailu guztien saldoa (iturria: bere {decl}). Kontu-zenbakiak ez dira argitaratzen.',
       cifra: 'kontu korronteetan, aurrezki-kontuetan eta beste ezarpen batzuetan',
       sinSaldo: 'saldorik gabe',
-      incompleto: 'Saldoren bat zuri dago edo ezin da zenbaki gisa irakurri, eta ez da batzen.',
+      incompleto: 'Saldoren bat hutsik dago edo ezin da zenbaki gisa irakurri, eta ez da batzen.',
       pagina: '2. orria · {decl} (PDF) ↗',
     },
     inv: {
@@ -858,7 +858,7 @@ export default area(es, {
       segun: (parcial, fecha) => `Iturria: bere ${parcial ? 'ondasun-aitorpenaren aldaketa' : 'ondasun-aitorpena'} (${fecha}).`,
       literal: 'Zenbatekoak diputatuak idatzi bezala kopiatzen dira.',
       cifra: ['ordaintzeke mailegu batean (taula ofizialaren batura)', 'ordaintzeke {n} mailegutan (taula ofizialaren batura)'],
-      incompleto: 'Saldoren bat zuri dago edo ezin da jatorrizkoan irakurri, eta ez da batzen.',
+      incompleto: 'Saldoren bat hutsik dago edo ezin da jatorrizkoan irakurri, eta ez da batzen.',
       otras: 'Beste zor eta betebehar batzuk:',
       observacionDip: 'Diputatuaren oharra: «{nota}»',
       anteriores: 'Aurreko aitorpenetako zor oraindik indarrean daudenak ({n})',
@@ -885,10 +885,10 @@ export default area(es, {
       titulo: 'Bere botoak Osoko Bilkuran',
       intro: ['XV. legegintzaldiko Osoko Bilkuraren bozketa guztiak, boto izendun argitaratua dutenak, diputatua denetik ({desde} – {hasta}).', 'XV. legegintzaldiko Osoko Bilkuraren bozketa guztiak, boto izendun argitaratua dutenak, diputatua denetik ({desde} – {hasta}).'],
       cifra: 'boto, eserlekua zuen {total} bozketatik ({pct})',
-      distintos: 'Bere taldeak ez bezala emandako botoak',
-      mixto: 'Talde Mistoan hainbat alderdi daude elkarrekin; beraz, ez da kontatzen taldeak ez bezala emandako boto gisa.',
+      distintos: 'Taldetik desberdin emandako botoak',
+      mixto: 'Talde Mistoan hainbat alderdi daude elkarrekin; beraz, ez da kontatzen taldetik desberdin emandako boto gisa.',
       siempre: 'Beti bere taldeko gehiengoak bezala bozkatu zuen (edo ez zuen bozkatu).',
-      veces: ['aldiz bozkatu zuen bai, ez edo abstentzioa, bozketa horretan bere taldeko gehiengoak ez bezala', 'aldiz bozkatu zuen bai, ez edo abstentzioa, bozketa horretan bere taldeko gehiengoak ez bezala'],
+      veces: ['aldiz bozkatu zuen bai, ez edo abstentzioa, bozketa horretan bere taldeko gehiengotik desberdin', 'aldiz bozkatu zuen bai, ez edo abstentzioa, bozketa horretan bere taldeko gehiengotik desberdin'],
       recientes: '. Berrienak ({n}):',
       dosPuntos: ':',
       fuente: 'Kongresuaren datu irekietako boto izendunak. Bozketa bakoitzeko taldea Kongresuak data horretarako argitaratzen duena da; bozketa sekretuak ez dira kontatzen · ',
@@ -931,7 +931,7 @@ export default area(es, {
     },
     tray: {
       titulo: 'Ibilbidea',
-      desde: ['{circ} barrutiko diputatua · kargu-hartzea: {fecha}', '{circ} barrutiko diputatua · kargu-hartzea: {fecha}'],
+      desde: ['{circ} {probintziako} diputatua · kargu-hartzea: {fecha}', '{circ} {probintziako} diputatua · kargu-hartzea: {fecha}'],
       cargos: 'Karguak Kongresuan',
       antes: 'Kongresua baino lehen',
       sinTrayectoria: 'Bere fitxa ofizialak ez du ibilbidea zehazten.',
@@ -968,8 +968,8 @@ export default area(es, {
       remTitulo: 'Ordainsaria, erakunde kopurutan',
       remNota: 'Dokumentu batek baino gehiagok erakunde bera aipatzen badu, gehien esaten duena zenbatzen da: ordainsariarekin, gero antzinatasun-osagarria, gero dietak edo gastuak bakarrik.',
       tipos: { empresa: 'Enpresak', publica: 'Sektore publikoa', fundacion: 'Fundazioak', asociacion: 'Elkarteak eta GKEak', partido: 'Alderdi politikoak', sindicato: 'Sindikatuak', educacion: 'Hezkuntza eta ikerketa', colegio: 'Elkargo profesionalak', otra: 'Beste erakunde batzuk' },
-      fuentes: { compatibilidad: 'Kongresuaren erabakia bere jarduerei buruz (BOCG)', registro: 'Interesen Erregistroa - Jarduerak', intereses: 'Interes ekonomikoen adierazpena', bienes: 'Ondasunen adierazpena', ficha: 'Fitxa ofiziala congreso.es-en' },
-      documentos: ['{n} dokumentu', '{n} dokumentu'],
+      fuentes: { compatibilidad: 'Kongresuaren erabakia bere jarduerei buruz (BOCG)', registro: 'Interesen Erregistroa - Jarduerak', intereses: 'Interes ekonomikoen aitorpena', bienes: 'Ondasunen aitorpena', ficha: 'Fitxa ofiziala congreso.es webgunean' },
+      documentos: ['dokumentu {n}', '{n} dokumentu'],
       periodo: 'aldia: {p}',
       textoLiteral: 'Testu literala',
       abrir: 'Ireki dokumentua ↗',
@@ -983,15 +983,15 @@ export default area(es, {
       confirmacion: {
         declarada: 'Enpresa bere dokumentu ofizialetan ere agertzen da: {motivo}.',
         'cargo-publico': 'Kargu bat adierazten duen administrazio bati lotutako enpresa publikoa: {motivo}.',
-        apellido: 'Sozietateak bere izena darama eta bere hauteskunde-barrutiko probintzian dago inskribatuta.',
+        apellido: 'Sozietateak bere izena darama eta bere probintzian dago inskribatuta.',
       },
       periodo: '{desde}–{hasta}',
-      actos: ['{n} egintza', '{n} egintza'],
-      registro: '{p}ko Merkataritza Erregistroa',
+      actos: ['egintza {n}', '{n} egintza'],
+      registro: 'Merkataritza Erregistroa ({p})',
       fuente: 'BORMEko Lehen Ataleko egintza inskribatuak (BOEren datu irekiak). Karguak eta izenak dauden bezala kopiatzen dira, BORMEren laburdurekin. ',
     },
     aviso: {
-      titulo: 'Irakurketa berretsi gabea.',
+      titulo: 'Berretsi gabeko irakurketa.',
       pdf: [' Egiaztatu ', 'PDF ofizialean ↗', '.'],
       confirmar: ['Berretsi badezakezu, ', 'jakinarazi iezaguzu', '.'],
     },
@@ -1001,7 +1001,7 @@ export default area(es, {
   gl: {
     descripcion: '{nombre} ({partido}, {circ}): rendas, contas, accións, propiedades e débedas declaradas, traballos anteriores, actividades e como vota.',
     /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
-    seo: { titulo: '{nombre} ({grupo}): patrimonio, propiedades e votos', descripcion: '{nombre} ({partido}, {circ}) declara {bienes}. Rendas, contas, débedas, traballos anteriores e como vota no Pleno.', bienes: '{propiedades} ({viviendas})', sinBienes: 'sen declaración de bens publicada' },
+    seo: { titulo: '{nombre} ({grupo}): patrimonio, propiedades e votos', descripcion: '{nombre} ({partido}, {circ}) {bienes}. Rendas, contas, débedas, traballos anteriores e como vota no Pleno.', bienes: 'declara {propiedades} ({viviendas})', sinBienes: 'non ten declaración de bens publicada' },
     /** Enlace a la página de su provincia. */
     provincia: 'Deputados por {provincia}',
     cab: {
@@ -1056,7 +1056,7 @@ export default area(es, {
       participacion: 'Os seus votos no Pleno',
       participacionCorto: 'Votos no Pleno',
       conEscano: 'de {n} votacións con escano · ',
-      distinto: '{n} distinto do seu grupo',
+      distinto: ['{n} distinto do seu grupo', '{n} distintos do seu grupo'],
       siempre: 'sempre co seu grupo',
       votaciones: 'Votos sobre vivenda',
       votacionesCorto: 'Votos',
@@ -1324,7 +1324,7 @@ export default area(es, {
   en: {
     descripcion: '{nombre} ({partido}, {circ}): declared income, accounts, shares, properties and debts, previous jobs, activities and how they vote.',
     /** Título y descripción para buscadores y vista previa de enlaces; {bienes} es «3 propiedades (1 vivienda)» o sinBienes. */
-    seo: { titulo: '{nombre} ({grupo}): assets, properties and votes', descripcion: '{nombre} ({partido}, {circ}) declares {bienes}. Income, accounts, debts, previous jobs and how they vote in the Plenary.', bienes: '{propiedades} ({viviendas})', sinBienes: 'no asset declaration published' },
+    seo: { titulo: '{nombre} ({grupo}): assets, properties and votes', descripcion: '{nombre} ({partido}, {circ}) {bienes}. Income, accounts, debts, previous jobs and how they vote in the Plenary.', bienes: 'declares {propiedades} ({viviendas})', sinBienes: 'has no published asset declaration' },
     /** Enlace a la página de su provincia. */
     provincia: 'Deputies for {provincia}',
     cab: {
@@ -1379,7 +1379,7 @@ export default area(es, {
       participacion: 'Their votes in the plenary',
       participacionCorto: 'Plenary votes',
       conEscano: 'of {n} roll calls while holding a seat · ',
-      distinto: '{n} different from their group',
+      distinto: ['{n} different from their group', '{n} different from their group'],
       siempre: 'always with their group',
       votaciones: 'Votes on housing',
       votacionesCorto: 'Votes',

@@ -409,21 +409,21 @@ export default area(es, {
   },
   eu: {
     "pestanas": {"aria": "Estatistiken atalak", "votos": "Botoak", "perfil": "Profila", "dinero": "Dirua", "empresas": "Enpresak"},
-    "cifras": {"votaciones": "Osoko bilkurako bozketa aztertuta", "mujeres": "emakume 350 diputatuen artean", "distintos": "diputatuk bozkatu dute noizbait beren taldeaz bestela", "alquiler": "diputatuk alokairuetatik errentak aitortzen dituzte"},
+    "cifras": {"votaciones": "Osoko Bilkurako bozketa aztertuta", "mujeres": "emakume 350 diputatuen artean", "distintos": "diputatuk bozkatu dute noizbait taldetik desberdin", "alquiler": "diputatuk alokairuetatik errentak aitortzen dituzte"},
     "verCifras": "Sakatu errenkada bat zifrak ikusteko.",
     "matriz": "Bi taldeek (errenkada eta zutabea) bat egin zuten bozketen ehunekoa.",
     "titulo": "Estatistikak",
     "tituloSeo": "Diputatuen estatistikak: talde bakoitzak nola bozkatzen duen, zer ikasi zuten eta zer aitortzen duten",
-    "descripcion": "Talde bakoitzak gaika nola bozkatzen duen, norekin bat egiten duen, diputatuek zer ikasi zuten, aitortutako errentak eta nork kobratzen dituen alokairuak. Guztizko zifrak, datu ofizialekin.",
-    "lead": "XV. Legegintzaldiko 350 diputatuen zifrak, Kongresuaren datu ofizialekin. Beti guztizkoak, inoiz ez batez bestekoak.",
+    "descripcion": "Talde bakoitzak gai bakoitzean nola bozkatzen duen, norekin bat egiten duen, diputatuek zer ikasi zuten, aitortutako errentak eta nork kobratzen dituen alokairuak. Guztizko zifrak, datu ofizialekin.",
+    "lead": "XV. legegintzaldiko 350 diputatuen zifrak, Kongresuaren datu ofizialekin. Beti guztizkoak, inoiz ez batez bestekoak.",
     "fuente": "Nola kalkulatzen den",
     "descargar": "Deskargatu datu hauek",
     "votoTema": {
-      "titulo": "Talde bakoitzak nola bozkatzen duen, gaika",
+      "titulo": "Talde bakoitzak nola bozkatzen duen, gaiaren arabera",
       "intro": "Gai bakoitzeko zenbat bozketatan bozkatu zuen talde bakoitzak, gehienbat, bai, ez edo abstentzioa.",
       "elige": "Gaia",
       "votaciones": [
-        "{n} bozketa",
+        "bozketa {n}",
         "{n} bozketa"
       ],
       "empate": "Berdinketa",
@@ -438,8 +438,8 @@ export default area(es, {
       "nota": "Bi taldeek gehiengoaren boto argia (berdinketarik gabe) izan zuten bozketak soilik zenbatzen dira."
     },
     "distintos": {
-      "titulo": "Nork bozkatzen duen gehien bere taldetik bestela",
-      "intro": "Egun hartan bere taldeko gehiengoaz bestela bai, ez edo abstentzioa gehien bozkatu zuten diputatuak.",
+      "titulo": "Nork bozkatzen duen gehien taldetik desberdin",
+      "intro": "Egun hartan bere taldeko gehiengotik desberdin bai, ez edo abstentzioa gehien bozkatu zuten diputatuak.",
       "veces": [
         "{n} aldiz",
         "{n} aldiz"
@@ -454,7 +454,7 @@ export default area(es, {
         "publica": "Publikoa soilik",
         "privada": "Pribatua soilik",
         "ambas": "Publikoa eta pribatua",
-        "sin-centro": "Espainiako unibertsitaterik ez fitxan",
+        "sin-centro": "Espainiako unibertsitaterik gabe fitxan",
         "sin-datos": "Ez dago prestakuntzarik bere fitxa ofizialean"
       },
       "univTitulo": "Unibertsitate ohikoenak",
@@ -475,34 +475,34 @@ export default area(es, {
       }
     },
     "rentas": {
-      "titulo": "Aitortutako errentak, tarteka",
+      "titulo": "Aitortutako errentak, tarteen arabera",
       "intro": "Ondasun-aitorpenaren aurreko urteko errentak, Kongresuko soldata kanpo (ez da aitortzen). Diputatuak tarte bakoitzean.",
       "ninguna": "Bat ere ez",
       "menos": "{a} baino gutxiago",
       "entre": "{a} - {b}",
       "mas": "{a} edo gehiago",
       "alMenos": [
-        "{n} aitorpenek zenbateko irakurtezinen bat du: bere gutxienekoaren tartean zenbatzen da.",
+        "Aitorpen batek zenbateko irakurtezinen bat du: bere gutxienekoaren tartean zenbatzen da.",
         "{n} aitorpenek zenbateko irakurtezinen bat dute: beren gutxienekoaren tartean zenbatzen dira."
       ],
       "sinDecl": [
-        "{n} diputatu aitorpen argitaraturik gabe.",
+        "diputatu {n} aitorpen argitaraturik gabe.",
         "{n} diputatu aitorpen argitaraturik gabe."
       ]
     },
     "alquiler": {
       "titulo": "Nork aitortzen dituen alokairuetako errentak",
       "intro": [
-        "{n} diputatuk higiezinak alokatzeagatiko errentak aitortzen ditu.",
+        "Diputatu batek higiezinak alokatzeagatiko errentak aitortzen ditu.",
         "{n} diputatuk higiezinak alokatzeagatiko errentak aitortzen dituzte."
       ],
-      "porGrupo": "Taldeka",
+      "porGrupo": "Talde bakoitzeko",
       "verLista": "Ikusi nortzuk diren",
       "nota": "Alokairua, errentamendua edo higiezinen kapitalaren etekinak aipatzen dituzten errenta-kontzeptuak, diputatu bakoitzak idazten dituen bezala (etxebizitzak, lokalak, garaje-plazak…). Ez dira dibidenduak ezta interesak zenbatzen."
     },
     "deGrupo": "{n} / {de}",
     "rentasGrupo": {
-      "titulo": "Nork aitortzen ditu errentak, taldeka",
+      "titulo": "Nork aitortzen ditu errentak, taldearen arabera",
       "intro": "Aurreko urteko errentaren bat aitortzen duten talde bakoitzeko diputatuak (Kongresuko soldata kanpo), aitorpena argitaratuta dutenen artean.",
       "con": "Errentak aitortzen dituzte",
       "sin": "Ez dute bat ere aitortzen",
@@ -528,16 +528,16 @@ export default area(es, {
       "titulo": "Akzioak eta inbertsio-funtsak",
       "intro": "Akzioak edo partaidetzak eta inbertsio-funtsak aitortzen dituzten diputatuak, bakoitzak duena deskribatzen duen moduaren arabera.",
       "acciones": [
-        "{n} diputatuk akzioak edo partaidetzak aitortzen ditu",
+        "Diputatu batek akzioak edo partaidetzak aitortzen ditu",
         "{n} diputatuk akzioak edo partaidetzak aitortzen dituzte"
       ],
       "fondos": [
-        "{n} diputatuk inbertsio-funtsak aitortzen ditu",
+        "Diputatu batek inbertsio-funtsak aitortzen ditu",
         "{n} diputatuk inbertsio-funtsak aitortzen dituzte"
       ],
       "euros": "{x} guztira",
-      "porGrupoAcciones": "Akzioak edo partaidetzak, taldeka",
-      "porGrupoFondos": "Inbertsio-funtsak, taldeka",
+      "porGrupoAcciones": "Akzioak edo partaidetzak, taldearen arabera",
+      "porGrupoFondos": "Inbertsio-funtsak, taldearen arabera",
       "nota": "Ondasun-aitorpeneko «Zor publikoa, obligazioak, akzioak eta partaidetzak» taula ofiziala. Errenkada bakoitzeko hitzen arabera sailkatzen da: akzioak eta funtsak aipatzen baditu, bietan zenbatzen da; pentsio-planak ez dira funtsak; ez badu esaten (adibidez, «TELEFONICA» bakarrik), ez da sailkatzen. Euroak zenbateko irakurgarriak dira."
     },
     "masValores": {
@@ -554,13 +554,13 @@ export default area(es, {
       "titulo": "Zer harreman duten enpresa pribatuekin",
       "intro": "Beren dokumentu ofizialetan enpresa pribatuak aipatzen dituzten diputatuak, harreman motaren arabera. Pertsona bat duen mota bakoitzean zenbatzen da.",
       "cifra": [
-        "{n} diputatuk enpresa pribaturen bat aipatzen du bere dokumentuetan",
+        "Diputatu batek enpresa pribaturen bat aipatzen du bere dokumentuetan",
         "{n} diputatuk enpresa pribaturen bat aipatzen dute beren dokumentuetan"
       ],
-      "nota": "Parte hartzea ez da jabea izatea ez kobratzea: akzioak izatea, enpresa batean lan egin izana edo baimendutako jarduera bat izatea harreman desberdinak dira. Mota dokumentuaren ataletik edo Kongresuaren erabakiak aipatzen duen legearen artikulutik dator."
+      "nota": "Parte hartzea ez da jabea izatea, ezta kobratzea ere: akzioak izatea, enpresa batean lan egin izana edo baimendutako jarduera bat izatea harreman desberdinak dira. Mota dokumentuaren ataletik edo Kongresuaren erabakiak aipatzen duen legearen artikulutik dator."
     },
     "empGrupo": {
-      "titulo": "Nork aipatzen ditu enpresa pribatuak, taldeka",
+      "titulo": "Nork aipatzen ditu enpresa pribatuak, taldearen arabera",
       "intro": "Beren dokumentu ofizialetan enpresa pribaturen bat aipatzen duten talde bakoitzeko diputatuak, edozein harremanekin.",
       "con": "Bat edo gehiago aipatzen dute",
       "sin": "Bat ere ez"
@@ -568,35 +568,35 @@ export default area(es, {
     "remuneracion": {
       "titulo": "Zer diote beren dokumentuek kobratzen duten ala ez",
       "intro": "Enpresa edo erakundeekin harremanen bat (karguak, jarduerak, lanak) duten diputatuak kasu bakoitzean. Pertsona bat bere dokumentuetan agertzen den kasu bakoitzean zenbatzen da.",
-      "lista": "Nork duen ordainsaria duen harremanen bat, dokumentuaren arabera",
+      "lista": "Ordainsariarekin harremanen bat duten pertsonek, dokumentuaren arabera",
       "nota": "Dokumentuaren testuak dioena bakarrik zenbatzen da: esaten ez duenean, ez da zenbatzen kobratzen duela ez kobratzen ez duela. Erabaki batzuek amaitutako kobrantzak aipatzen dituzte; testu literala diputatu bakoitzaren fitxan dago. Kongresuko soldata ez da hemen zenbatzen."
     },
     "masEmpresas": {
       "titulo": "Nork aipatzen ditu enpresa gehien",
       "intro": "Diputatu bakoitzaren dokumentu ofizialek aipatzen dituzten enpresa pribatu desberdinak, edozein harremanekin (akzioak, aurreko lanak, jarduerak…).",
       "empresas": [
-        "{n} enpresa",
+        "enpresa {n}",
         "{n} enpresa"
       ]
     },
     "borme": {
-      "titulo": "Sozietateetako karguak Merkataritza Erregistroaren arabera, taldeka",
+      "titulo": "Sozietateetako karguak Merkataritza Erregistroaren arabera, talde bakoitzeko",
       "intro": "2009az geroztik BORMEn inskribatutako egintzaren bat (izendapenak, kargu-uzteak…) duten diputatuak, beste dokumentu ofizial batek baieztatuta.",
       "con": "BORMEn karguekin",
       "sin": "Baieztatutako kargurik gabe",
-      "nota": "BORMEk ez du NANa argitaratzen: beste dokumentu ofizial batek baieztatutako izen-bat-etortzeak bakarrik zenbatzen dira. BORMEk ez du esaten kargua oraindik indarrean dagoen ere."
+      "nota": "BORMEk ez du NANa argitaratzen: beste dokumentu ofizial batek baieztatutako izen-bat-etortzeak bakarrik zenbatzen dira. BORMEk ezta ere kargua oraindik indarrean dagoenik ez du esaten."
     },
     "ong": {
       "titulo": "Fundazio, GKE eta elkarteei egindako ekarpenak",
-      "intro": "Interes ekonomikoen adierazpenean fundazio, GKE eta elkarteei kuotak edo dohaintzak aitortzen dizkieten diputatuak.",
+      "intro": "Interes ekonomikoen aitorpenean fundazio, GKE eta elkarteei kuotak edo dohaintzak aitortzen dizkieten diputatuak.",
       "cifra": [
-        "{n} diputatuk fundazio, GKE edo elkarteei egindako ekarpenak aitortzen ditu",
+        "Diputatu batek fundazio, GKE edo elkarteei egindako ekarpenak aitortzen ditu",
         "{n} diputatuk fundazio, GKE edo elkarteei egindako ekarpenak aitortzen dituzte"
       ],
-      "porGrupo": "Taldeka",
+      "porGrupo": "Talde bakoitzeko",
       "mas": "Zeini egiten dioten ekarpena diputatu gehienek",
       "cargos": [
-        "Gainera, {n} diputatuk kargu edo jarduera bat du fundazio edo elkarteren batean.",
+        "Gainera, diputatu batek kargu edo jarduera bat du fundazio edo elkarteren batean.",
         "Gainera, {n} diputatuk kargu edo jarduera bat dute fundazio edo elkarteren batean."
       ],
       "nota": "Ekarpen bat ez da kargu bat ezta erakundean parte hartzea ere. Norberaren alderdiari ordaindutako kuotak ez dira zenbatzen. Diputatu bakoitza behin zenbatzen da erakunde bakoitzeko."
@@ -605,8 +605,8 @@ export default area(es, {
       "titulo": "Emakumeak eta gizonak talde bakoitzean",
       "mujeres": "Emakumeak",
       "hombres": "Gizonak",
-      "nacTitulo": "Jaiotze urtea",
-      "nacIntro": "Diputatuak jaiotze-hamarkadaren arabera, fitxa ofizialaren arabera."
+      "nacTitulo": "Jaiotze-urtea",
+      "nacIntro": "Diputatuak jaiotze-hamarkadaren arabera, fitxa ofizialeko datuekin."
     }
   },
   gl: {

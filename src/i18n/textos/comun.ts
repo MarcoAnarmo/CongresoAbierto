@@ -112,11 +112,11 @@ export default area(es, {
     noEncontrada: { titulo: 'Pàgina no trobada', descripcion: 'La pàgina que busques no existeix.', texto: 'L’adreça no existeix o ha canviat.', volver: 'Ves a l’hemicicle' },
   },
   eu: {
-    nav: { estadisticas: 'Estatistikak', datos: 'Datuak', descargar: 'Deskargatu', mas: 'Gehiago', tarjetas: 'Txartelak', masTitulo: 'Orrialde gehiago', seccionDatos: 'Estatistikak eta deskargak', hemiciclo: 'Hemizikloa', diputados: 'Diputatuak', votaciones: 'Bozketak', votacionesCorto: 'Botoak', metodologia: 'Metodologia', metodologiaCorto: 'Metodoa', colabora: 'Lagundu' },
+    nav: { estadisticas: 'Estatistikak', datos: 'Datuak', descargar: 'Deskargatu', mas: 'Gehiago', tarjetas: 'Txartelak', masTitulo: 'Orrialde gehiago', seccionDatos: 'Estatistikak eta deskargak', hemiciclo: 'Hemizikloa', diputados: 'Diputatuak', votaciones: 'Bozketak', votacionesCorto: 'Botoak', metodologia: 'Metodologia', metodologiaCorto: 'Metodoa', colabora: 'Lagun ezazu' },
     marca: {
-      lema: 'Ezagutu zure ordezkaria',
+      lema: 'Ezagutu  zure ordezkaria',
       subtitulo: 'Gardentasuna eta Kongresuko datu ofizialetarako sarbide erraza',
-      descripcion: 'Ezagutu zure ordezkaria · Gardentasuna eta Kongresuko datu ofizialetarako sarbide erraza: nor diren 350 diputatuak, zer aitortzen duten eta nola bozkatzen duten.',
+      descripcion: 'Ezagutu zure ordezkaria · Gardentasuna eta Kongresuko datu ofizialetarako sarbide erraza: nortzuk diren 350 diputatuak, zer aitortzen duten eta nola bozkatzen duten.',
       inicio: 'Congreso Abierto, hasiera',
       navPrincipal: 'Nagusia',
       saltar: 'Joan edukira',
@@ -125,16 +125,16 @@ export default area(es, {
     tema: { oscuro: 'Aktibatu modu iluna', claro: 'Aktibatu modu argia' },
     idioma: { boton: 'Hizkuntza: euskara. Aldatu hizkuntza', titulo: 'Hizkuntza', datosEnCastellano: 'Datu ofizialak gaztelaniaz agertzen dira, Kongresuak argitaratzen dituen bezala.' },
     pie: {
-      explora: 'Arakatu', participa: 'Parte hartu', tarjetas: 'Partekatzeko txartelak', colabora: 'Lagundu nahi duzu?', avisoLegal: 'Datuen erabilera eta lege-oharra', hojaDeRuta: 'Ibilbide-orria',
-      codigo: 'Kodea GitHub-en', sugerencia: 'Egin iradokizun bat', error: 'Jakinarazi akats bat',
-      fuentes: '{congreso}ren eta {boe}ren datu ofizialak soilik, interpretaziorik gabe. Datu bakoitzak jatorrizko dokumentura eramaten du.',
+      explora: 'Ikertu', participa: 'Parte hartu', tarjetas: 'Partekatzeko txartelak', colabora: 'Lagundu nahi duzu?', avisoLegal: 'Datuen erabilera eta lege-oharra', hojaDeRuta: 'Bide-orria',
+      codigo: 'Kodea GitHub-en', sugerencia: 'Iradokizunak', error: 'Akatsak jakinarazi',
+      fuentes: '{congreso}ren eta {boe}ren datu ofizialak soilik azaltzen dira, interpretaziorik gabe. Datu bakoitzak jatorrizko dokumentura lotuta dago.',
       congreso: 'Diputatuen Kongresua', independiente: 'Proiektu independentea · Kode irekia (MIT)', idiomas: 'Hizkuntzak',
     },
     voto: { 'Sí': 'Bai', 'No': 'Ez', 'Abstención': 'Abstentzioa', 'No vota': 'Ez du bozkatzen' },
     resultado: { Aprobada: 'Onartua', Rechazada: 'Baztertua', Aprobado: 'Onartua', Rechazado: 'Baztertua', Convalidado: 'Baliozkotua', Derogado: 'Indargabetua' },
     elecciones: {
       texto: 'Hauteskunde orokorrak 2026ko azaroaren 29an', corto: 'azaroaren 29ko hauteskundeak', etiqueta: 'Hauteskunde orokorrak: azaroaren 29a',
-      mini: 'Hauteskundeak: azaroaren 29a', tarjeta: 'Hauteskunde orokorrak · azaroaren 29a', llamada: 'Azaroaren 29an bozkatu aurretik, ezagutu zure ordezkaria. ',
+      mini: 'Hauteskundeak: azaroaren 29a', tarjeta: 'Hauteskunde orokorrak · azaroaren 29a', llamada: 'Azaroaren 29an bozkatu aurretik, ezagutu ezazu zure ordezkaria. ',
     },
     temas: { vivienda: 'Etxebizitza', economia: 'Ekonomia eta zergak', trabajo: 'Lana eta pentsioak', sanidad: 'Osasuna eta zaintzak', educacion: 'Hezkuntza eta kultura', igualdad: 'Berdintasuna eta gizarte-eskubideak', justicia: 'Justizia eta segurtasuna', migracion: 'Migrazioa eta nazionalitatea', exterior: 'Kanpo-politika', defensa: 'Defentsa', transporte: 'Garraioa eta azpiegiturak', territorio: 'Autonomia-erkidegoak', 'campo-medioambiente': 'Landa, energia eta ingurumena', instituciones: 'Erakundeak eta gardentasuna', otros: 'Besteak' },
     vinculos: {
@@ -144,10 +144,10 @@ export default area(es, {
     },
     candidatura: '{grupo} ({partido} hautagaitza)',
     palabras: {
-      diputados: ['{n} diputatu', '{n} diputatu'], propiedades: ['{n} jabetza', '{n} jabetza'], viviendas: ['{n} etxebizitza', '{n} etxebizitza'],
-      vehiculos: ['{n} ibilgailu', '{n} ibilgailu'], cerrar: 'Itxi', sinDatos: 'daturik ez', alMes: 'hilean', lecturaNoConfirmada: 'Irakurketa berretsi gabea',
+      diputados: ['diputatu {n}', '{n} diputatu'], propiedades: ['jabetza {n}', '{n} jabetza'], viviendas: ['etxebizitza {n}', '{n} etxebizitza'],
+      vehiculos: ['ibilgailu {n}', '{n} ibilgailu'], cerrar: 'Itxi', sinDatos: 'daturik gabe', alMes: 'hilean', lecturaNoConfirmada: 'Berretsi gabeko irakurketa',
     },
-    noEncontrada: { titulo: 'Ez da orria aurkitu', descripcion: 'Bilatzen duzun orria ez dago.', texto: 'Helbidea ez dago edo aldatu egin da.', volver: 'Joan hemizikloara' },
+    noEncontrada: { titulo: 'Ez da orria aurkitu', descripcion: 'Bilatzen duzun orria ezin da aurkitu.', texto: 'Helbidea ez dago erabilgarri edo aldatu egin da.', volver: 'Joan hemizikloara' },
   },
   gl: {
     nav: { estadisticas: 'Estatísticas', datos: 'Datos', descargar: 'Descargar', mas: 'Máis', tarjetas: 'Tarxetas', masTitulo: 'Máis páxinas', seccionDatos: 'Estatísticas e descargas', hemiciclo: 'Hemiciclo', diputados: 'Deputados', votaciones: 'Votacións', votacionesCorto: 'Votos', metodologia: 'Metodoloxía', metodologiaCorto: 'Método', colabora: 'Colabora' },
