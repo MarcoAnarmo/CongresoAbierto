@@ -193,9 +193,9 @@ export default area(es, {
     leadCorto: 'Zer bozkatu den Osoko Bilkuran {año}tik, emaitza eta talde bakoitzak nola bozkatu duen.',
     vistas: { grupo: 'Nola ikusi bozketak', todas: 'Guztiak', claveLargo: 'Etxebizitzako gakoak', claveCorto: 'Etxebizitza', calendario: 'Egutegia' },
     filtros: {
-      zona: 'Bilatu bozketak', etiqueta: 'Bilatu bozketetan', placeholder: 'Bilatu: alokairua, pentsioak…', filtrar: 'Filtratu',
+      zona: 'Bilatu bozketak', etiqueta: 'Bilatu bozketetan', placeholder: 'Bilatu: alokairua, pentsioak…', filtrar: 'Iragazi',
       tema: 'Gaia', todosTemas: 'Gai guztiak', tipo: 'Ekimen mota', todosTipos: 'Mota guztiak', resultado: 'Emaitza', cualquiera: 'Edozein emaitza',
-      si: 'Onartuak edo baliozkotuak', no: 'Baztertuak edo indargabetuak', titulo: 'Filtratu bozketak', quitar: 'Filtroak kendu', ver: 'Ikusi emaitzak',
+      si: 'Onartuak edo baliozkotuak', no: 'Baztertuak edo indargabetuak', titulo: 'Iragazi bozketak', quitar: 'Iragazkiak kendu', ver: 'Ikusi emaitzak',
     },
     tiposPlural: { rdl: 'Lege-dekretuak', pl: 'Lege-proposamenak', pnl: 'Legez besteko proposamenak', mocion: 'Mozioak', leg: 'Legeen izapidetzea', int: 'Nazioarteko hitzarmenak', otro: 'Besteak' },
     verMas: 'Ikusi bozketa gehiago',
@@ -204,7 +204,7 @@ export default area(es, {
       zona: 'Bozketen egutegia', anterior: 'Bozketak dituen aurreko hila', mes: 'Hila', siguiente: 'Bozketak dituen hurrengo hila',
       aprobadas: 'onartuak edo baliozkotuak', rechazadas: 'baztertuak edo indargabetuak', pendiente: 'botoa zain', verMes: 'Ikusi hil osoa', semana: 'short',
     },
-    vacio: 'Ez dago bilaketarekin edo filtroekin bat datorren bozketarik.',
+    vacio: 'Ez dago bilaketarekin edo iragazkiekin bat datorren bozketarik.',
     glosario: {
       titulo: 'Prozeduraren glosarioa',
       rdl: { t: 'Convalidación o derogación de Reales Decretos-leyes (errege lege-dekretuak baliozkotzea edo indargabetzea)', d: 'Kongresuak erabakitzen du Gobernuaren lege-dekretu batek indarrean jarraitzen duen (baliozkotzea) edo indargabetuta geratzen den (Konstituzioaren 86. art.). Gorteak deseginda daudenean, Diputazio Iraunkorrak erabakitzen du (78. art.).' },
