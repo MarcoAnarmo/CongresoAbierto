@@ -198,7 +198,7 @@ const ruct = `<a href="https://www.educacion.gob.es/ruct/consultauniversidades?a
             </span>
           </span>
           <span class="t-cifra">
-            <span data-k="pr"><strong>{d.patrimonio.propiedades ?? '—'}</strong><small><span class="sr-only">{t.ficha.srPropiedades}</span>{f(t.ficha.vivAbrev, { n: d.patrimonio.viviendas ?? '—' })}</small></span>
+            <span data-k="pr"><strong>{d.patrimonio.propiedades ?? '—'}</strong><small>{d.patrimonio.propiedades === 1 ? t.ficha.propiedades[0] : t.ficha.propiedades[1]}</small>{d.patrimonio.viviendas !== null && <small>{pl(d.patrimonio.viviendas, palabras.viviendas, lang)}</small>}</span>
             <span data-k="v"><strong>{d.patrimonio.viviendas ?? '—'}</strong><small>{t.ficha.viviendas}</small></span>
             <span data-k="co"><strong>{d.patrimonio.vehiculos ?? '—'}</strong><small>{t.ficha.vehiculos}</small></span>
             <span data-k="r"><strong>{fmtNum(Math.round(d.retribucion.totalMensual))}</strong><small>{t.ficha.alMes}</small></span>
