@@ -7,7 +7,9 @@ const es = {
     /** Lema y subtítulo: siempre sin punto final. */
     lema: 'Conoce a quien te representa',
     subtitulo: 'Transparencia y acceso fácil a datos oficiales del Congreso',
-    descripcion: 'Conoce a quien te representa · Transparencia y acceso fácil a datos oficiales del Congreso: quiénes son los 350 diputados, qué declaran y cómo votan.',
+    /** Título de la portada en los buscadores («Congreso Abierto · …»). */
+    plataforma: 'Plataforma de transparencia legislativa',
+    descripcion: 'Plataforma de transparencia legislativa: cómo vota cada uno de los 350 diputados del Congreso, lo que cobran, sus propiedades, estudios y trabajos anteriores. Solo datos oficiales.',
     inicio: 'Congreso Abierto, inicio',
     navPrincipal: 'Principal',
     saltar: 'Saltar al contenido',
@@ -78,7 +80,8 @@ export default area(es, {
     marca: {
       lema: 'Coneix qui et representa',
       subtitulo: 'Transparència i accés fàcil a dades oficials del Congrés',
-      descripcion: 'Coneix qui et representa · Transparència i accés fàcil a dades oficials del Congrés: qui són els 350 diputats, què declaren i com voten.',
+      plataforma: 'Plataforma de transparència legislativa',
+      descripcion: 'Plataforma de transparència legislativa: com vota cadascun dels 350 diputats del Congrés, què cobren, les seves propietats, estudis i feines anteriors. Només dades oficials.',
       inicio: 'Congreso Abierto, inici',
       navPrincipal: 'Principal',
       saltar: 'Salta al contingut',
@@ -114,9 +117,10 @@ export default area(es, {
   eu: {
     nav: { estadisticas: 'Estatistikak', datos: 'Datuak', descargar: 'Deskargatu', mas: 'Gehiago', tarjetas: 'Txartelak', masTitulo: 'Orrialde gehiago', seccionDatos: 'Estatistikak eta deskargak', hemiciclo: 'Hemizikloa', diputados: 'Diputatuak', votaciones: 'Bozketak', votacionesCorto: 'Botoak', metodologia: 'Metodologia', metodologiaCorto: 'Metodoa', colabora: 'Lagun ezazu' },
     marca: {
-      lema: 'Ezagutu  zure ordezkaria',
+      lema: 'Ezagutu zure ordezkaria',
       subtitulo: 'Gardentasuna eta Kongresuko datu ofizialetarako sarbide erraza',
-      descripcion: 'Ezagutu zure ordezkaria · Gardentasuna eta Kongresuko datu ofizialetarako sarbide erraza: nortzuk diren 350 diputatuak, zer aitortzen duten eta nola bozkatzen duten.',
+      plataforma: 'Legegintza-gardentasunerako plataforma',
+      descripcion: 'Legegintza-gardentasunerako plataforma: nola bozkatzen duen Kongresuko 350 diputatuetako bakoitzak, zenbat kobratzen duten, haien jabetzak, ikasketak eta aurreko lanak. Datu ofizialak soilik.',
       inicio: 'Congreso Abierto, hasiera',
       navPrincipal: 'Nagusia',
       saltar: 'Joan edukira',
@@ -154,7 +158,8 @@ export default area(es, {
     marca: {
       lema: 'Coñece a quen te representa',
       subtitulo: 'Transparencia e acceso doado a datos oficiais do Congreso',
-      descripcion: 'Coñece a quen te representa · Transparencia e acceso doado a datos oficiais do Congreso: quen son os 350 deputados, que declaran e como votan.',
+      plataforma: 'Plataforma de transparencia lexislativa',
+      descripcion: 'Plataforma de transparencia lexislativa: como vota cada un dos 350 deputados do Congreso, canto cobran, as súas propiedades, estudos e traballos anteriores. Só datos oficiais.',
       inicio: 'Congreso Abierto, inicio',
       navPrincipal: 'Principal',
       saltar: 'Ir ao contido',
@@ -192,7 +197,8 @@ export default area(es, {
     marca: {
       lema: 'Know who represents you',
       subtitulo: 'Transparency and easy access to official data from the Spanish Congress',
-      descripcion: 'Know who represents you · Transparency and easy access to official data from the Spanish Congress: who the 350 deputies are, what they declare and how they vote.',
+      plataforma: 'Legislative transparency platform for Spain',
+      descripcion: 'Legislative transparency platform: how each of the 350 deputies in the Spanish Congress votes, what they are paid, their property, education and previous jobs. Only official data.',
       inicio: 'Congreso Abierto, home',
       navPrincipal: 'Main',
       saltar: 'Skip to content',
