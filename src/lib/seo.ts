@@ -13,8 +13,8 @@ const abs = (p: string) => new URL(p, SITIO).href;
 
 /** Organización y sitio web (portada). */
 export const sitio = (lang: string, nombre: string, descripcion: string): JsonLd[] => [
-  { '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITIO}/#web`, url: abs('/'), name: nombre, description: descripcion, inLanguage: lang, publisher: { '@id': `${SITIO}/#org` } },
-  { '@context': 'https://schema.org', '@type': 'Organization', '@id': `${SITIO}/#org`, name: 'Congreso Abierto', url: abs('/'), logo: abs('/apple-touch-icon.png'), email: 'ayuda@congresoabierto.org', sameAs: [REPO] },
+  { '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITIO}/#web`, url: abs('/'), name: nombre, alternateName: ['Congreso Abierto España', 'congresoabierto.org'], description: descripcion, inLanguage: lang, publisher: { '@id': `${SITIO}/#org` } },
+  { '@context': 'https://schema.org', '@type': 'Organization', '@id': `${SITIO}/#org`, name: 'Congreso Abierto', url: abs('/'), logo: abs('/apple-touch-icon.png'), description: descripcion, areaServed: { '@type': 'Country', name: 'España' }, email: 'ayuda@congresoabierto.org', sameAs: [REPO] },
 ];
 
 /** Migas de pan: [['Diputados', '/diputados'], ['Nombre', '/diputado/…']]. */
